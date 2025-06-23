@@ -1,0 +1,274 @@
+'use client';
+
+import React, { useState, useRef } from 'react';
+import { Monitor, PlayCircle, User } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import * as Dialog from '@/components/ui/dialog';
+import { useSettings } from '@/hooks/use-settings';
+import { useAuth } from '@/hooks/use-auth';
+import { SettingSection } from './setting-section';
+import { toast } from '@/components/toast';
+import type { SettingCardProps } from './setting-card';
+import { SettingsNav } from './settings-nav';
+import { useStorage } from '@/hooks/use-storage';
+import { useLanguage } from '@/hooks/use-language';
+
+// Define the type for settingsSections
+interface SettingsSection {
+  id: string;
+  icon: LucideIcon;
+  name: string;
+  description: string;
+  cardItems: SettingCardProps[];
+}
+
+// Update props to support controlled and uncontrolled usage
+interface SettingsModalProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+}
+
+export function SettingsModal({
+  open,
+  onOpenChange,
+  children,
+}: SettingsModalProps) {
+  const { t } = useLanguage();
+  const [activeSectionIndex, setActiveSectionIndex] = useState<number>(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isClearing, setIsClearing] = useState(false);
+  const { clearAllStorage } = useStorage();
+  const { settings, setSetting } = useSettings();
+  const { did } = useAuth();
+  const [tempName, setTempName] = useState(settings.name);
+
+  // Handlers for cards
+  const handleDisplayNameChange = (value: string) => setTempName(value);
+  const handleDisplayNameSave = () => setSetting('name', tempName);
+
+  // Avatar/photo logic
+  const handleAvatarButtonClick = () => fileInputRef.current?.click();
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result;
+        if (typeof result === 'string') {
+          setSetting('avatar', result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  const handleRemoveAvatar = () => {
+    setSetting('avatar', null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Clear all storage logic
+  const handleClearStorage = async () => {
+    setIsClearing(true);
+    try {
+      await clearAllStorage();
+      toast({
+        type: 'success',
+        description: t('settings.system.clearAllStorage.success'),
+      });
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to clear storage:', error);
+      toast({
+        type: 'error',
+        description: t('settings.system.clearAllStorage.error'),
+      });
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  // Settings sections using SettingCard variants
+  const settingsSections: SettingsSection[] = [
+    {
+      id: 'profile',
+      icon: User,
+      name: t('settings.sections.profile.title'),
+      description: t('settings.sections.profile.subtitle'),
+      cardItems: [
+        {
+          variant: 'single-input',
+          title: t('settings.profile.displayName.title'),
+          description: t('settings.profile.displayName.description'),
+          value: tempName,
+          onChange: handleDisplayNameChange,
+          placeholder: t('settings.profile.displayName.placeholder'),
+          buttonLabel: t('settings.profile.displayName.save'),
+          onButtonClick: handleDisplayNameSave,
+          disabled: tempName === settings.name && settings.name !== '',
+        },
+        {
+          variant: 'avatar',
+          title: t('settings.profile.photo.title'),
+          description: t('settings.profile.photo.description'),
+          avatarUrl: settings.avatar,
+          onAvatarChange: handleAvatarChange,
+          onRemoveAvatar: handleRemoveAvatar,
+          onUploadClick: handleAvatarButtonClick,
+          uploadLabel: t('settings.profile.photo.changePhoto'),
+          removeLabel: t('settings.profile.photo.remove'),
+          fileInputRef: fileInputRef,
+          fileTypesHint: t('settings.profile.photo.fileTypes'),
+          fallbackUrl: did ? `https://avatar.vercel.sh/${did}` : undefined,
+        },
+        {
+          variant: 'info',
+          title: t('settings.profile.didInformation.title'),
+          description: t('settings.profile.didInformation.description'),
+          info: did || '',
+          copyLabel: t('settings.profile.didInformation.copy'),
+          copiedLabel: t('settings.profile.didInformation.copied'),
+        },
+      ],
+    },
+
+    {
+      id: 'system',
+      icon: Monitor,
+      name: t('settings.sections.system.title'),
+      description: t('settings.sections.system.subtitle'),
+      cardItems: [
+        {
+          variant: 'danger-action',
+          title: t('settings.system.clearAllStorage.title'),
+          description: t('settings.system.clearAllStorage.description'),
+          buttonLabel: t('settings.system.clearAllStorage.button'),
+          onClick: handleClearStorage,
+          disabled: isClearing,
+          confirmationTitle: t('settings.system.clearAllStorage.confirmTitle'),
+          confirmationDescription: t(
+            'settings.system.clearAllStorage.confirmDescription',
+          ),
+          confirmationButtonLabel: t(
+            'settings.system.clearAllStorage.confirmButton',
+          ),
+          cancelButtonLabel: t('settings.system.clearAllStorage.cancel'),
+        },
+      ],
+    },
+    {
+      id: 'placeholders',
+      icon: PlayCircle,
+      name: t('settings.sections.placeholders.title'),
+      description: t('settings.sections.placeholders.subtitle'),
+      cardItems: [
+        {
+          variant: 'single-input',
+          title: 'Single Input',
+          description: 'A single input with a save button.',
+          value: 'Mock value',
+          onChange: () => {},
+          placeholder: 'Enter something...',
+          buttonLabel: 'Save',
+          onButtonClick: () => {},
+          disabled: false,
+        },
+        {
+          variant: 'single-select',
+          title: 'Single Select',
+          description: 'A single select dropdown.',
+          value: 'option1',
+          onChange: () => {},
+          options: [
+            { label: 'Option 1', value: 'option1' },
+            { label: 'Option 2', value: 'option2' },
+          ],
+          disabled: false,
+        },
+        {
+          variant: 'switch',
+          title: 'Switch',
+          description: 'A switch toggle.',
+          checked: true,
+          onChange: () => {},
+          disabled: false,
+        },
+        {
+          variant: 'info',
+          title: 'Info',
+          description: 'An info card with copy.',
+          info: 'Mock info to copy',
+          copyLabel: 'Click to copy',
+          copiedLabel: 'Copied!',
+        },
+        {
+          variant: 'danger-action',
+          title: 'Danger Action',
+          description: 'A dangerous action with confirmation.',
+          buttonLabel: 'Delete',
+          onClick: () => {},
+          disabled: false,
+          confirmationTitle: 'Are you sure?',
+          confirmationDescription: 'This cannot be undone.',
+          confirmationButtonLabel: 'Delete',
+          cancelButtonLabel: 'Cancel',
+        },
+        {
+          variant: 'avatar',
+          title: 'Avatar',
+          description: 'Upload or remove your avatar.',
+          avatarUrl: null,
+          onAvatarChange: () => {},
+          onRemoveAvatar: () => {},
+          onUploadClick: () => {},
+          uploadLabel: 'Upload',
+          removeLabel: 'Remove',
+          fileInputRef: { current: null },
+          fileTypesHint: 'PNG, JPG, GIF',
+          fallbackUrl: 'https://avatar.vercel.sh/mock',
+        },
+      ],
+    },
+  ];
+
+  const activeSection = settingsSections[activeSectionIndex];
+
+  return (
+    <Dialog.Dialog
+      {...(open !== undefined && onOpenChange ? { open, onOpenChange } : {})}
+    >
+      {children && (
+        <Dialog.DialogTrigger asChild>{children}</Dialog.DialogTrigger>
+      )}
+      <Dialog.DialogContent
+        className="fixed left-1/2 top-1/2 z-50 grid -translate-x-1/2 -translate-y-1/2 gap-0 border bg-background p-0 shadow-lg sm:rounded-lg overflow-hidden"
+        style={{
+          width: '80vw',
+          maxWidth: 800,
+          height: '80vh',
+          maxHeight: 700,
+        }}
+        aria-describedby={undefined}
+      >
+        <Dialog.DialogTitle className="sr-only">Settings</Dialog.DialogTitle>
+        <div className="size-full overflow-auto hide-scrollbar">
+          <div className="mx-auto w-full px-16 pb-8">
+            <SettingsNav
+              settingsSections={settingsSections}
+              setActiveSectionIndex={setActiveSectionIndex}
+              activeSectionIndex={activeSectionIndex}
+            />
+            <SettingSection
+              key={activeSection.id}
+              title={activeSection.name}
+              description={activeSection.description}
+              settingCards={activeSection.cardItems}
+            />
+          </div>
+        </div>
+      </Dialog.DialogContent>
+    </Dialog.Dialog>
+  );
+}

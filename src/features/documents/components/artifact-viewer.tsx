@@ -1,0 +1,248 @@
+import { formatDistance } from 'date-fns';
+import { useCallback, useEffect, useState } from 'react';
+import { useDebounceCallback } from 'usehooks-ts';
+import type { UseChatHelpers } from '@ai-sdk/react';
+
+import { VersionFooter } from '@/components/version-footer';
+import { ArtifactActions } from '@/components/artifact-actions';
+import { ArtifactCloseButton } from '@/components/artifact-close-button';
+
+import { useCurrentDocument } from '@/hooks/use-document-current';
+import { useDocuments } from '@/hooks/use-documents';
+import type { Document } from '@/stores/document-store';
+import { artifactDefinitions } from '@/artifacts';
+
+interface ArtifactViewerProps {
+  chatId: string;
+  status: UseChatHelpers['status'];
+  width?: number;
+}
+
+export function ArtifactViewer({ chatId, status, width }: ArtifactViewerProps) {
+  const {
+    currentDocument: artifact,
+    setCurrentDocument,
+    metadata,
+    setMetadata,
+  } = useCurrentDocument();
+  const {
+    documentsMap,
+    getDocuments,
+    updateDocument: updateDocumentInStore,
+  } = useDocuments();
+
+  // Use document store instead of SWR
+  const [versionedDocuments, setVersionedDocuments] = useState<Array<Document>>(
+    [],
+  );
+  const [isDocumentsFetching, setIsDocumentsFetching] = useState(false);
+
+  useEffect(() => {
+    if (artifact.documentId !== 'init' && artifact.status !== 'streaming') {
+      const currentDocuments = getDocuments(artifact.documentId);
+      if (currentDocuments) {
+        setVersionedDocuments(currentDocuments);
+      }
+    }
+  }, [documentsMap, artifact.documentId, artifact.status, getDocuments]);
+
+  const [mode, setMode] = useState<'edit' | 'diff'>('edit');
+  const [document, setDocument] = useState<Document | null>(null);
+  const [currentVersionIndex, setCurrentVersionIndex] = useState(-1);
+
+  useEffect(() => {
+    if (versionedDocuments && versionedDocuments.length > 0) {
+      const mostRecentDocument = versionedDocuments.at(-1);
+
+      if (mostRecentDocument) {
+        setDocument(mostRecentDocument);
+        setCurrentVersionIndex(versionedDocuments.length - 1);
+        setCurrentDocument((currentDocument) => ({
+          ...currentDocument,
+          content: mostRecentDocument.content ?? '',
+        }));
+      }
+    }
+  }, [versionedDocuments, setCurrentDocument]);
+
+  const [isContentDirty, setIsContentDirty] = useState(false);
+
+  const handleContentChange = useCallback(
+    (updatedContent: string) => {
+      if (!artifact || !document) return;
+
+      if (document.content !== updatedContent) {
+        // Update document in local store
+        updateDocumentInStore(artifact.documentId, {
+          content: updatedContent,
+          updatedAt: Date.now(),
+        });
+
+        setIsContentDirty(false);
+
+        // Update local state
+        const newDocument = {
+          ...document,
+          content: updatedContent,
+          updatedAt: Date.now(),
+        };
+        setVersionedDocuments([newDocument]);
+      }
+    },
+    [artifact, document, updateDocumentInStore],
+  );
+
+  const debouncedHandleContentChange = useDebounceCallback(
+    handleContentChange,
+    2000,
+  );
+
+  const saveContent = useCallback(
+    (updatedContent: string, debounce: boolean) => {
+      if (document && updatedContent !== document.content) {
+        setIsContentDirty(true);
+
+        if (debounce) {
+          debouncedHandleContentChange(updatedContent);
+        } else {
+          handleContentChange(updatedContent);
+        }
+      }
+    },
+    [document, debouncedHandleContentChange, handleContentChange],
+  );
+
+  function getDocumentContentById(index: number) {
+    if (!versionedDocuments) return '';
+    if (!versionedDocuments[index]) return '';
+    return versionedDocuments[index].content ?? '';
+  }
+
+  const handleVersionChange = (type: 'next' | 'prev' | 'toggle' | 'latest') => {
+    if (!versionedDocuments) return;
+
+    if (type === 'latest') {
+      setCurrentVersionIndex(versionedDocuments.length - 1);
+      setMode('edit');
+    }
+
+    if (type === 'toggle') {
+      setMode((mode) => (mode === 'edit' ? 'diff' : 'edit'));
+    }
+
+    if (type === 'prev') {
+      if (currentVersionIndex > 0) {
+        setCurrentVersionIndex((index) => index - 1);
+      }
+    } else if (type === 'next') {
+      if (currentVersionIndex < versionedDocuments.length - 1) {
+        setCurrentVersionIndex((index) => index + 1);
+      }
+    }
+  };
+
+  /*
+   * NOTE: if there are no documents, or if
+   * the documents are being fetched, then
+   * we mark it as the current version.
+   */
+
+  const isCurrentVersion =
+    versionedDocuments && versionedDocuments.length > 0
+      ? currentVersionIndex === versionedDocuments.length - 1
+      : true;
+
+  const artifactDefinition = artifactDefinitions.find(
+    (definition) => definition.kind === artifact.kind,
+  );
+
+  if (!artifactDefinition) {
+    throw new Error('Artifact definition not found!');
+  }
+
+  useEffect(() => {
+    if (artifact.documentId !== 'init') {
+      if (artifactDefinition.initialize) {
+        artifactDefinition.initialize({
+          documentId: artifact.documentId,
+          setMetadata,
+        });
+      }
+    }
+  }, [artifact.documentId, artifactDefinition, setMetadata]);
+
+  return (
+    <div
+      data-testid="artifact-viewer"
+      className="dark:bg-muted bg-background h-dvh flex flex-col overflow-y-scroll md:border-r dark:border-zinc-700 border-zinc-200 transition-all duration-300 ease-in-out animate-fade-in"
+      style={{ width: width || 'calc(100dvw - 400px)' }}
+    >
+      <div className="p-2 flex flex-row justify-between items-start">
+        <div className="flex flex-row gap-4 items-start">
+          <ArtifactCloseButton chatId={chatId} />
+
+          <div className="flex flex-col">
+            <div className="font-medium">{artifact.title}</div>
+
+            {isContentDirty ? (
+              <div className="text-sm text-muted-foreground">
+                Saving changes...
+              </div>
+            ) : document ? (
+              <div className="text-sm text-muted-foreground">
+                {`Updated ${formatDistance(
+                  new Date(document.updatedAt),
+                  new Date(),
+                  {
+                    addSuffix: true,
+                  },
+                )}`}
+              </div>
+            ) : (
+              <div className="w-32 h-3 mt-2 bg-muted-foreground/20 rounded-md animate-pulse" />
+            )}
+          </div>
+        </div>
+
+        <ArtifactActions
+          artifact={artifact}
+          currentVersionIndex={currentVersionIndex}
+          handleVersionChange={handleVersionChange}
+          isCurrentVersion={isCurrentVersion}
+          mode={mode}
+          metadata={metadata}
+          setMetadata={setMetadata}
+        />
+      </div>
+
+      <div className="dark:bg-muted bg-background h-full overflow-y-scroll !max-w-full items-center">
+        <artifactDefinition.content
+          title={artifact.title}
+          content={
+            isCurrentVersion
+              ? artifact.content
+              : getDocumentContentById(currentVersionIndex)
+          }
+          mode={mode}
+          status={artifact.status === 'streaming' ? 'streaming' : 'idle'}
+          currentVersionIndex={currentVersionIndex}
+          onSaveContent={saveContent}
+          isInline={false}
+          isCurrentVersion={isCurrentVersion}
+          getDocumentContentById={getDocumentContentById}
+          isLoading={isDocumentsFetching && !artifact.content}
+          metadata={metadata}
+          setMetadata={setMetadata}
+        />
+      </div>
+
+      {!isCurrentVersion && (
+        <VersionFooter
+          currentVersionIndex={currentVersionIndex}
+          documents={versionedDocuments}
+          handleVersionChange={handleVersionChange}
+        />
+      )}
+    </div>
+  );
+}
