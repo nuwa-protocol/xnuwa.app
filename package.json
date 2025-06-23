@@ -43,10 +43,12 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tailwindcss/vite": "^4.1.10",
+    "ai": "^4.3.16",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dexie": "^4.0.11",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.522.0",
@@ -60,8 +62,10 @@
     "recharts": "^3.0.0",
     "sonner": "^2.0.5",
     "tailwind-merge": "^3.3.1",
+    "usehooks-ts": "^3.1.1",
     "vaul": "^1.1.2",
-    "zod": "^3.25.67"
+    "zod": "^3.25.67",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.4",
