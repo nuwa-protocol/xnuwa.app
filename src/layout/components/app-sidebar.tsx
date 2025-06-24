@@ -51,7 +51,7 @@ export function AppSidebar() {
     <>
       <Sidebar
         className={cn(
-          "group-data-[side=left]:border-r-0",
+          "group-data-[side=left]:border-r-0 min-w-[250px]",
           // Add smooth transition animations
           "transition-all duration-300 ease-in-out"
         )}
