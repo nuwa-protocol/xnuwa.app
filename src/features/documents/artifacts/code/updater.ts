@@ -1,4 +1,4 @@
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider } from '@/features/ai-chat/services';
 import { z } from 'zod';
 import { streamObject } from 'ai';
 

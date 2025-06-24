@@ -1,17 +1,14 @@
 import { CopyIcon } from 'lucide-react';
-import { useLanguage } from '@/hooks/use-language';
-import { toast } from '@/components/toast';
-import { getLocaleText } from '@/locales/use-locale';
+import { toast } from '@/shared/components/toast';
+import { getLocaleText } from '@/shared/locales';
 import type { ArtifactAction } from '../../types';
 
 export function createCopyAction(): ArtifactAction {
-  const { language, t } = useLanguage();
 
   return {
     icon: <CopyIcon size={18} />,
-    description: t('artifact.image.actions.copy'),
+    description: getLocaleText('en').t('artifact.image.actions.copy'),
     onClick: ({ content }) => {
-      const { t } = getLocaleText(language);
       const img = new Image();
       img.src = `data:image/png;base64,${content}`;
       img.onload = () => {
@@ -29,7 +26,7 @@ export function createCopyAction(): ArtifactAction {
         }, 'image/png');
       };
       toast({
-        description: t('artifact.image.copiedImage'),
+        description: getLocaleText('en').t('artifact.image.copiedImage'),
         type: 'success',
       });
     },

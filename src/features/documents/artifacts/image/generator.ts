@@ -1,4 +1,4 @@
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider } from '@/features/ai-chat/services';
 import { experimental_generateImage } from 'ai';
 
 export async function generateImageContent(

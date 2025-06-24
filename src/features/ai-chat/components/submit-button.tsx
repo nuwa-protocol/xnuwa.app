@@ -2,8 +2,8 @@
 
 import { useFormStatus } from 'react-dom';
 import { LoaderIcon } from 'lucide-react';
-import { Button } from './ui/button';
-import { useLanguage } from '@/hooks/use-language';
+import { Button } from '@/shared/components/ui/button';
+import { useLanguage } from '@/shared/hooks/use-language';
 
 export function SubmitButton({
   children,

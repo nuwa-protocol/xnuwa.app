@@ -2,9 +2,9 @@
 // Client-side file storage system using unified storage architecture
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { generateUUID } from '@/utils';
-import { NuwaIdentityKit } from '@/lib/identity-kit';
-import { unifiedDB, createPersistConfig } from '@/storage';
+import { generateUUID } from '@/shared/utils';
+import { NuwaIdentityKit } from '@/features/auth/services';
+import { db, createPersistConfig } from '@/storage';
 
 // ================= Constants & Types ================= //
 
@@ -83,7 +83,7 @@ interface FileStoreState {
 
 // ================= Database Reference ================= //
 
-const fileDB = unifiedDB;
+const fileDB = db;
 
 // ================= Persist Configuration ================= //
 

@@ -12,17 +12,14 @@ import { createLogsToolbarItem } from './toolbar/logs';
 export { generateCodeContent } from './generator';
 export { updateCodeContent } from './updater';
 
-import { useLanguage } from '@/hooks/use-language';
-
 interface Metadata {
   outputs: Array<ConsoleOutput>;
 }
 
-const { t } = useLanguage();
-
-export const codeArtifact = new Artifact<'code', Metadata>({
-  kind: 'code',
-  description: t('artifact.code.description'),
+export const createCodeArtifact = () => {
+  return new Artifact<'code', Metadata>({
+    kind: 'code',
+    description: 'Code artifact for running and displaying code',
   initialize: async ({ setMetadata }) => {
     setMetadata({ outputs: [] });
   },
@@ -34,4 +31,7 @@ export const codeArtifact = new Artifact<'code', Metadata>({
     createCopyAction(),
   ],
   toolbar: [createCommentsToolbarItem(), createLogsToolbarItem()],
-});
+  });
+};
+
+export const codeArtifact = createCodeArtifact();

@@ -1,23 +1,12 @@
 // cap-store.ts
 // Store for managing capability (Cap) installations and their states
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { NuwaIdentityKit } from '@/lib/identity-kit';
-import { unifiedDB, createPersistConfig } from '@/storage';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { NuwaIdentityKit } from "@/features/auth/services";
+import { createPersistConfig, db } from "@/storage";
+import type { InstalledCap } from "../types";
 
 // ================= Interfaces ================= //
-
-// Installed Cap interface (minimal data for locally installed caps)
-export interface InstalledCap {
-  id: string;
-  name: string;
-  tag: string;
-  description: string;
-  version: string;
-  installDate: number;
-  isEnabled?: boolean;
-  settings?: Record<string, any>;
-}
 
 // Cap store state interface - only handles installed caps
 interface CapStoreState {
@@ -30,7 +19,7 @@ interface CapStoreState {
 
   // Cap actions
   installCap: (
-    cap: Omit<InstalledCap, 'installDate' | 'isEnabled' | 'did'>,
+    cap: Omit<InstalledCap, "installDate" | "isEnabled" | "did">
   ) => void;
   uninstallCap: (id: string) => void;
   isCapInstalled: (id: string) => boolean;
@@ -63,12 +52,12 @@ const getCurrentDID = async () => {
 };
 
 // Database reference
-const capDB = unifiedDB;
+const capDB = db;
 
 // ================= Persist Configuration ================= //
 
 const persistConfig = createPersistConfig<CapStoreState>({
-  name: 'cap-storage',
+  name: "cap-storage",
   getCurrentDID: getCurrentDID,
   partialize: (state) => ({
     installedCaps: state.installedCaps,
@@ -97,7 +86,7 @@ export const CapStateStore = create<CapStoreState>()(
       getAllInstalledCaps: () => {
         const { installedCaps } = get();
         return Object.values(installedCaps).sort(
-          (a, b) => b.installDate - a.installDate,
+          (a, b) => b.installDate - a.installDate
         );
       },
 
@@ -105,7 +94,7 @@ export const CapStateStore = create<CapStoreState>()(
         const { installedCaps } = get();
         const allCaps = Object.values(installedCaps);
 
-        if (category === 'all') {
+        if (category === "all") {
           return allCaps.sort((a, b) => b.installDate - a.installDate);
         }
 
@@ -116,7 +105,7 @@ export const CapStateStore = create<CapStoreState>()(
 
       // Installation management
       installCap: (
-        cap: Omit<InstalledCap, 'installDate' | 'isEnabled' | 'did'>,
+        cap: Omit<InstalledCap, "installDate" | "isEnabled" | "did">
       ) => {
         const { installedCaps } = get();
 
@@ -156,7 +145,7 @@ export const CapStateStore = create<CapStoreState>()(
           try {
             await capDB.caps.delete(id);
           } catch (error) {
-            console.error('Failed to delete cap from DB:', error);
+            console.error("Failed to delete cap from DB:", error);
           }
         };
         deleteFromDB();
@@ -254,9 +243,9 @@ export const CapStateStore = create<CapStoreState>()(
             const currentDID = await getCurrentDID();
             if (!currentDID) return;
 
-            await capDB.caps.where('did').equals(currentDID).delete();
+            await capDB.caps.where("did").equals(currentDID).delete();
           } catch (error) {
-            console.error('Failed to clear caps from DB:', error);
+            console.error("Failed to clear caps from DB:", error);
           }
         };
         clearDB();
@@ -271,20 +260,20 @@ export const CapStateStore = create<CapStoreState>()(
       getInstalledCapsByInstallDate: () => {
         const { installedCaps } = get();
         return Object.values(installedCaps).sort(
-          (a, b) => b.installDate - a.installDate,
+          (a, b) => b.installDate - a.installDate
         );
       },
 
       // Data persistence methods
       loadFromDB: async () => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === "undefined") return;
 
         try {
           const currentDID = await getCurrentDID();
           if (!currentDID) return;
 
           const caps = await capDB.caps
-            .where('did')
+            .where("did")
             .equals(currentDID)
             .toArray();
 
@@ -298,12 +287,12 @@ export const CapStateStore = create<CapStoreState>()(
             installedCaps: { ...state.installedCaps, ...capsMap },
           }));
         } catch (error) {
-          console.error('Failed to load caps from DB:', error);
+          console.error("Failed to load caps from DB:", error);
         }
       },
 
       saveToDB: async () => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === "undefined") return;
 
         try {
           const currentDID = await getCurrentDID();
@@ -313,10 +302,10 @@ export const CapStateStore = create<CapStoreState>()(
           const capsToSave = Object.values(installedCaps);
           await capDB.caps.bulkPut(capsToSave);
         } catch (error) {
-          console.error('Failed to save caps to DB:', error);
+          console.error("Failed to save caps to DB:", error);
         }
       },
     }),
-    persistConfig,
-  ),
+    persistConfig
+  )
 );

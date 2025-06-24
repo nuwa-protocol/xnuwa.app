@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { FileStateStore } from '@/stores/file-store';
+import { FileStateStore } from '@/features/ai-chat/stores';
 
 // Individual file hook
 export const useFile = (id: string) => {

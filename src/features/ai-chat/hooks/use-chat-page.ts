@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'react-router-dom';
 import { useChatSessions } from './use-chat-sessions';
 import {
   createInitialChatSession,
   type ChatSession,
-} from '@/stores/chat-store';
-import { convertToUIMessage } from '@/utils/message';
+} from '@/features/ai-chat/stores';
+import { convertToUIMessage } from '@/features/ai-chat/utils';
 
 // Specialized hook for chat page logic
 export const useChatPage = () => {
-  const searchParams = useSearchParams();
+  const [searchParams] = useSearchParams();
   const chatId = searchParams.get('cid');
   const { sessionsMap } = useChatSessions();
   const [chatSession, setChatSession] = useState<ChatSession | null>(null);

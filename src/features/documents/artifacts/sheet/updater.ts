@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { streamObject } from 'ai';
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider } from '@/features/ai-chat/services';
 
 export const updateDocumentPrompt = (currentContent: string | null) =>
   `\

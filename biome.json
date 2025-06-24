@@ -60,7 +60,9 @@
       "correctness": {
         "noUnusedImports": "warn",
         "useJsxKeyInIterable": "off",
-        "useExhaustiveDependencies": "off"
+        "useExhaustiveDependencies": "off",
+        "noUnusedVariables": "off",
+        "noUnusedFunctionParameters": "off"
       },
       "security": {
         "noDangerouslySetInnerHtml": "off",

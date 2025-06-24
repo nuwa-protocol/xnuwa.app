@@ -1,6 +1,6 @@
 import { streamObject } from 'ai';
 import z from 'zod';
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider } from '@/features/ai-chat/services';
 
 export const generateCodePrompt = `
 You are a Python code generator that creates self-contained, executable code snippets. When writing code:

@@ -1,15 +1,14 @@
 import { RedoIcon } from 'lucide-react';
-import { useLanguage } from '@/hooks/use-language';
+import { getLocaleText } from '@/shared/locales';
 import type { ArtifactAction } from '../../types';
 
 type Metadata = any;
 
 export function createRedoAction(): ArtifactAction<Metadata> {
-  const { t } = useLanguage();
 
   return {
     icon: <RedoIcon size={18} />,
-    description: t('artifact.sheet.actions.redo'),
+    description: getLocaleText('en').t('artifact.sheet.actions.redo'),
     onClick: ({ handleVersionChange }) => {
       handleVersionChange('next');
     },

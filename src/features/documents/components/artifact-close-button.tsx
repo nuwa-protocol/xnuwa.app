@@ -1,13 +1,12 @@
-import { memo } from 'react';
-import { useRouter } from 'next/navigation';
-import { CrossIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-import { useCurrentDocument } from '@/hooks/use-document-current';
+import { CrossIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { memo } from "react";
+import { useCurrentDocument } from "@/features/documents/hooks/use-document-current";
+import { Button } from "@/shared/components/ui/button";
 
 function PureArtifactCloseButton({ chatId }: { chatId: string }) {
   const { closeCurrentDocument } = useCurrentDocument();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   return (
     <Button
@@ -15,7 +14,7 @@ function PureArtifactCloseButton({ chatId }: { chatId: string }) {
       variant="outline"
       className="h-fit p-2 dark:hover:bg-zinc-700"
       onClick={() => {
-        router.push(`/chat?cid=${chatId}`);
+        navigate(`/chat?cid=${chatId}`);
         closeCurrentDocument();
       }}
     >

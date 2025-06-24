@@ -1,28 +1,29 @@
-import { Artifact } from '@/artifacts/types';
-import { useLanguage } from '@/hooks/use-language';
-import { TextContent } from './components/text-content';
-import { createVersionChangeAction } from './actions/version-change';
-import { createUndoAction } from './actions/undo';
-import { createRedoAction } from './actions/redo';
+import { Artifact } from '@/features/documents/artifacts/types';
 import { createCopyAction } from './actions/copy';
+import { createRedoAction } from './actions/redo';
+import { createUndoAction } from './actions/undo';
+import { createVersionChangeAction } from './actions/version-change';
+import { TextContent } from './components/text-content';
 import { createPolishToolbarItem } from './toolbar/polish';
 import { createSuggestionsToolbarItem } from './toolbar/suggestions';
 
-const { t } = useLanguage();
+export const createTextArtifact = () => {
+  return new Artifact<'text'>({
+    kind: 'text',
+    description: 'Text artifact for displaying and editing text',
+    initialize: async ({ documentId, setMetadata }) => {},
+    content: TextContent,
+    actions: [
+      createVersionChangeAction(),
+      createUndoAction(),
+      createRedoAction(),
+      createCopyAction(),
+    ],
+    toolbar: [createPolishToolbarItem(), createSuggestionsToolbarItem()],
+  });
+};
 
-export const textArtifact = new Artifact<'text'>({
-  kind: 'text',
-  description: t('artifact.text.description'),
-  initialize: async ({ documentId, setMetadata }) => {},
-  content: TextContent,
-  actions: [
-    createVersionChangeAction(),
-    createUndoAction(),
-    createRedoAction(),
-    createCopyAction(),
-  ],
-  toolbar: [createPolishToolbarItem(), createSuggestionsToolbarItem()],
-});
+export const textArtifact = createTextArtifact();
 
 export { generateTextContent } from './generator';
 export { updateTextContent } from './updater';

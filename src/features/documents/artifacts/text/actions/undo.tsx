@@ -1,13 +1,12 @@
 import { UndoIcon } from 'lucide-react';
-import { useLanguage } from '@/hooks/use-language';
+import { getLocaleText } from '@/shared/locales';
 import type { ArtifactAction } from '../../types';
 
 export function createUndoAction(): ArtifactAction {
-  const { t } = useLanguage();
 
   return {
     icon: <UndoIcon size={18} />,
-    description: t('artifact.text.actions.undo'),
+    description: getLocaleText('en').t('artifact.text.actions.undo'),
     onClick: ({ handleVersionChange }) => {
       handleVersionChange('prev');
     },

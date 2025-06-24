@@ -1,5 +1,5 @@
 import { ImageEditor } from './image-editor';
-import type { Document } from '@/stores/document-store';
+import type { Document } from '@/features/documents/stores';
 
 interface ImagePreviewProps {
   document: Document;

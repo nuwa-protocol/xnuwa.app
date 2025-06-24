@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { Artifact } from '@/components/artifact';
-import { useChatPage } from '@/hooks/use-chat-page';
-import Loading from '../loading';
+import { useChatPage } from "@/features/ai-chat/hooks/use-chat-page";
+import { Artifact } from "@/features/documents/components/artifact";
+import Loading from "@/shared/components/loading";
 
-export default function Page() {
+export default function ArtifactPage() {
   const { chatSession, isLoading, initialMessages } = useChatPage();
 
   if (isLoading || !chatSession) {

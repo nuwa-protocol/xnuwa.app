@@ -1,13 +1,12 @@
 import { RewindIcon } from 'lucide-react';
-import { useLanguage } from '@/hooks/use-language';
+import { getLocaleText } from '@/shared/locales';
 import type { ArtifactAction } from '../../types';
 
 export function createVersionChangeAction(): ArtifactAction {
-  const { t } = useLanguage();
 
   return {
     icon: <RewindIcon size={18} />,
-    description: t('artifact.text.actions.versionChange'),
+    description: getLocaleText('en').t('artifact.text.actions.versionChange'),
     onClick: ({ handleVersionChange }) => {
       handleVersionChange('toggle');
     },

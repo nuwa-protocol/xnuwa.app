@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useChatSessions } from '@/hooks/use-chat-sessions';
+import { useChatSessions } from '@/features/ai-chat/hooks/use-chat-sessions';
 
 export const useSearch = () => {
   const { sessionsMap } = useChatSessions();

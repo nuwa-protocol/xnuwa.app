@@ -1,6 +1,6 @@
-'use client';
-import { AssistantNav } from '@/components/assistant-nav';
-import { PathBreadcrumb } from './path-breadcrumb';
+"use client";
+import { AssistantNav } from "./assistant-nav";
+import { PathBreadcrumb } from "./path-breadcrumb";
 
 export default function Header() {
   return (

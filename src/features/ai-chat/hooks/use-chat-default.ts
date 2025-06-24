@@ -1,24 +1,24 @@
-import type { UIMessage } from 'ai';
-import { ErrorHandlers } from '@/errors/error-handler';
-import { useChat } from '@ai-sdk/react';
-import { generateUUID } from '@/utils';
-import { createClientAIFetch } from '@/lib/ai';
-import { ChatSDKError } from '@/errors/chatsdk-errors';
+import { useChat } from "@ai-sdk/react";
+import type { UIMessage } from "ai";
+import { ChatSDKError } from "@/shared/errors/chatsdk-errors";
+import { ErrorHandlers } from "@/shared/errors/error-handler";
+import { generateUUID } from "@/shared/utils";
+import { createClientAIFetch } from "../services";
 
 export const useChatDefault = (
   chatId: string,
-  initialMessages: UIMessage[],
+  initialMessages: UIMessage[]
 ) => {
   const handleUseChatError = (error: Error) => {
     let errorMessage: UIMessage;
     if (error instanceof ChatSDKError) {
       errorMessage = ErrorHandlers.api(error.message);
-    } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+    } else if (error.name === "TypeError" && error.message.includes("fetch")) {
       errorMessage = ErrorHandlers.network(
-        'Failed to connect to the AI service',
+        "Failed to connect to the AI service"
       );
-    } else if (error.message.includes('timeout')) {
-      errorMessage = ErrorHandlers.timeout('AI response');
+    } else if (error.message.includes("timeout")) {
+      errorMessage = ErrorHandlers.timeout("AI response");
     } else {
       errorMessage = ErrorHandlers.generic(error.message);
     }
@@ -46,7 +46,6 @@ export const useChatDefault = (
     experimental_prepareRequestBody: (body) => ({
       id: chatId,
       messages: body.messages,
-      lastMessage: body.messages.at(-1),
     }),
     onError: handleUseChatError,
   });

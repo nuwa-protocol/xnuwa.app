@@ -3,7 +3,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { ChatStateStore } from '@/stores/chat-store';
+import { ChatStateStore } from '@/features/ai-chat/stores';
 
 export const useChatStreams = () => {
   const store = ChatStateStore();

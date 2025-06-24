@@ -1,5 +1,5 @@
-import { SpreadsheetEditor } from '@/artifacts/sheet/components/sheet-editor';
-import type { Document } from '@/stores/document-store';
+import { SpreadsheetEditor } from '@/features/documents/artifacts/sheet/components/sheet-editor';
+import type { Document } from '@/features/documents/stores';
 
 interface SheetPreviewProps {
   document: Document;

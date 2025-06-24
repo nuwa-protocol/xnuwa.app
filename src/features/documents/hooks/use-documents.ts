@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { DocumentStateStore } from '@/stores/document-store';
-import type { Document } from '@/stores/document-store';
-import { generateUUID } from '@/utils';
+import { DocumentStateStore } from '@/features/documents/stores';
+import type { Document } from '@/features/documents/types';
+import { generateUUID } from '@/shared/utils';
 
 // Documents management hook with business logic
 export const useDocuments = () => {

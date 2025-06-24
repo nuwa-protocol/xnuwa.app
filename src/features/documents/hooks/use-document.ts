@@ -1,8 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { DocumentStateStore } from '@/stores/document-store';
-import type { Document } from '@/stores/document-store';
+import { DocumentStateStore, type Document } from '@/features/documents/stores';
 import { useDocuments } from './use-documents';
 
 export const useDocument = (id: string) => {

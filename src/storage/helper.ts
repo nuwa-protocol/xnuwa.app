@@ -14,21 +14,21 @@ export function createStorageKey(baseKey: string, did: string | null): string {
  */
 export function createPersistStorage<T>(config: PersistConfig<T>) {
   return {
-    getItem: async (name: string): Promise<string | null> => {
+    getItem: async (): Promise<string | null> => {
       const did = await config.getCurrentDID();
       const key = createStorageKey(config.name, did);
       const data = await storageActions.syncFromCache<T>(key);
       return data ? JSON.stringify(data) : null;
     },
 
-    setItem: async (name: string, value: string): Promise<void> => {
+    setItem: async (value: string): Promise<void> => {
       const did = await config.getCurrentDID();
       const key = createStorageKey(config.name, did);
       const data = JSON.parse(value);
       await storageActions.syncToCache(key, data);
     },
 
-    removeItem: async (name: string): Promise<void> => {
+    removeItem: async (): Promise<void> => {
       const did = await config.getCurrentDID();
       const key = createStorageKey(config.name, did);
       await storageActions.syncToCache(key, null);

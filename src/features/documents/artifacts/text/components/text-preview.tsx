@@ -1,5 +1,5 @@
-import { Editor } from '@/artifacts/text/components/text-editor';
-import type { Document } from '@/stores/document-store';
+import { Editor } from '@/features/documents/artifacts/text/components/text-editor';
+import type { Document } from '@/features/documents/stores';
 
 interface TextPreviewProps {
   document: Document;

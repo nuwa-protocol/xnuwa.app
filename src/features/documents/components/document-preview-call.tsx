@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import {
   FileIcon,
   LoaderIcon,
@@ -7,9 +7,9 @@ import {
   PencilIcon,
 } from 'lucide-react';
 
-import { toast } from '@/components/toast';
+import { toast } from '@/shared/components/toast';
 
-import { useLanguage } from '@/hooks/use-language';
+import { useLanguage } from '@/shared/hooks/use-language';
 
 const getActionText = (
   type: 'create' | 'update' | 'request-suggestions',
@@ -48,7 +48,7 @@ function PureDocumentToolCall({
   isReadonly,
 }: DocumentToolCallProps) {
   const { t } = useLanguage();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   return (
     <button
@@ -63,7 +63,7 @@ function PureDocumentToolCall({
           return;
         }
 
-        router.push(`/artifact?cid=${chatId}`);
+        navigate(`/artifact?cid=${chatId}`);
       }}
     >
       <div className="flex flex-row gap-3 items-start">

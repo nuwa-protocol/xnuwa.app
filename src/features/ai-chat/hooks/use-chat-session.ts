@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
-import { ChatStateStore } from '@/stores/chat-store';
-import type { ChatSession } from '@/stores/chat-store';
+import { ChatStateStore, type ChatSession } from '@/features/ai-chat/stores';
 import type { Message } from 'ai';
 
 export const useChatSession = (sessionId: string) => {

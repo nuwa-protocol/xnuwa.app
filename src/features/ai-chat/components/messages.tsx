@@ -5,7 +5,7 @@ import { memo } from 'react';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
-import { useMessages } from '@/hooks/use-messages';
+import { useMessages } from '@/features/ai-chat/hooks/use-messages';
 
 interface MessagesProps {
   chatId: string;

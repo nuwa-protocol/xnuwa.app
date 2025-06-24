@@ -1,42 +1,25 @@
 // document-store.ts
 // Store for managing documents, suggestions, and artifacts with unified storage
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { generateUUID } from '@/utils';
-import { NuwaIdentityKit } from '@/lib/identity-kit';
-import { unifiedDB, createPersistConfig } from '@/storage';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { NuwaIdentityKit } from "@/features/auth/services";
+import { generateUUID } from "@/shared/utils";
+import { createPersistConfig, db } from "@/storage";
+import type { CurrentDocumentProps, Document } from "../types";
 
-// ================= Interfaces ================= //
+// Re-export types for convenience
+export type { CurrentDocumentProps, Document } from "../types";
 
-// Document interface
-export interface Document {
-  id: string;
-  did?: string;
-  title: string;
-  content: string | null;
-  kind: 'text' | 'code' | 'image' | 'sheet';
-  createdAt: number;
-  updatedAt: number;
-}
-
-// Artifact interface (merged from use-artifact.ts)
-export interface CurrentDocumentProps {
-  documentId: string;
-  content: string;
-  kind: 'text' | 'code' | 'image' | 'sheet';
-  title: string;
-  status: 'streaming' | 'idle' | 'loading' | 'error' | 'success';
-}
 
 // ================= Constants ================= //
 
 // Empty document
 export const defaultEmptyDocument: CurrentDocumentProps = {
-  documentId: 'init',
-  content: '',
-  kind: 'text',
-  title: '',
-  status: 'idle',
+  documentId: "init",
+  content: "",
+  kind: "text",
+  title: "",
+  status: "idle",
 };
 
 // get current DID
@@ -47,7 +30,7 @@ const getCurrentDID = async () => {
 
 // ================= Database Reference ================= //
 
-const documentDB = unifiedDB;
+const documentDB = db;
 
 // ================= Store State Interface ================= //
 
@@ -57,24 +40,24 @@ interface DocumentStoreState {
   currentDocumentMetadata: Record<string, any>; // metadata for the current document
 
   // Document management
-  createDocument: (title: string, kind: Document['kind']) => string;
+  createDocument: (title: string, kind: Document["kind"]) => string;
   createDocumentWithId: (
     id: string,
     title: string,
-    kind: Document['kind'],
-    content?: string,
+    kind: Document["kind"],
+    content?: string
   ) => void;
   addNewVersionDocument: (id: string, content: string) => void;
   getDocument: (id: string) => Document | null;
   getDocuments: (id: string) => Document[];
   updateDocument: (
     id: string,
-    updates: Partial<Omit<Document, 'id' | 'createdAt'>>,
+    updates: Partial<Omit<Document, "id" | "createdAt">>
   ) => void;
   deleteDocument: (id: string) => void;
   deleteDocumentAfterTimestamp: (
     id: string,
-    updates: { content: string; timestamp: number },
+    updates: { content: string; timestamp: number }
   ) => void;
   setDocumentContent: (id: string, content: string) => void;
 
@@ -82,7 +65,7 @@ interface DocumentStoreState {
   setCurrentDocument: (
     updaterFn:
       | CurrentDocumentProps
-      | ((currentDocument: CurrentDocumentProps) => CurrentDocumentProps),
+      | ((currentDocument: CurrentDocumentProps) => CurrentDocumentProps)
   ) => void;
   UpdateCurrentDocument: (updates: Partial<CurrentDocumentProps>) => void;
   setCurrentDocumentMetadata: (metadata: any) => void;
@@ -101,7 +84,7 @@ interface DocumentStoreState {
 // ================= Persist Configuration ================= //
 
 const persistConfig = createPersistConfig<DocumentStoreState>({
-  name: 'document-storage',
+  name: "document-storage",
   getCurrentDID: getCurrentDID,
   partialize: (state) => ({
     documents: state.documents,
@@ -126,7 +109,7 @@ export const DocumentStateStore = create<DocumentStoreState>()(
       currentDocumentMetadata: {},
 
       // Document creation and management
-      createDocument: (title: string, kind: Document['kind']) => {
+      createDocument: (title: string, kind: Document["kind"]) => {
         const id = generateUUID();
         const now = Date.now();
 
@@ -154,8 +137,8 @@ export const DocumentStateStore = create<DocumentStoreState>()(
       createDocumentWithId: (
         id: string,
         title: string,
-        kind: Document['kind'],
-        content?: string,
+        kind: Document["kind"],
+        content?: string
       ) => {
         const now = Date.now();
 
@@ -205,13 +188,13 @@ export const DocumentStateStore = create<DocumentStoreState>()(
       getDocuments: (id: string) => {
         const { documents } = get();
         return Object.values(documents).filter(
-          (document) => document.id === id,
+          (document) => document.id === id
         );
       },
 
       updateDocument: (
         id: string,
-        updates: Partial<Omit<Document, 'id' | 'createdAt'>>,
+        updates: Partial<Omit<Document, "id" | "createdAt">>
       ) => {
         set((state) => {
           const document = state.documents[id];
@@ -236,15 +219,15 @@ export const DocumentStateStore = create<DocumentStoreState>()(
 
       deleteDocumentAfterTimestamp: async (
         id: string,
-        updates: { content: string; timestamp: number },
+        updates: { content: string; timestamp: number }
       ) => {
         set((state) => {
           const documents = state.documents;
           const newDocuments = Object.fromEntries(
             Object.entries(documents).filter(
               ([_, document]) =>
-                document.id !== id || document.createdAt <= updates.timestamp,
-            ),
+                document.id !== id || document.createdAt <= updates.timestamp
+            )
           );
           newDocuments[id] = {
             ...state.documents[id],
@@ -275,7 +258,7 @@ export const DocumentStateStore = create<DocumentStoreState>()(
           try {
             await documentDB.documents.delete(id);
           } catch (error) {
-            console.error('Failed to delete from DB:', error);
+            console.error("Failed to delete from DB:", error);
           }
         };
         deleteFromDB();
@@ -289,11 +272,11 @@ export const DocumentStateStore = create<DocumentStoreState>()(
       setCurrentDocument: (
         updaterFn:
           | CurrentDocumentProps
-          | ((currentDocument: CurrentDocumentProps) => CurrentDocumentProps),
+          | ((currentDocument: CurrentDocumentProps) => CurrentDocumentProps)
       ) => {
         set((state) => {
           const newArtifact =
-            typeof updaterFn === 'function'
+            typeof updaterFn === "function"
               ? updaterFn(state.currentDocument)
               : updaterFn;
 
@@ -335,7 +318,7 @@ export const DocumentStateStore = create<DocumentStoreState>()(
       getSortedDocuments: () => {
         const { documents } = get();
         return Object.values(documents).sort(
-          (a, b) => b.updatedAt - a.updatedAt,
+          (a, b) => b.updatedAt - a.updatedAt
         );
       },
 
@@ -350,23 +333,23 @@ export const DocumentStateStore = create<DocumentStoreState>()(
             const currentDID = await getCurrentDID();
             if (!currentDID) return;
 
-            await documentDB.documents.where('did').equals(currentDID).delete();
+            await documentDB.documents.where("did").equals(currentDID).delete();
           } catch (error) {
-            console.error('Failed to clear documents from DB:', error);
+            console.error("Failed to clear documents from DB:", error);
           }
         };
         clearDB();
       },
 
       loadFromDB: async () => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === "undefined") return;
 
         try {
           const currentDID = await getCurrentDID();
           if (!currentDID) return;
 
           const documents = await documentDB.documents
-            .where('did')
+            .where("did")
             .equals(currentDID)
             .toArray();
 
@@ -380,22 +363,22 @@ export const DocumentStateStore = create<DocumentStoreState>()(
             documents: { ...state.documents, ...documentsMap },
           }));
         } catch (error) {
-          console.error('Failed to load from DB:', error);
+          console.error("Failed to load from DB:", error);
         }
       },
 
       saveToDB: async () => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === "undefined") return;
 
         try {
           const { documents } = get();
           const documentsToSave = Object.values(documents);
           await documentDB.documents.bulkPut(documentsToSave);
         } catch (error) {
-          console.error('Failed to save to DB:', error);
+          console.error("Failed to save to DB:", error);
         }
       },
     }),
-    persistConfig,
-  ),
+    persistConfig
+  )
 );

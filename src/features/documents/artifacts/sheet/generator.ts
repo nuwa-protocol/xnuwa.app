@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { streamObject } from 'ai';
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider } from '@/features/ai-chat/services';
 
 export const sheetPrompt = `
 You are a spreadsheet creation assistant. Create a spreadsheet in csv format based on the given prompt. The spreadsheet should contain meaningful column headers and data.

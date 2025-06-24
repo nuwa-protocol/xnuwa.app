@@ -1,20 +1,11 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
-  --sidebar: hsl(0 0% 98%);
-  --sidebar-foreground: hsl(240 5.3% 26.1%);
-  --sidebar-primary: hsl(240 5.9% 10%);
-  --sidebar-primary-foreground: hsl(0 0% 98%);
-  --sidebar-accent: hsl(240 4.8% 95.9%);
-  --sidebar-accent-foreground: hsl(240 5.9% 10%);
-  --sidebar-border: hsl(220 13% 91%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -32,6 +23,16 @@
 }
 
 @layer base {
+  /* 添加 pulse 动画定义 */
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .5;
+    }
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
@@ -105,11 +106,13 @@
 
 @layer base {
   * {
-    @apply border-border;
+    /* 修复：使用原生 CSS 而不是 @apply */
+    border: 1px solid hsl(var(--border));
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 
@@ -120,15 +123,19 @@
 
   *[class^="text-"] {
     color: transparent;
-    @apply rounded-md bg-foreground/20 select-none animate-pulse;
+    border-radius: calc(var(--radius) - 2px);
+    background-color: hsl(var(--foreground) / 0.2);
+    user-select: none;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
   .skeleton-bg {
-    @apply bg-foreground/10;
+    background-color: hsl(var(--foreground) / 0.1);
   }
 
   .skeleton-div {
-    @apply bg-foreground/20 animate-pulse;
+    background-color: hsl(var(--foreground) / 0.2);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }
 
@@ -138,34 +145,54 @@
 
 .cm-editor,
 .cm-gutters {
-  @apply bg-background dark:bg-zinc-800 outline-none selection:bg-zinc-900 !important;
+  background-color: hsl(var(--background));
+  outline: none;
+  --tw-bg-opacity: 1 !important;
+}
+
+.dark .cm-editor,
+.dark .cm-gutters {
+  background-color: rgb(39 39 42) !important;
+}
+
+.cm-editor::selection,
+.cm-gutters::selection {
+  background-color: rgb(24 24 27) !important;
 }
 
 .ͼo.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground,
 .ͼo.cm-selectionBackground,
 .ͼo.cm-content::selection {
-  @apply bg-zinc-200 dark:bg-zinc-900 !important;
+  background-color: rgb(228 228 231) !important;
+}
+
+.dark .ͼo.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground,
+.dark .ͼo.cm-selectionBackground,
+.dark .ͼo.cm-content::selection {
+  background-color: rgb(24 24 27) !important;
 }
 
 .cm-activeLine,
 .cm-activeLineGutter {
-  @apply bg-transparent !important;
+  background-color: transparent !important;
 }
 
 .cm-activeLine {
-  @apply rounded-r-sm !important;
+  border-top-right-radius: 0.125rem !important;
+  border-bottom-right-radius: 0.125rem !important;
 }
 
 .cm-lineNumbers {
-  @apply min-w-7;
+  min-width: 1.75rem;
 }
 
 .cm-foldGutter {
-  @apply min-w-3;
+  min-width: 0.75rem;
 }
 
 .cm-lineNumbers .cm-activeLineGutter {
-  @apply rounded-l-sm !important;
+  border-top-left-radius: 0.125rem !important;
+  border-bottom-left-radius: 0.125rem !important;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -175,35 +202,4 @@
 .hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
-}
-
-.dark {
-  --sidebar: hsl(240 5.9% 10%);
-  --sidebar-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-primary: hsl(224.3 76.3% 48%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(240 3.7% 15.9%);
-  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-border: hsl(240 3.7% 15.9%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
-}
-
-@theme inline {
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
 }

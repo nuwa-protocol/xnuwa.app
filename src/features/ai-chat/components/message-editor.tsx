@@ -1,7 +1,7 @@
 'use client';
 
 import type { Message } from 'ai';
-import { Button } from './ui/button';
+import { Button } from '@/shared/components/ui/button';
 import {
   type Dispatch,
   type SetStateAction,
@@ -9,9 +9,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Textarea } from './ui/textarea';
+import { Textarea } from '@/shared/components/ui/textarea';
 import type { UseChatHelpers } from '@ai-sdk/react';
-import { useChatSession } from '@/hooks/use-chat-session';
+import { useChatSession } from '@/features/ai-chat/hooks/use-chat-session';
 
 export type MessageEditorProps = {
   chatId: string;

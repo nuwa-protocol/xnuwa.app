@@ -1,16 +1,14 @@
+import type { UseChatHelpers } from '@ai-sdk/react';
 import { formatDistance } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 import { useDebounceCallback } from 'usehooks-ts';
-import type { UseChatHelpers } from '@ai-sdk/react';
-
-import { VersionFooter } from '@/components/version-footer';
-import { ArtifactActions } from '@/components/artifact-actions';
-import { ArtifactCloseButton } from '@/components/artifact-close-button';
-
-import { useCurrentDocument } from '@/hooks/use-document-current';
-import { useDocuments } from '@/hooks/use-documents';
-import type { Document } from '@/stores/document-store';
-import { artifactDefinitions } from '@/artifacts';
+import { ArtifactActions } from './artifact-actions';
+import { ArtifactCloseButton } from './artifact-close-button';
+import { VersionFooter } from './version-footer';
+import { artifactDefinitions } from '@/features/documents/artifacts';
+import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
+import { useDocuments } from '@/features/documents/hooks/use-documents';
+import type { Document } from '@/features/documents/stores';
 
 interface ArtifactViewerProps {
   chatId: string;

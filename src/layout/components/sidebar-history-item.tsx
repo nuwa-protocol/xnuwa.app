@@ -1,20 +1,18 @@
-import type { ChatSession } from '@/stores/chat-store';
-import {
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from './ui/sidebar';
+import { MoreHorizontalIcon, TrashIcon } from "lucide-react";
+import { memo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type { ChatSession } from "@/features/ai-chat/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { MoreHorizontalIcon, TrashIcon } from 'lucide-react';
-import { memo, useState } from 'react';
-import { useFloatingSidebar } from './floating-sidebar';
-import { useRouter } from 'next/navigation';
-import { useLanguage } from '@/hooks/use-language';
+  SidebarMenuAction,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/shared/components/ui";
+import { useLanguage } from "@/shared/hooks/use-language";
+import { useFloatingSidebar } from "./floating-sidebar";
 
 const PureChatItem = ({
   chat,
@@ -27,14 +25,14 @@ const PureChatItem = ({
   onDelete: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
 }) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const floatingContext = useFloatingSidebar();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleChatSelect = () => {
     setOpenMobile(false);
-    router.push(`/chat?cid=${chat.id}`);
+    navigate(`/chat?cid=${chat.id}`);
   };
 
   return (
@@ -59,7 +57,7 @@ const PureChatItem = ({
             showOnHover={!isActive}
           >
             <MoreHorizontalIcon />
-            <span className="sr-only">{t('actions.more')}</span>
+            <span className="sr-only">{t("actions.more")}</span>
           </SidebarMenuAction>
         </DropdownMenuTrigger>
 
@@ -69,7 +67,7 @@ const PureChatItem = ({
             onSelect={() => onDelete(chat.id)}
           >
             <TrashIcon />
-            <span>{t('actions.delete')}</span>
+            <span>{t("actions.delete")}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

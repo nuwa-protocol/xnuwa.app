@@ -1,17 +1,16 @@
 import { SparklesIcon } from 'lucide-react';
-import { useLanguage } from '@/hooks/use-language';
+import { getLocaleText } from '@/shared/locales';
 import type { ArtifactToolbarItem, ArtifactToolbarContext } from '../../types';
 
 export function createFormatToolbarItem(): ArtifactToolbarItem {
-  const { t } = useLanguage();
 
   return {
-    description: t('artifact.sheet.toolbar.format'),
+    description: getLocaleText('en').t('artifact.sheet.toolbar.format'),
     icon: <SparklesIcon />,
     onClick: ({ appendMessage }: ArtifactToolbarContext) => {
       appendMessage({
         role: 'user',
-        content: t('artifact.sheet.formatPrompt'),
+        content: getLocaleText('en').t('artifact.sheet.formatPrompt'),
       });
     },
   };

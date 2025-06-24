@@ -1,17 +1,16 @@
 import { MessageCircleIcon } from 'lucide-react';
-import { useLanguage } from '@/hooks/use-language';
+import { getLocaleText } from '@/shared/locales';
 import type { ArtifactToolbarItem, ArtifactToolbarContext } from '../../types';
 
 export function createCommentsToolbarItem(): ArtifactToolbarItem {
-  const { t } = useLanguage();
 
   return {
     icon: <MessageCircleIcon />,
-    description: t('artifact.code.toolbar.comments'),
+    description: getLocaleText('en').t('artifact.code.toolbar.comments'),
     onClick: ({ appendMessage }: ArtifactToolbarContext) => {
       appendMessage({
         role: 'user',
-        content: t('artifact.code.addCommentsPrompt'),
+        content: getLocaleText('en').t('artifact.code.addCommentsPrompt'),
       });
     },
   };

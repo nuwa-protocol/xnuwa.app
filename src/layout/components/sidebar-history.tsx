@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useChatSessions } from "@/features/ai-chat/hooks/use-chat-sessions";
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   useSidebar,
-} from '@/components/ui/sidebar';
-import { useChatSessions } from '@/hooks/use-chat-sessions';
-import { ChatItem } from './sidebar-history-item';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useLanguage } from '@/hooks/use-language';
+} from "@/shared/components/ui";
+import { useLanguage } from "@/shared/hooks/use-language";
+import { ChatItem } from "./sidebar-history-item";
 
 export function SidebarHistory() {
   const { setOpenMobile } = useSidebar();
   const { sessionsMap, deleteSession } = useChatSessions();
-  const router = useRouter();
+  const navigate = useNavigate();
   const { t } = useLanguage();
 
-  const searchParams = useSearchParams();
-  const chatSessionId = searchParams.get('cid');
+  const [searchParams] = useSearchParams();
+  const chatSessionId = searchParams.get("cid");
 
   // get all sessions with messages and sort by time
   const now = Date.now();
@@ -67,10 +67,10 @@ export function SidebarHistory() {
           <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                {t('chatHistory.noChats')}
+                {t("chatHistory.noChats")}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                {t('chatHistory.startConversation')}
+                {t("chatHistory.startConversation")}
               </p>
             </div>
           </div>
@@ -82,14 +82,14 @@ export function SidebarHistory() {
   const handleDelete = (id: string) => {
     deleteSession(id);
     if (id === chatSessionId) {
-      router.push('/chat');
+      navigate("/chat");
     }
   };
 
   // group render function
   const renderGroup = (
     title: string,
-    items: typeof allSessionsWithMessages,
+    items: typeof allSessionsWithMessages
   ) => {
     if (items.length === 0) return null;
     return (
@@ -114,10 +114,10 @@ export function SidebarHistory() {
     <SidebarGroup>
       <SidebarGroupContent>
         <SidebarMenu>
-          {renderGroup(t('chatHistory.today'), grouped.today)}
-          {renderGroup(t('chatHistory.thisWeek'), grouped.last7)}
-          {renderGroup(t('chatHistory.aWeekAgo'), grouped.last30)}
-          {renderGroup(t('chatHistory.older'), grouped.older)}
+          {renderGroup(t("chatHistory.today"), grouped.today)}
+          {renderGroup(t("chatHistory.thisWeek"), grouped.last7)}
+          {renderGroup(t("chatHistory.aWeekAgo"), grouped.last30)}
+          {renderGroup(t("chatHistory.older"), grouped.older)}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

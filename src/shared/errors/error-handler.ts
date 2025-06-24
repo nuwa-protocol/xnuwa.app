@@ -1,28 +1,28 @@
-import type { UIMessage } from 'ai';
-import { generateUUID } from '@/utils';
-import { getLocale } from '@/locales';
+import type { UIMessage } from "ai";
+import { getLocale } from "@/shared/locales";
+import { generateUUID } from "@/shared/utils";
 
-// 错误级别
-export type ErrorLevel = 'info' | 'warning' | 'error' | 'critical';
+// error level
+export type ErrorLevel = "info" | "warning" | "error" | "critical";
 
-// 错误处理接口
+// error handler options
 interface ErrorHandlerOptions {
   level?: ErrorLevel;
   showToUser?: boolean;
 }
 
-const locale = getLocale('en');
+const locale = getLocale("en");
 
-// 创建错误消息
+// create error message
 export function createErrorMessage(
   error: string | Error,
-  options: ErrorHandlerOptions = {},
+  options: ErrorHandlerOptions = {}
 ): UIMessage {
   try {
-    const { level = 'error', showToUser = true } = options;
+    const { level = "error", showToUser = true } = options;
 
-    // 防御性检查：确保 level 是有效的字符串
-    const validLevel = typeof level === 'string' && level ? level : 'error';
+    // defensive check: ensure level is a valid string
+    const validLevel = typeof level === "string" && level ? level : "error";
 
     const errorText = error instanceof Error ? error.message : error;
 
@@ -31,21 +31,21 @@ export function createErrorMessage(
     }
 
     return createSystemMessage(
-      formatErrorForUser(errorText, validLevel as ErrorLevel),
+      formatErrorForUser(errorText, validLevel as ErrorLevel)
     );
   } catch (internalError) {
-    // 返回一个最基本的错误消息
+    // return a basic error message
     return {
       id: generateUUID(),
-      role: 'assistant',
-      content: 'An error occurred. Please try again.',
-      parts: [{ type: 'text', text: 'An error occurred. Please try again.' }],
+      role: "assistant",
+      content: "An error occurred. Please try again.",
+      parts: [{ type: "text", text: "An error occurred. Please try again." }],
       createdAt: new Date(),
     };
   }
 }
 
-// 格式化错误信息给用户
+// format error message for user
 function formatErrorForUser(errorText: string, level: ErrorLevel): string {
   const emoji = getErrorEmoji(level);
   const prefix = getErrorPrefix(level);
@@ -53,101 +53,102 @@ function formatErrorForUser(errorText: string, level: ErrorLevel): string {
   return `${emoji} **${prefix}**: ${errorText}\n\n*${locale.error.persist}*`;
 }
 
-// 获取错误表情符号
+// get error emoji
 function getErrorEmoji(level: ErrorLevel): string {
   switch (level) {
-    case 'info':
-      return 'ℹ️';
-    case 'warning':
-      return '⚠️';
-    case 'error':
-      return '❌';
-    case 'critical':
-      return '🚨';
+    case "info":
+      return "ℹ️";
+    case "warning":
+      return "⚠️";
+    case "error":
+      return "❌";
+    case "critical":
+      return "🚨";
     default:
-      return '❌';
+      return "❌";
   }
 }
 
-// 获取错误前缀
+// get error prefix
 function getErrorPrefix(level: ErrorLevel): string {
   switch (level) {
-    case 'info':
+    case "info":
       return locale.error.info;
-    case 'warning':
+    case "warning":
       return locale.error.warning;
-    case 'error':
+    case "error":
       return locale.error.error;
-    case 'critical':
+    case "critical":
       return locale.error.critical;
     default:
       return locale.error.error;
   }
 }
 
-// 创建系统消息
+// create system message
 function createSystemMessage(content: string): UIMessage {
   return {
     id: generateUUID(),
-    role: 'assistant',
+    role: "assistant",
     content,
-    parts: [{ type: 'text', text: content }],
+    parts: [{ type: "text", text: content }],
     createdAt: new Date(),
   };
 }
 
-// 常见错误类型处理
+// common error types
 export const ErrorHandlers = {
   network: (error?: string) =>
-    createErrorMessage(error || locale.error.network, { level: 'error' }),
+    createErrorMessage(error || locale.error.network, { level: "error" }),
 
   api: (error?: string) =>
-    createErrorMessage(error || locale.error.api, { level: 'error' }),
+    createErrorMessage(error || locale.error.api, { level: "error" }),
 
   storage: (error?: string) =>
-    createErrorMessage(error || locale.error.storage, { level: 'warning' }),
+    createErrorMessage(error || locale.error.storage, { level: "warning" }),
 
   validation: (error?: string) =>
-    createErrorMessage(error || locale.error.validation, { level: 'warning' }),
+    createErrorMessage(error || locale.error.validation, { level: "warning" }),
 
   permission: (error?: string) =>
-    createErrorMessage(error || locale.error.permission, { level: 'error' }),
+    createErrorMessage(error || locale.error.permission, { level: "error" }),
 
-  notFound: (resource = 'resource') =>
+  notFound: (resource = "resource") =>
     createErrorMessage(
-      locale.error.notFound.replace('{{resource}}', resource),
+      locale.error.notFound.replace("{{resource}}", resource),
       {
-        level: 'warning',
-      },
+        level: "warning",
+      }
     ),
 
-  timeout: (operation = 'operation') =>
+  timeout: (operation = "operation") =>
     createErrorMessage(
-      locale.error.timeout.replace('{{operation}}', operation),
+      locale.error.timeout.replace("{{operation}}", operation),
       {
-        level: 'warning',
-      },
+        level: "warning",
+      }
     ),
 
   generic: (error?: string) =>
-    createErrorMessage(error || locale.error.generic, { level: 'error' }),
+    createErrorMessage(error || locale.error.generic, { level: "error" }),
 };
 
-// 错误边界处理函数
+// error boundary handler
 export function handleAsyncError<T>(
   promise: Promise<T>,
-  fallback?: () => T,
+  fallback?: () => T
 ): Promise<T | null> {
   return promise.catch((error) => {
+    console.error(error);
     return fallback ? fallback() : null;
   });
 }
 
-// 重试机制
+// retry mechanism
 export async function retryOperation<T>(
   operation: () => Promise<T>,
   maxRetries = 3,
-  delay = 1000,
+  delay = 1000
 ): Promise<T> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -160,5 +161,5 @@ export async function retryOperation<T>(
     }
   }
 
-  throw new Error('Max retries exceeded');
+  throw new Error("Max retries exceeded");
 }

@@ -3,13 +3,13 @@
 import type { Attachment, UIMessage } from 'ai';
 import { useState } from 'react';
 
-import { ArtifactViewer } from '@/components/artifact-viewer';
-import { MultimodalInput } from '@/components/multimodal-input';
-import { Messages } from '@/components/messages';
+import { ArtifactViewer } from './artifact-viewer';
+import { MultimodalInput } from '@/features/ai-chat/components';
+import { Messages } from '@/features/ai-chat/components';
 
-import { useCurrentDocument } from '@/hooks/use-document-current';
-import { useChatDefault } from '@/hooks/use-chat-default';
-import { useArtifactWidth } from '@/hooks/use-artifact-width';
+import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
+import { useChatDefault } from '@/features/ai-chat/hooks/use-chat-default';
+import { useArtifactWidth } from '@/layout/hooks/use-artifact-width';
 
 export function Artifact({
   chatId,

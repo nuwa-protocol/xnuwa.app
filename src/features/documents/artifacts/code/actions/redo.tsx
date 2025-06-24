@@ -1,5 +1,5 @@
 import { RedoIcon } from 'lucide-react';
-import { useLanguage } from '@/hooks/use-language';
+import { getLocaleText } from '@/shared/locales';
 import type { ArtifactAction } from '../../types';
 
 interface Metadata {
@@ -7,11 +7,10 @@ interface Metadata {
 }
 
 export function createRedoAction(): ArtifactAction {
-  const { t } = useLanguage();
 
   return {
     icon: <RedoIcon size={18} />,
-    description: t('artifact.code.actions.redo'),
+    description: getLocaleText('en').t('artifact.code.actions.redo'),
     onClick: ({ handleVersionChange }) => {
       handleVersionChange('next');
     },

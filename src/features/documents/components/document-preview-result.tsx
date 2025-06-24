@@ -1,12 +1,12 @@
-import { memo } from 'react';
-import { useRouter } from 'next/navigation';
 import { FileIcon, MessageCircleIcon, PencilIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { memo } from 'react';
 
-import { toast } from '@/components/toast';
+import { toast } from '@/shared/components/toast';
 
-import type { ArtifactKind } from '@/artifacts';
-import { useLanguage } from '@/hooks/use-language';
-import { useCurrentDocument } from '@/hooks/use-document-current';
+import type { ArtifactKind } from '@/features/documents/artifacts';
+import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
+import { useLanguage } from '@/shared/hooks/use-language';
 
 const getActionText = (
   type: 'create' | 'update' | 'request-suggestions',
@@ -46,7 +46,7 @@ function PureDocumentToolResult({
 }: DocumentToolResultProps) {
   const { setCurrentDocument } = useCurrentDocument();
   const { t } = useLanguage();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   return (
     <button
@@ -68,7 +68,7 @@ function PureDocumentToolResult({
           title: result.title,
           status: 'idle',
         });
-        router.push(`/artifact?cid=${chatId}`);
+        navigate(`/artifact?cid=${chatId}`);
       }}
     >
       <div className="text-muted-foreground mt-1">

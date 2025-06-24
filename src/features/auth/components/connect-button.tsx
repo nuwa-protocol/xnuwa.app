@@ -1,9 +1,8 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-
-import { useAuth } from '@/hooks/use-auth';
-import { useAuthHandler } from '@/hooks/use-auth-handler';
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useAuthHandler } from "@/features/auth/hooks/use-auth-handler";
+import { Button } from "@/shared/components/ui/button";
 
 export function ConnectButton() {
   const { isConnected, isConnecting } = useAuth();
@@ -17,7 +16,7 @@ export function ConnectButton() {
 
   return (
     <Button onClick={handleConnect} disabled={isConnecting}>
-      {isConnecting ? 'Connecting…' : 'Sign-in with DID'}
+      {isConnecting ? "Connecting…" : "Sign-in with DID"}
     </Button>
   );
 }

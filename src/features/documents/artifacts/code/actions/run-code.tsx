@@ -1,11 +1,11 @@
 import { PlayIcon } from 'lucide-react';
-import { generateUUID } from '@/utils';
-import { useLanguage } from '@/hooks/use-language';
+import { generateUUID } from '@/shared/utils';
 import type { ArtifactAction } from '../../types';
 import type {
   ConsoleOutput,
   ConsoleOutputContent,
 } from '../components/console';
+import { getLocaleText } from '@/shared/locales';
 
 interface Metadata {
   outputs: Array<ConsoleOutput>;
@@ -58,12 +58,11 @@ function detectRequiredHandlers(code: string): string[] {
 }
 
 export function createRunCodeAction(): ArtifactAction<Metadata> {
-  const { t } = useLanguage();
 
   return {
     icon: <PlayIcon size={18} />,
     label: undefined as any,
-    description: t('artifact.code.actions.run'),
+    description: getLocaleText('en').t('artifact.code.actions.run'),
     onClick: async ({ content, setMetadata }) => {
       const runId = generateUUID();
       const outputContent: Array<ConsoleOutputContent> = [];

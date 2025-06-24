@@ -1,21 +1,20 @@
 'use client';
-import { cn } from '@/utils';
-import { memo, useCallback, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { FileIcon, FullscreenIcon, ImageIcon, LoaderIcon } from 'lucide-react';
 import equal from 'fast-deep-equal';
+import { FileIcon, FullscreenIcon, ImageIcon, LoaderIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { memo, useCallback, useMemo, useRef } from 'react';
+import type { ArtifactKind } from '@/features/documents/artifacts';
+import { CodePreview } from '@/features/documents/artifacts/code/components/code-preview';
+import { ImagePreview } from '@/features/documents/artifacts/image/components/image-preview';
+import { SheetPreview } from '@/features/documents/artifacts/sheet/components/sheet-preview';
+import { TextPreview } from '@/features/documents/artifacts/text/components/text-preview';
+import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
+import { useDocuments } from '@/features/documents/hooks/use-documents';
 
+import type { Document, CurrentDocumentProps } from '@/features/documents/stores';
+import { cn } from '@/shared/utils';
 import { DocumentToolCall } from './document-preview-call';
 import { DocumentToolResult } from './document-preview-result';
-import { TextPreview } from '@/artifacts/text/components/text-preview';
-import { CodePreview } from '@/artifacts/code/components/code-preview';
-import { SheetPreview } from '@/artifacts/sheet/components/sheet-preview';
-import { ImagePreview } from '@/artifacts/image/components/image-preview';
-
-import type { Document, CurrentDocumentProps } from '@/stores/document-store';
-import type { ArtifactKind } from '@/artifacts';
-import { useDocuments } from '@/hooks/use-documents';
-import { useCurrentDocument } from '@/hooks/use-document-current';
 
 interface DocumentPreviewProps {
   chatId: string;
@@ -33,7 +32,7 @@ export function DocumentPreview({
   const { currentDocument: artifact, setCurrentDocument } =
     useCurrentDocument();
   const { getDocument } = useDocuments();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   // Use document store instead of SWR
   const documents = useMemo(() => {
@@ -47,7 +46,7 @@ export function DocumentPreview({
   const isDocumentsFetching = false; // No longer fetching from API
 
   const previewDocument = useMemo(() => documents?.[0], [documents]);
-  const hitboxRef = useRef<HTMLDivElement>(null);
+  const hitboxRef = useRef<HTMLDivElement>(null!);
 
   if (artifact.documentId !== 'init') {
     if (result) {
@@ -158,7 +157,7 @@ const PureHitboxLayer = ({
   ) => void;
   chatId: string;
 }) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const handleClick = useCallback(() => {
     setCurrentDocument((artifact) =>
       artifact.status === 'streaming'
@@ -170,8 +169,8 @@ const PureHitboxLayer = ({
             kind: result.kind,
           },
     );
-    router.push(`/artifact?cid=${chatId}`);
-  }, [setCurrentDocument, result, chatId, router]);
+    navigate(`/artifact?cid=${chatId}`);
+  }, [setCurrentDocument, result, chatId, navigate]);
 
   return (
     <div

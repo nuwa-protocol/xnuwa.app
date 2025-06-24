@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useLanguage } from '@/hooks/use-language';
+import { useLanguage } from '@/shared/hooks/use-language';
 
 export const Greeting = () => {
   const { t } = useLanguage();

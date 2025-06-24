@@ -2,11 +2,11 @@
 
 import {
   type UseIdentityKitOptions,
-  useNuwaIdentityKit,
+  useIdentityKit,
 } from '@nuwa-ai/identity-kit-web';
 
 export const useAuth = (options: UseIdentityKitOptions = {}) => {
-  const { state } = useNuwaIdentityKit({
+  const { state } = useIdentityKit({
     appName: 'Nuwa Assistant',
     cadopDomain:
       typeof window !== 'undefined'

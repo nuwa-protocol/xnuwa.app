@@ -1,7 +1,6 @@
-import type { ArtifactContent } from '@/artifacts/types';
-import { DiffView } from '@/artifacts/text/components/diffview';
-
-import { Editor } from '@/artifacts/text/components/text-editor';
+import { DiffView } from '@/features/documents/artifacts/text/components/diffview';
+import { Editor } from '@/features/documents/artifacts/text/components/text-editor';
+import type { ArtifactContent } from '@/features/documents/artifacts/types';
 
 const Skeleton = () => {
   return (

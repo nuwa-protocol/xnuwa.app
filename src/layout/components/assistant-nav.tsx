@@ -1,34 +1,33 @@
-'use client';
-
-import { useState } from 'react';
-import Image from 'next/image';
-import { useTheme } from 'next-themes';
-import { useRouter } from 'next/navigation';
-
+"use client";
+import { LogOut, Monitor, Moon, Settings, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { SettingsModal } from "@/features/settings/components";
+import { useSettings } from "@/features/settings/hooks/use-settings";
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Settings, LogOut, Sun, Moon, Monitor } from 'lucide-react';
-import { SettingsModal } from '@/components/settings-modal';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
   Tooltip,
-  TooltipTrigger,
   TooltipContent,
-} from '@/components/ui/tooltip';
-
-import type { Locale } from '@/locales';
-import { useAuth } from '@/hooks/use-auth';
-import { useStorage } from '@/hooks/use-storage';
-import { useSettings } from '@/hooks/use-settings';
-import { useLanguage } from '@/hooks/use-language';
+  TooltipTrigger,
+} from "@/shared/components/ui";
+import { useLanguage } from "@/shared/hooks/use-language";
+import { useStorage } from "@/shared/hooks/use-storage";
+import type { Locale } from "@/shared/locales";
 
 export function AssistantNav() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { setTheme, theme } = useTheme();
   const { did } = useAuth();
   const { t } = useLanguage();
@@ -38,7 +37,7 @@ export function AssistantNav() {
 
   const handleLogout = () => {
     resetAllStores();
-    router.push('/login');
+    navigate("/login");
   };
 
   if (!did) {
@@ -54,13 +53,13 @@ export function AssistantNav() {
             data-testid="assistant-nav-button"
             className="flex items-center rounded-full bg-background p-2 hover:shadow hover:bg-accent hover:text-accent-foreground focus:outline-none hover:cursor-pointer"
           >
-            <Image
-              src={`https://avatar.vercel.sh/${did}`}
-              alt={'Assistant Avatar'}
-              width={36}
-              height={36}
-              className="rounded-full"
-            />
+            <Avatar>
+              <AvatarImage
+                src={`https://avatar.vercel.sh/${did}`}
+                alt={"Assistant Avatar"}
+              />
+              <AvatarFallback> Assistant Nav </AvatarFallback>
+            </Avatar>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -76,7 +75,7 @@ export function AssistantNav() {
           >
             <span className="flex items-center gap-2">
               <Settings size={16} />
-              {t('settings.title')}
+              {t("settings.title")}
             </span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -84,10 +83,10 @@ export function AssistantNav() {
           {/* Preferences Section */}
           <div className="px-4 py-2 text-sm">
             <div className="text-xs font-semibold text-muted-foreground mb-1">
-              {t('nav.menu.preferences')}
+              {t("nav.menu.preferences")}
             </div>
             <div className="flex items-center justify-between mb-2">
-              <span>{t('nav.menu.theme')}</span>
+              <span>{t("nav.menu.theme")}</span>
               <Tabs value={theme} onValueChange={setTheme}>
                 <TabsList className="h-8 bg-muted p-1 rounded-xl border border-muted-foreground/10">
                   <TabsTrigger
@@ -100,7 +99,7 @@ export function AssistantNav() {
                           <Monitor size={16} />
                         </span>
                       </TooltipTrigger>
-                      <TooltipContent>{t('nav.menu.system')}</TooltipContent>
+                      <TooltipContent>{t("nav.menu.system")}</TooltipContent>
                     </Tooltip>
                   </TabsTrigger>
                   <TabsTrigger
@@ -113,7 +112,7 @@ export function AssistantNav() {
                           <Sun size={16} />
                         </span>
                       </TooltipTrigger>
-                      <TooltipContent>{t('nav.menu.light')}</TooltipContent>
+                      <TooltipContent>{t("nav.menu.light")}</TooltipContent>
                     </Tooltip>
                   </TabsTrigger>
                   <TabsTrigger
@@ -126,23 +125,23 @@ export function AssistantNav() {
                           <Moon size={16} />
                         </span>
                       </TooltipTrigger>
-                      <TooltipContent>{t('nav.menu.dark')}</TooltipContent>
+                      <TooltipContent>{t("nav.menu.dark")}</TooltipContent>
                     </Tooltip>
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
             <div className="flex items-center justify-between">
-              <span>{t('nav.menu.language')}</span>
+              <span>{t("nav.menu.language")}</span>
               <select
                 className="border rounded px-2 py-1 text-xs bg-background"
                 value={settings.language}
                 onChange={(e) =>
-                  setSetting('language', e.target.value as Locale)
+                  setSetting("language", e.target.value as Locale)
                 }
               >
-                <option value="en">{t('language.english')}</option>
-                <option value="cn">{t('language.chinese')}</option>
+                <option value="en">{t("language.english")}</option>
+                <option value="cn">{t("language.chinese")}</option>
               </select>
             </div>
           </div>
@@ -159,7 +158,7 @@ export function AssistantNav() {
               onClick={handleLogout}
             >
               <LogOut size={16} />
-              {t('nav.profile.signOut')}
+              {t("nav.profile.signOut")}
             </button>
           </DropdownMenuItem>
         </DropdownMenuContent>

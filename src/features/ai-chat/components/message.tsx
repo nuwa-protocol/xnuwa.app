@@ -5,19 +5,19 @@ import type { UseChatHelpers } from '@ai-sdk/react';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
-import { DocumentToolCall } from './document-preview-call';
-import { DocumentToolResult } from './document-preview-result';
+import { DocumentToolCall } from '@/features/documents/components/document-preview-call';
+import { DocumentToolResult } from '@/features/documents/components/document-preview-result';
 import { PencilIcon, SparklesIcon } from 'lucide-react';
 import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
 import equal from 'fast-deep-equal';
-import { cn, sanitizeText } from '@/utils';
-import { Button } from './ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { cn, sanitizeText } from '@/shared/utils';
+import { Button } from '@/shared/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { MessageEditor } from './message-editor';
-import { DocumentPreview } from './document-preview';
+import { DocumentPreview } from '@/features/documents/components/document-preview';
 import { MessageReasoning } from './message-reasoning';
 
 const PurePreviewMessage = ({

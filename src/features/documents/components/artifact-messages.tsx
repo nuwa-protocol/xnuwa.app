@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import type { UIMessage } from 'ai';
 import type { UseChatHelpers } from '@ai-sdk/react';
 
-import { PreviewMessage, ThinkingMessage } from '@/components/message';
+import { PreviewMessage, ThinkingMessage } from '@/features/ai-chat/components';
 
-import { useMessages } from '@/hooks/use-messages';
-import type { CurrentDocumentProps } from '@/stores/document-store';
+import { useMessages } from '@/features/ai-chat/hooks/use-messages';
+import type { CurrentDocumentProps } from '@/features/documents/stores';
 
 interface ArtifactMessagesProps {
   chatId: string;

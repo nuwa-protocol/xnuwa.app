@@ -6,7 +6,7 @@ import {
   getCapsByCategory,
   type RemoteCap,
   type CapSearchFilters,
-} from '@/lib/cap/cap-fetch';
+} from '@/features/cap/services';
 
 interface UseCapRemoteState {
   remoteCaps: RemoteCap[];

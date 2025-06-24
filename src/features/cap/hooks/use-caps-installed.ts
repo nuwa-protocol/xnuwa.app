@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { CapStateStore, type InstalledCap } from '@/stores/cap-store';
+import { CapStateStore, type InstalledCap } from '@/features/cap/stores';
 
 // Installed caps management hook
 export const useInstalledCaps = () => {

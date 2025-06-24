@@ -1,11 +1,10 @@
 import { useCallback } from 'react';
-import { FileStateStore } from '@/stores/file-store';
-import { useLanguage } from './use-language';
-
-const { t } = useLanguage();
+import { FileStateStore } from '@/features/ai-chat/stores';
+import { useLanguage } from '@/shared/hooks';
 
 // File management hook
 export const useFiles = () => {
+  const { t } = useLanguage();
   const store = FileStateStore();
 
   const storeFile = useCallback(async (file: File) => {

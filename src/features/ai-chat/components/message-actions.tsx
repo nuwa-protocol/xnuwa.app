@@ -1,14 +1,14 @@
 import type { Message } from 'ai';
 import { CopyIcon } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from '@/shared/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from './ui/tooltip';
+} from '@/shared/components/ui/tooltip';
 import { memo } from 'react';
-import { toast } from '@/components/toast';
+import { toast } from '@/shared/components/toast';
 import { useCopyToClipboard } from 'usehooks-ts';
 
 export function PureMessageActions({

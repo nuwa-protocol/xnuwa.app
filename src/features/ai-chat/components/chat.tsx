@@ -4,8 +4,8 @@ import type { Attachment, UIMessage } from 'ai';
 import { useState } from 'react';
 import { MultimodalInput } from './multimodal-input';
 import { Messages } from './messages';
-import Header from './layout-header';
-import { useChatDefault } from '@/hooks/use-chat-default';
+import Header from '@/layout/components/header';
+import { useChatDefault } from '@/features/ai-chat/hooks/use-chat-default';
 
 export function Chat({
   id,

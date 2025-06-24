@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import {
-  defaultEmptyDocument,
   DocumentStateStore,
-} from '@/stores/document-store';
-import type { CurrentDocumentProps } from '@/stores/document-store';
+  defaultEmptyDocument,
+} from '@/features/documents/stores';
+import type { CurrentDocumentProps } from '@/features/documents/types';
 
 export const useCurrentDocument = () => {
   const store = DocumentStateStore();

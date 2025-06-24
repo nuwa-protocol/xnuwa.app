@@ -1,10 +1,10 @@
 'use client';
 
 import { memo, useEffect, useMemo, useState } from 'react';
-import DataGrid, { textEditor } from 'react-data-grid';
+import { DataGrid, textEditor } from 'react-data-grid';
 import { parse, unparse } from 'papaparse';
 import { useTheme } from 'next-themes';
-import { cn } from '@/utils';
+import { cn } from '@/shared/utils';
 
 import 'react-data-grid/lib/styles.css';
 

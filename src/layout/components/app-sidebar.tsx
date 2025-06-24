@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { cn } from '@/utils';
-import { useRouter } from 'next/navigation';
-import { Search, Settings, Folder, Package } from 'lucide-react';
-
-import { SearchModal } from '@/components/search-modal';
-import { SidebarToggle } from '@/components/sidebar-toggle';
-import { SidebarHistory } from '@/components/sidebar-history';
+import { Folder, Package, Search, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CapStoreModal } from "@/features/cap/components";
+import { SearchModal } from "@/features/search/components";
+import { SettingsModal } from "@/features/settings/components";
+import { useSidebarSettings } from "@/features/settings/hooks/use-settings-sidebar";
+import { Logo } from "@/shared/components";
 import {
   Sidebar,
   SidebarContent,
@@ -14,37 +14,35 @@ import {
   SidebarHeader,
   SidebarMenu,
   useSidebar,
-} from '@/components/ui/sidebar';
-import { SidebarButton } from '@/components/ui/sidebar-button';
-import { useFloatingSidebar } from '@/components/floating-sidebar';
-import { Logo } from '@/components/logo';
-import { SettingsModal } from '@/components/settings-modal';
-import { CapStoreModal } from '@/components/cap-store-modal';
-
-import { useSidebarSettings } from '@/hooks/use-settings-sidebar';
-import { useLanguage } from '@/hooks/use-language';
+} from "@/shared/components/ui";
+import { useLanguage } from "@/shared/hooks/use-language";
+import { cn } from "@/shared/utils";
+import { useFloatingSidebar } from "./floating-sidebar";
+import { SidebarButton } from "./sidebar-button";
+import { SidebarHistory } from "./sidebar-history";
+import { SidebarToggle } from "./sidebar-toggle";
 
 export function AppSidebar() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const { setOpenMobile } = useSidebar();
   const { mode: sidebarMode } = useSidebarSettings();
   const floatingContext = useFloatingSidebar();
-  const sidebarVariant = sidebarMode === 'floating' ? 'floating' : 'sidebar';
+  const sidebarVariant = sidebarMode === "floating" ? "floating" : "sidebar";
 
   const handleNewChat = () => {
     setOpenMobile(false);
-    router.push('/chat');
+    navigate("/chat");
   };
 
   const handleMouseEnter = () => {
-    if (sidebarMode === 'floating' && floatingContext) {
+    if (sidebarMode === "floating" && floatingContext) {
       floatingContext.setIsHovering(true);
     }
   };
 
   const handleMouseLeave = () => {
-    if (sidebarMode === 'floating' && floatingContext) {
+    if (sidebarMode === "floating" && floatingContext) {
       floatingContext.setIsHovering(false);
     }
   };
@@ -53,9 +51,9 @@ export function AppSidebar() {
     <>
       <Sidebar
         className={cn(
-          'group-data-[side=left]:border-r-0',
+          "group-data-[side=left]:border-r-0",
           // Add smooth transition animations
-          'transition-all duration-300 ease-in-out',
+          "transition-all duration-300 ease-in-out"
         )}
         variant={sidebarVariant}
         onMouseEnter={handleMouseEnter}
@@ -69,7 +67,7 @@ export function AppSidebar() {
                 <SidebarToggle />
               </div>
               <SidebarButton
-                text={t('nav.sidebar.new')}
+                text={t("nav.sidebar.new")}
                 onClick={handleNewChat}
                 variant="primary"
                 className="my-2"
@@ -77,20 +75,20 @@ export function AppSidebar() {
               <SearchModal>
                 <SidebarButton
                   icon={Search}
-                  text={t('nav.sidebar.search')}
+                  text={t("nav.sidebar.search")}
                   variant="secondary"
                 />
               </SearchModal>
               <CapStoreModal>
                 <SidebarButton
                   icon={Package}
-                  text={t('nav.sidebar.capStore')}
+                  text={t("nav.sidebar.capStore")}
                   variant="secondary"
                 />
               </CapStoreModal>
               <SidebarButton
                 icon={Folder}
-                text={t('nav.sidebar.artifact')}
+                text={t("nav.sidebar.artifact")}
                 onClick={() => {}}
                 variant="secondary"
               />
@@ -104,7 +102,7 @@ export function AppSidebar() {
           <SettingsModal>
             <SidebarButton
               icon={Settings}
-              text={t('nav.sidebar.settings')}
+              text={t("nav.sidebar.settings")}
               variant="secondary"
             />
           </SettingsModal>

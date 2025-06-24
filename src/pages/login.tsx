@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
-import { ConnectButton } from '@/components/connect-button';
-import { useLanguage } from '@/hooks/use-language';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ConnectButton } from "@/features/auth/components/connect-button";
+import { useAuth } from "@/features/auth/hooks";
+import { useLanguage } from "@/shared/hooks/use-language";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { isConnected } = useAuth();
   const { t } = useLanguage();
 
   // if already logged in, redirect to home
   useEffect(() => {
     if (isConnected) {
-      router.push('/');
+      navigate("/");
     }
-  }, [isConnected, router]);
+  }, [isConnected, navigate]);
 
   // if already logged in, do not show login form
   if (isConnected) {
@@ -28,10 +28,10 @@ export default function LoginPage() {
       <div className="w-full max-w-md overflow-hidden rounded-2xl flex flex-col gap-12">
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
           <h3 className="text-xl font-semibold dark:text-zinc-50">
-            {t('login.title')}
+            {t("login.title")}
           </h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
-            {t('login.description')}
+            {t("login.description")}
           </p>
         </div>
         <ConnectButton />

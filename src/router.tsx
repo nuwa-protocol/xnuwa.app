@@ -1,23 +1,28 @@
-import { createBrowserRouter } from "react-router";
-import Layout from "./components/Layout";
-import About from "./pages/About";
-import ErrorPage from "./pages/ErrorPage";
-import Home from "./pages/Home";
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import MainLayout from "./layout/main-layout";
+import RootLayout from "./layout/root-layout";
+import ArtifactPage from "./pages/artifact";
+import CallbackPage from "./pages/callback";
+import ChatPage from "./pages/chat";
+import LoginPage from "./pages/login";
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
-    errorElement: <ErrorPage />,
+    element: <RootLayout />,
     children: [
       {
-        index: true,
-        element: <Home />,
+        element: <MainLayout />,
+        children: [
+          { index: true, element: <Navigate to="/chat" replace /> },
+          { path: "artifact", element: <ArtifactPage /> },
+          { path: "chat", element: <ChatPage /> },
+        ],
       },
-      {
-        path: "about",
-        element: <About />,
-      },
+      { path: "login", element: <LoginPage /> },
+      { path: "callback", element: <CallbackPage /> },
     ],
   },
 ]);
+
+export default router;

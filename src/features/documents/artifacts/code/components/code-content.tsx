@@ -1,4 +1,4 @@
-import type { ArtifactContent } from '@/artifacts/types';
+import type { ArtifactContent } from '@/features/documents/artifacts/types';
 import { CodeEditor } from './code-editor';
 import { Console, type ConsoleOutput } from './console';
 

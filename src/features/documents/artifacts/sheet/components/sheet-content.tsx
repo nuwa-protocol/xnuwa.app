@@ -1,5 +1,5 @@
-import type { ArtifactContent } from '@/artifacts/types';
-import { SpreadsheetEditor } from '@/artifacts/sheet/components/sheet-editor';
+import { SpreadsheetEditor } from '@/features/documents/artifacts/sheet/components/sheet-editor';
+import type { ArtifactContent } from '@/features/documents/artifacts/types';
 
 type Metadata = any;
 

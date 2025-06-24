@@ -1,17 +1,16 @@
 import { CopyIcon } from 'lucide-react';
-import { useLanguage } from '@/hooks/use-language';
-import { toast } from '@/components/toast';
+import { getLocaleText } from '@/shared/locales';
+import { toast } from '@/shared/components/toast';
 import { parse, unparse } from 'papaparse';
 import type { ArtifactAction } from '../../types';
 
 type Metadata = any;
 
 export function createCopyAction(): ArtifactAction<Metadata> {
-  const { t } = useLanguage();
 
   return {
     icon: <CopyIcon />,
-    description: t('artifact.sheet.actions.copy'),
+    description: getLocaleText('en').t('artifact.sheet.actions.copy'),
     onClick: ({ content }) => {
       const parsed = parse<string[]>(content, { skipEmptyLines: true });
       const nonEmptyRows = parsed.data.filter((row) =>
@@ -20,7 +19,7 @@ export function createCopyAction(): ArtifactAction<Metadata> {
       const cleanedCsv = unparse(nonEmptyRows);
       navigator.clipboard.writeText(cleanedCsv);
       toast({
-        description: t('artifact.sheet.copiedCsv'),
+        description: getLocaleText('en').t('artifact.sheet.copiedCsv'),
         type: 'success',
       });
     },
