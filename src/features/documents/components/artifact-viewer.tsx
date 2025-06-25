@@ -42,7 +42,7 @@ export function ArtifactViewer({ chatId, status, width }: ArtifactViewerProps) {
         setVersionedDocuments(currentDocuments);
       }
     }
-  }, [documentsMap, artifact.documentId, artifact.status, getDocuments]);
+  }, [documentsMap, artifact.documentId, artifact.status]); // Remove getDocuments from dependencies
 
   const [mode, setMode] = useState<'edit' | 'diff'>('edit');
   const [document, setDocument] = useState<Document | null>(null);
@@ -55,13 +55,20 @@ export function ArtifactViewer({ chatId, status, width }: ArtifactViewerProps) {
       if (mostRecentDocument) {
         setDocument(mostRecentDocument);
         setCurrentVersionIndex(versionedDocuments.length - 1);
-        setCurrentDocument((currentDocument) => ({
-          ...currentDocument,
-          content: mostRecentDocument.content ?? '',
-        }));
+        
+        // Only update if content is actually different to prevent infinite loops
+        setCurrentDocument((currentDocument) => {
+          if (currentDocument.content !== (mostRecentDocument.content ?? '')) {
+            return {
+              ...currentDocument,
+              content: mostRecentDocument.content ?? '',
+            };
+          }
+          return currentDocument;
+        });
       }
     }
-  }, [versionedDocuments, setCurrentDocument]);
+  }, [versionedDocuments]); // Remove setCurrentDocument from dependencies
 
   const [isContentDirty, setIsContentDirty] = useState(false);
 
@@ -78,13 +85,21 @@ export function ArtifactViewer({ chatId, status, width }: ArtifactViewerProps) {
 
         setIsContentDirty(false);
 
-        // Update local state
-        const newDocument = {
-          ...document,
-          content: updatedContent,
-          updatedAt: Date.now(),
-        };
-        setVersionedDocuments([newDocument]);
+        // Update local state - update the current document in the array instead of replacing the whole array
+        setVersionedDocuments(prevVersions => {
+          const updatedVersions = [...prevVersions];
+          const currentIndex = updatedVersions.findIndex(doc => doc.id === document.id);
+          
+          if (currentIndex !== -1) {
+            updatedVersions[currentIndex] = {
+              ...document,
+              content: updatedContent,
+              updatedAt: Date.now(),
+            };
+          }
+          
+          return updatedVersions;
+        });
       }
     },
     [artifact, document, updateDocumentInStore],
