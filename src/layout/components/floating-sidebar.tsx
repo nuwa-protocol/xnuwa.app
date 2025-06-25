@@ -92,7 +92,7 @@ function SidebarLayoutContent({ children }: FloatingSidebarLayoutProps) {
             "transition-all duration-300 ease-in-out", // Smooth transition for position changes
             isFloating
               ? "fixed inset-y-0 left-0 z-50 w-0" // No width, positioned absolutely
-              : "relative" // Normal layout flow
+              : "relative w-64" // Normal layout flow
           )}
         >
           <AppSidebar />
