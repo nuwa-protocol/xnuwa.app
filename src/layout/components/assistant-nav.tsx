@@ -1,6 +1,6 @@
 "use client";
 import { LogOut, Monitor, Moon, Settings, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/shared/components/theme-provider";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/use-auth";
@@ -90,7 +90,7 @@ export function AssistantNav() {
             </div>
             <div className="flex items-center justify-between mb-2">
               <span>{t("nav.menu.theme")}</span>
-              <Tabs value={theme} onValueChange={setTheme}>
+              <Tabs value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "system")}>
                 <TabsList className="h-8 bg-muted p-1 rounded-xl border border-muted-foreground/10">
                   <TabsTrigger
                     value="system"
