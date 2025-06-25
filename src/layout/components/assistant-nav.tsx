@@ -25,11 +25,13 @@ import {
 import { useLanguage } from "@/shared/hooks/use-language";
 import { useStorage } from "@/shared/hooks/use-storage";
 import type { Locale } from "@/shared/locales";
+import { useAuthHandler } from "@/features/auth/hooks";
 
 export function AssistantNav() {
   const navigate = useNavigate();
   const { setTheme, theme } = useTheme();
   const { did } = useAuth();
+  const { logout } = useAuthHandler();
   const { t } = useLanguage();
   const { settings, setSetting } = useSettings();
   const { resetAllStores } = useStorage();
@@ -37,6 +39,7 @@ export function AssistantNav() {
 
   const handleLogout = () => {
     resetAllStores();
+    logout();
     navigate("/login");
   };
 
