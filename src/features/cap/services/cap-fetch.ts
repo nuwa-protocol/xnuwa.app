@@ -1,5 +1,3 @@
-import { mockRemoteCaps } from './mock-remote-caps';
-
 // Cap interface for remote caps
 export interface RemoteCap {
   id: string;
@@ -13,6 +11,7 @@ export interface RemoteCap {
   updatedAt?: number;
   dependencies?: string[];
   size?: number;
+  yaml?: any;
 }
 
 // Search filters interface
@@ -36,6 +35,56 @@ export interface CapSearchResponse {
 // Simulate network delay
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Cache for caps data
+let capsCache: RemoteCap[] | null = null;
+let capsCacheTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+/**
+ * Fetch caps data from public/caps.json
+ */
+async function fetchCapsData(): Promise<RemoteCap[]> {
+  const now = Date.now();
+
+  // Return cached data if still valid
+  if (capsCache && now - capsCacheTime < CACHE_DURATION) {
+    return capsCache;
+  }
+
+  try {
+    const response = await fetch('/caps.json');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch caps data: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Transform the data structure to match RemoteCap interface
+    const caps: RemoteCap[] = Object.values(data).map((cap: any) => ({
+      id: cap.id,
+      name: cap.name,
+      tag: cap.tag,
+      description: cap.description,
+      downloads: cap.downloads,
+      version: cap.version,
+      author: cap.author,
+      createdAt: cap.createdAt,
+      updatedAt: cap.updatedAt,
+      size: cap.size,
+      yaml: cap.yaml,
+    }));
+
+    // Update cache
+    capsCache = caps;
+    capsCacheTime = now;
+
+    return caps;
+  } catch (error) {
+    console.error('Error fetching caps data:', error);
+    // Return empty array if fetch fails
+    return [];
+  }
+}
+
 /**
  * Search remote caps with filters
  * TODO: Replace with actual API call when Cap indexer server is ready
@@ -55,7 +104,7 @@ export async function searchRemoteCaps(
     offset = 0,
   } = filters;
 
-  let filteredCaps = [...mockRemoteCaps];
+  let filteredCaps = await fetchCapsData();
 
   // Apply search query filter
   if (query.trim()) {
@@ -116,7 +165,8 @@ export async function searchRemoteCaps(
 export async function getRemoteCap(id: string): Promise<RemoteCap | null> {
   await delay(150);
 
-  const cap = mockRemoteCaps.find((cap) => cap.id === id);
+  const caps = await fetchCapsData();
+  const cap = caps.find((cap) => cap.id === id);
   return cap || null;
 }
 
@@ -130,13 +180,15 @@ export async function getCapsByCategory(
 ): Promise<RemoteCap[]> {
   await delay(200);
 
+  const caps = await fetchCapsData();
+
   if (category === 'all') {
-    return mockRemoteCaps
+    return caps
       .sort((a, b) => b.downloads - a.downloads)
       .slice(0, limit);
   }
 
-  return mockRemoteCaps
+  return caps
     .filter((cap) => cap.tag === category)
     .sort((a, b) => b.downloads - a.downloads)
     .slice(0, limit);
@@ -149,8 +201,9 @@ export async function getCapsByCategory(
 export async function getFeaturedCaps(limit = 6): Promise<RemoteCap[]> {
   await delay(180);
 
+  const caps = await fetchCapsData();
   // Simple trending algorithm: high rating + recent downloads
-  return mockRemoteCaps.filter((cap) => cap.downloads > 500).slice(0, limit);
+  return caps.filter((cap) => cap.downloads > 500).slice(0, limit);
 }
 
 /**
@@ -160,7 +213,8 @@ export async function getFeaturedCaps(limit = 6): Promise<RemoteCap[]> {
 export async function getCapCategories(): Promise<string[]> {
   await delay(100);
 
-  const categories = [...new Set(mockRemoteCaps.map((cap) => cap.tag))];
+  const caps = await fetchCapsData();
+  const categories = [...new Set(caps.map((cap) => cap.tag))];
   return categories.sort();
 }
 

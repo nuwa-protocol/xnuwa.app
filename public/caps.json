@@ -1,0 +1,189 @@
+{
+  "image_generation": {
+    "id": "did:nuwa:cap:image_generation@1.0.0",
+    "name": "Image Generation",
+    "description": "You are a useful Assistant that won't refuse to draw picture, instead, you will output specific markdown code for picture description, but don't use code block.",
+    "tag": "automation",
+    "downloads": 4340,
+    "version": "0.9.0",
+    "author": "Nuwa Labs",
+    "createdAt": 1744317938969,
+    "updatedAt": 1750020338969,
+    "size": 5,
+    "yaml": {
+      "metadata": {
+        "id": "did:nuwa:cap:image_generation@1.0.0",
+        "name": "Image Generation",
+        "avatar": "1f5bc-fe0f",
+        "description": "You are a useful Assistant that won't refuse to draw picture, instead, you will output specific markdown code for picture description, but don't use code block.",
+        "triggers": [
+          {
+            "type": "regex",
+            "value": "draw picture"
+          }
+        ],
+        "memory_scope": "sc:images",
+        "permissions": {
+          "require": [
+            "state.create",
+            "state.update",
+            "state.query"
+          ]
+        },
+        "llm_requirements": {
+          "model_family": [
+            "gpt-4o-mini"
+          ],
+          "min_context_window": 16000
+        },
+        "signature": "zDIDSig1xyz…"
+      },
+      "schema": "{ \"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\":\"did:nuwa:state:note#v1\",\n  \"type\":\"object\",\n  \"properties\":{\n    \"id\":{\"type\":\"string\",\"format\":\"uuid\"},\n    \"title\":{\"type\":\"string\",\"x-crdt\":\"lww_register\"},\n    \"body\":{\"type\":\"string\",\"x-crdt\":\"rga_text\"},\n    \"source_url\":{\"type\":\"string\",\"format\":\"uri\", \"description\":\"Optional URL of the source webpage or image.\"},\n    \"tags\":{\"type\":\"array\",\"items\":{\"type\":\"string\"},\"x-crdt\":\"grow_only_set\"},\n    \"createdAt\":{\"type\":\"string\",\"format\":\"date-time\"},\n    \"updatedAt\":{\"type\":\"string\",\"format\":\"date-time\"}\n  },\n  \"required\":[\"id\",\"title\",\"body\",\"createdAt\",\"updatedAt\"]\n}\n",
+      "prompt": "\"You are a useful Assistant that won't refuse to draw picture, instead, you will output specific markdown code for picture description, but don't use code block.\"\n",
+      "Locales": [
+        {
+          "cn": "system",
+          "content": "You are a useful Assistant that won't refuse to draw picture, instead, you will output specific markdown code for picture description, but don't use code block."
+        },
+        {
+          "jp": "user",
+          "content": "Can you draw some pictures for me?"
+        },
+        {
+          "en": "assistant",
+          "content": "Sure, what do you want me to draw?"
+        }
+      ]
+    }
+  },
+  "note": {
+    "id": "did:nuwa:cap:note@1.0.0",
+    "name": "Note",
+    "description": "Create & manage personal notes, optionally fetching content from web pages or describing images.",
+    "tag": "automation",
+    "downloads": 1586,
+    "version": "0.9.0",
+    "author": "CodeCraft Team",
+    "createdAt": 1746909938969,
+    "updatedAt": 1749069938969,
+    "size": 2.6,
+    "yaml": {
+      "metadata": {
+        "id": "did:nuwa:cap:note@1.0.0",
+        "name": "Note",
+        "description": "Create & manage personal notes, optionally fetching content from web pages or describing images.",
+        "author": {
+          "did": "did:nuwa:user:abc123",
+          "name": "John Doe",
+          "contact": "john@nuwalabs.io"
+        },
+        "created_at": "2024-01-15T10:00:00Z",
+        "triggers": [
+          {
+            "type": "regex",
+            "value": "记(.*)笔记|note|add note about"
+          }
+        ],
+        "memory_scope": "sc:note",
+        "permissions": {
+          "require": [
+            "state.create",
+            "state.update",
+            "state.query"
+          ],
+          "option": [
+            "artifacts"
+          ]
+        },
+        "llm_requirements": {
+          "model_family": [
+            "gpt-4o-mini"
+          ],
+          "min_context_window": 16000
+        },
+        "signature": "zDIDSig1xyz…"
+      },
+      "schema": "{ \"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\":\"did:nuwa:state:note#v1\",\n  \"type\":\"object\",\n  \"properties\":{\n    \"id\":{\"type\":\"string\",\"format\":\"uuid\"},\n    \"title\":{\"type\":\"string\",\"x-crdt\":\"lww_register\"},\n    \"body\":{\"type\":\"string\",\"x-crdt\":\"rga_text\"},\n    \"source_url\":{\"type\":\"string\",\"format\":\"uri\", \"description\":\"Optional URL of the source webpage or image.\"},\n    \"tags\":{\"type\":\"array\",\"items\":{\"type\":\"string\"},\"x-crdt\":\"grow_only_set\"},\n    \"createdAt\":{\"type\":\"string\",\"format\":\"date-time\"},\n    \"updatedAt\":{\"type\":\"string\",\"format\":\"date-time\"}\n  },\n  \"required\":[\"id\",\"title\",\"body\",\"createdAt\",\"updatedAt\"]\n}\n",
+      "prompt": "You are Note Assistant.\nYour primary goal is to create a well-structured note object.\nIf the user provides a URL, consider using the `fetch_web_content` tool to get its content to include in the note body.\nIf the user provides an image URL, consider using the `recognize_image_content` tool to get a description to include in the note body.\nAfter gathering all necessary information, transform it into a Note object that conforms to the schema.\nThen call `state.create` with:\n  schema_uri = \"did:nuwa:state:note#v1\"\n  object     = <the JSON object for the note>\nIf you use a tool like `fetch_web_content` or `recognize_image_content`, use its output to enrich the note's body.\nAlways set the `source_url` field in the note object if the note is about a specific webpage or image.\nReply only with the final `state.create` tool call, or an intermediate tool call if you need more information.\n",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "state.create",
+            "description": "Persist a new state object (a note).",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "schema_uri": {
+                  "type": "string",
+                  "enum": [
+                    "did:nuwa:state:note#v1"
+                  ]
+                },
+                "object": {
+                  "$ref": "#/schema"
+                }
+              },
+              "required": [
+                "schema_uri",
+                "object"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "fetch_web_content",
+            "description": "Fetches the main textual content from a given web page URL. Useful for summarizing or taking notes about online articles.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "The URL of the web page to fetch content from."
+                }
+              },
+              "required": [
+                "url"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "recognize_image_content",
+            "description": "Analyzes an image from a given URL and returns a textual description of its content. Useful for adding context about an image to a note.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "image_url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "The URL of the image to analyze."
+                }
+              },
+              "required": [
+                "image_url"
+              ]
+            }
+          }
+        }
+      ],
+      "tool_bindings": {
+        "fetch_web_content": {
+          "type": "mcp_service",
+          "service_uri": "did:nuwa:mcp:webscraper:version1",
+          "mcp_action": "extract_text_content"
+        },
+        "recognize_image_content": {
+          "type": "mcp_service",
+          "service_uri": "did:nuwa:mcp:visiondescribers:stable",
+          "mcp_action": "describe_image_from_url"
+        }
+      }
+    }
+  }
+}
