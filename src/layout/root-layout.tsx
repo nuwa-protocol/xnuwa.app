@@ -1,9 +1,8 @@
 import { Toaster } from "sonner";
-import { AuthGuard } from "./components/auth-guard";
+import { AuthGuard } from "@/features/auth/components";
+import { Outlet } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
 import "./globals.css";
-import { Outlet } from "react-router-dom";
-
 
 export default function RootLayout() {
   return (

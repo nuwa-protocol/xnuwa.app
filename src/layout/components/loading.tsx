@@ -1,11 +1,9 @@
-"use client";
+"use client";;
 import { useLanguage } from "@/shared/hooks/use-language";
-import { AuthGuard } from "./auth-guard";
 
 export default function Loading() {
   const { t } = useLanguage();
   return (
-    <AuthGuard>
       <div className="flex flex-col min-w-0 h-dvh bg-background">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
@@ -14,6 +12,5 @@ export default function Loading() {
           </div>
         </div>
       </div>
-    </AuthGuard>
   );
 }

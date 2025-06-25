@@ -46,9 +46,6 @@ const handleAIRequest = async ({
   const { updateMessages, updateTitle, updateSession, createStreamId } =
     ChatStateStore.getState();
 
-  updateSession(sessionId, {
-    updatedAt: Date.now(),
-  });
 
   const geoLocation = await getClientLocation();
 
@@ -86,7 +83,6 @@ const handleAIRequest = async ({
       });
 
       await updateMessages(sessionId, finalMessages);
-      await updateTitle(sessionId);
     },
   });
 

@@ -4,11 +4,13 @@ import { ChatSDKError } from "@/shared/errors/chatsdk-errors";
 import { ErrorHandlers } from "@/shared/errors/error-handler";
 import { generateUUID } from "@/shared/utils";
 import { createClientAIFetch } from "../services";
+import { useNavigate } from "react-router-dom";
 
 export const useChatDefault = (
   chatId: string,
   initialMessages: UIMessage[]
 ) => {
+  const navigate = useNavigate();
   const handleUseChatError = (error: Error) => {
     let errorMessage: UIMessage;
     if (error instanceof ChatSDKError) {
@@ -48,6 +50,9 @@ export const useChatDefault = (
       messages: body.messages,
     }),
     onError: handleUseChatError,
+    onFinish: () => {
+      navigate(`/chat?cid=${chatId}`);
+    },
   });
 
   return {

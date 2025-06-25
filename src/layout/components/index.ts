@@ -1,6 +1,5 @@
 export * from './app-sidebar';
 export * from './assistant-nav';
-export * from './auth-guard';
 export * from './floating-sidebar';
 export * from './header';
 export * from './loading';

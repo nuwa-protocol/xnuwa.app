@@ -12,6 +12,8 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   // Keep legacy DID store in sync so existing code relying on it continues to work.
   useEffect(() => {
+    console.log("isConnected", isConnected);
+    console.log("isConnecting", isConnecting);
     if (!isConnected) {
       navigate("/login");
     }
