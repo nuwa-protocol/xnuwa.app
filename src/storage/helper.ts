@@ -14,21 +14,31 @@ export function createStorageKey(baseKey: string, did: string | null): string {
  */
 export function createPersistStorage<T>(config: PersistConfig<T>) {
   return {
-    getItem: async (): Promise<string | null> => {
+    getItem: async (name: string): Promise<string | null> => {
       const did = await config.getCurrentDID();
       const key = createStorageKey(config.name, did);
       const data = await storageActions.syncFromCache<T>(key);
       return data ? JSON.stringify(data) : null;
     },
 
-    setItem: async (value: string): Promise<void> => {
+    setItem: async (name: string, value: string): Promise<void> => {
       const did = await config.getCurrentDID();
       const key = createStorageKey(config.name, did);
-      const data = JSON.parse(value);
-      await storageActions.syncToCache(key, data);
+      
+      try {
+        const data = JSON.parse(value);
+        await storageActions.syncToCache(key, data);
+      } catch (error) {
+        console.error('Failed to parse and save state:', {
+          name,
+          key,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
     },
 
-    removeItem: async (): Promise<void> => {
+    removeItem: async (name: string): Promise<void> => {
       const did = await config.getCurrentDID();
       const key = createStorageKey(config.name, did);
       await storageActions.syncToCache(key, null);
