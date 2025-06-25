@@ -3,7 +3,7 @@
 import { memo, useEffect, useMemo, useState } from 'react';
 import { DataGrid, textEditor } from 'react-data-grid';
 import { parse, unparse } from 'papaparse';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/shared/components/theme-provider';
 import { cn } from '@/shared/utils';
 
 import 'react-data-grid/lib/styles.css';

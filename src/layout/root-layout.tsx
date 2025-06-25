@@ -6,9 +6,7 @@ import "./globals.css";
 
 export default function RootLayout() {
   return (
-    <ThemeProvider
-      defaultTheme="light" storageKey="nuwa-ui-theme"
-    >
+    <ThemeProvider>
       <AuthGuard>
         <Toaster position="top-center" />
         <Outlet />
