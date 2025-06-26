@@ -43,7 +43,7 @@ const handleAIRequest = async ({
   messages: Message[];
   signal?: AbortSignal;
 }) => {
-  const { updateMessages, updateTitle, updateSession, createStreamId } =
+  const { updateMessages, createStreamId } =
     ChatStateStore.getState();
 
   await updateMessages(sessionId, messages);

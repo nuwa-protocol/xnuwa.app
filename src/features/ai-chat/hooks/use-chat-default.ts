@@ -50,7 +50,7 @@ export const useChatDefault = (
       messages: body.messages,
     }),
     onError: handleUseChatError,
-    onFinish: () => {
+    onResponse: () => {
       navigate(`/chat?cid=${chatId}`);
     },
   });
