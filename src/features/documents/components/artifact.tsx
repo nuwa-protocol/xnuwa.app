@@ -10,6 +10,7 @@ import { Messages } from '@/features/ai-chat/components';
 import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
 import { useChatDefault } from '@/features/ai-chat/hooks/use-chat-default';
 import { useArtifactWidth } from '@/layout/hooks/use-artifact-width';
+import { useNavigate } from 'react-router-dom';
 
 export function Artifact({
   chatId,
@@ -20,6 +21,12 @@ export function Artifact({
   initialMessages: Array<UIMessage>;
   isReadonly: boolean;
 }) {
+  const navigate = useNavigate();
+
+  const handleOnResponse = (response: any) => {
+    navigate(`/artifact?cid=${chatId}`);
+  };
+
   const {
     messages,
     setMessages: setChatMessages,
@@ -30,7 +37,7 @@ export function Artifact({
     status,
     stop,
     reload,
-  } = useChatDefault(chatId, initialMessages);
+  } = useChatDefault(chatId, initialMessages, handleOnResponse);
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const { currentDocument } = useCurrentDocument();
