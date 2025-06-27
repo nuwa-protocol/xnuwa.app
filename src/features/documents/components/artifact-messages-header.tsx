@@ -15,7 +15,7 @@ export function ArtifactMessagesHeader({ chatId }: { chatId: string }) {
     }
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted dark:bg-background">
+    <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted dark:bg-background shadow-sm">
       <div className="font-semibold text-md">{session ? session.title : 'New Chat'}</div>
       <Button variant="ghost" size="icon" onClick={handleNewChat} aria-label="New Chat Button">
         <PlusIcon className="size-5" />
