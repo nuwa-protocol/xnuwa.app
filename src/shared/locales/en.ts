@@ -210,10 +210,6 @@ export const en = {
         redo: 'Redo change',
         copy: 'Copy text',
       },
-      toolbar: {
-        polish: 'Polish writing',
-        suggestions: 'Writing suggestions',
-      },
       addPolish: 'Add final polish',
       requestSuggestions: 'Request suggestions',
       polishPrompt:
@@ -230,10 +226,6 @@ export const en = {
         undo: 'Undo change',
         redo: 'Redo change',
         copy: 'Copy code',
-      },
-      toolbar: {
-        comments: 'Add comments',
-        logs: 'Add logs',
       },
       run: 'Run',
       executeCode: 'Execute code',
@@ -257,11 +249,7 @@ export const en = {
         undo: 'Undo change',
         redo: 'Redo change',
         copy: 'Copy table as CSV',
-      },
-      toolbar: {
-        format: 'Format and clean data',
-        analyze: 'Analyze and visualize data',
-      },
+      }
     },
 
     image: {

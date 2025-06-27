@@ -197,10 +197,6 @@ export const cn: typeof en = {
         redo: '重做更改',
         copy: '复制文本',
       },
-      toolbar: {
-        polish: '润色写作',
-        suggestions: '写作建议',
-      },
       addPolish: '最终润色',
       requestSuggestions: '请求建议',
       polishPrompt:
@@ -216,10 +212,7 @@ export const cn: typeof en = {
         redo: '重做更改',
         copy: '复制代码',
       },
-      toolbar: {
-        comments: '添加注释',
-        logs: '添加日志',
-      },
+
       run: '运行',
       executeCode: '执行代码',
       copyCode: '复制代码到剪贴板',
@@ -241,10 +234,6 @@ export const cn: typeof en = {
         undo: '撤销更改',
         redo: '重做更改',
         copy: '复制表格为 CSV',
-      },
-      toolbar: {
-        format: '格式化和清理数据',
-        analyze: '分析和可视化数据',
       },
     },
 

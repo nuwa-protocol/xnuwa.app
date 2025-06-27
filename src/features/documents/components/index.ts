@@ -6,5 +6,4 @@ export * from './artifact';
 export * from './document-preview-call';
 export * from './document-preview-result';
 export * from './document-preview';
-export * from './toolbar';
 export * from './version-footer';
