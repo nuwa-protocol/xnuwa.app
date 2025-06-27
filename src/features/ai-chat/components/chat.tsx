@@ -52,6 +52,7 @@ export function Chat({
           setMessages={setChatMessages}
           reload={reload}
           isReadonly={isReadonly}
+          isArtifact={false}
         />
 
         <form

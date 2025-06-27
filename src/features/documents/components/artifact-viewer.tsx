@@ -13,10 +13,9 @@ import type { Document } from '@/features/documents/stores';
 interface ArtifactViewerProps {
   chatId: string;
   status: UseChatHelpers['status'];
-  width?: number;
 }
 
-export function ArtifactViewer({ chatId, status, width }: ArtifactViewerProps) {
+export function ArtifactViewer({ chatId, status }: ArtifactViewerProps) {
   const {
     currentDocument: artifact,
     setCurrentDocument,
@@ -187,7 +186,6 @@ export function ArtifactViewer({ chatId, status, width }: ArtifactViewerProps) {
     <div
       data-testid="artifact-viewer"
       className="dark:bg-muted bg-background h-dvh flex flex-col overflow-y-scroll md:border-r dark:border-zinc-700 border-zinc-200 transition-all duration-300 ease-in-out animate-fade-in"
-      style={{ width: width || 'calc(100dvw - 400px)' }}
     >
       <div className="p-2 flex flex-row justify-between items-start">
         <div className="flex flex-row gap-4 items-start">
