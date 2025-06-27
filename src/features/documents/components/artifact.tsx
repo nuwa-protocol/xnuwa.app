@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ArtifactViewer } from './artifact-viewer';
 import { MultimodalInput } from '@/features/ai-chat/components';
 import { Messages } from '@/features/ai-chat/components';
+import { ArtifactMessagesHeader } from './artifact-messages-header';
 
 import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
 import { useChatDefault } from '@/features/ai-chat/hooks/use-chat-default';
@@ -65,6 +66,7 @@ export function Artifact({
 
       {/* Chat */}
       <div className="fixed bg-muted dark:bg-background h-dvh shrink-0 flex flex-col max-w-[400px] right-0 top-0 left-auto">
+        <ArtifactMessagesHeader chatId={chatId} />
         <Messages
           chatId={chatId}
           status={status}
@@ -72,6 +74,7 @@ export function Artifact({
           setMessages={setChatMessages}
           reload={reload}
           isReadonly={isReadonly}
+          isArtifact
         />
 
         <form
