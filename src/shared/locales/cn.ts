@@ -268,8 +268,8 @@ export const cn: typeof en = {
     sections: {
       profile: {
         title: '个人资料',
-        description: '管理您的个人资料信息',
-        subtitle: '这是其他人在网站上看到您的方式。',
+        description: '管理您的资料信息',
+        subtitle: '这是您的 Nuwa 助手的信息。',
       },
       placeholders: {
         title: '占位符',
@@ -280,6 +280,10 @@ export const cn: typeof en = {
         title: '系统',
         description: '系统设置和维护',
         subtitle: '管理系统级设置和数据。',
+      },
+      general: {
+        title: "通用",
+        subtitle: "通用应用设置。",
       },
     },
     profile: {
@@ -330,6 +334,14 @@ export const cn: typeof en = {
           documents: '创建的文档和工件',
         },
       },
+      devMode: {
+        title: '开发者模式',
+        description: '启用或禁用开发者模式。'
+      },
+      language: {
+        title: '语言',
+        description: '选择你偏好的语言。'
+      }
     },
   },
 };
