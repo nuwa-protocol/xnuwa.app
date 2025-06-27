@@ -33,7 +33,6 @@ export function ArtifactViewer({ chatId, status, width }: ArtifactViewerProps) {
   const [versionedDocuments, setVersionedDocuments] = useState<Array<Document>>(
     [],
   );
-  const [isDocumentsFetching, setIsDocumentsFetching] = useState(false);
 
   useEffect(() => {
     if (artifact.documentId !== 'init' && artifact.status !== 'streaming') {
@@ -243,7 +242,7 @@ export function ArtifactViewer({ chatId, status, width }: ArtifactViewerProps) {
           isInline={false}
           isCurrentVersion={isCurrentVersion}
           getDocumentContentById={getDocumentContentById}
-          isLoading={isDocumentsFetching && !artifact.content}
+          isLoading={!artifact.content}
           metadata={metadata}
           setMetadata={setMetadata}
         />
