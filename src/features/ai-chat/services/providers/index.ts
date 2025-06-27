@@ -4,6 +4,7 @@ import {
   wrapLanguageModel,
 } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { createOpenAI } from '@ai-sdk/openai';
 
 import { createAuthorizedFetch } from './fetch';
 import { ChatStateStore } from '../../stores/chat-store';
@@ -12,6 +13,12 @@ import { ChatStateStore } from '../../stores/chat-store';
 const BASE_URL = 'https://test-llm.nuwa.dev/api/v1';
 
 const openrouter = createOpenRouter({
+  apiKey: 'NOT_USED',
+  baseURL: BASE_URL,
+  fetch: createAuthorizedFetch(),
+});
+
+const openai = createOpenAI({
   apiKey: 'NOT_USED',
   baseURL: BASE_URL,
   fetch: createAuthorizedFetch(),
@@ -31,11 +38,13 @@ const createDynamicProvider = () => {
       'title-model': openrouter('gpt-4o-mini'),
       'artifact-model': openrouter('gpt-4o-mini'),
     },
-    // imageModels: {
-    //   'small-model': openai.image('gpt-4o-mini'),
-    // },
+    imageModels: {
+      'small-model': openai.image('gpt-4o-mini'),
+    },
   });
 };
+
+
 
 // Export a provider that dynamically resolves models
 export const myProvider = {
@@ -43,8 +52,8 @@ export const myProvider = {
     const provider = createDynamicProvider();
     return provider.languageModel(modelName);
   },
-  // imageModel: (modelName: string) => {
-  //   const provider = createDynamicProvider();
-  //   return provider.imageModel(modelName);
-  // },
+  imageModel: (modelName: string) => {
+    const provider = createDynamicProvider();
+    return provider.imageModel(modelName);
+  },
 };
