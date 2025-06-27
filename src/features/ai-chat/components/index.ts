@@ -7,6 +7,8 @@ export * from './message-editor';
 export * from './message-reasoning';
 export * from './message';
 export * from './messages';
+export * from './model-avatar';
+export * from './model-selector';
 export * from './multimodal-input';
 export * from './preview-attachment';
 export * from './submit-button';

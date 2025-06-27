@@ -30,6 +30,7 @@ import { Button } from "@/shared/components/ui/button";
 import { useLanguage } from "@/shared/hooks/use-language";
 import { PreviewAttachment } from "./preview-attachment";
 import { SuggestedActions } from "./suggested-actions";
+import { ModelSelector } from "./model-selector";
 
 function PureMultimodalInput({
   chatId,
@@ -261,8 +262,9 @@ function PureMultimodalInput({
         }}
       />
 
-      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
+      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start items-center gap-2">
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
+        <ModelSelector />
       </div>
 
       <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
