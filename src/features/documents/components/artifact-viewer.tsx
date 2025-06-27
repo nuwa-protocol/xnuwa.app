@@ -25,7 +25,7 @@ export function ArtifactViewer({ chatId, status }: ArtifactViewerProps) {
   const {
     documentsMap,
     getDocuments,
-    updateDocument: updateDocumentInStore,
+    updateDocumentContent,
   } = useDocuments();
 
   // Use document store instead of SWR
@@ -76,10 +76,7 @@ export function ArtifactViewer({ chatId, status }: ArtifactViewerProps) {
 
       if (document.content !== updatedContent) {
         // Update document in local store
-        updateDocumentInStore(artifact.documentId, {
-          content: updatedContent,
-          updatedAt: Date.now(),
-        });
+        updateDocumentContent(artifact.documentId, updatedContent);
 
         setIsContentDirty(false);
 
@@ -100,7 +97,7 @@ export function ArtifactViewer({ chatId, status }: ArtifactViewerProps) {
         });
       }
     },
-    [artifact, document, updateDocumentInStore],
+    [artifact, document, updateDocumentContent],
   );
 
   const debouncedHandleContentChange = useDebounceCallback(
