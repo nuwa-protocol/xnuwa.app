@@ -1,4 +1,3 @@
-"use client";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { Attachment, UIMessage } from "ai";
 import cx from "classnames";
@@ -25,7 +24,6 @@ import { useLocalStorage, useWindowSize } from "usehooks-ts";
 import { useFiles } from "@/features/ai-chat/hooks/use-files";
 import { useScrollToBottom } from "@/features/ai-chat/hooks/use-scroll-to-bottom";
 import { toast } from "@/shared/components";
-import { Textarea } from "@/shared/components/ui";
 import { Button } from "@/shared/components/ui/button";
 import { useLanguage } from "@/shared/hooks/use-language";
 import { PreviewAttachment } from "./preview-attachment";
@@ -64,28 +62,6 @@ function PureMultimodalInput({
   const { uploadFile } = useFiles();
   const { t } = useLanguage();
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      adjustHeight();
-    }
-  }, []);
-
-  const adjustHeight = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${
-        textareaRef.current.scrollHeight + 2
-      }px`;
-    }
-  };
-
-  const resetHeight = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = "98px";
-    }
-  };
-
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
     "input",
     ""
@@ -97,7 +73,6 @@ function PureMultimodalInput({
       // Prefer DOM value over localStorage to handle hydration
       const finalValue = domValue || localStorageInput || "";
       setInput(finalValue);
-      adjustHeight();
     }
     // Only run once after hydration
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,7 +84,6 @@ function PureMultimodalInput({
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
-    adjustHeight();
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -122,7 +96,6 @@ function PureMultimodalInput({
 
     setAttachments([]);
     setLocalStorageInput("");
-    resetHeight();
 
     if (width && width > 768) {
       textareaRef.current?.focus();
@@ -199,7 +172,7 @@ function PureMultimodalInput({
 
       <input
         type="file"
-        className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
+        className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none "
         ref={fileInputRef}
         multiple
         onChange={handleFileChange}
@@ -229,54 +202,65 @@ function PureMultimodalInput({
         </div>
       )}
 
-      <Textarea
-        data-testid="multimodal-input"
-        ref={textareaRef}
-        placeholder="Send a message..."
-        value={input}
-        onChange={handleInput}
+      <div
         className={cx(
-          "min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700",
+          "flex flex-col rounded-2xl bg-muted dark:border-zinc-700 border border-input ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
           className
         )}
-        rows={2}
-        autoFocus
-        onKeyDown={(event) => {
-          if (
-            event.key === "Enter" &&
-            !event.shiftKey &&
-            !event.nativeEvent.isComposing
-          ) {
-            event.preventDefault();
-
-            if (status !== "ready") {
-              toast({
-                type: "error",
-                description:
-                  "Please wait for the model to finish its response!",
-              });
-            } else {
-              submitForm();
-            }
+      >
+        <textarea
+          data-testid="multimodal-input"
+          ref={textareaRef}
+          placeholder="Send a message..."
+          value={input}
+          onChange={handleInput}
+          className="flex-1 min-h-[50px] max-h-[calc(25dvh-48px)] overflow-auto hide-scrollbar resize-none text-base bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none pt-3 px-3 pb-0"
+          rows={2}
+          autoFocus
+          style={
+            {
+              fieldSizing: 'content',
+            } as React.CSSProperties
           }
-        }}
-      />
+          onKeyDown={(event) => {
+            if (
+              event.key === "Enter" &&
+              !event.shiftKey &&
+              !event.nativeEvent.isComposing
+            ) {
+              event.preventDefault();
 
-      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start items-center gap-2">
-        <AttachmentsButton fileInputRef={fileInputRef} status={status} />
-        <ModelSelector />
-      </div>
+              if (status !== "ready") {
+                toast({
+                  type: "error",
+                  description:
+                    "Please wait for the model to finish its response!",
+                });
+              } else {
+                submitForm();
+              }
+            }
+          }}
+        />
 
-      <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
-        {status === "submitted" || status === "streaming" ? (
-          <StopButton stop={stop} setMessages={setMessages} />
-        ) : (
-          <SendButton
-            input={input}
-            submitForm={submitForm}
-            uploadQueue={uploadQueue}
-          />
-        )}
+        <div className="flex justify-between items-center p-2">
+          <div className="flex items-center gap-2">
+            <AttachmentsButton fileInputRef={fileInputRef} status={status} />
+            <ModelSelector />
+          </div>
+
+          <div className="flex items-center">
+            {status === "submitted" || status === "streaming" ? (
+              <StopButton stop={stop} setMessages={setMessages} />
+            ) : (
+              <SendButton
+                input={input}
+                submitForm={submitForm}
+                uploadQueue={uploadQueue}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
