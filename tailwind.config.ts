@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  darkMode: ["class", "class"],
+  darkMode: ["class"],
   content: [
     './src/**/*.{js,ts,jsx,tsx,mdx}',
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -9,20 +9,37 @@ const config: Config = {
   ],
   theme: {
   	extend: {
-  		fontFamily: {
-  			sans: [
-  				'Geist Sans',
-  				'ui-sans-serif',
-  				'system-ui',
-  				'sans-serif'
-  			],
-  			mono: [
-  				'Geist Mono',
-  				'ui-monospace',
-  				'SFMono-Regular',
-  				'monospace'
-  			]
-  		},
+  				fontFamily: {
+			sans: [
+				'Inter',
+				'Noto Sans SC',
+				'Geist Sans',
+				'-apple-system',
+				'BlinkMacSystemFont',
+				'Segoe UI',
+				'PingFang SC',
+				'Hiragino Sans GB',
+				'Microsoft YaHei',
+				'Helvetica Neue',
+				'Helvetica',
+				'Arial',
+				'sans-serif'
+			],
+			mono: [
+				'JetBrains Mono',
+				'Geist Mono',
+				'Fira Code',
+				'SF Mono',
+				'Monaco',
+				'Inconsolata',
+				'Roboto Mono',
+				'Source Code Pro',
+				'Menlo',
+				'Consolas',
+				'DejaVu Sans Mono',
+				'monospace'
+			]
+		},
   		screens: {
   			'toast-mobile': '600px'
   		},

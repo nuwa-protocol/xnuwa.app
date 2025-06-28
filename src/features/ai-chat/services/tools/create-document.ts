@@ -7,7 +7,8 @@ import { generateTextContent } from '@/features/documents/artifacts/text';
 import { DocumentStateStore } from '@/features/documents/stores';
 import { generateUUID } from '@/shared/utils';
 
-const artifactKinds = ['text', 'code', 'image', 'sheet'] as const;
+// const artifactKinds = ['text', 'code', 'image', 'sheet'] as const;
+const artifactKinds = ['text'] as const;
 
 // generate function mapping
 const generators = {
