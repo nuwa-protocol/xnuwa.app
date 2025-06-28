@@ -12,14 +12,12 @@ import './starry-night.css';
 
 interface CodeBlockProps {
   node: any;
-  inline: boolean;
   className: string;
   children: any;
 }
 
 export function CodeBlock({
   node,
-  inline,
   className,
   children,
   ...props
@@ -33,19 +31,21 @@ export function CodeBlock({
   const codeString = Array.isArray(children) ? children.join('') : String(children);
   const language = className?.replace('language-', '') || '';
 
+  const isBlock = className && className.startsWith('language-');
+
   useEffect(() => {
-    if (!inline && !isLoading && codeString.trim()) {
+    if (isBlock && !isLoading && codeString.trim()) {
       highlight(codeString, language).then(setHighlightedCode);
     }
-  }, [codeString, language, inline, isLoading, highlight]);
+  }, [codeString, language, isBlock, isLoading, highlight]);
 
-  if (!inline) {
+  if (isBlock) {
     return (
       <div className="not-prose flex flex-col relative group">
         {/* Language label as a tab above the code block */}
         {language && (
           <div className="flex justify-start mb-0">
-            <div className="px-3 py-1 text-xs font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-t-md border border-zinc-200 dark:border-zinc-700 border-b-0">
+            <div className="px-3 py-1 text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-t-md border border-zinc-200 dark:border-zinc-700 border-b-0 capitalize">
               {language}
             </div>
           </div>
@@ -95,7 +95,7 @@ export function CodeBlock({
   } else {
     return (
       <code
-        className={`${className} text-sm bg-zinc-100 dark:bg-zinc-800 py-0.5 px-1 rounded-md`}
+        className={`${className} text-sm bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-300 py-0.5 px-1 rounded-md`}
         {...props}
       >
         {children}
