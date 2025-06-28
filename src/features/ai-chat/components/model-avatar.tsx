@@ -2,6 +2,7 @@ import React from 'react';
 import { BotIcon } from 'lucide-react';
 import type { OpenRouterModel } from '../types';
 import { Img } from 'react-image';
+import { useTheme } from '@/shared/components/theme-provider';
 
 interface ModelAvatarProps {
   model: OpenRouterModel;
@@ -29,9 +30,10 @@ export const ModelAvatar: React.FC<ModelAvatarProps> = ({
   className = ''
 }) => {
 
+  const { resolvedTheme } = useTheme();
   const iconSlug = model.name.split(':')[0];
-  const iconSrc = `https://unpkg.com/@lobehub/icons-static-svg@latest/icons/${iconSlug}-color.svg`
-  const iconSrcBw = `https://unpkg.com/@lobehub/icons-static-svg@latest/icons/${iconSlug}.svg`
+  const iconSrc = `https://unpkg.com/@lobehub/icons-static-webp@latest/${resolvedTheme}/${iconSlug}-color.webp`
+  const iconSrcBw = `https://unpkg.com/@lobehub/icons-static-webp@latest/${resolvedTheme}/${iconSlug}.webp`
   return (
     <Img
       src={[iconSrc, iconSrcBw]}
