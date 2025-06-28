@@ -8,6 +8,7 @@ class Database extends Dexie {
   streams!: Table<any>;
   caps!: Table<any>;
   settings!: Table<any>;
+  models!: Table<any>;
 
   constructor() {
     if (typeof window === "undefined") {
@@ -25,6 +26,7 @@ class Database extends Dexie {
       streams: "id, did, chatId, createdAt",
       caps: "id, did, installDate, tag",
       settings: "did",
+      models: "did",
     });
   }
 }

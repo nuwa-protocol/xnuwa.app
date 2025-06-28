@@ -5,6 +5,7 @@ import {
   streamText,
 } from "ai";
 import { ChatStateStore } from "@/features/ai-chat/stores/chat-store";
+import { ModelStateStore } from "@/features/ai-chat/stores/model-store";
 import { getClientLocation } from "@/features/ai-chat/utils";
 import { generateUUID } from "@/shared/utils";
 import { systemPrompt } from "../prompts";
@@ -54,6 +55,9 @@ const handleAIRequest = async ({
   const streamId = generateUUID();
   createStreamId(streamId, sessionId);
 
+  // get selected model
+  const selectedModel = ModelStateStore.getState().selectedModel;
+
   const result = streamText({
     model: myProvider.languageModel(DEFAULT_CHAT_MODEL),
     system: systemPrompt({
@@ -64,11 +68,11 @@ const handleAIRequest = async ({
     }),
     messages,
     maxSteps: 5,
-    experimental_activeTools: [
+    experimental_activeTools: selectedModel.supported_parameters.includes("tools") ? [
       "getWeather",
       "createDocument",
       "updateDocument",
-    ],
+    ]:[],
     experimental_transform: smoothStream({ chunking: "word" }),
     experimental_generateMessageId: generateUUID,
     tools: {

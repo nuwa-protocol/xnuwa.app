@@ -91,6 +91,7 @@
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.58.1",
+    "react-image": "^4.1.0",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^3.0.3",
     "react-router": "^7.6.2",
