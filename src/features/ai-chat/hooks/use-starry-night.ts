@@ -38,10 +38,8 @@ export function useStarryNight(): UseStarryNightReturn {
 
     const initStarryNight = async () => {
       try {
-        console.log('🌟 Initializing starry-night...');
         // Initialize starry-night with common languages
         const instance = await createStarryNight(common);
-        console.log('✅ Starry-night initialized successfully:', instance);
         if (mounted) {
           setStarryNight(instance);
           setIsLoading(false);
