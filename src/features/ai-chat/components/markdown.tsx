@@ -1,6 +1,5 @@
 import { memo } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
-import { Link } from "react-router-dom";
 import remarkGfm from "remark-gfm";
 import { CodeBlock } from "./code-block";
 
@@ -38,15 +37,14 @@ const components: Partial<Components> = {
   },
   a: ({ node, children, ...props }) => {
     return (
-      // @ts-expect-error
-      <Link
+      <a
         className="text-blue-500 hover:underline"
         target="_blank"
         rel="noreferrer"
         {...props}
       >
         {children}
-      </Link>
+      </a>
     );
   },
   h1: ({ node, children, ...props }) => {
