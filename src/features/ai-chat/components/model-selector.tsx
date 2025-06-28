@@ -131,20 +131,21 @@ export const ModelSelector: React.FC = () => {
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
-        <DialogHeader>
+        <DialogHeader className="sr-only">
           <DialogTitle>Select a Model</DialogTitle>
         </DialogHeader>
         <Input
-          placeholder="Search models..."
+          autoFocus
+          placeholder={"Search models"}
           value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="mb-4"
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-none border-0 border-b focus-visible:ring-0 focus-visible:border-primary"
         />
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="mb-4 w-full grid grid-cols-7 h-auto space-x-2">
             {PROVIDER_TABS.map((provider) => (
-              <TabsTrigger 
-                key={provider} 
+              <TabsTrigger
+                key={provider}
                 value={provider}
                 className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
@@ -153,8 +154,8 @@ export const ModelSelector: React.FC = () => {
             ))}
           </TabsList>
           {PROVIDER_TABS.map((provider) => (
-            <TabsContent key={provider} value={provider}>
-              <div className="max-h-[400px] overflow-y-auto space-y-2">
+            <TabsContent key={provider} value={provider} >
+              <div className="h-[400px] overflow-y-auto space-y-2 hide-scrollbar">
                 {filteredModels[provider] && filteredModels[provider].length === 0 && (
                   <div className="text-center text-muted-foreground py-8">No models found</div>
                 )}
@@ -186,8 +187,8 @@ export const ModelSelector: React.FC = () => {
                       }}
                       className="p-1 h-8 w-8"
                     >
-                      <StarIcon 
-                        className={`w-4 h-4 ${isFavorite(model.id) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`} 
+                      <StarIcon
+                        className={`w-4 h-4 ${isFavorite(model.id) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
                       />
                     </Button>
                   </div>
