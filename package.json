@@ -59,6 +59,7 @@
     "@rjsf/validator-ajv8": "^5.24.12",
     "@tailwindcss/typography": "^0.5.16",
     "@vercel/functions": "^2.2.2",
+    "@wooorm/starry-night": "^3.8.0",
     "ai": "^4.3.16",
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.5.1",
