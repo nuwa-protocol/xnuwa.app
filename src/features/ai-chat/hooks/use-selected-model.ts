@@ -1,8 +1,8 @@
-import { ChatStateStore } from '../stores/chat-store';
+import { ModelStateStore } from '../stores/model-store';
 
 export function useSelectedModel() {
-  const selectedModel = ChatStateStore((state) => state.selectedModel);
-  const setSelectedModel = ChatStateStore((state) => state.setSelectedModel);
+  const selectedModel = ModelStateStore((state) => state.selectedModel);
+  const setSelectedModel = ModelStateStore((state) => state.setSelectedModel);
 
   return {
     selectedModel,

@@ -5,6 +5,7 @@ import {
   streamText,
 } from "ai";
 import { ChatStateStore } from "@/features/ai-chat/stores/chat-store";
+import { ModelStateStore } from "@/features/ai-chat/stores/model-store";
 import { getClientLocation } from "@/features/ai-chat/utils";
 import { generateUUID } from "@/shared/utils";
 import { systemPrompt } from "../prompts";
@@ -55,7 +56,7 @@ const handleAIRequest = async ({
   createStreamId(streamId, sessionId);
 
   // get selected model
-  const selectedModel = ChatStateStore.getState().selectedModel;
+  const selectedModel = ModelStateStore.getState().selectedModel;
 
   const result = streamText({
     model: myProvider.languageModel(DEFAULT_CHAT_MODEL),

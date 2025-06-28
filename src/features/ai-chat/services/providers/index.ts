@@ -7,7 +7,7 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { createOpenAI } from '@ai-sdk/openai';
 
 import { createAuthorizedFetch } from './fetch';
-import { ChatStateStore } from '../../stores/chat-store';
+import { ModelStateStore } from '../../stores/model-store';
 
 // Base URL of Nuwa LLM Gateway
 const BASE_URL = 'https://test-llm.nuwa.dev/api/v1';
@@ -26,7 +26,7 @@ const openai = createOpenAI({
 
 // Function to create provider with current selected model
 const createDynamicProvider = () => {
-  const selectedModel = ChatStateStore.getState().selectedModel;
+  const selectedModel = ModelStateStore.getState().selectedModel;
   
   return customProvider({
     languageModels: {
