@@ -1,6 +1,6 @@
 "use client";
 
-import { Folder, Package, Search, Settings } from "lucide-react";
+import { Bug, Folder, Package, Search, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CapStoreModal } from "@/features/cap/components";
 import { SearchModal } from "@/features/search/components";
@@ -21,6 +21,7 @@ import { useFloatingSidebar } from "./floating-sidebar";
 import { SidebarButton } from "./sidebar-button";
 import { SidebarHistory } from "./sidebar-history";
 import { SidebarToggle } from "./sidebar-toggle";
+import { useDevMode } from "@/shared/hooks";
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export function AppSidebar() {
   const { mode: sidebarMode } = useSidebarSettings();
   const floatingContext = useFloatingSidebar();
   const sidebarVariant = sidebarMode === "floating" ? "floating" : "sidebar";
+  const isDevMode = useDevMode();
 
   const handleNewChat = () => {
     setOpenMobile(false);
@@ -86,12 +88,20 @@ export function AppSidebar() {
                   variant="secondary"
                 />
               </CapStoreModal>
-              <SidebarButton
+              {isDevMode && (<SidebarButton
                 icon={Folder}
                 text={t("nav.sidebar.artifact")}
                 onClick={() => {}}
                 variant="secondary"
-              />
+              />)}
+              {isDevMode && (<SidebarButton
+                icon={Bug}
+                text={"MCP Debug"}
+                onClick={() => {
+                  navigate("/mcp-debug");
+                }}
+                variant="secondary"
+              />)}
             </div>
           </SidebarMenu>
         </SidebarHeader>

@@ -8,7 +8,7 @@ import { generateTitleFromUserMessage } from "../services";
 import { NuwaIdentityKit } from "@/features/auth/services";
 import { generateUUID } from "@/shared/utils";
 import { createPersistConfig, db } from "@/storage";
-import type { ChatSession, StreamRecord } from "../types";
+import type { ChatSession, StreamRecord, OpenRouterModel } from "../types";
 
 // ================= Constants ================= //
 export const createInitialChatSession = (): ChatSession => ({
@@ -74,6 +74,7 @@ const persistConfig = createPersistConfig<ChatStoreState>({
   getCurrentDID: getCurrentDID,
   partialize: (state) => ({
     sessions: state.sessions,
+    selectedModel: state.selectedModel,
   }),
   onRehydrateStorage: () => (state) => {
     if (state) {
@@ -88,6 +89,11 @@ export const ChatStateStore = create<ChatStoreState>()(
   persist(
     (set, get) => ({
       sessions: {},
+      selectedModel: DEFAULT_SELECTED_MODEL,
+
+      setSelectedModel: (model: OpenRouterModel) => {
+        set({ selectedModel: model });
+      },
 
       getSession: (id: string) => {
         const { sessions } = get();
