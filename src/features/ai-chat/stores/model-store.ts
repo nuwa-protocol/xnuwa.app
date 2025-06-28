@@ -6,6 +6,7 @@ import { persist } from "zustand/middleware";
 import { NuwaIdentityKit } from "@/features/auth/services";
 import { createPersistConfig } from "@/storage";
 import type { OpenRouterModel } from "../types";
+import { db } from "@/storage";
 
 // default selected model
 export const DEFAULT_SELECTED_MODEL: OpenRouterModel = {
@@ -69,6 +70,8 @@ const getCurrentDID = async () => {
   return await getDid();
 };
 
+const modelDB = db;
+
 // model store state interface
 interface ModelStateStoreState {
   // model selection state
@@ -79,6 +82,10 @@ interface ModelStateStoreState {
   favoriteModels: OpenRouterModel[];
   addToFavorites: (model: OpenRouterModel) => void;
   removeFromFavorites: (modelId: string) => void;
+
+  // data persistence
+  loadFromDB: () => Promise<void>;
+  saveToDB: () => Promise<void>;
 }
 
 // persist configuration
@@ -89,6 +96,11 @@ const persistConfig = createPersistConfig<ModelStateStoreState>({
     selectedModel: state.selectedModel,
     favoriteModels: state.favoriteModels,
   }),
+  onRehydrateStorage: () => (state) => {
+    if (state) {
+      state.loadFromDB();
+    }
+  },
 });
 
 // model store factory
@@ -100,6 +112,7 @@ export const ModelStateStore = create<ModelStateStoreState>()(
 
       setSelectedModel: (model: OpenRouterModel) => {
         set({ selectedModel: model });
+        get().saveToDB();
       },
 
       addToFavorites: (model: OpenRouterModel) => {
@@ -114,6 +127,7 @@ export const ModelStateStore = create<ModelStateStoreState>()(
             favoriteModels: [...state.favoriteModels, model],
           };
         });
+        get().saveToDB();
       },
 
       removeFromFavorites: (modelId: string) => {
@@ -122,7 +136,42 @@ export const ModelStateStore = create<ModelStateStoreState>()(
             (model) => model.id !== modelId
           ),
         }));
+        get().saveToDB();
       },
+
+      loadFromDB: async () => {
+        if (typeof window === "undefined") return;
+        try {
+          const currentDID = await getCurrentDID();
+          if (!currentDID) return;
+          const record = await modelDB.models.where("did").equals(currentDID).first();
+          if (record) {
+            set({
+              selectedModel: record.selectedModel,
+              favoriteModels: record.favoriteModels,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to load model store from DB:", error);
+        }
+      },
+
+      saveToDB: async () => {
+        if (typeof window === "undefined") return;
+        try {
+          const currentDID = await getCurrentDID();
+          if (!currentDID) return;
+          const { selectedModel, favoriteModels } = get();
+          await modelDB.models.put({
+            did: currentDID,
+            selectedModel,
+            favoriteModels,
+          });
+        } catch (error) {
+          console.error("Failed to save model store to DB:", error);
+        }
+      },
+
     }),
     persistConfig
   )
