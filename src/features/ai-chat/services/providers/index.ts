@@ -35,7 +35,7 @@ const createDynamicProvider = () => {
         model: openrouter('gpt-4o-mini'),
         middleware: extractReasoningMiddleware({ tagName: 'think' }),
       }),
-      'title-model': openrouter(selectedModel.id),
+      'title-model': openrouter('gpt-4o-mini'),
       'artifact-model': openrouter(selectedModel.id),
     },
     imageModels: {

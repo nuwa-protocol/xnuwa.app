@@ -12,12 +12,12 @@ import type { OpenRouterModel } from '../types';
 
 const PROVIDER_TABS = [
   'Favorite',
+  'All',
   'OpenAI',
   'Anthropic',
   'Google',
   'Meta',
   'Free',
-  'All',
 ];
 
 function isFreeModel(model: OpenRouterModel): boolean {
@@ -112,7 +112,10 @@ export const ModelSelector: React.FC = () => {
 
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(open) => {
+      setOpen(open);
+      setSearch('');
+    }}>
       <DialogTrigger asChild>
         <button
           className="flex items-center gap-2 px-3 py-2 rounded-xl border bg-background hover:bg-accent transition-colors"
