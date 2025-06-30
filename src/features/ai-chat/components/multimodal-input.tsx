@@ -25,10 +25,11 @@ import { useFiles } from "@/features/ai-chat/hooks/use-files";
 import { useScrollToBottom } from "@/features/ai-chat/hooks/use-scroll-to-bottom";
 import { toast } from "@/shared/components";
 import { Button } from "@/shared/components/ui/button";
+import { useDevMode } from "@/shared/hooks/use-dev-mode";
 import { useLanguage } from "@/shared/hooks/use-language";
+import { ModelSelector } from "./model-selector";
 import { PreviewAttachment } from "./preview-attachment";
 import { SuggestedActions } from "./suggested-actions";
-import { ModelSelector } from "./model-selector";
 
 function PureMultimodalInput({
   chatId,
@@ -61,6 +62,7 @@ function PureMultimodalInput({
   const { width } = useWindowSize();
   const { uploadFile } = useFiles();
   const { t } = useLanguage();
+  const isDevMode = useDevMode();
 
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
     "input",
@@ -244,8 +246,9 @@ function PureMultimodalInput({
         />
 
         <div className="flex justify-between items-center p-2">
+
           <div className="flex items-center gap-2">
-            <AttachmentsButton fileInputRef={fileInputRef} status={status} />
+            {isDevMode && <AttachmentsButton fileInputRef={fileInputRef} status={status} />}
             <ModelSelector />
           </div>
 

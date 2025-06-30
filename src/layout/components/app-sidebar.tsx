@@ -15,13 +15,13 @@ import {
   SidebarMenu,
   useSidebar,
 } from "@/shared/components/ui";
+import { useDevMode } from "@/shared/hooks";
 import { useLanguage } from "@/shared/hooks/use-language";
 import { cn } from "@/shared/utils";
 import { useFloatingSidebar } from "./floating-sidebar";
 import { SidebarButton } from "./sidebar-button";
 import { SidebarHistory } from "./sidebar-history";
 import { SidebarToggle } from "./sidebar-toggle";
-import { useDevMode } from "@/shared/hooks";
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -81,17 +81,17 @@ export function AppSidebar() {
                   variant="secondary"
                 />
               </SearchModal>
-              <CapStoreModal>
+              {isDevMode && (<CapStoreModal>
                 <SidebarButton
                   icon={Package}
                   text={t("nav.sidebar.capStore")}
                   variant="secondary"
                 />
-              </CapStoreModal>
+              </CapStoreModal>)}
               {isDevMode && (<SidebarButton
                 icon={Folder}
                 text={t("nav.sidebar.artifact")}
-                onClick={() => {}}
+                onClick={() => { }}
                 variant="secondary"
               />)}
               {isDevMode && (<SidebarButton
