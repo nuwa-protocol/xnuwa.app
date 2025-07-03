@@ -4,6 +4,7 @@ import type {
   LanguageModelV1FunctionTool,
   LanguageModelV1LogProbs,
   LanguageModelV1ProviderDefinedTool,
+  LanguageModelV1Source,
   LanguageModelV1StreamPart,
 } from '@ai-sdk/provider';
 import {
@@ -37,6 +38,52 @@ import type {
   OpenRouterChatModelId,
   OpenRouterChatSettings,
 } from './types/openrouter-chat-settings';
+
+const OpenRouterAnnotationSchema = z.object({
+  type: z.string(),
+  url_citation: z
+    .object({
+      start_index: z.number(),
+      end_index: z.number(),
+      title: z.string(),
+      url: z.string(),
+      content: z.string().optional(),
+    })
+    .optional(),
+});
+
+function convertAnnotationsToSources(
+  annotations: Array<{
+    type: string;
+    url_citation?: {
+      start_index: number;
+      end_index: number;
+      title: string;
+      url: string;
+      content?: string;
+    };
+  }>,
+): LanguageModelV1Source[] {
+  return annotations
+    .filter((a) => a.type === 'url_citation' && a.url_citation)
+    .map((a, index) => ({
+      sourceType: 'url' as const,
+      url: a.url_citation?.url ?? '',
+      id: `${index}`,
+      title: a.url_citation?.title ?? '',
+      providerMetadata: {
+        openrouter: {
+          source: {
+            url: a.url_citation?.url ?? '',
+            title: a.url_citation?.title ?? '',
+            content: a.url_citation?.content ?? '',
+            start_index: a.url_citation?.start_index ?? 0,
+            end_index: a.url_citation?.end_index ?? 0,
+          },
+        },
+      },
+    }));
+}
 
 function isFunctionTool(
   tool: LanguageModelV1FunctionTool | LanguageModelV1ProviderDefinedTool,
@@ -322,6 +369,9 @@ export class OpenRouterChatLanguageModel implements LanguageModelV1 {
       },
       text: choice.message.content ?? undefined,
       reasoning,
+      sources: choice.message.annotations
+        ? convertAnnotationsToSources(choice.message.annotations)
+        : undefined,
       toolCalls: choice.message.tool_calls?.map((toolCall) => ({
         toolCallType: 'function',
         toolCallId: toolCall.id ?? generateId(),
@@ -398,6 +448,9 @@ export class OpenRouterChatLanguageModel implements LanguageModelV1 {
 
     // Store usage accounting setting for reference in the transformer
     const shouldIncludeUsageAccounting = !!this.settings.usage?.include;
+
+    // Track if we've already sent sources
+    let hasSentSources = false;
 
     return {
       stream: response.pipeThrough(
@@ -489,6 +542,22 @@ export class OpenRouterChatLanguageModel implements LanguageModelV1 {
                 type: 'reasoning',
                 textDelta: delta.reasoning,
               });
+            }
+
+            // transform annotations to sources and enqueue (only once):
+            if (
+              !hasSentSources &&
+              delta.annotations != null &&
+              delta.annotations.length > 0
+            ) {
+              hasSentSources = true;
+              const sources = convertAnnotationsToSources(delta.annotations);
+              for (const source of sources) {
+                controller.enqueue({
+                  type: 'source',
+                  source: source,
+                });
+              }
             }
 
             if (delta.reasoning_details && delta.reasoning_details.length > 0) {
@@ -755,7 +824,7 @@ const OpenRouterNonStreamChatCompletionResponseSchema =
           content: z.string().nullable().optional(),
           reasoning: z.string().nullable().optional(),
           reasoning_details: ReasoningDetailArraySchema.nullish(),
-
+          annotations: z.array(OpenRouterAnnotationSchema).optional(),
           tool_calls: z
             .array(
               z.object({
@@ -805,6 +874,7 @@ const OpenRouterStreamChatCompletionChunkSchema = z.union([
             role: z.enum(['assistant']).optional(),
             content: z.string().nullish(),
             reasoning: z.string().nullish().optional(),
+            annotations: z.array(OpenRouterAnnotationSchema).optional(),
             reasoning_details: ReasoningDetailArraySchema.nullish(),
             tool_calls: z
               .array(
