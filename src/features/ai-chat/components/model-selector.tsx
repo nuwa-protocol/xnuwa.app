@@ -1,14 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { useAvailableModels, useSelectedModel } from '../hooks';
-import { useFavoriteModels } from '../hooks/use-favorite-models';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
+import { StarIcon } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Button } from '@/shared/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/components/ui/dialog';
 import { Input } from '@/shared/components/ui/input';
 import { Skeleton } from '@/shared/components/ui/skeleton';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
-import { Button } from '@/shared/components/ui/button';
-import { StarIcon } from 'lucide-react';
-import { ModelAvatar } from './model-avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+import { useAvailableModels, useSelectedModel } from '../hooks';
+import { useFavoriteModels } from '../hooks/use-favorite-models';
 import type { OpenRouterModel } from '../types';
+import { ModelAvatar } from './model-avatar';
 
 const PROVIDER_TABS = [
   'Favorite',
@@ -91,8 +91,7 @@ export const ModelSelector: React.FC = () => {
       filtered[provider] = (groupedModels[provider] || []).filter(
         (m) =>
           getModelName(m).toLowerCase().includes(s) ||
-          getProviderName(m).toLowerCase().includes(s) ||
-          m.id.toLowerCase().includes(s)
+          getProviderName(m).toLowerCase().includes(s)
       );
     }
     return filtered;

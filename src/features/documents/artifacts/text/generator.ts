@@ -1,5 +1,5 @@
 import { smoothStream, streamText } from 'ai';
-import { myProvider } from '@/features/ai-chat/services';
+import { llmProvider } from '@/features/ai-chat/services/providers';
 
 export async function generateTextContent(
   title: string,
@@ -8,7 +8,7 @@ export async function generateTextContent(
   let draftContent = '';
 
   const { fullStream } = streamText({
-    model: myProvider.languageModel('artifact-model'),
+    model: llmProvider.artifact(),
     system:
       'Write about the given topic. Markdown is supported. Use headings wherever appropriate.',
     experimental_transform: smoothStream({ chunking: 'word' }),

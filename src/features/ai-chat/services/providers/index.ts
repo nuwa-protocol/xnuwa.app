@@ -1,13 +1,7 @@
-import {
-  customProvider,
-  extractReasoningMiddleware,
-  wrapLanguageModel,
-} from 'ai';
-import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { createOpenAI } from '@ai-sdk/openai';
-
-import { createAuthorizedFetch } from './fetch';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { ModelStateStore } from '../../stores/model-store';
+import { createAuthorizedFetch } from './fetch';
 
 // Base URL of Nuwa LLM Gateway
 const BASE_URL = 'https://test-llm.nuwa.dev/api/v1';
@@ -24,36 +18,21 @@ const openai = createOpenAI({
   fetch: createAuthorizedFetch(),
 });
 
-// Function to create provider with current selected model
-const createDynamicProvider = () => {
-  const selectedModel = ModelStateStore.getState().selectedModel;
-  
-  return customProvider({
-    languageModels: {
-      'chat-model': openrouter(selectedModel.id),
-      'chat-model-reasoning': wrapLanguageModel({
-        model: openrouter('gpt-4o-mini'),
-        middleware: extractReasoningMiddleware({ tagName: 'think' }),
-      }),
-      'title-model': openrouter('gpt-4o-mini'),
-      'artifact-model': openrouter(selectedModel.id),
-    },
-    imageModels: {
-      'small-model': openai.image('gpt-4o-mini'),
-    },
-  });
-};
-
-
-
 // Export a provider that dynamically resolves models
-export const myProvider = {
-  languageModel: (modelName: string) => {
-    const provider = createDynamicProvider();
-    return provider.languageModel(modelName);
+export const llmProvider = {
+  chat: () => {
+    const selectedModel = ModelStateStore.getState().selectedModel;
+    return openrouter(selectedModel.id);
   },
-  imageModel: (modelName: string) => {
-    const provider = createDynamicProvider();
-    return provider.imageModel(modelName);
+  artifact: () => {
+    const selectedModel = ModelStateStore.getState().selectedModel;
+    return openrouter(selectedModel.id);
+  },
+  utility: () => {
+    const selectedModel = ModelStateStore.getState().selectedModel;
+    return openrouter('openai/gpt-4o-mini');
+  },
+  image: () => {
+    return openai.image('dall-e-3');
   },
 };

@@ -1,6 +1,6 @@
 import { streamObject } from 'ai';
 import z from 'zod';
-import { myProvider } from '@/features/ai-chat/services';
+import { llmProvider } from '@/features/ai-chat/services/providers';
 
 export const generateCodePrompt = `
 You are a Python code generator that creates self-contained, executable code snippets. When writing code:
@@ -35,7 +35,7 @@ export async function generateCodeContent(
   let draftContent = '';
 
   const { fullStream } = streamObject({
-    model: myProvider.languageModel('artifact-model'),
+    model: llmProvider.artifact(),
     system: generateCodePrompt,
     prompt: title,
     schema: z.object({

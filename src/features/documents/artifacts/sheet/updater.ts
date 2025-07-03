@@ -1,6 +1,6 @@
-import { z } from 'zod';
 import { streamObject } from 'ai';
-import { myProvider } from '@/features/ai-chat/services';
+import { z } from 'zod';
+import { llmProvider } from '@/features/ai-chat/services/providers';
 
 export const updateDocumentPrompt = (currentContent: string | null) =>
   `\
@@ -17,7 +17,7 @@ export async function updateSheetContent(
   let draftContent = '';
 
   const { fullStream } = streamObject({
-    model: myProvider.languageModel('artifact-model'),
+    model: llmProvider.artifact(),
     system: updateDocumentPrompt(currentContent),
     prompt: description,
     schema: z.object({
