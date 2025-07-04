@@ -3,13 +3,11 @@
 import {
   ChevronDownIcon,
   ChevronRightIcon,
-  ExternalLinkIcon,
   Globe,
 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Badge } from '@/shared/components/ui/badge';
-import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import {
   Collapsible,
@@ -17,6 +15,7 @@ import {
   CollapsibleTrigger,
 } from '@/shared/components/ui/collapsible';
 import { cn } from '@/shared/utils';
+import { MessageSourceItem } from './message-source-item';
 
 interface MessageSourceProps {
   sources: Array<{
@@ -66,72 +65,14 @@ export const MessageSource = ({ sources, className }: MessageSourceProps) => {
           <CollapsibleContent className="w-full">
             <div className="border-t w-full">
               <div className="p-2 space-y-1 w-full">
-                {sources.map((source, index) => {
-                  const title = source.title || 'Untitled Source';
-                  const url = source.url || '';
-                  const id = source.id || 'unknown';
-                  const isExternalUrl = url.startsWith('http');
-
-                  if (isExternalUrl && url) {
-                    return (
-                      <Button
-                        key={`source-${index}-${id}`}
-                        variant="ghost"
-                        className="flex items-center gap-3 p-2 h-auto justify-start rounded-md w-full min-w-0"
-                        onClick={() => handleSourceClick(url)}
-                      >
-                        <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-                          <Badge
-                            variant="outline"
-                            className="text-xs flex-shrink-0"
-                          >
-                            #{index + 1}
-                          </Badge>
-
-                          <span className="font-medium text-sm truncate flex-shrink">
-                            {title}
-                          </span>
-
-                          {url && (
-                            <span className="text-xs text-muted-foreground truncate flex-shrink min-w-0">
-                              • {url}
-                            </span>
-                          )}
-                        </div>
-
-                        <ExternalLinkIcon className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                      </Button>
-                    );
-                  }
-
-                  return (
-                    <div
-                      key={`source-${index}-${id}`}
-                      className="flex items-center gap-3 p-2 rounded-md min-w-0"
-                    >
-                      <Globe className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-
-                      <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-                        <Badge
-                          variant="outline"
-                          className="text-xs flex-shrink-0"
-                        >
-                          #{id}
-                        </Badge>
-
-                        <span className="font-medium text-sm truncate flex-shrink">
-                          {title}
-                        </span>
-
-                        {url && (
-                          <span className="text-xs text-muted-foreground truncate flex-shrink min-w-0">
-                            • {url}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                {sources.map((source, index) => (
+                  <MessageSourceItem
+                    key={`source-${index}-${source.id || 'unknown'}`}
+                    source={source}
+                    index={index}
+                    onSourceClick={handleSourceClick}
+                  />
+                ))}
               </div>
             </div>
           </CollapsibleContent>
