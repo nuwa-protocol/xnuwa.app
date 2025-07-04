@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
+import { Slider } from '@/shared/components/ui/slider';
 import { Switch } from '@/shared/components/ui/switch';
 import { cn } from '@/shared/utils';
 import { useSelectedModel } from '../hooks';
@@ -33,7 +34,12 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   const [open, setOpen] = useState(false);
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
   const { SetModelAuto } = useSelectAuto();
-  const { webSearchEnabled, setWebSearchEnabled } = useWebSearch();
+  const {
+    webSearchEnabled,
+    webSearchContextSize,
+    setWebSearchEnabled,
+    setWebSearchContextSize,
+  } = useWebSearch();
 
   const handleModelSelect = (model: Model) => {
     setSelectedModel(model);
@@ -47,6 +53,12 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   const handleDirectOpen = () => {
     setModelSelectorOpen(true);
+  };
+
+  const handleWebSearchContextSizeChange = (value: number[]) => {
+    setWebSearchContextSize(
+      ['low', 'medium', 'high'][value[0]] as 'low' | 'medium' | 'high',
+    );
   };
 
   return (
@@ -106,15 +118,34 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             }}
           >
             <Globe className="h-4 w-4" />
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-row flex-1 gap-2">
               <span className="text-sm font-medium">Web Search</span>
             </div>
+
             <Switch
               checked={webSearchEnabled}
               onCheckedChange={setWebSearchEnabled}
               onClick={(e) => e.stopPropagation()}
             />
           </DropdownMenuItem>
+
+          {webSearchEnabled && (
+            <div className="w-full max-w-sm p-4">
+              <Slider
+                defaultValue={[
+                  ['low', 'medium', 'high'].indexOf(webSearchContextSize),
+                ]}
+                max={2}
+                step={1}
+                onValueChange={handleWebSearchContextSizeChange}
+              />
+              <div className="mt-2 -mx-1.5 flex items-center justify-between text-muted-foreground text-xs">
+                <span>Low</span>
+                <span>Medium</span>
+                <span>High</span>
+              </div>
+            </div>
+          )}
 
           <DropdownMenuSeparator />
           {favoriteModels.length > 0 && (

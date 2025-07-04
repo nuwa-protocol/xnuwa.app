@@ -64,7 +64,9 @@ interface ModelStateStoreState {
 
   // web search state
   webSearchEnabled: boolean;
+  webSearchContextSize: 'low' | 'medium' | 'high';
   setWebSearchEnabled: (enabled: boolean) => void;
+  setWebSearchContextSize: (size: 'low' | 'medium' | 'high') => void;
 
   // available models state
   availableModels: Model[] | null;
@@ -87,6 +89,7 @@ const persistConfig = createPersistConfig<ModelStateStoreState>({
     selectedModel: state.selectedModel,
     favoriteModels: state.favoriteModels,
     webSearchEnabled: state.webSearchEnabled,
+    webSearchContextSize: state.webSearchContextSize,
   }),
   onRehydrateStorage: () => (state) => {
     if (state) {
@@ -104,6 +107,7 @@ export const ModelStateStore = create<ModelStateStoreState>()(
       selectedModel: AUTO_MODEL,
       favoriteModels: [],
       webSearchEnabled: false,
+      webSearchContextSize: 'low',
 
       // available models state
       availableModels: null,
@@ -141,6 +145,11 @@ export const ModelStateStore = create<ModelStateStoreState>()(
 
       setWebSearchEnabled: (enabled: boolean) => {
         set({ webSearchEnabled: enabled });
+        get().saveToDB();
+      },
+
+      setWebSearchContextSize: (size: 'low' | 'medium' | 'high') => {
+        set({ webSearchContextSize: size });
         get().saveToDB();
       },
 

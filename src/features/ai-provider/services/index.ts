@@ -23,20 +23,39 @@ export const llmProvider = {
   chat: () => {
     const selectedModel = ModelStateStore.getState().selectedModel;
     const webSearchEnabled = ModelStateStore.getState().webSearchEnabled;
+    const webSearchContextSize =
+      ModelStateStore.getState().webSearchContextSize;
+    const modelSupportWebSearch =
+      selectedModel.supported_parameters.includes('web_search_options');
     return openrouter.chat(
       selectedModel.id,
-      webSearchEnabled
+      modelSupportWebSearch
         ? {
             extraBody: {
-              plugins: [
-                {
-                  id: 'web',
-                  max_results: 3,
-                },
-              ],
+              web_search_options: {
+                search_context_size: webSearchEnabled
+                  ? webSearchContextSize
+                  : 'low',
+              },
             },
           }
-        : {},
+        : webSearchEnabled
+          ? {
+              extraBody: {
+                plugins: [
+                  {
+                    id: 'web',
+                    max_results:
+                      webSearchContextSize === 'low'
+                        ? 3
+                        : webSearchContextSize === 'medium'
+                          ? 5
+                          : 10,
+                  },
+                ],
+              },
+            }
+          : {},
     );
   },
   artifact: () => {
