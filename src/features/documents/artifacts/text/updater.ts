@@ -1,5 +1,5 @@
 import { smoothStream, streamText } from 'ai';
-import { myProvider } from '@/features/ai-chat/services';
+import { llmProvider } from '@/features/ai-provider/services';
 
 export const updateDocumentPrompt = (currentContent: string | null) =>
   `\
@@ -16,7 +16,7 @@ export async function updateTextContent(
   let draftContent = '';
 
   const { fullStream } = streamText({
-    model: myProvider.languageModel('artifact-model'),
+    model: llmProvider.artifact(),
     system: updateDocumentPrompt(currentContent),
     experimental_transform: smoothStream({ chunking: 'word' }),
     prompt: description,

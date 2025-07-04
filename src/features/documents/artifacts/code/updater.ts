@@ -1,6 +1,6 @@
-import { myProvider } from '@/features/ai-chat/services';
-import { z } from 'zod';
 import { streamObject } from 'ai';
+import { z } from 'zod';
+import { llmProvider } from '@/features/ai-provider/services';
 
 export const updateCodePrompt = (currentContent: string) => `
   Improve the following code snippet based on the given prompt.
@@ -16,7 +16,7 @@ export async function updateCodeContent(
   let draftContent = '';
 
   const { fullStream } = streamObject({
-    model: myProvider.languageModel('artifact-model'),
+    model: llmProvider.artifact(),
     system: updateCodePrompt(currentContent),
     prompt: description,
     schema: z.object({

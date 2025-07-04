@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { ChatSDKError } from "@/shared/errors/chatsdk-errors";
-import { handleAIRequest } from "./handler";
+import { ChatSDKError } from '@/shared/errors/chatsdk-errors';
+import { handleAIRequest } from './handler';
 
 export const createClientAIFetch = (): ((
   input: RequestInfo | URL,
-  init?: RequestInit
+  init?: RequestInit,
 ) => Promise<Response>) => {
   return async (input: RequestInfo | URL, init?: RequestInit) => {
     try {
       if (!init || !init.body) {
-        throw new Error("Request body is required");
+        throw new Error('Request body is required');
       }
 
       const requestBody = JSON.parse(init.body as string);
@@ -25,22 +25,21 @@ export const createClientAIFetch = (): ((
       return response;
     } catch (error) {
       if (error instanceof ChatSDKError) {
-        return new Response(JSON.stringify({ error: "AI request failed" }), {
+        return new Response(JSON.stringify({ error: 'AI request failed' }), {
           status: 500,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         });
       }
-      return new Response(JSON.stringify({ error: "Unknown error occurred" }), {
+      return new Response(JSON.stringify({ error: 'Unknown error occurred' }), {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
     }
   };
 };
 
-export { generateTitleFromUserMessage } from "./local-ai";
-export { myProvider } from "./providers";
+export { generateTitleFromUserMessage } from './utility-ai';

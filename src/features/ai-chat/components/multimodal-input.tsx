@@ -1,15 +1,15 @@
-import type { UseChatHelpers } from "@ai-sdk/react";
-import type { Attachment, UIMessage } from "ai";
-import cx from "classnames";
-import equal from "fast-deep-equal";
-import { AnimatePresence, motion } from "framer-motion";
+import type { UseChatHelpers } from '@ai-sdk/react';
+import type { Attachment, UIMessage } from 'ai';
+import cx from 'classnames';
+import equal from 'fast-deep-equal';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowDown,
   ArrowUpIcon,
   PaperclipIcon,
   StopCircleIcon,
-} from "lucide-react";
-import type React from "react";
+} from 'lucide-react';
+import type React from 'react';
 import {
   type ChangeEvent,
   type Dispatch,
@@ -19,17 +19,17 @@ import {
   useEffect,
   useRef,
   useState,
-} from "react";
-import { useLocalStorage, useWindowSize } from "usehooks-ts";
-import { useFiles } from "@/features/ai-chat/hooks/use-files";
-import { useScrollToBottom } from "@/features/ai-chat/hooks/use-scroll-to-bottom";
-import { toast } from "@/shared/components";
-import { Button } from "@/shared/components/ui/button";
-import { useDevMode } from "@/shared/hooks/use-dev-mode";
-import { useLanguage } from "@/shared/hooks/use-language";
-import { ModelSelector } from "./model-selector";
-import { PreviewAttachment } from "./preview-attachment";
-import { SuggestedActions } from "./suggested-actions";
+} from 'react';
+import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { useFiles } from '@/features/ai-chat/hooks/use-files';
+import { useScrollToBottom } from '@/features/ai-chat/hooks/use-scroll-to-bottom';
+import { ModelSelector } from '@/features/ai-provider/components';
+import { toast } from '@/shared/components';
+import { Button } from '@/shared/components/ui/button';
+import { useDevMode } from '@/shared/hooks/use-dev-mode';
+import { useLanguage } from '@/shared/hooks/use-language';
+import { PreviewAttachment } from './preview-attachment';
+import { SuggestedActions } from './suggested-actions';
 
 function PureMultimodalInput({
   chatId,
@@ -46,16 +46,16 @@ function PureMultimodalInput({
   className,
 }: {
   chatId: string;
-  input: UseChatHelpers["input"];
-  setInput: UseChatHelpers["setInput"];
-  status: UseChatHelpers["status"];
+  input: UseChatHelpers['input'];
+  setInput: UseChatHelpers['setInput'];
+  status: UseChatHelpers['status'];
   stop: () => void;
   attachments: Array<Attachment>;
   setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
   messages: Array<UIMessage>;
-  setMessages: UseChatHelpers["setMessages"];
-  append: UseChatHelpers["append"];
-  handleSubmit: UseChatHelpers["handleSubmit"];
+  setMessages: UseChatHelpers['setMessages'];
+  append: UseChatHelpers['append'];
+  handleSubmit: UseChatHelpers['handleSubmit'];
   className?: string;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -65,15 +65,15 @@ function PureMultimodalInput({
   const isDevMode = useDevMode();
 
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
-    "input",
-    ""
+    'input',
+    '',
   );
 
   useEffect(() => {
     if (textareaRef.current) {
       const domValue = textareaRef.current.value;
       // Prefer DOM value over localStorage to handle hydration
-      const finalValue = domValue || localStorageInput || "";
+      const finalValue = domValue || localStorageInput || '';
       setInput(finalValue);
     }
     // Only run once after hydration
@@ -97,7 +97,7 @@ function PureMultimodalInput({
     });
 
     setAttachments([]);
-    setLocalStorageInput("");
+    setLocalStorageInput('');
 
     if (width && width > 768) {
       textareaRef.current?.focus();
@@ -114,7 +114,7 @@ function PureMultimodalInput({
         const uploadPromises = files.map((file) => uploadFile(file));
         const uploadedAttachments = await Promise.all(uploadPromises);
         const successfullyUploadedAttachments = uploadedAttachments.filter(
-          (attachment) => attachment !== undefined
+          (attachment) => attachment !== undefined,
         );
 
         setAttachments((currentAttachments) => [
@@ -123,20 +123,20 @@ function PureMultimodalInput({
         ]);
       } catch (error) {
         toast({
-          description: t("upload.errorUploading"),
-          type: "error",
+          description: t('upload.errorUploading'),
+          type: 'error',
         });
       } finally {
         setUploadQueue([]);
       }
     },
-    [setAttachments, uploadFile, t]
+    [setAttachments, uploadFile, t],
   );
 
   const { isAtBottom, scrollToBottom } = useScrollToBottom();
 
   useEffect(() => {
-    if (status === "submitted") {
+    if (status === 'submitted') {
       scrollToBottom();
     }
   }, [status, scrollToBottom]);
@@ -149,7 +149,7 @@ function PureMultimodalInput({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             className="absolute left-1/2 bottom-28 -translate-x-1/2 z-50"
           >
             <Button
@@ -194,9 +194,9 @@ function PureMultimodalInput({
             <PreviewAttachment
               key={filename}
               attachment={{
-                url: "",
+                url: '',
                 name: filename,
-                contentType: "",
+                contentType: '',
               }}
               isUploading={true}
             />
@@ -206,8 +206,8 @@ function PureMultimodalInput({
 
       <div
         className={cx(
-          "flex flex-col rounded-2xl bg-muted dark:border-zinc-700 border border-input ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-          className
+          'flex flex-col rounded-2xl bg-muted dark:border-zinc-700 border border-input ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+          className,
         )}
       >
         <textarea
@@ -226,17 +226,17 @@ function PureMultimodalInput({
           }
           onKeyDown={(event) => {
             if (
-              event.key === "Enter" &&
+              event.key === 'Enter' &&
               !event.shiftKey &&
               !event.nativeEvent.isComposing
             ) {
               event.preventDefault();
 
-              if (status !== "ready") {
+              if (status !== 'ready') {
                 toast({
-                  type: "error",
+                  type: 'error',
                   description:
-                    "Please wait for the model to finish its response!",
+                    'Please wait for the model to finish its response!',
                 });
               } else {
                 submitForm();
@@ -246,14 +246,15 @@ function PureMultimodalInput({
         />
 
         <div className="flex justify-between items-center p-2">
-
           <div className="flex items-center gap-2">
-            {isDevMode && <AttachmentsButton fileInputRef={fileInputRef} status={status} />}
+            {isDevMode && (
+              <AttachmentsButton fileInputRef={fileInputRef} status={status} />
+            )}
             <ModelSelector />
           </div>
 
           <div className="flex items-center">
-            {status === "submitted" || status === "streaming" ? (
+            {status === 'submitted' || status === 'streaming' ? (
               <StopButton stop={stop} setMessages={setMessages} />
             ) : (
               <SendButton
@@ -277,7 +278,7 @@ export const MultimodalInput = memo(
     if (!equal(prevProps.attachments, nextProps.attachments)) return false;
     if (!equal(prevProps.messages, nextProps.messages)) return false;
     return true;
-  }
+  },
 );
 
 function PureAttachmentsButton({
@@ -285,7 +286,7 @@ function PureAttachmentsButton({
   status,
 }: {
   fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
-  status: UseChatHelpers["status"];
+  status: UseChatHelpers['status'];
 }) {
   return (
     <Button
@@ -295,7 +296,7 @@ function PureAttachmentsButton({
         event.preventDefault();
         fileInputRef.current?.click();
       }}
-      disabled={status !== "ready"}
+      disabled={status !== 'ready'}
       variant="ghost"
     >
       <PaperclipIcon size={14} />
@@ -310,7 +311,7 @@ function PureStopButton({
   setMessages,
 }: {
   stop: () => void;
-  setMessages: UseChatHelpers["setMessages"];
+  setMessages: UseChatHelpers['setMessages'];
 }) {
   return (
     <Button

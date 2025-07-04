@@ -7,6 +7,4 @@ export * from './use-file';
 export * from './use-files';
 export * from './use-messages';
 export * from './use-scroll-to-bottom';
-export * from './use-available-models';
-export * from './use-selected-model';
 export * from './use-starry-night';
