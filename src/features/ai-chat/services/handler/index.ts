@@ -8,6 +8,7 @@ import {
 import { ChatStateStore } from '@/features/ai-chat/stores/chat-store';
 import { llmProvider } from '@/features/ai-provider/services';
 import { ModelStateStore } from '@/features/ai-provider/stores';
+import { SettingsStateStore } from '@/features/settings/stores';
 import { generateUUID } from '@/shared/utils';
 import { systemPrompt } from '../prompts';
 import { createDocument } from '../tools/create-document';
@@ -72,17 +73,17 @@ const handleAIRequest = async ({
 
   // get selected model
   const selectedModel = ModelStateStore.getState().selectedModel;
+  const isDevMode = SettingsStateStore.getState().settings.devMode;
 
   const result = streamText({
     model: llmProvider.chat(),
     system: systemPrompt(),
     messages,
     maxSteps: 5,
-    experimental_activeTools: selectedModel.supported_parameters.includes(
-      'tools',
-    )
-      ? ['createDocument', 'updateDocument']
-      : [],
+    experimental_activeTools:
+      selectedModel.supported_parameters.includes('tools') && isDevMode
+        ? ['createDocument', 'updateDocument']
+        : [],
     experimental_transform: smoothStream({ chunking: 'word' }),
     experimental_generateMessageId: generateUUID,
     tools: {
