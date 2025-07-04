@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/features/auth/services';
 import { createPersistConfig, db } from '@/storage';
+import { getAvailableModels } from '../services/models';
 import type { Model } from '../types';
 
 // default selected model
@@ -63,6 +64,14 @@ interface ModelStateStoreState {
   addToFavorites: (model: Model) => void;
   removeFromFavorites: (modelId: string) => void;
 
+  // available models state
+  availableModels: Model[] | null;
+  isLoadingModels: boolean;
+  modelsError: Error | null;
+  fetchAvailableModels: () => Promise<void>;
+  preloadModels: () => Promise<void>;
+  reloadModels: () => Promise<void>;
+
   // data persistence
   loadFromDB: () => Promise<void>;
   saveToDB: () => Promise<void>;
@@ -79,6 +88,8 @@ const persistConfig = createPersistConfig<ModelStateStoreState>({
   onRehydrateStorage: () => (state) => {
     if (state) {
       state.loadFromDB();
+      // preload models on store rehydration
+      state.preloadModels();
     }
   },
 });
@@ -89,6 +100,11 @@ export const ModelStateStore = create<ModelStateStoreState>()(
     (set, get) => ({
       selectedModel: DEFAULT_SELECTED_MODEL,
       favoriteModels: [],
+
+      // available models state
+      availableModels: null,
+      isLoadingModels: false,
+      modelsError: null,
 
       setSelectedModel: (model: Model) => {
         set({ selectedModel: model });
@@ -117,6 +133,78 @@ export const ModelStateStore = create<ModelStateStoreState>()(
           ),
         }));
         get().saveToDB();
+      },
+
+      // fetch available models
+      fetchAvailableModels: async () => {
+        const { availableModels, isLoadingModels } = get();
+
+        // if there is cached data and not loading, return
+        if (availableModels && !isLoadingModels) {
+          return;
+        }
+
+        // if loading, wait for completion
+        if (isLoadingModels) {
+          return;
+        }
+
+        set({ isLoadingModels: true, modelsError: null });
+
+        try {
+          const models = await getAvailableModels();
+          set({
+            availableModels: models,
+            isLoadingModels: false,
+            modelsError: null,
+          });
+        } catch (error) {
+          set({
+            modelsError: error as Error,
+            isLoadingModels: false,
+          });
+        }
+      },
+
+      // preload models (silent loading, no UI state)
+      preloadModels: async () => {
+        const { availableModels } = get();
+
+        // if there is cached data, return
+        if (availableModels) {
+          return;
+        }
+
+        try {
+          const models = await getAvailableModels();
+          set({
+            availableModels: models,
+            modelsError: null,
+          });
+          console.log('Models preloaded successfully');
+        } catch (error) {
+          console.warn('Failed to preload models:', error);
+          set({ modelsError: error as Error });
+        }
+      },
+
+      // reload models (force refresh)
+      reloadModels: async () => {
+        set({ isLoadingModels: true, modelsError: null });
+
+        try {
+          const models = await getAvailableModels();
+          set({
+            availableModels: models,
+            isLoadingModels: false,
+            modelsError: null,
+          });
+        } catch (error) {
+          set({
+            modelsError: error as Error,
+            isLoadingModels: false,
+          });
+        }
       },
 
       loadFromDB: async () => {
