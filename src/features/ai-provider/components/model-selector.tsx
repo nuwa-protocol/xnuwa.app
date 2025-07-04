@@ -11,6 +11,7 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { useSelectedModel } from '../hooks';
 import { useFavoriteModels } from '../hooks/use-favorite-models';
+import { useSelectAuto } from '../hooks/use-select-auto';
 import type { Model } from '../types';
 import { getModelName } from '../utils';
 import { LLMModelSelector } from './model-selector-dialog';
@@ -27,6 +28,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   const { favoriteModels } = useFavoriteModels();
   const [open, setOpen] = useState(false);
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
+  const { SetModelAuto } = useSelectAuto();
 
   const handleModelSelect = (model: Model) => {
     setSelectedModel(model);
@@ -70,6 +72,24 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           <DropdownMenuTrigger asChild>{renderButton()}</DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-64 max-h-80 overflow-y-auto">
+            {/* Auto option */}
+            <DropdownMenuItem
+              key="auto"
+              className="flex items-center gap-2 py-2 px-3 cursor-pointer"
+              onClick={SetModelAuto}
+            >
+              <ProviderAvatar provider="Auto" size="sm" />
+              <div className="flex flex-col flex-1 min-w-0">
+                <span className="text-sm font-medium truncate">Auto</span>
+                <span className="text-xs text-muted-foreground truncate">
+                  Auto select the best model
+                </span>
+              </div>
+              {selectedModel?.id === 'auto' && (
+                <div className="w-2 h-2 rounded-full bg-primary" />
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             {favoriteModels.length > 0 && (
               <>
                 <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground flex items-center gap-2">

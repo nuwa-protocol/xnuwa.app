@@ -29,7 +29,7 @@ import {
   Zhipu,
 } from '@lobehub/icons';
 import { BotIcon } from 'lucide-react';
-import type React from 'react';
+import React from 'react';
 
 interface ProviderAvatarProps {
   provider: string;
@@ -48,6 +48,23 @@ const iconSizeMap = {
   md: 32,
   lg: 48,
 };
+
+const AutoIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="none"
+    viewBox="0 0 16 16"
+  >
+    <path
+      fill="currentColor"
+      d="m3.5 8.5.849 2.152L6.5 11.5l-2.151.848L3.5 14.5l-.849-2.152L.5 11.5l2.151-.848L3.5 8.5Z"
+    />
+    <path stroke="currentColor" d="M1 4.5h2.5l7 7h4M14.5 4.5h-4L9 6" />
+    <path stroke="currentColor" d="m12 2 2.5 2.5L12 7M12 9l2.5 2.5L12 14" />
+  </svg>
+);
 
 // Provider名称到图标组件的映射
 const PROVIDER_ICON_MAP: Record<
@@ -107,10 +124,26 @@ export const ProviderAvatar: React.FC<ProviderAvatarProps> = ({
   // 标准化provider名称
   const normalizedProvider = provider.toLowerCase().replace(/\s+/g, '-');
 
+  const iconSize = iconSizeMap[size];
+
+  // 如果 provider 是 auto，渲染 AutoIcon 并加上主色
+  if (normalizedProvider === 'auto') {
+    return (
+      <div
+        className={`${sizeMap[size]} ${className} flex items-center justify-center`}
+        style={{ color: 'var(--primary)' }} // 你可以根据主题调整
+      >
+        {React.cloneElement(AutoIcon, {
+          width: iconSize,
+          height: iconSize,
+          className: 'text-primary',
+        })}
+      </div>
+    );
+  }
+
   // 查找对应的图标组件
   const IconComponent = PROVIDER_ICON_MAP[normalizedProvider];
-
-  const iconSize = iconSizeMap[size];
 
   // 如果有对应的图标组件，使用它
   if (IconComponent) {

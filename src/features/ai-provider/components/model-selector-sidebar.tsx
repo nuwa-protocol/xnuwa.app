@@ -58,7 +58,7 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
                 isActive={selectedTab === 'favorite'}
                 onClick={() => handleTabChange('favorite')}
               >
-                <StarIcon className="h-4 w-4" />
+                <StarIcon className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                 <span>Favorite</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
