@@ -11,8 +11,8 @@ import { createAuthorizedFetch } from './fetch';
 async function fetchOpenRouterModels(): Promise<OpenRouterAPIResponse> {
   const authorizedFetch = createAuthorizedFetch();
   // TODO: change to nuwa endpoint - need to improve the speed of nuwa endpoint
-  const endpoint = 'https://test-llm.nuwa.dev/api/v1/models';
-  // const endpoint = 'https://openrouter.ai/api/v1/models';
+  // const endpoint = 'https://test-llm.nuwa.dev/api/v1/models';
+  const endpoint = 'https://openrouter.ai/api/v1/models';
 
   try {
     const response = await authorizedFetch(endpoint, {
@@ -41,10 +41,8 @@ function parseModelInfo(model: OpenRouterModel) {
   if (model.name.includes(':')) {
     [providerName, name] = model.name.split(':');
     providerName = providerName.trim();
-    name = name.split('(')[0].trim();
   } else {
     providerName = providerSlug;
-    name = model.name.split('(')[0].trim();
   }
 
   return {

@@ -62,6 +62,12 @@ interface ModelStateStoreState {
   addToFavorites: (model: Model) => void;
   removeFromFavorites: (modelId: string) => void;
 
+  // web search state
+  webSearchEnabled: boolean;
+  webSearchContextSize: 'low' | 'medium' | 'high';
+  setWebSearchEnabled: (enabled: boolean) => void;
+  setWebSearchContextSize: (size: 'low' | 'medium' | 'high') => void;
+
   // available models state
   availableModels: Model[] | null;
   isLoadingModels: boolean;
@@ -82,6 +88,8 @@ const persistConfig = createPersistConfig<ModelStateStoreState>({
   partialize: (state) => ({
     selectedModel: state.selectedModel,
     favoriteModels: state.favoriteModels,
+    webSearchEnabled: state.webSearchEnabled,
+    webSearchContextSize: state.webSearchContextSize,
   }),
   onRehydrateStorage: () => (state) => {
     if (state) {
@@ -98,6 +106,8 @@ export const ModelStateStore = create<ModelStateStoreState>()(
     (set, get) => ({
       selectedModel: AUTO_MODEL,
       favoriteModels: [],
+      webSearchEnabled: false,
+      webSearchContextSize: 'low',
 
       // available models state
       availableModels: null,
@@ -130,6 +140,16 @@ export const ModelStateStore = create<ModelStateStoreState>()(
             (model) => model.id !== modelId,
           ),
         }));
+        get().saveToDB();
+      },
+
+      setWebSearchEnabled: (enabled: boolean) => {
+        set({ webSearchEnabled: enabled });
+        get().saveToDB();
+      },
+
+      setWebSearchContextSize: (size: 'low' | 'medium' | 'high') => {
+        set({ webSearchContextSize: size });
         get().saveToDB();
       },
 
@@ -218,6 +238,7 @@ export const ModelStateStore = create<ModelStateStoreState>()(
             set({
               selectedModel: record.selectedModel,
               favoriteModels: record.favoriteModels,
+              webSearchEnabled: record.webSearchEnabled ?? false,
             });
           }
         } catch (error) {
@@ -230,11 +251,12 @@ export const ModelStateStore = create<ModelStateStoreState>()(
         try {
           const currentDID = await getCurrentDID();
           if (!currentDID) return;
-          const { selectedModel, favoriteModels } = get();
+          const { selectedModel, favoriteModels, webSearchEnabled } = get();
           await modelDB.models.put({
             did: currentDID,
             selectedModel,
             favoriteModels,
+            webSearchEnabled,
           });
         } catch (error) {
           console.error('Failed to save model store to DB:', error);
