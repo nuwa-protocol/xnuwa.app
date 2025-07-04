@@ -29,7 +29,10 @@ Do not update document right after creating it. Wait for user feedback or reques
 export const regularPrompt =
   'You are a friendly assistant! Keep your responses concise and helpful.';
 
-
 export const systemPrompt = () => {
+  return `${regularPrompt}`;
+};
+
+export const systemPromptWithArtifacts = () => {
   return `${regularPrompt}\n\n${artifactsPrompt}`;
 };
