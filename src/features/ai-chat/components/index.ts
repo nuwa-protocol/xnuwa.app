@@ -9,6 +9,7 @@ export * from './message-reasoning';
 export * from './message-source';
 export * from './messages';
 export * from './model-selector';
+export * from './model-selector-dialog';
 export * from './model-selector-sidebar';
 export * from './multimodal-input';
 export * from './preview-attachment';
