@@ -12,6 +12,7 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { Slider } from '@/shared/components/ui/slider';
 import { Switch } from '@/shared/components/ui/switch';
+import { useLocale } from '@/shared/locales/use-locale';
 import { cn } from '@/shared/utils';
 import { useSelectedModel } from '../hooks';
 import { useFavoriteModels } from '../hooks/use-favorite-models';
@@ -29,6 +30,7 @@ interface ModelSelectorProps {
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
   className = '',
 }) => {
+  const { t } = useLocale();
   const { selectedModel, setSelectedModel } = useSelectedModel();
   const { favoriteModels, toggleFavorite, isFavorite } = useFavoriteModels();
   const [open, setOpen] = useState(false);
@@ -82,7 +84,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               </>
             ) : (
               <span className="text-muted-foreground text-sm">
-                Select Model
+                {t('aiProvider.modelSelector.selectModel')}
               </span>
             )}
           </button>
@@ -100,9 +102,11 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           >
             <ProviderAvatar provider="Auto" size="sm" />
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-sm font-medium truncate">Auto</span>
+              <span className="text-sm font-medium truncate">
+                {t('aiProvider.modelSelector.auto')}
+              </span>
               <span className="text-xs text-muted-foreground truncate">
-                Auto select the best model
+                {t('aiProvider.modelSelector.autoDescription')}
               </span>
             </div>
             {selectedModel?.id === 'auto' && (
@@ -119,7 +123,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           >
             <Globe className="h-4 w-4" />
             <div className="flex flex-row flex-1 gap-2">
-              <span className="text-sm font-medium">Web Search</span>
+              <span className="text-sm font-medium">
+                {t('aiProvider.modelSelector.webSearch')}
+              </span>
             </div>
 
             <Switch
@@ -140,9 +146,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                 onValueChange={handleWebSearchContextSizeChange}
               />
               <div className="mt-2 -mx-1.5 flex items-center justify-between text-muted-foreground text-xs">
-                <span>Low</span>
-                <span>Medium</span>
-                <span>High</span>
+                <span>{t('aiProvider.modelSelector.contextSize.low')}</span>
+                <span>{t('aiProvider.modelSelector.contextSize.medium')}</span>
+                <span>{t('aiProvider.modelSelector.contextSize.high')}</span>
               </div>
             </div>
           )}
@@ -195,7 +201,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             <CircleArrowOutUpRight />
             <div className="flex flex-row flex-1">
               <span className="text-sm">
-                {favoriteModels.length > 0 ? 'More Models ' : 'All Models '}
+                {favoriteModels.length > 0
+                  ? t('aiProvider.modelSelector.moreModels')
+                  : t('aiProvider.modelSelector.allModels')}
               </span>
             </div>
           </DropdownMenuItem>

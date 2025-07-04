@@ -22,6 +22,7 @@ import {
 } from '@/shared/components/ui/select';
 import { SidebarInset, SidebarProvider } from '@/shared/components/ui/sidebar';
 import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useLocale } from '@/shared/locales/use-locale';
 import { useAvailableModels, useSelectedModel } from '../hooks';
 import { useFavoriteModels } from '../hooks/use-favorite-models';
 import type { Model } from '../types';
@@ -36,6 +37,7 @@ import { ModelSelectorSidebar } from './model-selector-sidebar';
 import { ProviderAvatar } from './provider-avatar';
 
 export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
+  const { t } = useLocale();
   const { models, loading, error } = useAvailableModels();
   const { selectedModel, setSelectedModel } = useSelectedModel();
   const { isFavorite } = useFavoriteModels();
@@ -183,9 +185,11 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
       return (
         <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
           <span className="text-4xl mb-2">★</span>
-          <p className="text-lg font-medium mb-1">No favorite models</p>
+          <p className="text-lg font-medium mb-1">
+            {t('aiProvider.modelDialog.favoriteEmpty.title')}
+          </p>
           <p className="text-sm">
-            You can click the star on the model card to add it to your favorites
+            {t('aiProvider.modelDialog.favoriteEmpty.description')}
           </p>
         </div>
       );
@@ -209,16 +213,20 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
   );
 
   const getTitle = () => {
-    if (selectedTab === 'auto') return 'Auto Settings & Recommendations';
-    if (selectedTab === 'favorite') return 'Favorite Models';
+    if (selectedTab === 'auto')
+      return t('aiProvider.modelDialog.title.autoSettings');
+    if (selectedTab === 'favorite')
+      return t('aiProvider.modelDialog.title.favoriteModels');
     if (selectedTab === 'provider') {
       if (selectedProvider) {
         const provider = providers.find((p) => p.id === selectedProvider);
-        return `${provider?.name} Models`;
+        return t('aiProvider.modelDialog.title.providerModels', {
+          provider: provider?.name,
+        });
       }
-      return 'Providers';
+      return t('aiProvider.modelDialog.title.providers');
     }
-    return 'All Models';
+    return t('aiProvider.modelDialog.title.allModels');
   };
 
   if (loading) {
@@ -248,7 +256,9 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <p className="text-red-500 mb-2">Failed to load models</p>
+          <p className="text-red-500 mb-2">
+            {t('aiProvider.modelDialog.error.failedToLoad')}
+          </p>
           <p className="text-sm text-muted-foreground">{error.message}</p>
         </div>
       </div>
@@ -258,7 +268,9 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
   if (!models || models.length === 0) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">No models available</p>
+        <p className="text-muted-foreground">
+          {t('aiProvider.modelDialog.error.noModelsAvailable')}
+        </p>
       </div>
     );
   }
@@ -285,7 +297,7 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search models..."
+                  placeholder={t('aiProvider.modelDialog.search.placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -304,19 +316,19 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
                   <SelectItem value="name">
                     <div className="flex items-center gap-2">
                       <ArrowDownAZ className="h-4 w-4" />
-                      Name
+                      {t('aiProvider.modelDialog.sort.name')}
                     </div>
                   </SelectItem>
                   <SelectItem value="price-asc">
                     <div className="flex items-center gap-2">
                       <ArrowDownNarrowWide className="h-4 w-4" />
-                      Price (Low to High)
+                      {t('aiProvider.modelDialog.sort.priceLowToHigh')}
                     </div>
                   </SelectItem>
                   <SelectItem value="price-desc">
                     <div className="flex items-center gap-2">
                       <ArrowDownWideNarrow className="h-4 w-4" />
-                      Price (High to Low)
+                      {t('aiProvider.modelDialog.sort.priceHighToLow')}
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -334,6 +346,7 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
 };
 
 export const ModelSelectorDialog: React.FC = () => {
+  const { t } = useLocale();
   const { selectedModel } = useSelectedModel();
   const [open, setOpen] = useState(false);
 
@@ -353,7 +366,9 @@ export const ModelSelectorDialog: React.FC = () => {
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </>
           ) : (
-            <span className="text-muted-foreground text-sm">Select Model</span>
+            <span className="text-muted-foreground text-sm">
+              {t('aiProvider.modelSelector.selectModel')}
+            </span>
           )}
         </button>
       </DialogTrigger>

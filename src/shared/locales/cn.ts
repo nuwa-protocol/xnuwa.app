@@ -37,6 +37,87 @@ export const cn: typeof en = {
       dark: '深色',
     },
   },
+  aiProvider: {
+    modelSelector: {
+      selectModel: '选择模型',
+      auto: '自动',
+      autoDescription: '自动选择最佳模型',
+      webSearch: '网络搜索',
+      contextSize: {
+        low: '低',
+        medium: '中',
+        high: '高',
+      },
+      moreModels: '更多模型',
+      allModels: '所有模型',
+    },
+    modelDialog: {
+      title: {
+        autoSettings: '自动设置和推荐',
+        favoriteModels: '收藏模型',
+        providerModels: '{{provider}} 模型',
+        allModels: '所有模型',
+        providers: '提供商',
+      },
+      search: {
+        placeholder: '搜索模型...',
+      },
+      sort: {
+        name: '名称',
+        priceLowToHigh: '价格 (从低到高)',
+        priceHighToLow: '价格 (从高到低)',
+      },
+      loading: {
+        title: '正在加载模型...',
+      },
+      error: {
+        failedToLoad: '加载模型失败',
+        noModelsAvailable: '暂无可用模型',
+      },
+      favoriteEmpty: {
+        title: '暂无收藏模型',
+        description: '您可以点击模型卡片上的星标将其添加到收藏',
+      },
+    },
+    autoSettings: {
+      focusCategory: {
+        title: '重点分类',
+        placeholder: '选择分类（可选）',
+        none: '无',
+      },
+      optimizeFor: {
+        title: '优化目标',
+        speed: '速度',
+        cost: '成本',
+        latency: '延迟',
+      },
+      advancedSettings: {
+        title: '高级设置',
+        description: '用于模型选择的高级优化设置。',
+        minContextLength: '最小上下文长度',
+        contextPlaceholder: '例如：8000',
+      },
+      recommendedModels: '推荐模型',
+    },
+    modelCard: {
+      pricing: {
+        inputTokens: '/百万输入词元',
+        outputTokens: '/百万输出词元',
+      },
+    },
+    sidebar: {
+      title: '选择模型',
+      tabs: {
+        auto: '自动',
+        favorite: '收藏',
+        all: '全部',
+        providers: '提供商',
+      },
+    },
+    category: {
+      models: '模型',
+    },
+  },
   capStore: {
     title: 'Cap 商店',
     description: '发现并安装能力，提升你的体验',
@@ -282,8 +363,8 @@ export const cn: typeof en = {
         subtitle: '管理系统级设置和数据。',
       },
       general: {
-        title: "通用",
-        subtitle: "通用应用设置。",
+        title: '通用',
+        subtitle: '通用应用设置。',
       },
     },
     profile: {
@@ -336,12 +417,12 @@ export const cn: typeof en = {
       },
       devMode: {
         title: '开发者模式',
-        description: '启用或禁用开发者模式。'
+        description: '启用或禁用开发者模式。',
       },
       language: {
         title: '语言',
-        description: '选择你偏好的语言。'
-      }
+        description: '选择你偏好的语言。',
+      },
     },
   },
 };
