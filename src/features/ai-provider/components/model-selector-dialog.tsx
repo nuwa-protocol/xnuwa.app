@@ -178,6 +178,19 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
       );
     }
 
+    // Add empty state for favorite tab
+    if (selectedTab === 'favorite' && getFilteredModels().length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
+          <span className="text-4xl mb-2">★</span>
+          <p className="text-lg font-medium mb-1">No favorite models</p>
+          <p className="text-sm">
+            You can click the star on the model card to add it to your favorites
+          </p>
+        </div>
+      );
+    }
+
     const filteredModels = getFilteredModels();
     return renderModelGrid(filteredModels);
   };

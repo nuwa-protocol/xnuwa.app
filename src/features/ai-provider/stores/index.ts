@@ -8,24 +8,22 @@ import { createPersistConfig, db } from '@/storage';
 import { getAvailableModels } from '../services/models';
 import type { Model } from '../types';
 
-// default selected model
-export const DEFAULT_SELECTED_MODEL: Model = {
-  id: 'gpt-4o-mini',
-  name: 'GPT-4o-mini',
-  slug: 'gpt-4o-mini',
-  providerName: 'OpenAI',
-  providerSlug: 'openai',
-  description:
-    "GPT-4o-mini is OpenAI's newest model after GPT-4 Omni, supporting both text and image inputs with text outputs.",
-  context_length: 128000,
+export const AUTO_MODEL: Model = {
+  id: 'openrouter/auto',
+  name: 'Auto',
+  slug: 'auto',
+  providerName: 'Auto',
+  providerSlug: 'auto',
+  description: 'Automatically select the best model based on your needs.',
+  context_length: 0,
   pricing: {
-    input_per_million_tokens: 0.15,
-    output_per_million_tokens: 0.6,
+    input_per_million_tokens: 0,
+    output_per_million_tokens: 0,
     request_per_k_requests: 0,
-    image_per_k_images: 0.217,
+    image_per_k_images: 0,
     web_search_per_k_searches: 0,
   },
-  supported_inputs: ['text', 'image', 'file'],
+  supported_inputs: [],
   supported_parameters: [
     'max_tokens',
     'temperature',
@@ -98,7 +96,7 @@ const persistConfig = createPersistConfig<ModelStateStoreState>({
 export const ModelStateStore = create<ModelStateStoreState>()(
   persist(
     (set, get) => ({
-      selectedModel: DEFAULT_SELECTED_MODEL,
+      selectedModel: AUTO_MODEL,
       favoriteModels: [],
 
       // available models state
