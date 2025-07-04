@@ -76,14 +76,21 @@ export function generateCategoriesAndProviders(models: Model[]): {
   providers: Provider[];
 } {
   const categoryMap = new Map<string, number>();
-  const providerMap = new Map<string, number>();
+  const providerMap = new Map<string, { name: string; count: number }>();
 
   models.forEach((model) => {
     const category = getModelCategory(model);
-    const provider = model.providerName;
+    const providerName = model.providerName;
+    const providerId = providerName.toLowerCase().replace(/\s+/g, '');
 
     categoryMap.set(category, (categoryMap.get(category) || 0) + 1);
-    providerMap.set(provider, (providerMap.get(provider) || 0) + 1);
+
+    const existingProvider = providerMap.get(providerId);
+    if (existingProvider) {
+      existingProvider.count += 1;
+    } else {
+      providerMap.set(providerId, { name: providerName, count: 1 });
+    }
   });
 
   const categories: Category[] = Array.from(categoryMap.entries()).map(
@@ -95,8 +102,8 @@ export function generateCategoriesAndProviders(models: Model[]): {
   );
 
   const providers: Provider[] = Array.from(providerMap.entries())
-    .map(([name, count]) => ({
-      id: name.toLowerCase().replace(/\s+/g, ''),
+    .map(([id, { name, count }]) => ({
+      id,
       name,
       count,
     }))
