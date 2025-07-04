@@ -29,7 +29,7 @@ export const llmProvider = {
       selectedModel.supported_parameters.includes('web_search_options');
     return openrouter.chat(
       selectedModel.id,
-      modelSupportWebSearch
+      modelSupportWebSearch && webSearchEnabled
         ? {
             extraBody: {
               web_search_options: {
