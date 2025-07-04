@@ -10,7 +10,7 @@ import { llmProvider } from '@/features/ai-provider/services';
 import { ModelStateStore } from '@/features/ai-provider/stores';
 import { SettingsStateStore } from '@/features/settings/stores';
 import { generateUUID } from '@/shared/utils';
-import { systemPrompt } from '../prompts';
+import { systemPrompt, systemPromptWithArtifacts } from '../prompts';
 import { createDocument } from '../tools/create-document';
 import { updateDocument } from '../tools/update-document';
 
@@ -77,7 +77,7 @@ const handleAIRequest = async ({
 
   const result = streamText({
     model: llmProvider.chat(),
-    system: systemPrompt(),
+    system: isDevMode ? systemPromptWithArtifacts() : systemPrompt(),
     messages,
     maxSteps: 5,
     experimental_activeTools:
