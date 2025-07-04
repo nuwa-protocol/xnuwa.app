@@ -40,3 +40,7 @@ yarn.lock
 
 # Others
 *.log
+
+# Playwrite Tests
+playwright-report/
+test-results/
