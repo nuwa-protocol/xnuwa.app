@@ -88,29 +88,58 @@ const PurePreviewMessage = ({
                 </div>
               )}
 
+            {(() => {
+              const processedIndices = new Set<number>();
+              const elements: React.ReactNode[] = [];
+              
+              message.parts?.forEach((part, index) => {
+                if (processedIndices.has(index)) return;
+                
+                const { type } = part;
+                
+                if (type === 'reasoning') {
+                  elements.push(
+                    <MessageReasoning
+                      key={`reasoning-${message.id}-${index}`}
+                      isLoading={isLoading}
+                      reasoning={part.reasoning}
+                    />
+                  );
+                  processedIndices.add(index);
+                } else if (type === 'source') {
+                  // Collect all consecutive source parts
+                  const sources = [];
+                  let currentIndex = index;
+                  
+                  while (currentIndex < message.parts.length && 
+                         message.parts[currentIndex].type === 'source') {
+                    const sourcePart = message.parts[currentIndex];
+                    if (sourcePart.type === 'source') {
+                      sources.push(sourcePart.source);
+                    }
+                    processedIndices.add(currentIndex);
+                    currentIndex++;
+                  }
+                  
+                  elements.push(
+                    <MessageSource
+                      key={`sources-${message.id}-${index}`}
+                      sources={sources}
+                      className="mb-2"
+                    />
+                  );
+                }
+              });
+              
+              return elements;
+            })()}
+            
             {message.parts?.map((part, index) => {
+              const processedTypes = new Set(['reasoning', 'source']);
+              if (processedTypes.has(part.type)) return null;
+              
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
-
-              if (type === 'reasoning') {
-                return (
-                  <MessageReasoning
-                    key={key}
-                    isLoading={isLoading}
-                    reasoning={part.reasoning}
-                  />
-                );
-              }
-
-              if (type === 'source') {
-                return (
-                  <MessageSource
-                    key={key}
-                    source={part.source}
-                    className="mb-2"
-                  />
-                );
-              }
 
               if (type === 'text') {
                 if (mode === 'view') {
