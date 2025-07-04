@@ -1,0 +1,18 @@
+name: Hotfix Deployment
+on:
+  push:
+    branches: [ hotfix/* ]
+  workflow_dispatch:
+
+jobs:
+  deploy-hotfix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Merge to main
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git checkout main
+          git merge --no-ff ${{ github.ref }}
+          git push origin main
