@@ -1,4 +1,4 @@
-'use client';;
+'use client';
 
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
@@ -11,7 +11,11 @@ import { DocumentPreview } from '@/features/documents/components/document-previe
 import { DocumentToolCall } from '@/features/documents/components/document-preview-call';
 import { DocumentToolResult } from '@/features/documents/components/document-preview-result';
 import { Button } from '@/shared/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip';
 import { cn, sanitizeText } from '@/shared/utils';
 import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
@@ -91,28 +95,30 @@ const PurePreviewMessage = ({
             {(() => {
               const processedIndices = new Set<number>();
               const elements: React.ReactNode[] = [];
-              
+
               message.parts?.forEach((part, index) => {
                 if (processedIndices.has(index)) return;
-                
+
                 const { type } = part;
-                
+
                 if (type === 'reasoning') {
                   elements.push(
                     <MessageReasoning
                       key={`reasoning-${message.id}-${index}`}
                       isLoading={isLoading}
                       reasoning={part.reasoning}
-                    />
+                    />,
                   );
                   processedIndices.add(index);
                 } else if (type === 'source') {
                   // Collect all consecutive source parts
                   const sources = [];
                   let currentIndex = index;
-                  
-                  while (currentIndex < message.parts.length && 
-                         message.parts[currentIndex].type === 'source') {
+
+                  while (
+                    currentIndex < message.parts.length &&
+                    message.parts[currentIndex].type === 'source'
+                  ) {
                     const sourcePart = message.parts[currentIndex];
                     if (sourcePart.type === 'source') {
                       sources.push(sourcePart.source);
@@ -120,24 +126,24 @@ const PurePreviewMessage = ({
                     processedIndices.add(currentIndex);
                     currentIndex++;
                   }
-                  
+
                   elements.push(
                     <MessageSource
                       key={`sources-${message.id}-${index}`}
                       sources={sources}
                       className="mb-2"
-                    />
+                    />,
                   );
                 }
               });
-              
+
               return elements;
             })()}
-            
+
             {message.parts?.map((part, index) => {
               const processedTypes = new Set(['reasoning', 'source']);
               if (processedTypes.has(part.type)) return null;
-              
+
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
 
@@ -321,10 +327,23 @@ export const ThinkingMessage = () => {
           <SparklesIcon size={14} />
         </div>
 
-        <div className="flex flex-col gap-2 w-full">
-          <div className="flex flex-col gap-4 text-muted-foreground">
-            Hmm...
-          </div>
+        <div className="flex items-center justify-center gap-1">
+          {[...Array(3)].map((_, i) => (
+            <motion.div
+              className="h-3 w-3 rounded-full bg-primary"
+              initial={{ x: 0 }}
+              animate={{
+                x: [0, 10, 0],
+                opacity: [0.5, 1, 0.5],
+                scale: [1, 1.2, 1],
+              }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+                delay: i * 0.2,
+              }}
+            />
+          ))}
         </div>
       </div>
     </motion.div>
