@@ -23,7 +23,10 @@ import {
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { useFiles } from '@/features/ai-chat/hooks/use-files';
 import { useScrollToBottom } from '@/features/ai-chat/hooks/use-scroll-to-bottom';
-import { ModelSelector } from '@/features/ai-provider/components';
+import {
+  ModelSelector,
+  WebSearchToggle,
+} from '@/features/ai-provider/components';
 import { toast } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
@@ -251,6 +254,7 @@ function PureMultimodalInput({
               <AttachmentsButton fileInputRef={fileInputRef} status={status} />
             )}
             <ModelSelector />
+            <WebSearchToggle />
           </div>
 
           <div className="flex items-center">

@@ -10,14 +10,6 @@ const openrouter = createOpenRouter({
   apiKey: 'NOT_USED',
   baseURL: BASE_URL,
   fetch: createAuthorizedFetch(),
-  // extraBody: {
-  //   plugins: [
-  //     {
-  //       id: 'web',
-  //       max_results: 3,
-  //     },
-  //   ],
-  // },
 });
 
 const openai = createOpenAI({
@@ -30,7 +22,22 @@ const openai = createOpenAI({
 export const llmProvider = {
   chat: () => {
     const selectedModel = ModelStateStore.getState().selectedModel;
-    return openrouter.chat(selectedModel.id);
+    const webSearchEnabled = ModelStateStore.getState().webSearchEnabled;
+    return openrouter.chat(
+      selectedModel.id,
+      webSearchEnabled
+        ? {
+            extraBody: {
+              plugins: [
+                {
+                  id: 'web',
+                  max_results: 3,
+                },
+              ],
+            },
+          }
+        : {},
+    );
   },
   artifact: () => {
     const selectedModel = ModelStateStore.getState().selectedModel;
