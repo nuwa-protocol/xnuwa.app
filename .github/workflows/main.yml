@@ -3,16 +3,53 @@ on:
   push:
     branches: [ hotfix/* ]
   workflow_dispatch:
+    inputs:
+      hotfix_branch:
+        description: 'Hotfix branch to merge'
+        required: true
+        default: 'hotfix/'
 
 jobs:
   deploy-hotfix:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Merge to main
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
         run: |
-          git config user.name "GitHub Actions"
+          git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
+
+      - name: Merge hotfix to main
+        run: |
           git checkout main
-          git merge --no-ff ${{ github.ref }}
+          git pull origin main
+          
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            BRANCH_NAME="${{ github.event.inputs.hotfix_branch }}"
+          else
+            BRANCH_NAME="${{ github.ref_name }}"
+          fi
+          
+          echo "Merging branch: $BRANCH_NAME"
+
+          git merge --no-ff origin/$BRANCH_NAME -m "Merge $BRANCH_NAME into main"
+          
           git push origin main
+
+      - name: Delete hotfix branch
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            git push origin --delete ${{ github.ref_name }}
+          fi
+        continue-on-error: true
+
+      - name: Create release tag
+        run: |
+          TAG_NAME="hotfix-$(date +%Y%m%d-%H%M%S)"
+          git tag -a $TAG_NAME -m "Hotfix release $TAG_NAME"
+          git push origin $TAG_NAME
