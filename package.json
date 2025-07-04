@@ -27,6 +27,7 @@
     "@fontsource/geist-mono": "^5.2.6",
     "@fontsource/geist-sans": "^5.2.5",
     "@hookform/resolvers": "^5.1.1",
+    "@lobehub/icons": "^2.9.0",
     "@modelcontextprotocol/sdk": "^1.13.2",
     "@nuwa-ai/identity-kit": "^0.2.2",
     "@nuwa-ai/identity-kit-web": "^0.2.2",
