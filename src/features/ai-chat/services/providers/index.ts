@@ -10,6 +10,14 @@ const openrouter = createOpenRouter({
   apiKey: 'NOT_USED',
   baseURL: BASE_URL,
   fetch: createAuthorizedFetch(),
+  // extraBody: {
+  //   plugins: [
+  //     {
+  //       id: 'web',
+  //       max_results: 3,
+  //     },
+  //   ],
+  // },
 });
 
 const openai = createOpenAI({

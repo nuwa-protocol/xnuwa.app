@@ -1,37 +1,61 @@
-import { useEffect, useState } from 'react';
-import { fetchAvailableModels } from '../services/providers/models';
-import type { OpenRouterModelsResponse, OpenRouterModel } from '../types';
+import { useCallback, useEffect, useState } from 'react';
+import { getAvailableModels } from '../services/providers/models';
+import type { Model } from '../types';
+
+let cachedModels: Model[] | null = null;
+let isLoading = false;
+let loadingPromise: Promise<Model[]> | null = null;
 
 export function useAvailableModels() {
-  const [models, setModels] = useState<OpenRouterModel[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [models, setModels] = useState<Model[] | null>(cachedModels);
+  const [loading, setLoading] = useState<boolean>(cachedModels === null);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
+  const fetchModels = useCallback(async () => {
+    if (cachedModels) {
+      setModels(cachedModels);
+      setLoading(false);
+      return;
+    }
+
+    if (isLoading && loadingPromise) {
+      try {
+        const data = await loadingPromise;
+        setModels(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err as Error);
+        setLoading(false);
+      }
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    fetchAvailableModels()
-      .then((data: OpenRouterModelsResponse) => {
-        if (isMounted) {
-          setModels(data.data);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          setError(err);
-          setLoading(false);
-        }
-      });
-    return () => {
-      isMounted = false;
-    };
+    isLoading = true;
+
+    try {
+      loadingPromise = getAvailableModels();
+      const data = await loadingPromise;
+      cachedModels = data;
+      setModels(data);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+      isLoading = false;
+      loadingPromise = null;
+    }
   }, []);
+
+  useEffect(() => {
+    fetchModels();
+  }, [fetchModels]);
 
   return {
     models,
     loading,
     error,
+    reload: fetchModels,
   };
-} 
+}

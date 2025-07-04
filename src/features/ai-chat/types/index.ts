@@ -1,4 +1,4 @@
-import type { Message } from "ai";
+import type { Message } from 'ai';
 
 // client chat interface
 export interface ChatSession {
@@ -41,6 +41,7 @@ export interface OpenRouterModel {
     web_search: string;
     internal_reasoning: string;
     input_cache_read?: string;
+    input_cache_write?: string;
   };
   canonical_slug: string;
   context_length: number;
@@ -49,14 +50,25 @@ export interface OpenRouterModel {
   supported_parameters: string[];
 }
 
-export interface OpenRouterModelsResponse {
+export interface OpenRouterAPIResponse {
   data: OpenRouterModel[];
 }
 
-// Unified model selection interface
-export interface SelectedModel {
+export interface Model {
   id: string;
-  provider: string;
   name: string;
+  slug: string;
+  providerName: string;
+  providerSlug: string;
+  description: string;
+  context_length: number;
+  pricing: {
+    input_per_million_tokens: number;
+    output_per_million_tokens: number;
+    request_per_k_requests: number;
+    image_per_k_images: number;
+    web_search_per_k_searches: number;
+  };
+  supported_inputs: string[];
   supported_parameters: string[];
 }

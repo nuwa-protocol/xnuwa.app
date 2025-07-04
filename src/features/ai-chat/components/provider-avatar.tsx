@@ -1,11 +1,10 @@
-import React from 'react';
 import { BotIcon } from 'lucide-react';
-import type { OpenRouterModel } from '../types';
+import React from 'react';
 import { Img } from 'react-image';
 import { useTheme } from '@/shared/components/theme-provider';
 
-interface ModelAvatarProps {
-  model: OpenRouterModel;
+interface ProviderAvatarProps {
+  provider: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -24,14 +23,14 @@ const iconSizeMap = {
 
 
 
-export const ModelAvatar: React.FC<ModelAvatarProps> = ({
-  model,
+export const ProviderAvatar: React.FC<ProviderAvatarProps> = ({
+  provider,
   size = 'md',
   className = ''
 }) => {
 
   const { resolvedTheme } = useTheme();
-  const iconSlug = model.name.split(':')[0];
+  const iconSlug = provider
   const iconSrc = `https://unpkg.com/@lobehub/icons-static-webp@latest/${resolvedTheme}/${iconSlug}-color.webp`
   const iconSrcBw = `https://unpkg.com/@lobehub/icons-static-webp@latest/${resolvedTheme}/${iconSlug}.webp`
   return (
