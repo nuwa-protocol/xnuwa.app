@@ -1,11 +1,7 @@
-import { AlertTriangle, Home, RotateCcw } from 'lucide-react';
-import { Link, useNavigate, useRouteError } from 'react-router-dom';
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from '@/shared/components/ui/alert';
+import { Database } from 'lucide-react';
+import { useNavigate, useRouteError } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
+import { useStorage } from '@/shared/hooks/use-storage';
 import { getLocale } from '@/shared/locales';
 
 const locale = getLocale('en');
@@ -15,6 +11,33 @@ interface RouteError {
   statusText?: string;
   message?: string;
   data?: any;
+}
+
+function ErrorActions() {
+  const { clearAllStorage } = useStorage();
+
+  const handleClearStorage = async () => {
+    try {
+      await clearAllStorage();
+      // Show success message
+      console.log('Storage cleared successfully');
+      // Reload the page after clearing storage
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to clear storage:', error);
+      // Still reload even if clearing fails
+      window.location.reload();
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row">
+      <Button onClick={handleClearStorage} className="w-full" variant="outline">
+        <Database className="mr-2 h-4 w-4" />
+        Clear Storage
+      </Button>
+    </div>
+  );
 }
 
 export default function ErrorPage() {
@@ -61,51 +84,21 @@ export default function ErrorPage() {
   const { title, description } = getErrorMessage();
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="mx-auto max-w-lg text-center">
-        <div className="mb-8">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-            <AlertTriangle className="h-8 w-8 text-destructive" />
-          </div>
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-md text-center">
+        <div className="mx-auto h-12 w-12 text-primary" />
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          Oops, something went wrong!
+        </h1>
+        <p className="mt-4 text-muted-foreground">
+          An unexpected error has occurred. This might be caused by an
+          incompatible upgrade of the product. Please try refresh the page or
+          clear the storage.
+        </p>
 
-          <h1 className="mb-2 text-2xl font-bold tracking-tight">{title}</h1>
-
-          <p className="text-muted-foreground">{description}</p>
+        <div className="mt-6">
+          <ErrorActions />
         </div>
-
-        <Alert variant="destructive" className="mb-6">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Error information</AlertTitle>
-          <AlertDescription>
-            {error.status && (
-              <span className="font-mono">
-                {error.status} {error.statusText}
-              </span>
-            )}
-            {error.message && (
-              <div className="mt-1 text-sm">{error.message}</div>
-            )}
-          </AlertDescription>
-        </Alert>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button onClick={handleGoBack} variant="outline">
-            Go back
-          </Button>
-
-          <Button asChild>
-            <Link to="/chat">
-              <Home className="mr-2 h-4 w-4" />
-              Go to home
-            </Link>
-          </Button>
-
-          <Button onClick={handleRetry} variant="outline">
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Reload
-          </Button>
-        </div>
-
         {import.meta.env.DEV && error.data && (
           <details className="mt-8 text-left">
             <summary className="cursor-pointer text-sm text-muted-foreground">
