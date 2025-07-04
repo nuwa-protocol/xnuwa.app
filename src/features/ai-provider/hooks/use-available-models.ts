@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getAvailableModels } from '../services/providers/models';
+import { getAvailableModels } from '../services/models';
 import type { Model } from '../types';
 
 let cachedModels: Model[] | null = null;

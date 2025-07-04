@@ -1,4 +1,4 @@
-import { ModelStateStore } from '../stores/model-store';
+import { ModelStateStore } from '../stores';
 
 export function useSelectedModel() {
   const selectedModel = ModelStateStore((state) => state.selectedModel);
@@ -8,4 +8,4 @@ export function useSelectedModel() {
     selectedModel,
     setSelectedModel,
   };
-} 
+}

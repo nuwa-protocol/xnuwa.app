@@ -1,4 +1,4 @@
-import { ModelStateStore } from '../stores/model-store';
+import { ModelStateStore } from '../stores';
 import type { Model } from '../types';
 
 export function useFavoriteModels() {

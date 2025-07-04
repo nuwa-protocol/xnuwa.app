@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { ModelStateStore } from '../../stores/model-store';
+import { ModelStateStore } from '../stores';
 import { createAuthorizedFetch } from './fetch';
 import { createOpenRouter } from './openrouter-provider';
 

@@ -29,7 +29,7 @@ import {
   generateCategoriesAndProviders,
   getModelCategory,
   getModelName,
-} from '../utils/model-utils';
+} from '../utils';
 import { AutoSettings } from './auto-settings';
 import { ModelCard } from './model-card';
 import { ModelSelectorSidebar } from './model-selector-sidebar';

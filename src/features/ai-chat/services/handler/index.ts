@@ -1,4 +1,4 @@
-import { LanguageModelV1Source } from '@ai-sdk/provider';
+import type { LanguageModelV1Source } from '@ai-sdk/provider';
 import {
   appendResponseMessages,
   type Message,
@@ -6,10 +6,10 @@ import {
   streamText,
 } from 'ai';
 import { ChatStateStore } from '@/features/ai-chat/stores/chat-store';
-import { ModelStateStore } from '@/features/ai-chat/stores/model-store';
+import { llmProvider } from '@/features/ai-provider/services';
+import { ModelStateStore } from '@/features/ai-provider/stores';
 import { generateUUID } from '@/shared/utils';
 import { systemPrompt } from '../prompts';
-import { llmProvider } from '../providers';
 import { createDocument } from '../tools/create-document';
 import { updateDocument } from '../tools/update-document';
 

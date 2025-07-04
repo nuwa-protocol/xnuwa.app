@@ -12,7 +12,7 @@ import {
 import { useSelectedModel } from '../hooks';
 import { useFavoriteModels } from '../hooks/use-favorite-models';
 import type { Model } from '../types';
-import { getModelName } from '../utils/model-utils';
+import { getModelName } from '../utils';
 import { LLMModelSelector } from './model-selector-dialog';
 import { ProviderAvatar } from './provider-avatar';
 

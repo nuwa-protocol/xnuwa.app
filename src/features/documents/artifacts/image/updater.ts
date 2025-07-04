@@ -1,5 +1,5 @@
 import { experimental_generateImage } from 'ai';
-import { llmProvider } from '@/features/ai-chat/services/providers';
+import { llmProvider } from '@/features/ai-provider/services';
 
 export async function updateImageContent(
   description: string,

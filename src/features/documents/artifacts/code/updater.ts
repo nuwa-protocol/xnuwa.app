@@ -1,6 +1,6 @@
 import { streamObject } from 'ai';
 import { z } from 'zod';
-import { llmProvider } from '@/features/ai-chat/services/providers';
+import { llmProvider } from '@/features/ai-provider/services';
 
 export const updateCodePrompt = (currentContent: string) => `
   Improve the following code snippet based on the given prompt.

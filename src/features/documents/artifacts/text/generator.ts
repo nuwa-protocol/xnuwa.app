@@ -1,5 +1,5 @@
 import { smoothStream, streamText } from 'ai';
-import { llmProvider } from '@/features/ai-chat/services/providers';
+import { llmProvider } from '@/features/ai-provider/services';
 
 export async function generateTextContent(
   title: string,

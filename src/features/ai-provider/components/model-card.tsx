@@ -11,7 +11,7 @@ import {
 import { cn } from '@/shared/utils';
 import { useFavoriteModels } from '../hooks/use-favorite-models';
 import type { Model } from '../types';
-import { getModelName, getProviderName } from '../utils/model-utils';
+import { getModelName, getProviderName } from '../utils';
 import { ProviderAvatar } from './provider-avatar';
 
 interface ModelCardProps {

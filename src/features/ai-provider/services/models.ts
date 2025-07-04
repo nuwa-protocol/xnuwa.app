@@ -1,11 +1,7 @@
 // This file is kept for potential future model functionality
 // Currently no model selection is needed
 
-import type {
-  Model,
-  OpenRouterAPIResponse,
-  OpenRouterModel,
-} from '../../types';
+import type { Model, OpenRouterAPIResponse, OpenRouterModel } from '../types';
 import { createAuthorizedFetch } from './fetch';
 
 /**

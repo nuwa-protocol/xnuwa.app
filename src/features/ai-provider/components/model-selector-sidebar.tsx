@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
 } from '@/shared/components/ui/sidebar';
 import { useDevMode } from '@/shared/hooks';
-import type { Provider } from '../utils/model-utils';
+import type { Provider } from '../utils';
 import { ProviderAvatar } from './provider-avatar';
 
 interface ModelSelectorSidebarProps {
