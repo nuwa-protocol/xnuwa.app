@@ -44,3 +44,6 @@ yarn.lock
 # Playwrite Tests
 playwright-report/
 test-results/
+
+# cap
+public/caps.json
