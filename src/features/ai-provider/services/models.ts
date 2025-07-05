@@ -42,6 +42,7 @@ function parseModelInfo(model: OpenRouterModel) {
     [providerName, name] = model.name.split(':');
     providerName = providerName.trim();
   } else {
+    name = model.name;
     providerName = providerSlug;
   }
 
