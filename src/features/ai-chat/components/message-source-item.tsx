@@ -47,7 +47,8 @@ export const MessageSourceItem = ({
 
   if (isExternalUrl && url) {
     return (
-      <div
+      <button
+        type="button"
         key={`source-${index}-${id}`}
         className="group flex items-start gap-3 p-2 hover:bg-muted/20 transition-all duration-200 rounded cursor-pointer border border-transparent hover:border-border/30"
         onClick={() => onSourceClick(url)}
@@ -105,7 +106,7 @@ export const MessageSourceItem = ({
         </div>
 
         <ExternalLinkIcon className="w-3 h-3 text-muted-foreground/40 group-hover:text-muted-foreground/70 flex-shrink-0 mt-1 transition-colors" />
-      </div>
+      </button>
     );
   }
 

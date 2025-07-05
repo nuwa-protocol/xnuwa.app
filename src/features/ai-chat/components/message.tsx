@@ -5,7 +5,7 @@ import type { UIMessage } from 'ai';
 import cx from 'classnames';
 import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
-import { PencilIcon, SparklesIcon } from 'lucide-react';
+import { PencilIcon } from 'lucide-react';
 import { memo, useState } from 'react';
 import { DocumentPreview } from '@/features/documents/components/document-preview';
 import { DocumentToolCall } from '@/features/documents/components/document-preview-call';
@@ -32,7 +32,6 @@ const PurePreviewMessage = ({
   reload,
   isReadonly,
   requiresScrollPadding,
-  isArtifact,
 }: {
   chatId: string;
   message: UIMessage;
@@ -41,7 +40,6 @@ const PurePreviewMessage = ({
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
   requiresScrollPadding: boolean;
-  isArtifact: boolean;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
@@ -63,14 +61,6 @@ const PurePreviewMessage = ({
             },
           )}
         >
-          {message.role === 'assistant' && !isArtifact && (
-            <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
-              <div className="translate-y-px">
-                <SparklesIcon size={14} />
-              </div>
-            </div>
-          )}
-
           <div
             className={cn('flex flex-col gap-4 w-full', {
               'min-h-96': message.role === 'assistant' && requiresScrollPadding,
@@ -136,8 +126,8 @@ const PurePreviewMessage = ({
 
                       <div
                         data-testid="message-content"
-                        className={cn('flex flex-col gap-4', {
-                          'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
+                        className={cn('flex flex-col gap-4 w-full', {
+                          'bg-purple-200 dark:bg-purple-700 px-3 py-2 rounded-xl':
                             message.role === 'user',
                         })}
                       >
@@ -295,10 +285,6 @@ export const ThinkingMessage = () => {
           },
         )}
       >
-        <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
-          <SparklesIcon size={14} />
-        </div>
-
         <div className="flex items-center justify-center gap-1">
           {[...Array(3)].map((_, i) => (
             <motion.div

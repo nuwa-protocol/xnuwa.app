@@ -1,0 +1,13 @@
+.markdown-preview-content ul {
+    list-style-type: disc !important;
+    padding-left: 1.5rem !important;
+  }
+
+.markdown-preview-content ol {
+list-style-type: decimal !important;
+padding-left: 1.5rem !important;
+}
+
+.markdown-preview-content pre code {
+    min-width: 100% !important;
+}

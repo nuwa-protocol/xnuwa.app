@@ -56,7 +56,6 @@ function PureMessages({
           requiresScrollPadding={
             hasSentMessage && index === messages.length - 1
           }
-          isArtifact={isArtifact}
         />
       ))}
 

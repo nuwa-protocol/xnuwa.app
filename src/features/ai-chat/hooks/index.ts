@@ -7,4 +7,3 @@ export * from './use-file';
 export * from './use-files';
 export * from './use-messages';
 export * from './use-scroll-to-bottom';
-export * from './use-starry-night';
