@@ -23,7 +23,6 @@ import { MessageEditor } from './message-editor';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { PreviewAttachment } from './preview-attachment';
-import { Weather } from './weather';
 
 const PurePreviewMessage = ({
   chatId,
@@ -77,6 +76,7 @@ const PurePreviewMessage = ({
               'min-h-96': message.role === 'assistant' && requiresScrollPadding,
             })}
           >
+            {/* render attachments */}
             {message.experimental_attachments &&
               message.experimental_attachments.length > 0 && (
                 <div
@@ -92,54 +92,19 @@ const PurePreviewMessage = ({
                 </div>
               )}
 
-            {(() => {
-              const processedIndices = new Set<number>();
-              const elements: React.ReactNode[] = [];
+            {/* render reasoning */}
+            {message.parts?.map((part, index) => {
+              if (part.type !== 'reasoning') return null;
+              return (
+                <MessageReasoning
+                  key={`reasoning-${message.id}-${index}`}
+                  isLoading={isLoading}
+                  reasoning={part.reasoning}
+                />
+              );
+            })}
 
-              message.parts?.forEach((part, index) => {
-                if (processedIndices.has(index)) return;
-
-                const { type } = part;
-
-                if (type === 'reasoning') {
-                  elements.push(
-                    <MessageReasoning
-                      key={`reasoning-${message.id}-${index}`}
-                      isLoading={isLoading}
-                      reasoning={part.reasoning}
-                    />,
-                  );
-                  processedIndices.add(index);
-                } else if (type === 'source') {
-                  // Collect all consecutive source parts
-                  const sources = [];
-                  let currentIndex = index;
-
-                  while (
-                    currentIndex < message.parts.length &&
-                    message.parts[currentIndex].type === 'source'
-                  ) {
-                    const sourcePart = message.parts[currentIndex];
-                    if (sourcePart.type === 'source') {
-                      sources.push(sourcePart.source);
-                    }
-                    processedIndices.add(currentIndex);
-                    currentIndex++;
-                  }
-
-                  elements.push(
-                    <MessageSource
-                      key={`sources-${message.id}-${index}`}
-                      sources={sources}
-                      className="mb-2"
-                    />,
-                  );
-                }
-              });
-
-              return elements;
-            })()}
-
+            {/* render text/tool-invocation */}
             {message.parts?.map((part, index) => {
               const processedTypes = new Set(['reasoning', 'source']);
               if (processedTypes.has(part.type)) return null;
@@ -214,9 +179,7 @@ const PurePreviewMessage = ({
                         skeleton: ['getWeather'].includes(toolName),
                       })}
                     >
-                      {toolName === 'getWeather' ? (
-                        <Weather />
-                      ) : toolName === 'createDocument' ? (
+                      {toolName === 'createDocument' ? (
                         <DocumentPreview
                           chatId={chatId}
                           isReadonly={isReadonly}
@@ -226,13 +189,6 @@ const PurePreviewMessage = ({
                         <DocumentToolCall
                           chatId={chatId}
                           type="update"
-                          args={args}
-                          isReadonly={isReadonly}
-                        />
-                      ) : toolName === 'requestSuggestions' ? (
-                        <DocumentToolCall
-                          chatId={chatId}
-                          type="request-suggestions"
                           args={args}
                           isReadonly={isReadonly}
                         />
@@ -246,9 +202,7 @@ const PurePreviewMessage = ({
 
                   return (
                     <div key={toolCallId}>
-                      {toolName === 'getWeather' ? (
-                        <Weather weatherAtLocation={result} />
-                      ) : toolName === 'createDocument' ? (
+                      {toolName === 'createDocument' ? (
                         <DocumentPreview
                           chatId={chatId}
                           isReadonly={isReadonly}
@@ -276,6 +230,24 @@ const PurePreviewMessage = ({
                 }
               }
             })}
+
+            {/* render source */}
+            {(() => {
+              const sources: any[] = [];
+              message.parts?.forEach((part) => {
+                if (part.type === 'source') {
+                  sources.push(part.source);
+                }
+              });
+              if (sources.length === 0) return null;
+              return (
+                <MessageSource
+                  key={`sources-${message.id}`}
+                  sources={sources}
+                  className="mb-2"
+                />
+              );
+            })()}
 
             {!isReadonly && (
               <MessageActions

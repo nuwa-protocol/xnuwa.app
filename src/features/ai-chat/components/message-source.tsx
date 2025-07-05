@@ -1,10 +1,8 @@
 'use client';
 
-import { ChevronDownIcon, ChevronRightIcon, Globe } from 'lucide-react';
+import { ChevronDownIcon, ChevronUpIcon, LinkIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import { Badge } from '@/shared/components/ui/badge';
-import { Card, CardContent } from '@/shared/components/ui/card';
 import {
   Collapsible,
   CollapsibleContent,
@@ -36,44 +34,33 @@ export const MessageSource = ({ sources, className }: MessageSourceProps) => {
   };
 
   return (
-    <Card className={cn('w-full', className)}>
-      <CardContent className="p-0">
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger className="flex items-center gap-3 w-full p-4 hover:bg-muted/50 transition-colors">
-            <Globe className="w-4 h-4 text-muted-foreground" />
-            <div className="flex-1 min-w-0 text-left">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">
-                  Search Result{sources.length !== 1 ? 's' : ''}
-                </span>
-              </div>
-            </div>
-            <Badge variant="secondary" className="text-xs">
-              {sources.length} source{sources.length !== 1 ? 's' : ''}
-            </Badge>
-            {isOpen ? (
-              <ChevronDownIcon className="w-4 h-4" />
-            ) : (
-              <ChevronRightIcon className="w-4 h-4" />
-            )}
-          </CollapsibleTrigger>
+    <div className={cn('w-full', className)}>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger className="group flex items-center gap-2 py-2 px-1 hover:bg-muted/30 transition-all duration-200 rounded-md border border-transparent hover:border-border/50">
+          <LinkIcon className="w-3.5 h-3.5 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors" />
+          <span className="text-xs text-muted-foreground/70 group-hover:text-muted-foreground transition-colors font-medium">
+            {sources.length} source{sources.length !== 1 ? 's' : ''}
+          </span>
+          {isOpen ? (
+            <ChevronUpIcon className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+          ) : (
+            <ChevronDownIcon className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+          )}
+        </CollapsibleTrigger>
 
-          <CollapsibleContent className="w-full">
-            <div className="border-t w-full">
-              <div className="p-2 space-y-1 w-full">
-                {sources.map((source, index) => (
-                  <MessageSourceItem
-                    key={`source-${index}-${source.id || 'unknown'}`}
-                    source={source}
-                    index={index}
-                    onSourceClick={handleSourceClick}
-                  />
-                ))}
-              </div>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      </CardContent>
-    </Card>
+        <CollapsibleContent className="w-full">
+          <div className="mt-2 space-y-1 w-full">
+            {sources.map((source, index) => (
+              <MessageSourceItem
+                key={`source-${index}-${source.id || 'unknown'}`}
+                source={source}
+                index={index}
+                onSourceClick={handleSourceClick}
+              />
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
   );
 };
