@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import type { Document } from "@/features/documents/types";
-import { useLanguage } from "@/shared/hooks/use-language";
-import { useDocuments } from "./use-documents";
+import { useCallback, useState } from 'react';
+import type { Document } from '@/features/documents/types';
+import { useLanguage } from '@/shared/hooks/use-language';
+import { useDocuments } from './use-documents';
 
 // Version management hook for document operations
 export const useVersionManagement = () => {
@@ -16,7 +16,7 @@ export const useVersionManagement = () => {
       documentId: string,
       documents: Document[],
       currentVersionIndex: number,
-      onSuccess?: () => void
+      onSuccess?: () => void,
     ) => {
       setIsMutating(true);
 
@@ -25,7 +25,7 @@ export const useVersionManagement = () => {
         if (currentDocument) {
           // Update document to the selected version's content
           await deleteAfterTimestamp(documentId, {
-            content: currentDocument.content ?? "",
+            content: currentDocument.content ?? '',
             timestamp: currentDocument.createdAt,
           });
 
@@ -33,13 +33,13 @@ export const useVersionManagement = () => {
           onSuccess?.();
         }
       } catch (error) {
-        console.error(t("version.failedRestore"), error);
+        console.error(t('version.failedRestore'), error);
         throw error;
       } finally {
         setIsMutating(false);
       }
     },
-    [deleteAfterTimestamp, t]
+    [deleteAfterTimestamp, t],
   );
 
   return {

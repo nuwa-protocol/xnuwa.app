@@ -1,8 +1,8 @@
-import { CopyIcon } from "lucide-react";
-import type React from "react";
-import { useState } from "react";
-import { useCopyToClipboard } from "usehooks-ts";
-import { toast } from "@/shared/components";
+import { CopyIcon } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
+import { useCopyToClipboard } from 'usehooks-ts';
+import { toast } from '@/shared/components';
 import {
   Avatar,
   AvatarFallback,
@@ -19,12 +19,12 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/shared/components/ui";
-import { cn } from "@/shared/utils";
+} from '@/shared/components/ui';
+import { cn } from '@/shared/utils';
 
 // Variant-specific props
 type SingleInputProps = {
-  variant: "single-input";
+  variant: 'single-input';
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -34,7 +34,7 @@ type SingleInputProps = {
 };
 
 type SingleSelectProps = {
-  variant: "single-select";
+  variant: 'single-select';
   value: string;
   onChange: (value: string) => void;
   options: { label: string; value: string }[];
@@ -42,21 +42,21 @@ type SingleSelectProps = {
 };
 
 type SwitchProps = {
-  variant: "switch";
+  variant: 'switch';
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
 };
 
 type InfoProps = {
-  variant: "info";
+  variant: 'info';
   info: string;
   copyLabel?: string;
   copiedLabel: string;
 };
 
 type DangerActionProps = {
-  variant: "danger-action";
+  variant: 'danger-action';
   buttonLabel: string;
   onClick: () => void;
   disabled?: boolean;
@@ -67,7 +67,7 @@ type DangerActionProps = {
 };
 
 type AvatarProps = {
-  variant: "avatar";
+  variant: 'avatar';
   avatarUrl: string | null;
   onAvatarChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveAvatar: () => void;
@@ -90,13 +90,13 @@ export type SettingCardProps =
 export function SettingCard(props: SettingCardProps) {
   const { title, description } = props;
   const [showConfirm, setShowConfirm] = useState(false);
-  const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
+  const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const [_, copyToClipboard] = useCopyToClipboard();
 
   let content: React.ReactNode = null;
 
   switch (props.variant) {
-    case "single-input":
+    case 'single-input':
       content = (
         <div className="flex gap-2 items-center">
           <Input
@@ -118,7 +118,7 @@ export function SettingCard(props: SettingCardProps) {
         </div>
       );
       break;
-    case "single-select":
+    case 'single-select':
       content = (
         <Select
           value={props.value}
@@ -140,7 +140,7 @@ export function SettingCard(props: SettingCardProps) {
         </Select>
       );
       break;
-    case "switch":
+    case 'switch':
       content = (
         <Switch
           defaultChecked={props.checked}
@@ -149,11 +149,11 @@ export function SettingCard(props: SettingCardProps) {
         />
       );
       break;
-    case "info":
+    case 'info': {
       const MAX_INFO_LENGTH = 20;
       const truncatedInfo =
         props.info.length > MAX_INFO_LENGTH
-          ? props.info.slice(0, MAX_INFO_LENGTH) + "..."
+          ? `${props.info.slice(0, MAX_INFO_LENGTH)}...`
           : props.info;
       content = (
         <Tooltip>
@@ -164,12 +164,12 @@ export function SettingCard(props: SettingCardProps) {
               className="flex items-center gap-2 font-mono"
               onClick={async () => {
                 await copyToClipboard(props.info);
-                setCopyState("copied");
+                setCopyState('copied');
                 toast({
-                  type: "success",
-                  description: props.copiedLabel || "Copied!",
+                  type: 'success',
+                  description: props.copiedLabel || 'Copied!',
                 });
-                setTimeout(() => setCopyState("idle"), 1200);
+                setTimeout(() => setCopyState('idle'), 1200);
               }}
             >
               <CopyIcon size={14} />
@@ -180,7 +180,8 @@ export function SettingCard(props: SettingCardProps) {
         </Tooltip>
       );
       break;
-    case "danger-action":
+    }
+    case 'danger-action':
       content = (
         <>
           <div className="flex flex-col items-end gap-2">
@@ -197,11 +198,11 @@ export function SettingCard(props: SettingCardProps) {
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
               <div className="bg-background rounded-lg p-6 shadow-lg max-w-sm w-full">
                 <div className="font-semibold mb-2">
-                  {props.confirmationTitle || "Are you sure?"}
+                  {props.confirmationTitle || 'Are you sure?'}
                 </div>
                 <div className="mb-4 text-sm text-muted-foreground">
                   {props.confirmationDescription ||
-                    "This action cannot be undone."}
+                    'This action cannot be undone.'}
                 </div>
                 <div className="flex justify-end gap-2">
                   <Button
@@ -209,7 +210,7 @@ export function SettingCard(props: SettingCardProps) {
                     onClick={() => setShowConfirm(false)}
                     disabled={props.disabled}
                   >
-                    {props.cancelButtonLabel || "Cancel"}
+                    {props.cancelButtonLabel || 'Cancel'}
                   </Button>
                   <Button
                     variant="destructive"
@@ -228,7 +229,7 @@ export function SettingCard(props: SettingCardProps) {
         </>
       );
       break;
-    case "avatar":
+    case 'avatar':
       content = (
         <div className="space-y-4">
           <div className="flex items-center gap-4">
@@ -288,23 +289,23 @@ export function SettingCard(props: SettingCardProps) {
   return (
     <div
       className={cn(
-        "flex items-center gap-8 p-6 border rounded-lg bg-background shadow-sm",
-        props.variant === "danger-action" && "border-red-500 border-2"
+        'flex items-center gap-8 p-6 border rounded-lg bg-background shadow-sm',
+        props.variant === 'danger-action' && 'border-red-500 border-2',
       )}
     >
       <div className="flex-1 min-w-0">
         <div
           className={cn(
-            "text-base font-semibold mb-1",
-            props.variant === "danger-action" && "text-red-500 font-bold"
+            'text-base font-semibold mb-1',
+            props.variant === 'danger-action' && 'text-red-500 font-bold',
           )}
         >
           {title}
         </div>
         <div
           className={cn(
-            "text-muted-foreground text-sm",
-            props.variant === "danger-action" && "text-red-500 font-medium"
+            'text-muted-foreground text-sm',
+            props.variant === 'danger-action' && 'text-red-500 font-medium',
           )}
         >
           {description}

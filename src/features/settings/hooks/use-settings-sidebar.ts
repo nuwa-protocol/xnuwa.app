@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { SettingsStateStore } from "@/features/settings/stores";
+import { useCallback } from 'react';
+import { SettingsStateStore } from '@/features/settings/stores';
 
 // Sidebar state hook
 export const useSidebarSettings = () => {
@@ -9,7 +9,7 @@ export const useSidebarSettings = () => {
     store.setSidebarCollapsed(collapsed);
   }, []);
 
-  const setSidebarMode = useCallback((mode: "pinned" | "floating") => {
+  const setSidebarMode = useCallback((mode: 'pinned' | 'floating') => {
     store.setSidebarMode(mode);
   }, []);
 

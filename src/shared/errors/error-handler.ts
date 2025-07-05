@@ -1,9 +1,9 @@
-import type { UIMessage } from "ai";
-import { getLocale } from "@/shared/locales";
-import { generateUUID } from "@/shared/utils";
+import type { UIMessage } from 'ai';
+import { getLocale } from '@/shared/locales';
+import { generateUUID } from '@/shared/utils';
 
 // error level
-export type ErrorLevel = "info" | "warning" | "error" | "critical";
+export type ErrorLevel = 'info' | 'warning' | 'error' | 'critical';
 
 // error handler options
 interface ErrorHandlerOptions {
@@ -11,18 +11,18 @@ interface ErrorHandlerOptions {
   showToUser?: boolean;
 }
 
-const locale = getLocale("en");
+const locale = getLocale('en');
 
 // create error message
 export function createErrorMessage(
   error: string | Error,
-  options: ErrorHandlerOptions = {}
+  options: ErrorHandlerOptions = {},
 ): UIMessage {
   try {
-    const { level = "error", showToUser = true } = options;
+    const { level = 'error', showToUser = true } = options;
 
     // defensive check: ensure level is a valid string
-    const validLevel = typeof level === "string" && level ? level : "error";
+    const validLevel = typeof level === 'string' && level ? level : 'error';
 
     const errorText = error instanceof Error ? error.message : error;
 
@@ -31,15 +31,15 @@ export function createErrorMessage(
     }
 
     return createSystemMessage(
-      formatErrorForUser(errorText, validLevel as ErrorLevel)
+      formatErrorForUser(errorText, validLevel as ErrorLevel),
     );
   } catch (internalError) {
     // return a basic error message
     return {
       id: generateUUID(),
-      role: "assistant",
-      content: "An error occurred. Please try again.",
-      parts: [{ type: "text", text: "An error occurred. Please try again." }],
+      role: 'assistant',
+      content: 'An error occurred. Please try again.',
+      parts: [{ type: 'text', text: 'An error occurred. Please try again.' }],
       createdAt: new Date(),
     };
   }
@@ -56,29 +56,29 @@ function formatErrorForUser(errorText: string, level: ErrorLevel): string {
 // get error emoji
 function getErrorEmoji(level: ErrorLevel): string {
   switch (level) {
-    case "info":
-      return "ℹ️";
-    case "warning":
-      return "⚠️";
-    case "error":
-      return "❌";
-    case "critical":
-      return "🚨";
+    case 'info':
+      return 'ℹ️';
+    case 'warning':
+      return '⚠️';
+    case 'error':
+      return '❌';
+    case 'critical':
+      return '🚨';
     default:
-      return "❌";
+      return '❌';
   }
 }
 
 // get error prefix
 function getErrorPrefix(level: ErrorLevel): string {
   switch (level) {
-    case "info":
+    case 'info':
       return locale.error.info;
-    case "warning":
+    case 'warning':
       return locale.error.warning;
-    case "error":
+    case 'error':
       return locale.error.error;
-    case "critical":
+    case 'critical':
       return locale.error.critical;
     default:
       return locale.error.error;
@@ -89,9 +89,9 @@ function getErrorPrefix(level: ErrorLevel): string {
 function createSystemMessage(content: string): UIMessage {
   return {
     id: generateUUID(),
-    role: "assistant",
+    role: 'assistant',
     content,
-    parts: [{ type: "text", text: content }],
+    parts: [{ type: 'text', text: content }],
     createdAt: new Date(),
   };
 }
@@ -99,44 +99,44 @@ function createSystemMessage(content: string): UIMessage {
 // common error types
 export const ErrorHandlers = {
   network: (error?: string) =>
-    createErrorMessage(error || locale.error.network, { level: "error" }),
+    createErrorMessage(error || locale.error.network, { level: 'error' }),
 
   api: (error?: string) =>
-    createErrorMessage(error || locale.error.api, { level: "error" }),
+    createErrorMessage(error || locale.error.api, { level: 'error' }),
 
   storage: (error?: string) =>
-    createErrorMessage(error || locale.error.storage, { level: "warning" }),
+    createErrorMessage(error || locale.error.storage, { level: 'warning' }),
 
   validation: (error?: string) =>
-    createErrorMessage(error || locale.error.validation, { level: "warning" }),
+    createErrorMessage(error || locale.error.validation, { level: 'warning' }),
 
   permission: (error?: string) =>
-    createErrorMessage(error || locale.error.permission, { level: "error" }),
+    createErrorMessage(error || locale.error.permission, { level: 'error' }),
 
-  notFound: (resource = "resource") =>
+  notFound: (resource = 'resource') =>
     createErrorMessage(
-      locale.error.notFound.replace("{{resource}}", resource),
+      locale.error.notFound.replace('{{resource}}', resource),
       {
-        level: "warning",
-      }
+        level: 'warning',
+      },
     ),
 
-  timeout: (operation = "operation") =>
+  timeout: (operation = 'operation') =>
     createErrorMessage(
-      locale.error.timeout.replace("{{operation}}", operation),
+      locale.error.timeout.replace('{{operation}}', operation),
       {
-        level: "warning",
-      }
+        level: 'warning',
+      },
     ),
 
   generic: (error?: string) =>
-    createErrorMessage(error || locale.error.generic, { level: "error" }),
+    createErrorMessage(error || locale.error.generic, { level: 'error' }),
 };
 
 // error boundary handler
 export function handleAsyncError<T>(
   promise: Promise<T>,
-  fallback?: () => T
+  fallback?: () => T,
 ): Promise<T | null> {
   return promise.catch((error) => {
     console.error(error);
@@ -148,7 +148,7 @@ export function handleAsyncError<T>(
 export async function retryOperation<T>(
   operation: () => Promise<T>,
   maxRetries = 3,
-  delay = 1000
+  delay = 1000,
 ): Promise<T> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -161,5 +161,5 @@ export async function retryOperation<T>(
     }
   }
 
-  throw new Error("Max retries exceeded");
+  throw new Error('Max retries exceeded');
 }

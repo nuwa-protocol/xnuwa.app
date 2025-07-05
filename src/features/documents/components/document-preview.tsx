@@ -1,8 +1,8 @@
 'use client';
 import equal from 'fast-deep-equal';
 import { FileIcon, FullscreenIcon, ImageIcon, LoaderIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { memo, useCallback, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { ArtifactKind } from '@/features/documents/artifacts';
 import { CodePreview } from '@/features/documents/artifacts/code/components/code-preview';
 import { ImagePreview } from '@/features/documents/artifacts/image/components/image-preview';
@@ -11,7 +11,10 @@ import { TextPreview } from '@/features/documents/artifacts/text/components/text
 import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
 import { useDocuments } from '@/features/documents/hooks/use-documents';
 
-import type { Document, CurrentDocumentProps } from '@/features/documents/stores';
+import type {
+  CurrentDocumentProps,
+  Document,
+} from '@/features/documents/stores';
 import { cn } from '@/shared/utils';
 import { DocumentToolCall } from './document-preview-call';
 import { DocumentToolResult } from './document-preview-result';
@@ -45,7 +48,7 @@ export function DocumentPreview({
   const isDocumentsFetching = false; // No longer fetching from API
 
   const previewDocument = useMemo(() => documents?.[0], [documents]);
-  const hitboxRef = useRef<HTMLDivElement>(null!);
+  const hitboxRef = useRef<HTMLDivElement | null>(null);
 
   if (artifact.documentId !== 'init') {
     if (result) {
@@ -147,7 +150,7 @@ const PureHitboxLayer = ({
   setCurrentDocument,
   chatId,
 }: {
-  hitboxRef: React.RefObject<HTMLDivElement>;
+  hitboxRef: React.RefObject<HTMLDivElement | null>;
   result: any;
   setCurrentDocument: (
     updaterFn:

@@ -8,7 +8,7 @@ export const createImageArtifact = () => {
   return new Artifact({
     kind: 'image',
     description: 'Image artifact for displaying images',
-  content: ImageContent,
+    content: ImageContent,
     actions: [createUndoAction(), createRedoAction(), createCopyAction()],
   });
 };

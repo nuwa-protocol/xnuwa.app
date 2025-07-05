@@ -1,4 +1,3 @@
-export * from "./cap-store";
-
 // Re-export types for convenience
-export type { InstalledCap, RemoteCap, CapDisplayData } from "../types";
+export type { CapDisplayData, InstalledCap, RemoteCap } from '../types';
+export * from './cap-store';

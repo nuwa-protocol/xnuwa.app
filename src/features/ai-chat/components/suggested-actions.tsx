@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import type { UseChatHelpers } from "@ai-sdk/react";
-import { motion } from "framer-motion";
-import { memo } from "react";
-import { Button } from "@/shared/components/ui";
-import { useLanguage } from "@/shared/hooks/use-language";
+import type { UseChatHelpers } from '@ai-sdk/react';
+import { motion } from 'framer-motion';
+import { memo } from 'react';
+import { Button } from '@/shared/components/ui';
+import { useLanguage } from '@/shared/hooks/use-language';
 
 interface SuggestedActionsProps {
-  append: UseChatHelpers["append"];
+  append: UseChatHelpers['append'];
 }
 
 function PureSuggestedActions({ append }: SuggestedActionsProps) {
   const { t } = useLanguage();
-  const suggestedActions = t("suggestedActions") as Array<{
+  const suggestedActions = t('suggestedActions') as Array<{
     title: string;
     label: string;
     action: string;
@@ -30,13 +30,13 @@ function PureSuggestedActions({ append }: SuggestedActionsProps) {
           exit={{ opacity: 0, y: 20 }}
           transition={{ delay: 0.05 * index }}
           key={`suggested-action-${suggestedAction.title}-${index}`}
-          className={index > 1 ? "hidden sm:block" : "block"}
+          className={index > 1 ? 'hidden sm:block' : 'block'}
         >
           <Button
             variant="ghost"
             onClick={async () => {
               append({
-                role: "user",
+                role: 'user',
                 content: suggestedAction.action,
               });
             }}

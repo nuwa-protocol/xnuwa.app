@@ -1,6 +1,6 @@
-import { createContext, type ReactNode, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/features/auth/hooks/use-auth";
+import { createContext, type ReactNode, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 
 type AuthGuardValue = ReturnType<typeof useAuth>;
 
@@ -18,7 +18,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     }
 
     if (!isConnecting && !isConnected) {
-      navigate("/login");
+      navigate('/login');
     }
   }, [isInitializing, isConnecting, isConnected, navigate]);
 

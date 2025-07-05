@@ -1,11 +1,11 @@
-import type { UIMessage } from 'ai';
-import { PreviewMessage, ThinkingMessage } from './message';
-import { Greeting } from './greeting';
-import { memo } from 'react';
-import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
+import type { UIMessage } from 'ai';
+import equal from 'fast-deep-equal';
 import { motion } from 'framer-motion';
+import { memo } from 'react';
 import { useMessages } from '@/features/ai-chat/hooks/use-messages';
+import { Greeting } from './greeting';
+import { PreviewMessage, ThinkingMessage } from './message';
 
 interface MessagesProps {
   chatId: string;
@@ -24,7 +24,7 @@ function PureMessages({
   setMessages,
   reload,
   isReadonly,
-  isArtifact
+  isArtifact,
 }: MessagesProps) {
   const {
     containerRef: messagesContainerRef,

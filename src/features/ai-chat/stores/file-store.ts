@@ -2,9 +2,9 @@
 // Client-side file storage system using unified storage architecture
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { generateUUID } from '@/shared/utils';
 import { NuwaIdentityKit } from '@/features/auth/services';
-import { db, createPersistConfig } from '@/storage';
+import { generateUUID } from '@/shared/utils';
+import { createPersistConfig, db } from '@/storage';
 
 // ================= Constants & Types ================= //
 

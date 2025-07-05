@@ -1,11 +1,9 @@
 import { FileIcon, PencilIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { memo } from 'react';
-
-import { toast } from '@/shared/components/toast';
-
+import { useNavigate } from 'react-router-dom';
 import type { ArtifactKind } from '@/features/documents/artifacts';
 import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
+import { toast } from '@/shared/components/toast';
 import { useLanguage } from '@/shared/hooks/use-language';
 
 const getActionText = (
@@ -76,7 +74,7 @@ function PureDocumentToolResult({
           <FileIcon size={16} />
         ) : type === 'update' ? (
           <PencilIcon size={16} />
-        ) :  null}
+        ) : null}
       </div>
       <div className="text-left">
         {`${getActionText(type, 'past', t)} "${result.title}"`}

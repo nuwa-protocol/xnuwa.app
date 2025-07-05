@@ -1,13 +1,13 @@
-import { Pin, PinOff } from "lucide-react";
-import { useSidebarSettings } from "@/features/settings/hooks/use-settings-sidebar";
+import { Pin, PinOff } from 'lucide-react';
+import { useSidebarSettings } from '@/features/settings/hooks/use-settings-sidebar';
 import {
   Button,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   useSidebar,
-} from "@/shared/components/ui";
-import { useLanguage } from "@/shared/hooks/use-language";
+} from '@/shared/components/ui';
+import { useLanguage } from '@/shared/hooks/use-language';
 
 export function SidebarToggle() {
   const { setOpen } = useSidebar();
@@ -15,17 +15,17 @@ export function SidebarToggle() {
   const { t } = useLanguage();
 
   const handleToggleMode = () => {
-    const newMode = sidebarMode === "pinned" ? "floating" : "pinned";
+    const newMode = sidebarMode === 'pinned' ? 'floating' : 'pinned';
     setSidebarMode(newMode);
 
     // In pinned mode, open the sidebar by default
     // In floating mode, let hover logic control it
-    if (newMode === "pinned") {
+    if (newMode === 'pinned') {
       setOpen(true);
     }
   };
 
-  const isPinned = sidebarMode === "pinned";
+  const isPinned = sidebarMode === 'pinned';
 
   return (
     <Tooltip>
@@ -42,7 +42,7 @@ export function SidebarToggle() {
         </Button>
       </TooltipTrigger>
       <TooltipContent align="start">
-        {isPinned ? t("nav.sidebar.toggleUnpin") : t("nav.sidebar.togglePin")}
+        {isPinned ? t('nav.sidebar.toggleUnpin') : t('nav.sidebar.togglePin')}
       </TooltipContent>
     </Tooltip>
   );

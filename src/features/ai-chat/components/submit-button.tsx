@@ -1,7 +1,7 @@
 'use client';
 
-import { useFormStatus } from 'react-dom';
 import { LoaderIcon } from 'lucide-react';
+import { useFormStatus } from 'react-dom';
 import { Button } from '@/shared/components/ui/button';
 import { useLanguage } from '@/shared/hooks/use-language';
 

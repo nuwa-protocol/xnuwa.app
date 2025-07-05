@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  ChevronDownIcon,
-  ChevronRightIcon,
-  Globe,
-} from 'lucide-react';
+import { ChevronDownIcon, ChevronRightIcon, Globe } from 'lucide-react';
 import { useState } from 'react';
 
 import { Badge } from '@/shared/components/ui/badge';

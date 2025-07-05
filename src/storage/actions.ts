@@ -1,7 +1,7 @@
-import { db } from "./db";
+import { db } from './db';
 
 class StorageActions {
-  private isBrowser = typeof window !== "undefined";
+  private isBrowser = typeof window !== 'undefined';
 
   // Sync state to localStorage cache
   async syncToCache<T>(key: string, data: T): Promise<void> {
@@ -30,7 +30,7 @@ class StorageActions {
   // Save to IndexedDB storage layer
   async saveToStorage<T extends { id: string; did: string }>(
     table: string,
-    records: T[]
+    records: T[],
   ): Promise<void> {
     if (!this.isBrowser || records.length === 0) return;
 
@@ -51,7 +51,7 @@ class StorageActions {
     try {
       const dbTable = (db as any)[table];
       if (dbTable) {
-        const records = await dbTable.where("did").equals(did).toArray();
+        const records = await dbTable.where('did').equals(did).toArray();
         return records.sort((a: any, b: any) => b.updatedAt - a.updatedAt);
       }
       return [];
@@ -64,14 +64,14 @@ class StorageActions {
   // Delete from IndexedDB
   async deleteFromStorage(
     table: string,
-    condition: string | { key: string; value: any }
+    condition: string | { key: string; value: any },
   ): Promise<void> {
     if (!this.isBrowser) return;
 
     try {
       const dbTable = (db as any)[table];
       if (dbTable) {
-        if (typeof condition === "string") {
+        if (typeof condition === 'string') {
           await dbTable.delete(condition);
         } else {
           await dbTable.where(condition.key).equals(condition.value).delete();
@@ -89,7 +89,7 @@ class StorageActions {
     try {
       // Clear IndexedDB
       await db.transaction(
-        "rw",
+        'rw',
         [
           db.chats,
           db.documents,
@@ -109,16 +109,16 @@ class StorageActions {
             db.caps.clear(),
             db.settings.clear(),
           ]);
-        }
+        },
       );
 
       // Clear localStorage
       const keysToRemove = Object.keys(localStorage).filter(
-        (key) => key.includes("storage") || key.includes("nuwa")
+        (key) => key.includes('storage') || key.includes('nuwa'),
       );
       keysToRemove.forEach((key) => localStorage.removeItem(key));
     } catch (error) {
-      console.error("Failed to clear all storage:", error);
+      console.error('Failed to clear all storage:', error);
     }
   }
 }

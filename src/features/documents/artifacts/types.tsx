@@ -32,7 +32,6 @@ export type ArtifactAction<M = any> = {
   isDisabled?: (context: ArtifactActionContext<M>) => boolean;
 };
 
-
 export interface ArtifactContent<M = any> {
   title: string;
   content: string;

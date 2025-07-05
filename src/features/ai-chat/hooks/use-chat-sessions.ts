@@ -1,6 +1,6 @@
-import { useCallback } from "react";
-import { ChatStateStore } from "@/features/ai-chat/stores/chat-store";
-import type { ChatSession } from "@/features/ai-chat/types";
+import { useCallback } from 'react';
+import { ChatStateStore } from '@/features/ai-chat/stores/chat-store';
+import type { ChatSession } from '@/features/ai-chat/types';
 
 export const useChatSessions = () => {
   const store = ChatStateStore();
@@ -10,10 +10,10 @@ export const useChatSessions = () => {
   }, []);
 
   const updateSession = useCallback(
-    (id: string, updates: Partial<Omit<ChatSession, "id">>) => {
+    (id: string, updates: Partial<Omit<ChatSession, 'id'>>) => {
       store.updateSession(id, updates);
     },
-    []
+    [],
   );
 
   const clearAllSessions = useCallback(() => {
@@ -22,7 +22,7 @@ export const useChatSessions = () => {
 
   const getSortedSessions = useCallback(() => {
     return Object.values(store.sessions).sort(
-      (a, b) => b.updatedAt - a.updatedAt
+      (a, b) => b.updatedAt - a.updatedAt,
     );
   }, [store.sessions]);
 

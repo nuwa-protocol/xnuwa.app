@@ -1,1 +1,1 @@
-export { SearchModal } from "./search-modal";
+export { SearchModal } from './search-modal';

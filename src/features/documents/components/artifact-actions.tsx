@@ -1,22 +1,22 @@
-import { type Dispatch, memo, type SetStateAction, useState } from "react";
-import { toast } from "@/shared/components/toast";
-import { artifactDefinitions } from "@/features/documents/artifacts";
-import type { ArtifactActionContext } from "@/features/documents/artifacts/types";
-import { Button } from "@/shared/components/ui/button";
+import { type Dispatch, memo, type SetStateAction, useState } from 'react';
+import { artifactDefinitions } from '@/features/documents/artifacts';
+import type { ArtifactActionContext } from '@/features/documents/artifacts/types';
+import type { CurrentDocumentProps } from '@/features/documents/stores';
+import { toast } from '@/shared/components/toast';
+import { Button } from '@/shared/components/ui/button';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/shared/components/ui/tooltip";
-import type { CurrentDocumentProps } from "@/features/documents/stores";
-import { cn } from "@/shared/utils";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip';
+import { cn } from '@/shared/utils';
 
 interface ArtifactActionsProps {
   artifact: CurrentDocumentProps;
-  handleVersionChange: (type: "next" | "prev" | "toggle" | "latest") => void;
+  handleVersionChange: (type: 'next' | 'prev' | 'toggle' | 'latest') => void;
   currentVersionIndex: number;
   isCurrentVersion: boolean;
-  mode: "edit" | "diff";
+  mode: 'edit' | 'diff';
   metadata: any;
   setMetadata: Dispatch<SetStateAction<any>>;
 }
@@ -33,11 +33,11 @@ function PureArtifactActions({
   const [isLoading, setIsLoading] = useState(false);
 
   const artifactDefinition = artifactDefinitions.find(
-    (definition) => definition.kind === artifact.kind
+    (definition) => definition.kind === artifact.kind,
   );
 
   if (!artifactDefinition) {
-    throw new Error("Artifact definition not found!");
+    throw new Error('Artifact definition not found!');
   }
 
   const actionContext: ArtifactActionContext = {
@@ -57,9 +57,9 @@ function PureArtifactActions({
           <TooltipTrigger asChild>
             <Button
               variant="outline"
-              className={cn("h-fit dark:hover:bg-zinc-700", {
-                "p-2": !action.label,
-                "py-1.5 px-2": action.label,
+              className={cn('h-fit dark:hover:bg-zinc-700', {
+                'p-2': !action.label,
+                'py-1.5 px-2': action.label,
               })}
               onClick={async () => {
                 setIsLoading(true);
@@ -68,19 +68,19 @@ function PureArtifactActions({
                   await Promise.resolve(action.onClick(actionContext));
                 } catch (error) {
                   toast({
-                    type: "error",
-                    description: "Failed to execute action",
+                    type: 'error',
+                    description: 'Failed to execute action',
                   });
                 } finally {
                   setIsLoading(false);
                 }
               }}
               disabled={
-                isLoading || artifact.status === "streaming"
+                isLoading || artifact.status === 'streaming'
                   ? true
                   : action.isDisabled
-                  ? action.isDisabled(actionContext)
-                  : false
+                    ? action.isDisabled(actionContext)
+                    : false
               }
             >
               {action.icon}
@@ -104,5 +104,5 @@ export const ArtifactActions = memo(
     if (prevProps.artifact.content !== nextProps.artifact.content) return false;
 
     return true;
-  }
+  },
 );

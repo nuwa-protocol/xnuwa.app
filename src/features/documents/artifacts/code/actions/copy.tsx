@@ -8,7 +8,6 @@ interface Metadata {
 }
 
 export function createCopyAction(): ArtifactAction<Metadata> {
-
   return {
     icon: <CopyIcon size={18} />,
     description: getLocaleText('en').t('artifact.code.actions.copy'),
