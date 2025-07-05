@@ -1,13 +1,13 @@
-import { ChatStateStore } from "@/features/ai-chat/stores/chat-store";
-import { ChatSDKError } from "@/shared/errors/chatsdk-errors";
+import { ChatStateStore } from '@/features/ai-chat/stores/chat-store';
+import { ChatSDKError } from '@/shared/errors/chatsdk-errors';
 
 // define stream state
 enum StreamState {
-  INITIAL = "initial",
-  ACTIVE = "active",
-  PAUSED = "paused",
-  COMPLETED = "completed",
-  ERROR = "error",
+  INITIAL = 'initial',
+  ACTIVE = 'active',
+  PAUSED = 'paused',
+  COMPLETED = 'completed',
+  ERROR = 'error',
 }
 
 interface StreamMetadata {
@@ -21,7 +21,7 @@ interface StreamMetadata {
 interface ClientStreamContext {
   resumableStream: (
     streamId: string,
-    getStream: () => ReadableStream
+    getStream: () => ReadableStream,
   ) => Promise<ReadableStream>;
 }
 
@@ -40,7 +40,7 @@ let globalStreamContext: ClientStreamContext | null = null;
 // create a resumable ReadableStream
 function createResumableStream(
   originalStream: ReadableStream,
-  streamId: string
+  streamId: string,
 ): ReadableStream {
   let reader = originalStream.getReader();
   let isFirstChunk = true;
@@ -54,7 +54,7 @@ function createResumableStream(
           lastActiveTime: Date.now(),
         });
       } catch (error) {
-        console.error("Error initializing stream:", error);
+        console.error('Error initializing stream:', error);
       }
     },
     async pull(controller) {
@@ -62,7 +62,7 @@ function createResumableStream(
         try {
           const metadata = streamMetadata.get(streamId);
           if (!metadata) {
-            throw new Error("Stream metadata not found");
+            throw new Error('Stream metadata not found');
           }
 
           if (isFirstChunk) {
@@ -92,7 +92,7 @@ function createResumableStream(
         } catch (error) {
           const metadata = streamMetadata.get(streamId);
           if (!metadata) {
-            controller.error(new ChatSDKError("bad_request:stream"));
+            controller.error(new ChatSDKError('bad_request:stream'));
             return;
           }
 
@@ -113,7 +113,7 @@ function createResumableStream(
             metadata.state = StreamState.ERROR;
             metadata.error = error as Error;
             streamMetadata.set(streamId, metadata);
-            controller.error(new ChatSDKError("bad_request:stream"));
+            controller.error(new ChatSDKError('bad_request:stream'));
           }
         }
       };
@@ -131,7 +131,7 @@ export function getStreamContext(): ClientStreamContext | null {
     globalStreamContext = {
       resumableStream: async (
         streamId: string,
-        getStream: () => ReadableStream
+        getStream: () => ReadableStream,
       ) => {
         const { getStreamIdsByChatId } = ChatStateStore.getState();
 
@@ -163,7 +163,7 @@ export function getStreamContext(): ClientStreamContext | null {
           return createResumableStream(originalStream, streamId);
         } catch (error) {
           console.error(`Error in resumableStream: ${error}`);
-          throw new ChatSDKError("bad_request:stream");
+          throw new ChatSDKError('bad_request:stream');
         }
       },
     };

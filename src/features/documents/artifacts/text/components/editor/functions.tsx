@@ -3,10 +3,8 @@
 import { defaultMarkdownSerializer } from 'prosemirror-markdown';
 import { DOMParser, type Node } from 'prosemirror-model';
 import { renderToString } from 'react-dom/server';
-
-import { Markdown } from './markdown';
-
 import { documentSchema } from './config';
+import { Markdown } from './markdown';
 
 export const buildDocumentFromContent = (content: string) => {
   const parser = DOMParser.fromSchema(documentSchema);

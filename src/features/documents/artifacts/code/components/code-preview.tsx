@@ -1,5 +1,5 @@
-import { CodeEditor } from './code-editor';
 import type { Document } from '@/features/documents/stores';
+import { CodeEditor } from './code-editor';
 
 interface CodePreviewProps {
   document: Document;

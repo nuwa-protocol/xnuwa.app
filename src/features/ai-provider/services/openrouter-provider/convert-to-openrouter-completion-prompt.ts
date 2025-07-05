@@ -44,7 +44,7 @@ export function convertToOpenRouterCompletionPrompt({
     switch (role) {
       case 'system': {
         throw new InvalidPromptError({
-          message: 'Unexpected system message in prompt: ${content}',
+          message: `Unexpected system message in prompt: ${content}`,
           prompt,
         });
       }

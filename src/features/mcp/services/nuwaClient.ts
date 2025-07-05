@@ -1,12 +1,21 @@
-import { experimental_createMCPClient as createMCPClient } from "ai";
-import { MCPError, NuwaMCPClient, PromptDefinition, PromptMessagesResultSchema, PromptSchema, ResourceDefinition, ResourceSchema, ResourceTemplateDefinition, ResourceTemplateSchema } from "../types";
-import { z } from "zod";
-import { McpTransportType } from "../types";
-import { createDidAuthSigner, SignedSSEClientTransport } from "./authTransport";
-import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
-import { IdentityKitWeb } from "@nuwa-ai/identity-kit-web";
-import { DIDAuth } from "@nuwa-ai/identity-kit";
+import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
+import { DIDAuth } from '@nuwa-ai/identity-kit';
+import { IdentityKitWeb } from '@nuwa-ai/identity-kit-web';
+import { experimental_createMCPClient as createMCPClient } from 'ai';
+import {
+  MCPError,
+  type McpTransportType,
+  type NuwaMCPClient,
+  type PromptDefinition,
+  PromptMessagesResultSchema,
+  PromptSchema,
+  type ResourceDefinition,
+  ResourceSchema,
+  type ResourceTemplateDefinition,
+  ResourceTemplateSchema,
+} from '../types';
+import { createDidAuthSigner, SignedSSEClientTransport } from './authTransport';
 
 /**
  * Cached MCP client instances keyed by server URL.
@@ -18,19 +27,19 @@ const CACHE = new Map<string, Promise<NuwaMCPClient>>();
 /**
  * Creates a Nuwa-specific wrapper around the AI SDK's MCPClient
  * that provides typed access to prompts and resources.
- * 
+ *
  * @param url The MCP server URL
  * @param transportType Optional transport type, auto-detected if not specified
  * @returns A Promise resolving to a NuwaMCPClient instance
  */
 export async function createNuwaMCPClient(
   url: string,
-  transportType?: McpTransportType
+  transportType?: McpTransportType,
 ): Promise<NuwaMCPClient> {
   // Check cache first - only use URL as key, ignoring transportType
   // This ensures we reuse the same connection regardless of how transportType is specified
   if (CACHE.has(url)) {
-    return CACHE.get(url)!;
+    return CACHE.get(url) as Promise<NuwaMCPClient>;
   }
 
   // Create a new client promise
@@ -46,16 +55,27 @@ export async function createNuwaMCPClient(
         } as any);
       }
       if (transportType === 'sse') {
-        return new SignedSSEClientTransport(new URL(url), signer, initialHeader);
+        return new SignedSSEClientTransport(
+          new URL(url),
+          signer,
+          initialHeader,
+        );
       }
       // auto-detect
       try {
-        await fetch(url, { method: 'HEAD', headers: { Authorization: initialHeader } });
+        await fetch(url, {
+          method: 'HEAD',
+          headers: { Authorization: initialHeader },
+        });
         return new StreamableHTTPClientTransport(new URL(url), {
           requestInit: { headers: { Authorization: initialHeader } },
         } as any);
       } catch {
-        return new SignedSSEClientTransport(new URL(url), signer, initialHeader);
+        return new SignedSSEClientTransport(
+          new URL(url),
+          signer,
+          initialHeader,
+        );
       }
     };
 
@@ -66,9 +86,11 @@ export async function createNuwaMCPClient(
 
     // Disable capability whitelist so we can use experimental methods like prompts/list
     if (typeof (rawClient as any).assertCapability === 'function') {
-      (rawClient as any).assertCapability = () => { /* no-op */ };
+      (rawClient as any).assertCapability = () => {
+        /* no-op */
+      };
     }
-    
+
     // 4. Create the enhanced client
     const client: NuwaMCPClient = {
       raw: rawClient,
@@ -91,7 +113,10 @@ export async function createNuwaMCPClient(
                 const prompt = PromptSchema.parse(promptData);
                 promptsMap[prompt.name] = prompt;
               } catch (err) {
-                console.warn(`Failed to parse prompt: ${JSON.stringify(promptData)}`, err);
+                console.warn(
+                  `Failed to parse prompt: ${JSON.stringify(promptData)}`,
+                  err,
+                );
               }
             }
           }
@@ -114,12 +139,12 @@ export async function createNuwaMCPClient(
         const passThroughSchema = { parse: (v: any) => v } as const;
         try {
           const result = await (rawClient as any).request({
-            request: { 
-              method: 'prompts/get', 
-              params: { 
+            request: {
+              method: 'prompts/get',
+              params: {
                 name,
-                arguments: args || {} 
-              } 
+                arguments: args || {},
+              },
             },
             resultSchema: passThroughSchema,
           });
@@ -161,8 +186,11 @@ export async function createNuwaMCPClient(
           });
 
           // Transform the response into a map
-          const resourcesMap: Record<string, ResourceDefinition | ResourceTemplateDefinition> = {};
-          
+          const resourcesMap: Record<
+            string,
+            ResourceDefinition | ResourceTemplateDefinition
+          > = {};
+
           if (Array.isArray(result?.resources)) {
             for (const resourceData of result.resources) {
               try {
@@ -180,11 +208,14 @@ export async function createNuwaMCPClient(
                   resourcesMap[template.uriTemplate] = template;
                 }
               } catch (err) {
-                console.warn(`Failed to parse resource: ${JSON.stringify(resourceData)}`, err);
+                console.warn(
+                  `Failed to parse resource: ${JSON.stringify(resourceData)}`,
+                  err,
+                );
               }
             }
           }
-          
+
           return resourcesMap;
         } catch (err: any) {
           throw new MCPError({
@@ -212,16 +243,19 @@ export async function createNuwaMCPClient(
         }
       },
 
-      async readResourceTemplate<T = unknown>(uriTemplate: string, args: Record<string, unknown>): Promise<T> {
+      async readResourceTemplate<T = unknown>(
+        uriTemplate: string,
+        args: Record<string, unknown>,
+      ): Promise<T> {
         const passThroughSchema = { parse: (v: any) => v } as const;
         try {
           const result = await (rawClient as any).request({
-            request: { 
-              method: 'resources/read', 
-              params: { 
+            request: {
+              method: 'resources/read',
+              params: {
                 uri: uriTemplate,
-                arguments: args 
-              } 
+                arguments: args,
+              },
             },
             resultSchema: passThroughSchema,
           });
@@ -240,7 +274,7 @@ export async function createNuwaMCPClient(
         await rawClient.close();
         // Remove from cache when closed
         CACHE.delete(url);
-      }
+      },
     };
 
     // Add execute() methods to prompts for easier access
@@ -251,7 +285,7 @@ export async function createNuwaMCPClient(
 
   // Store in cache
   CACHE.set(url, promise);
-  
+
   return promise;
 }
 
@@ -261,14 +295,14 @@ export async function createNuwaMCPClient(
 export async function closeNuwaMCPClient(url: string): Promise<void> {
   const clientPromise = CACHE.get(url);
   if (!clientPromise) return;
-  
+
   try {
     const client = await clientPromise;
     await client.close();
   } catch (err) {
     // ignore
   }
-  
+
   CACHE.delete(url);
 }
 
@@ -285,7 +319,7 @@ async function enhancePromptsWithExecute(client: NuwaMCPClient): Promise<void> {
     Object.defineProperty(client, 'prompts', {
       value: async () => {
         const freshMap = await prompts();
-        
+
         // Add execute() methods to each prompt
         for (const [name, prompt] of Object.entries(freshMap)) {
           if (!freshMap[name].execute) {
@@ -294,13 +328,13 @@ async function enhancePromptsWithExecute(client: NuwaMCPClient): Promise<void> {
             };
           }
         }
-        
+
         return freshMap;
       },
       writable: true,
       configurable: true,
     });
-    
+
     // Pre-populate the prompts object with known prompts for direct access
     const promptsObj = client.prompts as any;
     for (const [name, prompt] of Object.entries(promptsMap)) {
@@ -308,77 +342,76 @@ async function enhancePromptsWithExecute(client: NuwaMCPClient): Promise<void> {
         ...prompt,
         execute: async (args?: Record<string, unknown>) => {
           return client.getPrompt(name, args);
-        }
+        },
       };
     }
   } catch (err) {
     // If enhancing fails, we still have the basic client functionality
     console.warn('Failed to enhance prompts with execute() methods', err);
   }
-} 
-
+}
 
 /**
  * Creates a DID authentication header for the MCP request
  */
 export async function createDidAuthHeader(url: string): Promise<string> {
-    const sdk = await IdentityKitWeb.init({ storage: "local" });
-    const payload = {
-      operation: "mcp-json-rpc",
-      params: { url },
-    } as const;
-    const sigObj = await sdk.sign(payload);
-    return DIDAuth.v1.toAuthorizationHeader(sigObj);
+  const sdk = await IdentityKitWeb.init({ storage: 'local' });
+  const payload = {
+    operation: 'mcp-json-rpc',
+    params: { url },
+  } as const;
+  const sigObj = await sdk.sign(payload);
+  return DIDAuth.v1.toAuthorizationHeader(sigObj);
+}
+
+/**
+ * Resolves the appropriate transport based on the URL and explicit type
+ */
+export async function resolveTransport(
+  url: string,
+  authHeader: string,
+  explicitType?: McpTransportType,
+): Promise<any> {
+  const createHttpTransport = async () => {
+    return new StreamableHTTPClientTransport(new URL(url), {
+      requestInit: { headers: { Authorization: authHeader } },
+    } as any);
+  };
+
+  const createSseTransport = async () => {
+    return new SSEClientTransport(new URL(url), {
+      requestInit: { headers: { Authorization: authHeader } },
+    } as any);
+  };
+
+  // Explicit type requested by caller
+  if (explicitType === 'httpStream') {
+    return createHttpTransport();
   }
-  
-  /**
-   * Resolves the appropriate transport based on the URL and explicit type
-   */
-  export async function resolveTransport(
-    url: string,
-    authHeader: string,
-    explicitType?: McpTransportType,
-  ): Promise<any> {
-    const createHttpTransport = async () => {
-      return new StreamableHTTPClientTransport(new URL(url), {
-        requestInit: { headers: { Authorization: authHeader } },
-      } as any);
-    };
-  
-    const createSseTransport = async () => {
-      return new SSEClientTransport(new URL(url), {
-        requestInit: { headers: { Authorization: authHeader } },
-      } as any);
-    };
-  
-    // Explicit type requested by caller
-    if (explicitType === "httpStream") {
-      return createHttpTransport();
-    }
-    if (explicitType === "sse") {
-      return createSseTransport();
-    }
-  
-    // Auto-detect: try HTTP streaming then fallback to SSE
-    // First try HTTP streaming
-    try {
-      // Quick HEAD probe – skip CORS preflight for same-origin
-      const _headResp = await fetch(url, {
-        method: "HEAD",
-        headers: {
-          Authorization: authHeader,
-        },
-      });
-      // Even if the server responds 4xx to HEAD, it may still support
-      // streaming GET requests (FastMCP behaves this way). Any successful
-      // fetch response indicates the endpoint is reachable, so we assume
-      // HTTP streaming is available unless the request itself fails.
-      return createHttpTransport();
-    } catch (_) {
-      // Ignore probe errors – we'll fall back to SSE
-      console.debug("Failed to probe HTTP streaming, falling back to SSE");
-    }
-  
-    // Fallback SSE transport (works for HTTP streaming servers too, but less efficient).
+  if (explicitType === 'sse') {
     return createSseTransport();
-  } 
+  }
+
+  // Auto-detect: try HTTP streaming then fallback to SSE
+  // First try HTTP streaming
+  try {
+    // Quick HEAD probe – skip CORS preflight for same-origin
+    const _headResp = await fetch(url, {
+      method: 'HEAD',
+      headers: {
+        Authorization: authHeader,
+      },
+    });
+    // Even if the server responds 4xx to HEAD, it may still support
+    // streaming GET requests (FastMCP behaves this way). Any successful
+    // fetch response indicates the endpoint is reachable, so we assume
+    // HTTP streaming is available unless the request itself fails.
+    return createHttpTransport();
+  } catch (_) {
+    // Ignore probe errors – we'll fall back to SSE
+    console.debug('Failed to probe HTTP streaming, falling back to SSE');
+  }
+
+  // Fallback SSE transport (works for HTTP streaming servers too, but less efficient).
+  return createSseTransport();
+}

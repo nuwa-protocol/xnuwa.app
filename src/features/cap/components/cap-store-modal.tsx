@@ -1,6 +1,6 @@
-import { Loader2, Package, Search } from "lucide-react";
-import { useState } from "react";
-import * as Dialog from "@/shared/components/ui";
+import { Loader2, Package, Search } from 'lucide-react';
+import { useState } from 'react';
+import * as Dialog from '@/shared/components/ui';
 import {
   Button,
   Input,
@@ -8,12 +8,12 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/shared/components/ui";
-import { useLanguage } from "@/shared/hooks/use-language";
-import { useCapRemote } from "../hooks/use-cap-remote";
-import { useInstalledCaps } from "../hooks/use-caps-installed";
-import type { CapDisplayData, RemoteCap } from "../types";
-import { CapCard } from "./cap-card";
+} from '@/shared/components/ui';
+import { useLanguage } from '@/shared/hooks/use-language';
+import { useCapRemote } from '../hooks/use-cap-remote';
+import { useInstalledCaps } from '../hooks/use-caps-installed';
+import type { CapDisplayData, RemoteCap } from '../types';
+import { CapCard } from './cap-card';
 
 interface CapStoreModalProps {
   open?: boolean;
@@ -37,8 +37,8 @@ export function CapStoreModal({
     disableCap,
   } = useInstalledCaps();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
 
   const { remoteCaps, isLoading, error, refetch } = useCapRemote({
     searchQuery,
@@ -46,12 +46,12 @@ export function CapStoreModal({
   });
 
   const tabs = [
-    { id: "all", label: t("capStore.tabs.all") },
-    { id: "development", label: t("capStore.tabs.development") },
-    { id: "design", label: t("capStore.tabs.design") },
-    { id: "analytics", label: t("capStore.tabs.analytics") },
-    { id: "productivity", label: t("capStore.tabs.productivity") },
-    { id: "security", label: t("capStore.tabs.security") },
+    { id: 'all', label: t('capStore.tabs.all') },
+    { id: 'development', label: t('capStore.tabs.development') },
+    { id: 'design', label: t('capStore.tabs.design') },
+    { id: 'analytics', label: t('capStore.tabs.analytics') },
+    { id: 'productivity', label: t('capStore.tabs.productivity') },
+    { id: 'security', label: t('capStore.tabs.security') },
   ];
 
   // Combine remote caps with local state
@@ -105,16 +105,16 @@ export function CapStoreModal({
       <Dialog.DialogContent
         className="fixed left-1/2 top-1/2 z-50 flex flex-col -translate-x-1/2 -translate-y-1/2 gap-0 border bg-background p-0 shadow-lg sm:rounded-lg overflow-hidden"
         style={{
-          width: "90vw",
+          width: '90vw',
           maxWidth: 1000,
-          height: "85vh",
+          height: '85vh',
           maxHeight: 800,
           minHeight: 0,
         }}
         aria-describedby={undefined}
       >
         <Dialog.DialogTitle className="sr-only">
-          {t("capStore.title")}
+          {t('capStore.title')}
         </Dialog.DialogTitle>
         <div className="flex-1 flex flex-col min-h-0">
           {/* Header */}
@@ -122,9 +122,9 @@ export function CapStoreModal({
             <div className="flex items-center gap-3 mb-4">
               <Package className="size-6" />
               <div>
-                <h2 className="text-lg font-semibold">{t("capStore.title")}</h2>
+                <h2 className="text-lg font-semibold">{t('capStore.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  {t("capStore.description")}
+                  {t('capStore.description')}
                 </p>
               </div>
             </div>
@@ -133,7 +133,7 @@ export function CapStoreModal({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input
-                placeholder={t("capStore.searchPlaceholder")}
+                placeholder={t('capStore.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -176,35 +176,35 @@ export function CapStoreModal({
                         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
                           <Package className="size-12 text-red-500 mb-4" />
                           <h3 className="text-lg font-medium mb-2 text-red-600">
-                            {t("capStore.status.error")}
+                            {t('capStore.status.error')}
                           </h3>
                           <p className="text-muted-foreground max-w-md mb-4">
-                            {t("capStore.status.errorDesc")}
+                            {t('capStore.status.errorDesc')}
                           </p>
                           <Button variant="outline" onClick={refetch}>
-                            {t("capStore.status.tryAgain")}
+                            {t('capStore.status.tryAgain')}
                           </Button>
                         </div>
                       ) : isLoading ? (
                         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
                           <Loader2 className="size-12 text-muted-foreground mb-4 animate-spin" />
                           <h3 className="text-lg font-medium mb-2">
-                            {t("capStore.status.loading")}
+                            {t('capStore.status.loading')}
                           </h3>
                           <p className="text-muted-foreground max-w-md">
-                            {t("capStore.status.fetching")}
+                            {t('capStore.status.fetching')}
                           </p>
                         </div>
                       ) : capDisplayData.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
                           <Package className="size-12 text-muted-foreground mb-4" />
                           <h3 className="text-lg font-medium mb-2">
-                            {t("capStore.status.noCaps")}
+                            {t('capStore.status.noCaps')}
                           </h3>
                           <p className="text-muted-foreground max-w-md">
                             {searchQuery.trim()
-                              ? t("capStore.status.noCapsDesc.search")
-                              : t("capStore.status.noCapsDesc.category")}
+                              ? t('capStore.status.noCapsDesc.search')
+                              : t('capStore.status.noCapsDesc.category')}
                           </p>
                         </div>
                       ) : (
@@ -220,7 +220,7 @@ export function CapStoreModal({
                               onToggleEnable={() =>
                                 handleToggleEnable(
                                   capData.remote.id,
-                                  capData.isEnabled
+                                  capData.isEnabled,
                                 )
                               }
                             />

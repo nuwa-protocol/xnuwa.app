@@ -1,5 +1,5 @@
-import { AlertCircle, Check, Download, Loader2, Power } from "lucide-react";
-import { useState } from "react";
+import { AlertCircle, Check, Download, Loader2, Power } from 'lucide-react';
+import { useState } from 'react';
 import {
   Avatar,
   AvatarFallback,
@@ -7,9 +7,9 @@ import {
   Badge,
   Button,
   Card,
-} from "@/shared/components/ui";
-import { useLanguage } from "@/shared/hooks/use-language";
-import type { CapDisplayData } from "../types";
+} from '@/shared/components/ui';
+import { useLanguage } from '@/shared/hooks/use-language';
+import type { CapDisplayData } from '../types';
 
 export function CapCard({
   capData,
@@ -67,12 +67,12 @@ export function CapCard({
               </Badge>
               {isInstalled && !isEnabled && (
                 <Badge variant="outline" className="text-xs text-orange-600">
-                  {t("capStore.card.disabled")}
+                  {t('capStore.card.disabled')}
                 </Badge>
               )}
               {hasUpdate && (
                 <Badge variant="destructive" className="text-xs">
-                  {t("capStore.card.update")}
+                  {t('capStore.card.update')}
                 </Badge>
               )}
             </div>
@@ -95,12 +95,12 @@ export function CapCard({
               </span>
             ) : (
               <span className="text-xs">
-                {t("capStore.card.version", { version: remote.version })}
+                {t('capStore.card.version', { version: remote.version })}
               </span>
             )}
             {remote.author && (
               <span className="text-xs">
-                {t("capStore.card.by", { author: remote.author })}
+                {t('capStore.card.by', { author: remote.author })}
               </span>
             )}
           </div>
@@ -111,7 +111,7 @@ export function CapCard({
               {/* Install/Uninstall button */}
               <Button
                 size="sm"
-                variant={isInstalled ? "default" : "outline"}
+                variant={isInstalled ? 'default' : 'outline'}
                 className="text-xs px-2 py-1 h-6"
                 onClick={handleInstall}
                 disabled={isLoading}
@@ -121,10 +121,10 @@ export function CapCard({
                 ) : isInstalled ? (
                   <>
                     <Check className="size-3 mr-1" />
-                    {t("capStore.card.installed")}
+                    {t('capStore.card.installed')}
                   </>
                 ) : (
-                  t("capStore.card.install")
+                  t('capStore.card.install')
                 )}
               </Button>
 
@@ -138,7 +138,7 @@ export function CapCard({
                 >
                   <Power
                     className={`size-3 ${
-                      isEnabled ? "text-green-600" : "text-gray-400"
+                      isEnabled ? 'text-green-600' : 'text-gray-400'
                     }`}
                   />
                 </Button>
@@ -151,7 +151,7 @@ export function CapCard({
             {/* Install date (if installed) */}
             {isInstalled && local?.installDate && (
               <span className="text-xs text-muted-foreground">
-                {t("capStore.card.installDate", {
+                {t('capStore.card.installDate', {
                   date: new Date(local.installDate).toLocaleDateString(),
                 })}
               </span>

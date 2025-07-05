@@ -5,7 +5,7 @@ import type { UIMessage } from 'ai';
 import cx from 'classnames';
 import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
-import { PencilIcon, SparklesIcon } from 'lucide-react';
+import { PencilIcon } from 'lucide-react';
 import { memo, useState } from 'react';
 import { DocumentPreview } from '@/features/documents/components/document-preview';
 import { DocumentToolCall } from '@/features/documents/components/document-preview-call';
@@ -23,7 +23,6 @@ import { MessageEditor } from './message-editor';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { PreviewAttachment } from './preview-attachment';
-import { Weather } from './weather';
 
 const PurePreviewMessage = ({
   chatId,
@@ -33,7 +32,6 @@ const PurePreviewMessage = ({
   reload,
   isReadonly,
   requiresScrollPadding,
-  isArtifact,
 }: {
   chatId: string;
   message: UIMessage;
@@ -42,7 +40,6 @@ const PurePreviewMessage = ({
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
   requiresScrollPadding: boolean;
-  isArtifact: boolean;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
@@ -64,19 +61,12 @@ const PurePreviewMessage = ({
             },
           )}
         >
-          {message.role === 'assistant' && !isArtifact && (
-            <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
-              <div className="translate-y-px">
-                <SparklesIcon size={14} />
-              </div>
-            </div>
-          )}
-
           <div
             className={cn('flex flex-col gap-4 w-full', {
               'min-h-96': message.role === 'assistant' && requiresScrollPadding,
             })}
           >
+            {/* render attachments */}
             {message.experimental_attachments &&
               message.experimental_attachments.length > 0 && (
                 <div
@@ -92,54 +82,19 @@ const PurePreviewMessage = ({
                 </div>
               )}
 
-            {(() => {
-              const processedIndices = new Set<number>();
-              const elements: React.ReactNode[] = [];
+            {/* render reasoning */}
+            {message.parts?.map((part, index) => {
+              if (part.type !== 'reasoning') return null;
+              return (
+                <MessageReasoning
+                  key={`reasoning-${message.id}-${index}`}
+                  isLoading={isLoading}
+                  reasoning={part.reasoning}
+                />
+              );
+            })}
 
-              message.parts?.forEach((part, index) => {
-                if (processedIndices.has(index)) return;
-
-                const { type } = part;
-
-                if (type === 'reasoning') {
-                  elements.push(
-                    <MessageReasoning
-                      key={`reasoning-${message.id}-${index}`}
-                      isLoading={isLoading}
-                      reasoning={part.reasoning}
-                    />,
-                  );
-                  processedIndices.add(index);
-                } else if (type === 'source') {
-                  // Collect all consecutive source parts
-                  const sources = [];
-                  let currentIndex = index;
-
-                  while (
-                    currentIndex < message.parts.length &&
-                    message.parts[currentIndex].type === 'source'
-                  ) {
-                    const sourcePart = message.parts[currentIndex];
-                    if (sourcePart.type === 'source') {
-                      sources.push(sourcePart.source);
-                    }
-                    processedIndices.add(currentIndex);
-                    currentIndex++;
-                  }
-
-                  elements.push(
-                    <MessageSource
-                      key={`sources-${message.id}-${index}`}
-                      sources={sources}
-                      className="mb-2"
-                    />,
-                  );
-                }
-              });
-
-              return elements;
-            })()}
-
+            {/* render text/tool-invocation */}
             {message.parts?.map((part, index) => {
               const processedTypes = new Set(['reasoning', 'source']);
               if (processedTypes.has(part.type)) return null;
@@ -171,8 +126,8 @@ const PurePreviewMessage = ({
 
                       <div
                         data-testid="message-content"
-                        className={cn('flex flex-col gap-4', {
-                          'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
+                        className={cn('flex flex-col gap-4 w-full', {
+                          'bg-purple-200 dark:bg-purple-700 px-3 py-2 rounded-xl':
                             message.role === 'user',
                         })}
                       >
@@ -214,9 +169,7 @@ const PurePreviewMessage = ({
                         skeleton: ['getWeather'].includes(toolName),
                       })}
                     >
-                      {toolName === 'getWeather' ? (
-                        <Weather />
-                      ) : toolName === 'createDocument' ? (
+                      {toolName === 'createDocument' ? (
                         <DocumentPreview
                           chatId={chatId}
                           isReadonly={isReadonly}
@@ -226,13 +179,6 @@ const PurePreviewMessage = ({
                         <DocumentToolCall
                           chatId={chatId}
                           type="update"
-                          args={args}
-                          isReadonly={isReadonly}
-                        />
-                      ) : toolName === 'requestSuggestions' ? (
-                        <DocumentToolCall
-                          chatId={chatId}
-                          type="request-suggestions"
                           args={args}
                           isReadonly={isReadonly}
                         />
@@ -246,9 +192,7 @@ const PurePreviewMessage = ({
 
                   return (
                     <div key={toolCallId}>
-                      {toolName === 'getWeather' ? (
-                        <Weather weatherAtLocation={result} />
-                      ) : toolName === 'createDocument' ? (
+                      {toolName === 'createDocument' ? (
                         <DocumentPreview
                           chatId={chatId}
                           isReadonly={isReadonly}
@@ -276,6 +220,24 @@ const PurePreviewMessage = ({
                 }
               }
             })}
+
+            {/* render source */}
+            {(() => {
+              const sources: any[] = [];
+              message.parts?.forEach((part) => {
+                if (part.type === 'source') {
+                  sources.push(part.source);
+                }
+              });
+              if (sources.length === 0) return null;
+              return (
+                <MessageSource
+                  key={`sources-${message.id}`}
+                  sources={sources}
+                  className="mb-2"
+                />
+              );
+            })()}
 
             {!isReadonly && (
               <MessageActions
@@ -323,10 +285,6 @@ export const ThinkingMessage = () => {
           },
         )}
       >
-        <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
-          <SparklesIcon size={14} />
-        </div>
-
         <div className="flex items-center justify-center gap-1">
           {[...Array(3)].map((_, i) => (
             <motion.div

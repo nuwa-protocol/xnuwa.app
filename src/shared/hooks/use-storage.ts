@@ -1,9 +1,9 @@
-import { ChatStateStore, FileStateStore } from "@/features/ai-chat/stores";
-import { DocumentStateStore } from "@/features/documents/stores";
-import { SettingsStateStore } from "@/features/settings/stores";
+import { ChatStateStore, FileStateStore } from '@/features/ai-chat/stores';
+import { DocumentStateStore } from '@/features/documents/stores';
+import { SettingsStateStore } from '@/features/settings/stores';
 
 // Check if we're in a browser environment
-const isBrowser = typeof window !== "undefined";
+const isBrowser = typeof window !== 'undefined';
 
 export const useStorage = () => {
   // clear all client storage data, including:

@@ -1,19 +1,19 @@
 // chat-store.ts
 // Store for managing chat sessions and message history with unified storage
 
-import type { Message } from "ai";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { generateTitleFromUserMessage } from "../services";
-import { NuwaIdentityKit } from "@/features/auth/services";
-import { generateUUID } from "@/shared/utils";
-import { createPersistConfig, db } from "@/storage";
-import type { ChatSession, StreamRecord } from "../types";
+import type { Message } from 'ai';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { NuwaIdentityKit } from '@/features/auth/services';
+import { generateUUID } from '@/shared/utils';
+import { createPersistConfig, db } from '@/storage';
+import { generateTitleFromUserMessage } from '../services';
+import type { ChatSession, StreamRecord } from '../types';
 
 // ================= Constants ================= //
 export const createInitialChatSession = (): ChatSession => ({
   id: generateUUID(),
-  title: "New Chat",
+  title: 'New Chat',
   createdAt: Date.now(),
   updatedAt: Date.now(),
   messages: [],
@@ -25,7 +25,6 @@ const getCurrentDID = async () => {
   return await getDid();
 };
 
-
 // ================= Database Reference ================= //
 
 // 使用统一数据库，不再需要单独的ChatDatabase
@@ -34,12 +33,12 @@ const chatDB = db;
 // chat store state interface
 interface ChatStoreState {
   sessions: Record<string, ChatSession>;
-  
+
   // session management
   getSession: (id: string) => ChatSession | null;
   updateSession: (
     id: string,
-    updates: Partial<Omit<ChatSession, "id">>
+    updates: Partial<Omit<ChatSession, 'id'>>,
   ) => void;
   deleteSession: (id: string) => void;
 
@@ -48,7 +47,7 @@ interface ChatStoreState {
   updateSingleMessage: (
     sessionId: string,
     messageId: string,
-    updates: Partial<Message>
+    updates: Partial<Message>,
   ) => void;
   deleteMessage: (sessionId: string, messageId: string) => void;
   deleteMessagesAfterTimestamp: (sessionId: string, timestamp: number) => void;
@@ -70,7 +69,7 @@ interface ChatStoreState {
 // ================= Persist Configuration ================= //
 
 const persistConfig = createPersistConfig<ChatStoreState>({
-  name: "chat-storage",
+  name: 'chat-storage',
   getCurrentDID: getCurrentDID,
   partialize: (state) => ({
     sessions: state.sessions,
@@ -96,7 +95,7 @@ export const ChatStateStore = create<ChatStoreState>()(
 
       updateSession: (
         id: string,
-        updates: Partial<Omit<ChatSession, "id">>
+        updates: Partial<Omit<ChatSession, 'id'>>,
       ) => {
         set((state) => {
           const session = state.sessions[id];
@@ -134,15 +133,15 @@ export const ChatStateStore = create<ChatStoreState>()(
             if (!currentDID) return;
 
             await chatDB.chats
-              .where(["did", "id"])
+              .where(['did', 'id'])
               .equals([currentDID, id])
               .delete();
             await chatDB.streams
-              .where(["did", "chatId"])
+              .where(['did', 'chatId'])
               .equals([currentDID, id])
               .delete();
           } catch (error) {
-            console.error("Failed to delete from DB:", error);
+            console.error('Failed to delete from DB:', error);
           }
         };
         deleteFromDB();
@@ -158,7 +157,7 @@ export const ChatStateStore = create<ChatStoreState>()(
             isNewSession = true;
             session = {
               id: sessionId,
-              title: "New Chat",
+              title: 'New Chat',
               createdAt: Date.now(),
               updatedAt: Date.now(),
               messages: [],
@@ -167,10 +166,10 @@ export const ChatStateStore = create<ChatStoreState>()(
 
           // check if there are new messages to add
           const currentMessageIds = new Set(
-            session.messages.map((msg) => msg.id)
+            session.messages.map((msg) => msg.id),
           );
           const hasNewMessages = messages.some(
-            (msg) => !currentMessageIds.has(msg.id)
+            (msg) => !currentMessageIds.has(msg.id),
           );
 
           // only update when there are new messages
@@ -207,14 +206,14 @@ export const ChatStateStore = create<ChatStoreState>()(
       updateSingleMessage: (
         sessionId: string,
         messageId: string,
-        updates: Partial<Message>
+        updates: Partial<Message>,
       ) => {
         set((state) => {
           const session = state.sessions[sessionId];
           if (!session) return state;
 
           const updatedMessages = session.messages.map((msg) =>
-            msg.id === messageId ? { ...msg, ...updates } : msg
+            msg.id === messageId ? { ...msg, ...updates } : msg,
           );
 
           return {
@@ -238,7 +237,7 @@ export const ChatStateStore = create<ChatStoreState>()(
           if (!session) return state;
 
           const updatedMessages = session.messages.filter(
-            (msg) => msg.id !== messageId
+            (msg) => msg.id !== messageId,
           );
 
           return {
@@ -296,7 +295,7 @@ export const ChatStateStore = create<ChatStoreState>()(
             createdAt: Date.now(),
           });
         } catch (error) {
-          console.error("Failed to create stream ID:", error);
+          console.error('Failed to create stream ID:', error);
           throw error;
         }
       },
@@ -307,16 +306,16 @@ export const ChatStateStore = create<ChatStoreState>()(
           if (!currentDID) return [];
 
           const streams = await chatDB.streams
-            .where(["did", "chatId"])
+            .where(['did', 'chatId'])
             .equals([currentDID, chatId])
             .toArray();
           // sort by creation time
           const sortedStreams = streams.sort(
-            (a: StreamRecord, b: StreamRecord) => a.createdAt - b.createdAt
+            (a: StreamRecord, b: StreamRecord) => a.createdAt - b.createdAt,
           );
           return sortedStreams.map((stream: StreamRecord) => stream.id);
         } catch (error) {
-          console.error("Failed to get stream IDs:", error);
+          console.error('Failed to get stream IDs:', error);
           return [];
         }
       },
@@ -327,7 +326,7 @@ export const ChatStateStore = create<ChatStoreState>()(
 
         // find the first user message
         const firstUserMessage = session.messages.find(
-          (msg) => msg.role === "user"
+          (msg) => msg.role === 'user',
         );
         if (!firstUserMessage) return;
 
@@ -339,7 +338,7 @@ export const ChatStateStore = create<ChatStoreState>()(
           // directly update session title
           get().updateSession(sessionId, { title });
         } catch (error) {
-          console.error("Failed to generate title with AI:", error);
+          console.error('Failed to generate title with AI:', error);
         }
       },
 
@@ -354,27 +353,27 @@ export const ChatStateStore = create<ChatStoreState>()(
             await chatDB.chats.clear();
             await chatDB.streams.clear();
           } catch (error) {
-            console.error("Failed to clear DB:", error);
+            console.error('Failed to clear DB:', error);
           }
         };
         clearDB();
       },
 
       loadFromDB: async () => {
-        if (typeof window === "undefined") return;
+        if (typeof window === 'undefined') return;
 
         try {
           const currentDID = await getCurrentDID();
           if (!currentDID) return;
 
           const chats = await chatDB.chats
-            .where("did")
+            .where('did')
             .equals(currentDID)
             .toArray();
 
           // Sort by updatedAt in descending order
           const sortedChats = chats.sort(
-            (a: ChatSession, b: ChatSession) => b.updatedAt - a.updatedAt
+            (a: ChatSession, b: ChatSession) => b.updatedAt - a.updatedAt,
           );
           const sessionsMap: Record<string, ChatSession> = {};
 
@@ -386,12 +385,12 @@ export const ChatStateStore = create<ChatStoreState>()(
             sessions: { ...state.sessions, ...sessionsMap },
           }));
         } catch (error) {
-          console.error("Failed to load from DB:", error);
+          console.error('Failed to load from DB:', error);
         }
       },
 
       saveToDB: async () => {
-        if (typeof window === "undefined") return;
+        if (typeof window === 'undefined') return;
 
         try {
           const { sessions } = get();
@@ -400,10 +399,10 @@ export const ChatStateStore = create<ChatStoreState>()(
           // use bulkPut to efficiently update data
           await chatDB.chats.bulkPut(chatsToSave);
         } catch (error) {
-          console.error("Failed to save to DB:", error);
+          console.error('Failed to save to DB:', error);
         }
       },
     }),
-    persistConfig
-  )
+    persistConfig,
+  ),
 );

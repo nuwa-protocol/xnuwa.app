@@ -2,13 +2,13 @@ import type { UseChatHelpers } from '@ai-sdk/react';
 import { formatDistance } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 import { useDebounceCallback } from 'usehooks-ts';
-import { ArtifactActions } from './artifact-actions';
-import { ArtifactCloseButton } from './artifact-close-button';
-import { VersionFooter } from './version-footer';
 import { artifactDefinitions } from '@/features/documents/artifacts';
 import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
 import { useDocuments } from '@/features/documents/hooks/use-documents';
 import type { Document } from '@/features/documents/stores';
+import { ArtifactActions } from './artifact-actions';
+import { ArtifactCloseButton } from './artifact-close-button';
+import { VersionFooter } from './version-footer';
 
 interface ArtifactViewerProps {
   chatId: string;
@@ -22,11 +22,7 @@ export function ArtifactViewer({ chatId, status }: ArtifactViewerProps) {
     metadata,
     setMetadata,
   } = useCurrentDocument();
-  const {
-    documentsMap,
-    getDocuments,
-    updateDocumentContent,
-  } = useDocuments();
+  const { documentsMap, getDocuments, updateDocumentContent } = useDocuments();
 
   // Use document store instead of SWR
   const [versionedDocuments, setVersionedDocuments] = useState<Array<Document>>(
@@ -53,7 +49,7 @@ export function ArtifactViewer({ chatId, status }: ArtifactViewerProps) {
       if (mostRecentDocument) {
         setDocument(mostRecentDocument);
         setCurrentVersionIndex(versionedDocuments.length - 1);
-        
+
         // Only update if content is actually different to prevent infinite loops
         setCurrentDocument((currentDocument) => {
           if (currentDocument.content !== (mostRecentDocument.content ?? '')) {
@@ -81,10 +77,12 @@ export function ArtifactViewer({ chatId, status }: ArtifactViewerProps) {
         setIsContentDirty(false);
 
         // Update local state - update the current document in the array instead of replacing the whole array
-        setVersionedDocuments(prevVersions => {
+        setVersionedDocuments((prevVersions) => {
           const updatedVersions = [...prevVersions];
-          const currentIndex = updatedVersions.findIndex(doc => doc.id === document.id);
-          
+          const currentIndex = updatedVersions.findIndex(
+            (doc) => doc.id === document.id,
+          );
+
           if (currentIndex !== -1) {
             updatedVersions[currentIndex] = {
               ...document,
@@ -92,7 +90,7 @@ export function ArtifactViewer({ chatId, status }: ArtifactViewerProps) {
               updatedAt: Date.now(),
             };
           }
-          
+
           return updatedVersions;
         });
       }

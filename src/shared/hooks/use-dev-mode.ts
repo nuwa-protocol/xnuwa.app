@@ -4,4 +4,4 @@ export function useDevMode() {
   return SettingsStateStore((s) => s.settings.devMode);
 }
 
-export default useDevMode; 
+export default useDevMode;

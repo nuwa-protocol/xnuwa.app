@@ -8,5 +8,5 @@ export const ReactRenderer = {
     return {
       destroy: () => root.unmount(),
     };
-  }
+  },
 };

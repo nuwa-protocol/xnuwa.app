@@ -8,6 +8,7 @@
       "!lib/editor/react-renderer.tsx",
       "!node_modules/**",
       "!.next/**",
+      "!src/shared/components/ui/**",
       "!public/**",
       "!.vercel/**"
     ]
@@ -105,8 +106,12 @@
     }
   },
   "css": {
-    "formatter": { "enabled": false },
-    "linter": { "enabled": false }
+    "formatter": {
+      "enabled": false
+    },
+    "linter": {
+      "enabled": false
+    }
   },
   "overrides": [
     {

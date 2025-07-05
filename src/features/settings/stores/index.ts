@@ -1,11 +1,11 @@
 // settings-store.ts
 // Store for managing user settings and UI preferences
 
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { NuwaIdentityKit } from "@/features/auth/services";
-import type { Locale } from "@/shared/locales";
-import { createPersistConfig, db } from "@/storage";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { NuwaIdentityKit } from '@/features/auth/services';
+import type { Locale } from '@/shared/locales';
+import { createPersistConfig, db } from '@/storage';
 
 // get current DID
 const getCurrentDID = async () => {
@@ -32,14 +32,14 @@ interface SettingsState {
   setSettings: (settings: UserSettings) => void;
   setSetting: <K extends keyof UserSettings>(
     key: K,
-    value: UserSettings[K]
+    value: UserSettings[K],
   ) => void;
 
   // sidebar state
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
-  sidebarMode: "pinned" | "floating";
-  setSidebarMode: (mode: "pinned" | "floating") => void;
+  sidebarMode: 'pinned' | 'floating';
+  setSidebarMode: (mode: 'pinned' | 'floating') => void;
 
   // reset settings
   resetSettings: () => void;
@@ -52,7 +52,7 @@ interface SettingsState {
 // ================= Persist Configuration ================= //
 
 const persistConfig = createPersistConfig<SettingsState>({
-  name: "settings-storage",
+  name: 'settings-storage',
   getCurrentDID: getCurrentDID,
   partialize: (state) => ({
     settings: state.settings,
@@ -73,8 +73,8 @@ export const SettingsStateStore = create<SettingsState>()(
     (set, get) => ({
       // User settings
       settings: {
-        language: "en",
-        name: "",
+        language: 'en',
+        name: '',
         avatar: null,
         devMode: false,
       },
@@ -97,8 +97,8 @@ export const SettingsStateStore = create<SettingsState>()(
       setSidebarCollapsed: (collapsed: boolean) => {
         set({ sidebarCollapsed: collapsed });
       },
-      sidebarMode: "pinned",
-      setSidebarMode: (mode: "pinned" | "floating") => {
+      sidebarMode: 'pinned',
+      setSidebarMode: (mode: 'pinned' | 'floating') => {
         set({ sidebarMode: mode });
       },
 
@@ -106,13 +106,13 @@ export const SettingsStateStore = create<SettingsState>()(
       resetSettings: () => {
         set({
           settings: {
-            language: "en",
-            name: "",
+            language: 'en',
+            name: '',
             avatar: null,
             devMode: false,
           },
           sidebarCollapsed: false,
-          sidebarMode: "pinned",
+          sidebarMode: 'pinned',
         });
         get().saveToDB();
       },
@@ -120,7 +120,7 @@ export const SettingsStateStore = create<SettingsState>()(
       // Data persistence methods
       loadFromDB: async () => {
         const currentDID = await getCurrentDID();
-        if (typeof window === "undefined" || !currentDID) return;
+        if (typeof window === 'undefined' || !currentDID) return;
 
         try {
           const userSettings = await settingsDB.settings.get(currentDID);
@@ -133,13 +133,13 @@ export const SettingsStateStore = create<SettingsState>()(
             });
           }
         } catch (error) {
-          console.error("Failed to load settings from DB:", error);
+          console.error('Failed to load settings from DB:', error);
         }
       },
 
       saveToDB: async () => {
         const currentDID = await getCurrentDID();
-        if (typeof window === "undefined" || !currentDID) return;
+        if (typeof window === 'undefined' || !currentDID) return;
 
         try {
           const { settings, sidebarCollapsed, sidebarMode } = get();
@@ -149,10 +149,10 @@ export const SettingsStateStore = create<SettingsState>()(
             sidebarMode,
           });
         } catch (error) {
-          console.error("Failed to save settings to DB:", error);
+          console.error('Failed to save settings to DB:', error);
         }
       },
     }),
-    persistConfig
-  )
+    persistConfig,
+  ),
 );

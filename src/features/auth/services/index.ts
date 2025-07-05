@@ -1,6 +1,6 @@
 import {
-  type UseIdentityKitOptions,
   IdentityKitWeb,
+  type UseIdentityKitOptions,
 } from '@nuwa-ai/identity-kit-web';
 
 export const NuwaIdentityKit = (options: UseIdentityKitOptions = {}) => {

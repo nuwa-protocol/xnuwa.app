@@ -5,7 +5,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/features/auth/services';
 import { createPersistConfig, db } from '@/storage';
-import { getAvailableModels } from '../services/models';
+import { fetchAvailableModels } from '../services/models';
 import type { Model } from '../types';
 
 export const AUTO_MODEL: Model = {
@@ -170,7 +170,7 @@ export const ModelStateStore = create<ModelStateStoreState>()(
         set({ isLoadingModels: true, modelsError: null });
 
         try {
-          const models = await getAvailableModels();
+          const models = await fetchAvailableModels();
           set({
             availableModels: models,
             isLoadingModels: false,
@@ -194,7 +194,7 @@ export const ModelStateStore = create<ModelStateStoreState>()(
         }
 
         try {
-          const models = await getAvailableModels();
+          const models = await fetchAvailableModels();
           set({
             availableModels: models,
             modelsError: null,
@@ -211,7 +211,7 @@ export const ModelStateStore = create<ModelStateStoreState>()(
         set({ isLoadingModels: true, modelsError: null });
 
         try {
-          const models = await getAvailableModels();
+          const models = await fetchAvailableModels();
           set({
             availableModels: models,
             isLoadingModels: false,

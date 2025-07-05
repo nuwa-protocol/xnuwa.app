@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  searchRemoteCaps,
+  type CapSearchFilters,
   getCapsByCategory,
   type RemoteCap,
-  type CapSearchFilters,
+  searchRemoteCaps,
 } from '@/features/cap/services';
 
 interface UseCapRemoteState {

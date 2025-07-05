@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback } from "react";
-import { SettingsStateStore } from "@/features/settings/stores";
+import { useCallback } from 'react';
+import { SettingsStateStore } from '@/features/settings/stores';
 
 // User settings hook
 export const useSettings = () => {
@@ -10,11 +10,11 @@ export const useSettings = () => {
   const setSetting = useCallback(
     <K extends keyof typeof store.settings>(
       key: K,
-      value: (typeof store.settings)[K]
+      value: (typeof store.settings)[K],
     ) => {
       store.setSetting(key, value);
     },
-    []
+    [],
   );
 
   const setSettings = useCallback((settings: typeof store.settings) => {

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useChatSessions } from './use-chat-sessions';
 import {
-  createInitialChatSession,
   type ChatSession,
+  createInitialChatSession,
 } from '@/features/ai-chat/stores';
 import { convertToUIMessage } from '@/features/ai-chat/utils';
+import { useChatSessions } from './use-chat-sessions';
 
 // Specialized hook for chat page logic
 export const useChatPage = () => {

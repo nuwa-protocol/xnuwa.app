@@ -3,7 +3,6 @@ import { getLocaleText } from '@/shared/locales';
 import type { ArtifactAction } from '../../types';
 
 export function createUndoAction(): ArtifactAction {
-
   return {
     icon: <UndoIcon size={18} />,
     description: getLocaleText('en').t('artifact.text.actions.undo'),

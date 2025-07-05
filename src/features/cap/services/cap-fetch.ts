@@ -183,9 +183,7 @@ export async function getCapsByCategory(
   const caps = await fetchCapsData();
 
   if (category === 'all') {
-    return caps
-      .sort((a, b) => b.downloads - a.downloads)
-      .slice(0, limit);
+    return caps.sort((a, b) => b.downloads - a.downloads).slice(0, limit);
   }
 
   return caps

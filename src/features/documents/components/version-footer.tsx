@@ -1,13 +1,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useWindowSize } from 'usehooks-ts';
 import { LoaderIcon } from 'lucide-react';
+import { useWindowSize } from 'usehooks-ts';
+import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
+import { useVersionManagement } from '@/features/documents/hooks/use-version-management';
 import type { Document } from '@/features/documents/stores';
 import { Button } from '@/shared/components/ui/button';
 import { useLanguage } from '@/shared/hooks/use-language';
-import { useVersionManagement } from '@/features/documents/hooks/use-version-management';
-import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
 
 interface VersionFooterProps {
   handleVersionChange: (type: 'next' | 'prev' | 'toggle' | 'latest') => void;

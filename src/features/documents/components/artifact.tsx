@@ -1,20 +1,18 @@
-'use client';;
+'use client';
+
 import type { Attachment, UIMessage } from 'ai';
 import { useState } from 'react';
-
-import { ArtifactViewer } from './artifact-viewer';
-import { MultimodalInput } from '@/features/ai-chat/components';
-import { Messages } from '@/features/ai-chat/components';
-import { ArtifactMessagesHeader } from './artifact-messages-header';
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle
-} from '@/shared/components/ui/resizable';
-
-import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
-import { useChatDefault } from '@/features/ai-chat/hooks/use-chat-default';
 import { useNavigate } from 'react-router-dom';
+import { Messages, MultimodalInput } from '@/features/ai-chat/components';
+import { useChatDefault } from '@/features/ai-chat/hooks/use-chat-default';
+import { useCurrentDocument } from '@/features/documents/hooks/use-document-current';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/shared/components/ui/resizable';
+import { ArtifactMessagesHeader } from './artifact-messages-header';
+import { ArtifactViewer } from './artifact-viewer';
 
 export function Artifact({
   chatId,
@@ -57,31 +55,17 @@ export function Artifact({
 
   return (
     <div className="h-dvh w-dvw fixed top-0 left-0 z-50 bg-transparent">
-      <ResizablePanelGroup 
-        direction="horizontal" 
-        className="h-full w-full"
-      >
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full">
         {/* Artifact viewer panel */}
-        <ResizablePanel 
-          defaultSize={60} 
-          minSize={30}
-          className="min-w-96"
-        >
-          <ArtifactViewer
-            chatId={chatId}
-            status={status}
-          />
+        <ResizablePanel defaultSize={60} minSize={30} className="min-w-96">
+          <ArtifactViewer chatId={chatId} status={status} />
         </ResizablePanel>
 
         {/* Resizable handle */}
         <ResizableHandle />
 
         {/* Chat panel */}
-        <ResizablePanel 
-          defaultSize={40} 
-          minSize={25}
-          className="min-w-80"
-        >
+        <ResizablePanel defaultSize={40} minSize={25} className="min-w-80">
           <div className="flex flex-col bg-muted dark:bg-background h-full">
             <ArtifactMessagesHeader chatId={chatId} />
             <Messages
@@ -95,7 +79,9 @@ export function Artifact({
             />
 
             <form
-              className={'flex flex-row gap-2 relative items-end w-full px-4 pb-4'}
+              className={
+                'flex flex-row gap-2 relative items-end w-full px-4 pb-4'
+              }
             >
               {!isReadonly && (
                 <MultimodalInput

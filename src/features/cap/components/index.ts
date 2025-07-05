@@ -1,1 +1,1 @@
-export { CapStoreModal } from "./cap-store-modal";
+export { CapStoreModal } from './cap-store-modal';

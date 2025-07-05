@@ -5,7 +5,6 @@ import type { ArtifactAction } from '../../types';
 type Metadata = any;
 
 export function createUndoAction(): ArtifactAction<Metadata> {
-
   return {
     icon: <UndoIcon size={18} />,
     description: getLocaleText('en').t('artifact.sheet.actions.undo'),

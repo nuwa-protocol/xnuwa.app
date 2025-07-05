@@ -1,7 +1,7 @@
-import { MoreHorizontalIcon, TrashIcon } from "lucide-react";
-import { memo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import type { ChatSession } from "@/features/ai-chat/types";
+import { MoreHorizontalIcon, TrashIcon } from 'lucide-react';
+import { memo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import type { ChatSession } from '@/features/ai-chat/types';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,9 +10,9 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/shared/components/ui";
-import { useLanguage } from "@/shared/hooks/use-language";
-import { useFloatingSidebar } from "./floating-sidebar";
+} from '@/shared/components/ui';
+import { useLanguage } from '@/shared/hooks/use-language';
+import { useFloatingSidebar } from './floating-sidebar';
 
 const PureChatItem = ({
   chat,
@@ -57,7 +57,7 @@ const PureChatItem = ({
             showOnHover={!isActive}
           >
             <MoreHorizontalIcon />
-            <span className="sr-only">{t("actions.more")}</span>
+            <span className="sr-only">{t('actions.more')}</span>
           </SidebarMenuAction>
         </DropdownMenuTrigger>
 
@@ -67,7 +67,7 @@ const PureChatItem = ({
             onSelect={() => onDelete(chat.id)}
           >
             <TrashIcon />
-            <span>{t("actions.delete")}</span>
+            <span>{t('actions.delete')}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

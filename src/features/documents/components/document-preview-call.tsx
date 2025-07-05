@@ -1,6 +1,6 @@
+import { FileIcon, LoaderIcon, PencilIcon } from 'lucide-react';
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileIcon, LoaderIcon, PencilIcon } from 'lucide-react';
 
 import { toast } from '@/shared/components/toast';
 

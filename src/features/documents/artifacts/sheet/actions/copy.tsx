@@ -1,13 +1,12 @@
 import { CopyIcon } from 'lucide-react';
-import { getLocaleText } from '@/shared/locales';
-import { toast } from '@/shared/components/toast';
 import { parse, unparse } from 'papaparse';
+import { toast } from '@/shared/components/toast';
+import { getLocaleText } from '@/shared/locales';
 import type { ArtifactAction } from '../../types';
 
 type Metadata = any;
 
 export function createCopyAction(): ArtifactAction<Metadata> {
-
   return {
     icon: <CopyIcon />,
     description: getLocaleText('en').t('artifact.sheet.actions.copy'),

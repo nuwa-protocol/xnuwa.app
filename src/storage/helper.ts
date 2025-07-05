@@ -1,6 +1,6 @@
-import { createJSONStorage } from "zustand/middleware";
-import { storageActions } from "./actions";
-import type { PersistConfig } from "./types";
+import { createJSONStorage } from 'zustand/middleware';
+import { storageActions } from './actions';
+import type { PersistConfig } from './types';
 
 /**
  * Create storage key with DID
@@ -24,7 +24,7 @@ export function createPersistStorage<T>(config: PersistConfig<T>) {
     setItem: async (name: string, value: string): Promise<void> => {
       const did = await config.getCurrentDID();
       const key = createStorageKey(config.name, did);
-      
+
       try {
         const data = JSON.parse(value);
         await storageActions.syncToCache(key, data);

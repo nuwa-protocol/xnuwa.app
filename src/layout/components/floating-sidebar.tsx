@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   createContext,
@@ -8,11 +8,11 @@ import {
   useContext,
   useMemo,
   useState,
-} from "react";
-import { useSidebarSettings } from "@/features/settings/hooks/use-settings-sidebar";
-import { SidebarInset, SidebarProvider } from "@/shared/components/ui";
-import { cn } from "@/shared/utils";
-import { AppSidebar } from "./app-sidebar";
+} from 'react';
+import { useSidebarSettings } from '@/features/settings/hooks/use-settings-sidebar';
+import { SidebarInset, SidebarProvider } from '@/shared/components/ui';
+import { cn } from '@/shared/utils';
+import { AppSidebar } from './app-sidebar';
 
 // Context for managing floating sidebar hover state
 const FloatingSidebarContext = createContext<{
@@ -26,7 +26,7 @@ export const useFloatingSidebar = () => {
 
   if (!context) {
     throw new Error(
-      "useFloatingSidebar must be used within FloatingSidebarProvider"
+      'useFloatingSidebar must be used within FloatingSidebarProvider',
     );
   }
   return context;
@@ -42,40 +42,35 @@ const ContentWrapper = memo(
     return (
       <SidebarInset
         className={cn(
-          "flex-1 transition-all duration-300 ease-in-out", // Add smooth transition
+          'flex-1 transition-all duration-300 ease-in-out', // Add smooth transition
           // Enhanced animation for content positioning
           isFloating
-            ? "w-full ml-0"
+            ? 'w-full ml-0'
             : // Full width in floating mode
-              "" // Normal layout in pinned mode
+              '', // Normal layout in pinned mode
         )}
       >
-        <div className={"h-full transition-all duration-300 ease-in-out"}>
+        <div className={'h-full transition-all duration-300 ease-in-out'}>
           {children}
         </div>
       </SidebarInset>
     );
-  }
+  },
 );
-ContentWrapper.displayName = "ContentWrapper";
+ContentWrapper.displayName = 'ContentWrapper';
 
 function SidebarLayoutContent({ children }: FloatingSidebarLayoutProps) {
   const { collapsed: sidebarCollapsed, mode: sidebarMode } =
     useSidebarSettings();
 
-  // Get hover state from context
-  let isHovering = false;
-  try {
-    const floatingContext = useFloatingSidebar();
-    isHovering = floatingContext.isHovering;
-  } catch {
-    // Context not available, fallback to false
-  }
+  // Get hover state from context (handle null gracefully)
+  const floatingContext = useContext(FloatingSidebarContext);
+  const isHovering = floatingContext?.isHovering ?? false;
 
   // Calculate if sidebar should be open
   const shouldBeOpen =
-    sidebarMode === "floating" ? isHovering : !sidebarCollapsed;
-  const isFloating = sidebarMode === "floating";
+    sidebarMode === 'floating' ? isHovering : !sidebarCollapsed;
+  const isFloating = sidebarMode === 'floating';
 
   // Memoize the content wrapper to prevent re-renders when only positioning changes
   const contentElement = useMemo(() => {
@@ -89,10 +84,10 @@ function SidebarLayoutContent({ children }: FloatingSidebarLayoutProps) {
         {/* Sidebar container with smooth transition animation */}
         <div
           className={cn(
-            "transition-all duration-300 ease-in-out", // Smooth transition for position changes
+            'transition-all duration-300 ease-in-out', // Smooth transition for position changes
             isFloating
-              ? "fixed inset-y-0 left-0 z-50 w-0" // No width, positioned absolutely
-              : "relative w-64" // Normal layout flow
+              ? 'fixed inset-y-0 left-0 z-50 w-0' // No width, positioned absolutely
+              : 'relative w-64', // Normal layout flow
           )}
         >
           <AppSidebar />
@@ -123,7 +118,7 @@ export function FloatingSidebarLayout({
     (hovering: boolean) => {
       if (!isStaying) setIsHovering(hovering);
     },
-    [isStaying]
+    [isStaying],
   );
 
   const contextValue = useMemo(
@@ -132,7 +127,7 @@ export function FloatingSidebarLayout({
       setIsHovering: stableSetIsHovering,
       stayHovering,
     }),
-    [isHovering, stableSetIsHovering, stayHovering]
+    [isHovering, stableSetIsHovering, stayHovering],
   );
 
   return (
@@ -141,7 +136,7 @@ export function FloatingSidebarLayout({
         <SidebarLayoutContent>{children}</SidebarLayoutContent>
 
         {/* Hover trigger area for floating mode */}
-        {sidebarMode === "floating" && (
+        {sidebarMode === 'floating' && (
           <div
             aria-hidden="true"
             className="fixed left-0 top-0 w-20 h-full z-40 bg-transparent pointer-events-auto"
@@ -159,14 +154,10 @@ export const useSidebarOpenState = () => {
   const { collapsed: sidebarCollapsed, mode: sidebarMode } =
     useSidebarSettings();
 
-  let isHovering = false;
-  try {
-    const floatingContext = useFloatingSidebar();
-    isHovering = floatingContext.isHovering;
-  } catch {
-    // Context not available, which is fine for non-floating modes
-  }
+  // Get hover state from context (handle null gracefully)
+  const floatingContext = useContext(FloatingSidebarContext);
+  const isHovering = floatingContext?.isHovering ?? false;
 
   // In floating mode, use hover state; in pinned mode, respect the collapsed state
-  return sidebarMode === "floating" ? isHovering : !sidebarCollapsed;
+  return sidebarMode === 'floating' ? isHovering : !sidebarCollapsed;
 };

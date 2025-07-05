@@ -1,14 +1,14 @@
-import { Folder, MessageSquare } from "lucide-react";
-import type { ReactNode } from "react";
+import { Folder, MessageSquare } from 'lucide-react';
+import type { ReactNode } from 'react';
 import {
   Link,
   useLocation,
   useNavigate,
   useSearchParams,
-} from "react-router-dom";
-import { useChatSessions } from "@/features/ai-chat/hooks/use-chat-sessions";
-import { useSidebarSettings } from "@/features/settings/hooks/use-settings-sidebar";
-import { Logo } from "@/shared/components";
+} from 'react-router-dom';
+import { useChatSessions } from '@/features/ai-chat/hooks/use-chat-sessions';
+import { useSidebarSettings } from '@/features/settings/hooks/use-settings-sidebar';
+import { Logo } from '@/shared/components';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,8 +18,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/shared/components/ui";
-import { useLanguage } from "@/shared/hooks/use-language";
+} from '@/shared/components/ui';
+import { useLanguage } from '@/shared/hooks/use-language';
 
 function NavDropdown({
   icon,
@@ -40,18 +40,18 @@ function NavDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         <DropdownMenuItem
-          onClick={() => router.push("/chat")}
+          onClick={() => router.push('/chat')}
           className="flex items-center gap-2"
         >
           <MessageSquare className="size-4" />
-          {t("nav.sidebar.chat")}
+          {t('nav.sidebar.chat')}
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => router.push("/artifact")}
+          onClick={() => router.push('/artifact')}
           className="flex items-center gap-2"
         >
           <Folder className="size-4" />
-          {t("nav.sidebar.artifact")}
+          {t('nav.sidebar.artifact')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -65,33 +65,33 @@ export function PathBreadcrumb() {
   const { sessionsMap } = useChatSessions();
   const { t } = useLanguage();
 
-  const pathSegments = location.pathname.split("/").filter(Boolean) || [];
-  const isChat = pathSegments[0] === "chat";
-  const isFile = pathSegments[0] === "file";
+  const pathSegments = location.pathname.split('/').filter(Boolean) || [];
+  const isChat = pathSegments[0] === 'chat';
+  const isFile = pathSegments[0] === 'file';
 
   const { mode } = useSidebarSettings();
-  const isFloating = mode === "floating";
+  const isFloating = mode === 'floating';
 
   let breadcrumbContent = null;
 
   if (isChat) {
-    const chatId = searchParams.get("cid");
+    const chatId = searchParams.get('cid');
 
-    const session = sessionsMap[chatId || ""] || null;
+    const session = sessionsMap[chatId || ''] || null;
 
     breadcrumbContent = (
       <>
         <BreadcrumbItem className="text-md font-medium text-foreground">
           <NavDropdown
             icon={<MessageSquare className="size-4" />}
-            label={t("nav.sidebar.chat")}
+            label={t('nav.sidebar.chat')}
             t={t}
             router={router}
           />
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          {session?.title || t("nav.sidebar.new")}
+          {session?.title || t('nav.sidebar.new')}
         </BreadcrumbItem>
       </>
     );
@@ -100,7 +100,7 @@ export function PathBreadcrumb() {
       <BreadcrumbItem className="text-md font-medium text-foreground">
         <NavDropdown
           icon={<Folder className="size-4" />}
-          label={t("nav.sidebar.artifact")}
+          label={t('nav.sidebar.artifact')}
           t={t}
           router={router}
         />

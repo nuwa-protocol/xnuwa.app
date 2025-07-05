@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDownIcon, LoaderIcon } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 import { Markdown } from './markdown';
 
 interface MessageReasoningProps {

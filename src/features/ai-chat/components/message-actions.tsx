@@ -1,5 +1,8 @@
 import type { Message } from 'ai';
 import { CopyIcon } from 'lucide-react';
+import { memo } from 'react';
+import { useCopyToClipboard } from 'usehooks-ts';
+import { toast } from '@/shared/components/toast';
 import { Button } from '@/shared/components/ui/button';
 import {
   Tooltip,
@@ -7,9 +10,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
-import { memo } from 'react';
-import { toast } from '@/shared/components/toast';
-import { useCopyToClipboard } from 'usehooks-ts';
 
 export function PureMessageActions({
   message,
