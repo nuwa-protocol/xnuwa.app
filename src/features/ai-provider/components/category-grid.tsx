@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Tag } from 'lucide-react';
 import type React from 'react';
+import { useLocale } from '@/shared/locales/use-locale';
 import type { Category } from '../utils';
 
 interface CategoryGridProps {
@@ -12,6 +13,8 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
   categories,
   onCategorySelect,
 }) => {
+  const { t } = useLocale();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {categories.map((category) => (
@@ -27,7 +30,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
             <div>
               <h3 className="font-medium">{category.name}</h3>
               <p className="text-sm text-muted-foreground">
-                {category.count} models
+                {category.count} {t('aiProvider.category.models')}
               </p>
             </div>
           </div>

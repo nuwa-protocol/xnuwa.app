@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
+import { useLocale } from '@/shared/locales/use-locale';
 import { cn } from '@/shared/utils';
 import { useFavoriteModels } from '../hooks/use-favorite-models';
 import type { Model } from '../types';
@@ -25,6 +26,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({
   isSelected,
   onClick,
 }) => {
+  const { t } = useLocale();
   const { isFavorite, toggleFavorite } = useFavoriteModels();
 
   return (
@@ -73,13 +75,13 @@ export const ModelCard: React.FC<ModelCardProps> = ({
           <div className="flex gap-2 text-sm text-muted-foreground">
             <span>
               ${Number(model.pricing.input_per_million_tokens.toPrecision(3))}{' '}
-              /M input tokens
+              {t('aiProvider.modelCard.pricing.inputTokens')}
             </span>
           </div>
           <div className="flex gap-2 text-sm text-muted-foreground">
             <span>
               ${Number(model.pricing.output_per_million_tokens.toPrecision(3))}{' '}
-              /M output tokens
+              {t('aiProvider.modelCard.pricing.outputTokens')}
             </span>
           </div>
         </CardFooter>

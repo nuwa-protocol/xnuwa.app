@@ -36,6 +36,88 @@ export const en = {
       dark: 'Dark',
     },
   },
+  aiProvider: {
+    modelSelector: {
+      selectModel: 'Select Model',
+      auto: 'Auto',
+      autoDescription: 'Auto select the best model',
+      webSearch: 'Web Search',
+      contextSize: {
+        low: 'Low',
+        medium: 'Medium',
+        high: 'High',
+      },
+      moreModels: 'More Models',
+      allModels: 'All Models',
+    },
+    modelDialog: {
+      title: {
+        autoSettings: 'Auto Settings & Recommendations',
+        favoriteModels: 'Favorite Models',
+        providerModels: '{{provider}} Models',
+        allModels: 'All Models',
+        providers: 'Providers',
+      },
+      search: {
+        placeholder: 'Search models...',
+      },
+      sort: {
+        name: 'Name',
+        priceLowToHigh: 'Price (Low to High)',
+        priceHighToLow: 'Price (High to Low)',
+      },
+      loading: {
+        title: 'Loading models...',
+      },
+      error: {
+        failedToLoad: 'Failed to load models',
+        noModelsAvailable: 'No models available',
+      },
+      favoriteEmpty: {
+        title: 'No favorite models',
+        description:
+          'You can click the star on the model card to add it to your favorites',
+      },
+    },
+    autoSettings: {
+      focusCategory: {
+        title: 'Focus Category',
+        placeholder: 'Select a category (optional)',
+        none: 'None',
+      },
+      optimizeFor: {
+        title: 'Optimize For',
+        speed: 'Speed',
+        cost: 'Cost',
+        latency: 'Latency',
+      },
+      advancedSettings: {
+        title: 'Advanced Settings',
+        description: 'Advanced optimization settings for model selection.',
+        minContextLength: 'Minimum Context Length',
+        contextPlaceholder: 'e.g., 8000',
+      },
+      recommendedModels: 'Recommended Models',
+    },
+    modelCard: {
+      pricing: {
+        inputTokens: '/M input tokens',
+        outputTokens: '/M output tokens',
+      },
+    },
+    sidebar: {
+      title: 'Select Model',
+      tabs: {
+        auto: 'Auto',
+        favorite: 'Favorite',
+        all: 'All',
+        providers: 'Providers',
+      },
+    },
+    category: {
+      models: 'models',
+    },
+  },
   capStore: {
     title: 'Cap Store',
     description: 'Discover and install capabilities to enhance your experience',
@@ -249,7 +331,7 @@ export const en = {
         undo: 'Undo change',
         redo: 'Redo change',
         copy: 'Copy table as CSV',
-      }
+      },
     },
 
     image: {
@@ -297,8 +379,8 @@ export const en = {
         subtitle: 'Manage system-level settings and data.',
       },
       general: {
-        title: "General",
-        subtitle: "General application settings.",
+        title: 'General',
+        subtitle: 'General application settings.',
       },
     },
     profile: {
@@ -353,12 +435,12 @@ export const en = {
       },
       devMode: {
         title: 'Developer Mode',
-        description: 'Enable or disable developer mode.'
+        description: 'Enable or disable developer mode.',
       },
       language: {
         title: 'Language',
-        description: 'Select your preferred language.'
-      }
+        description: 'Select your preferred language.',
+      },
     },
   },
 };

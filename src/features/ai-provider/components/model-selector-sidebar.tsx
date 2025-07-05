@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from '@/shared/components/ui/sidebar';
 import { useDevMode } from '@/shared/hooks';
+import { useLocale } from '@/shared/locales/use-locale';
 import type { Provider } from '../utils';
 import { ProviderAvatar } from './provider-avatar';
 
@@ -29,6 +30,7 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
   onTabChange,
   onProviderChange,
 }) => {
+  const { t } = useLocale();
   const isDevMode = useDevMode();
 
   const handleTabChange = (tab: string) => {
@@ -38,7 +40,9 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
 
   return (
     <Sidebar collapsible="none" className="w-54 flex flex-col">
-      <SidebarHeader className="p-4 font-bold">Select Model</SidebarHeader>
+      <SidebarHeader className="p-4 font-bold">
+        {t('aiProvider.sidebar.title')}
+      </SidebarHeader>
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
@@ -49,7 +53,7 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
                   onClick={() => handleTabChange('auto')}
                 >
                   <Settings className="h-4 w-4" />
-                  <span>Auto</span>
+                  <span>{t('aiProvider.sidebar.tabs.auto')}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )}
@@ -59,7 +63,7 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
                 onClick={() => handleTabChange('favorite')}
               >
                 <StarIcon className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                <span>Favorite</span>
+                <span>{t('aiProvider.sidebar.tabs.favorite')}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
@@ -68,7 +72,7 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
                 onClick={() => handleTabChange('all')}
               >
                 <List className="h-4 w-4" />
-                <span>All</span>
+                <span>{t('aiProvider.sidebar.tabs.all')}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -76,7 +80,7 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
       </SidebarGroup>
       <SidebarGroup>
         <SidebarGroupLabel className="sticky top-0 z-10 pb-2 flex-shrink-0">
-          Providers
+          {t('aiProvider.sidebar.tabs.providers')}
         </SidebarGroupLabel>
         <SidebarMenu className="flex h-[calc(80vh-200px)] overflow-auto hide-scrollbar">
           {providers.map((provider) => (
