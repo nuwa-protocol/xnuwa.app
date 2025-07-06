@@ -369,5 +369,6 @@ class EntityDB {
   }
 }
 
-// Export EntityDB class
-export { EntityDB };
+export const memoryDB = new EntityDB({
+  vectorPath: 'db_name'
+});
