@@ -1,4 +1,8 @@
-import { ChatStateStore, FileStateStore, MemoryStateStore } from '@/features/ai-chat/stores';
+import {
+  ChatStateStore,
+  FileStateStore,
+  MemoryStateStore,
+} from '@/features/ai-chat/stores';
 import { DocumentStateStore } from '@/features/documents/stores';
 import { SettingsStateStore } from '@/features/settings/stores';
 

@@ -11,7 +11,7 @@ export const saveMemory = () =>
     }),
     execute: async ({ memory }) => {
       await MemoryStateStore.getState().saveMemory(memory);
-      return null;
+      return memory;
     },
   });
 
@@ -27,10 +27,13 @@ export const queryMemory = () =>
         .describe('the number of memories to retrieve'),
     }),
     execute: async ({ query, amount }) => {
-      const memories = await MemoryStateStore.getState().queryMemories(query, { limit: amount });
+      const memories = await MemoryStateStore.getState().queryMemories(query, {
+        limit: amount,
+      });
+      console.log()
       return memories.map((m) => ({
         text: m.text,
-        similarity: m.similarity,
+        createdAt: m.createdAt,
       }));
     },
   });

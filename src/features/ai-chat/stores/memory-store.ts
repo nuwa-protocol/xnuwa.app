@@ -26,7 +26,7 @@ interface Memory {
   metadata?: Record<string, any>;
 }
 
-interface SimilarityResult extends Memory {
+interface QueryMemoryResult extends Memory {
   similarity: number;
 }
 
@@ -85,7 +85,7 @@ interface MemoryStoreState {
   queryMemories: (
     queryText: string,
     options?: QueryOptions,
-  ) => Promise<SimilarityResult[]>;
+  ) => Promise<QueryMemoryResult[]>;
 
   // utility methods
   clearAllMemories: () => Promise<void>;
@@ -186,7 +186,7 @@ export const MemoryStateStore = create<MemoryStoreState>()(
           const memoryList = Object.values(memories);
 
           // Calculate cosine similarity for each memory and sort by similarity
-          const similarities: SimilarityResult[] = memoryList.map((memory) => {
+          const similarities: QueryMemoryResult[] = memoryList.map((memory) => {
             const similarity = cosineSimilarity(queryVector, memory.vector);
             return { ...memory, similarity };
           });
