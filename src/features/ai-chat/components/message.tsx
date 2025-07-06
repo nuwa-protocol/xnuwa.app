@@ -16,7 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
-import { cn, sanitizeText } from '@/shared/utils';
+import { cn, generateUUID, sanitizeText } from '@/shared/utils';
 import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
 import { MessageEditor } from './message-editor';
@@ -288,6 +288,7 @@ export const ThinkingMessage = () => {
         <div className="flex items-center justify-center gap-1">
           {[...Array(3)].map((_, i) => (
             <motion.div
+            key={`thinking-dot-${generateUUID()}`}
               className="h-3 w-3 rounded-full bg-primary"
               initial={{ x: 0 }}
               animate={{

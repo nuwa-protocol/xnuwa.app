@@ -1,3 +1,4 @@
+import { EntityDB } from './entity-db.js';
 import Dexie, { type Table } from 'dexie';
 
 class Database extends Dexie {
@@ -32,3 +33,7 @@ class Database extends Dexie {
 }
 
 export const db = new Database();
+
+export const entityDB = new EntityDB({
+  vectorPath: 'db_name'
+});

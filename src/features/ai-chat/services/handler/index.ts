@@ -13,6 +13,7 @@ import { generateUUID } from '@/shared/utils';
 import { systemPrompt, systemPromptWithArtifacts } from '../prompts';
 import { createDocument } from '../tools/create-document';
 import { updateDocument } from '../tools/update-document';
+import { entityDB } from '@/storage';
 
 // Error handling function
 function errorHandler(error: unknown) {
@@ -68,12 +69,21 @@ const handleAIRequest = async ({
   await updateMessages(sessionId, messages);
 
   // Create streamId for stream resumption
-  const streamId = generateUUID();
-  createStreamId(streamId, sessionId);
+  // const streamId = generateUUID();
+  // createStreamId(streamId, sessionId);
 
   // get selected model
   const selectedModel = ModelStateStore.getState().selectedModel;
   const isDevMode = SettingsStateStore.getState().settings.devMode;
+
+
+  await entityDB.insert({
+    text:messages[messages.length - 1].content,
+  });
+  
+  const context = await entityDB.query(messages[messages.length - 1].content)
+
+  console.log(context);
 
   const result = streamText({
     model: llmProvider.chat(),
@@ -99,13 +109,17 @@ const handleAIRequest = async ({
 
       // the appendResponseMessages function above does not append sources to the final messages
       // so we need to append them manually
-      await updateMessages(
-        sessionId,
-        appendSourcesToFinalMessages(
+      const finalMessagesWithSources = appendSourcesToFinalMessages(
           finalMessages,
           response.messages[0].id,
           sources,
-        ),
+        );
+
+      
+
+      await updateMessages(
+        sessionId,
+        finalMessagesWithSources
       );
     },
   });
