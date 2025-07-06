@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { memoryDB } from './memory-db';
+import { MemoryStateStore } from '../../stores/memory-store';
 
 export const saveMemory = () =>
   tool({
@@ -10,7 +10,7 @@ export const saveMemory = () =>
       memory: z.string().describe('the memory text to save'),
     }),
     execute: async ({ memory }) => {
-      await memoryDB.insert({ text: memory });
+      await MemoryStateStore.getState().saveMemory(memory);
       return null;
     },
   });
@@ -20,14 +20,17 @@ export const queryMemory = () =>
     description:
       'Retrieve one or more memory about the user by providing a query and an amount. Alwasy use English for saving and retrieving memories.',
     parameters: z.object({
-      query: z.string().describe('the memory text to save'),
+      query: z.string().describe('the query to search for in the memory'),
       amount: z
         .number()
         .default(1)
         .describe('the number of memories to retrieve'),
     }),
     execute: async ({ query, amount }) => {
-      const context = await memoryDB.query(query, { limit: amount });
-      return context;
+      const memories = await MemoryStateStore.getState().queryMemories(query, { limit: amount });
+      return memories.map((m) => ({
+        text: m.text,
+        similarity: m.similarity,
+      }));
     },
   });
