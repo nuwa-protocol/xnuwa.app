@@ -12,8 +12,8 @@ export function MemoryToolCall({ toolInvocation }: MemoryToolCallProps) {
   const isDevMode = useDevMode();
 
   if (toolName === 'saveMemory') {
-    const savedMemory = state === 'result' && toolInvocation.result ? toolInvocation.result : null;
-
+    const savedMemory = state === 'result' && toolInvocation.result.memory ? toolInvocation.result.memory : null;
+    const reason = state === 'result' && toolInvocation.result.reason ? toolInvocation.result.reason : null;
     return (
       <div className="flex flex-col text-xs text-muted-foreground rounded px-2 py-1">
         <div className="flex items-center gap-2">
@@ -32,12 +32,20 @@ export function MemoryToolCall({ toolInvocation }: MemoryToolCallProps) {
             )}
           </div>
         )}
+        
+        {isDevMode && reason && (
+          <div className="mt-1 ml-5">
+            <span className="text-muted-foreground">Reason: </span>
+            <span>{reason}</span>
+          </div>
+        )}
       </div>
     );
   }
 
   if (toolName === 'queryMemory') {
-    const memories = state === 'result' && Array.isArray(toolInvocation.result) ? toolInvocation.result : [];
+    const memories = state === 'result' && Array.isArray(toolInvocation.result.memories) ? toolInvocation.result.memories : [];
+    const reason = state === 'result' && toolInvocation.result.reason ? toolInvocation.result.reason : null;
 
     return (
       <div className="flex flex-col text-xs text-muted-foreground rounded px-2 py-1">
@@ -53,7 +61,7 @@ export function MemoryToolCall({ toolInvocation }: MemoryToolCallProps) {
         
         {isDevMode && memories.length > 0 && (
           <div className="mt-1 ml-5 bg-muted p-2 rounded max-h-32 overflow-y-auto">
-            {memories.map((memory) => (
+            {memories.map((memory: any) => (
               <div 
                 key={`memory-${memory.id || JSON.stringify(memory).slice(0, 20)}-${generateUUID()}`} 
                 className="mb-2 pb-2 border-b border-border last:border-0 last:mb-0 last:pb-0"
@@ -63,6 +71,13 @@ export function MemoryToolCall({ toolInvocation }: MemoryToolCallProps) {
                 </pre>
               </div>
             ))}
+          </div>
+        )}
+        
+        {isDevMode && reason && (
+          <div className="mt-1 ml-5">
+            <span className="text-muted-foreground">Reason: </span>
+            <span>{reason}</span>
           </div>
         )}
       </div>

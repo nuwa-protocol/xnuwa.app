@@ -169,13 +169,13 @@ export function SettingsModal({
         },
       ],
     },
-    {
+    ...(isDevMode ? [{
       id: 'memory',
-      name:"Memory",
-      description:"Manage your memories",
+      name: "Memory",
+      description: "Manage your memories",
       icon: Brain,
       customComponent: <MemoryManagement />,
-    },
+    }] : []),
     {
       id: 'system',
       icon: Monitor,

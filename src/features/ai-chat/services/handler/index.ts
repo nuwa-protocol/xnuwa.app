@@ -7,8 +7,9 @@ import {
 } from 'ai';
 import { ChatStateStore } from '@/features/ai-chat/stores/chat-store';
 import { llmProvider } from '@/features/ai-provider/services';
+import { SettingsStateStore } from '@/features/settings/stores';
 import { generateUUID } from '@/shared/utils';
-import { systemPrompt } from '../prompts';
+import { devModeSystemPrompt, systemPrompt } from '../prompts';
 import { tools } from '../tools';
 
 // Error handling function
@@ -61,12 +62,12 @@ const handleAIRequest = async ({
   signal?: AbortSignal;
 }) => {
   const { updateMessages } = ChatStateStore.getState();
-
+  const isDevMode = SettingsStateStore.getState().settings.devMode;
   await updateMessages(sessionId, messages);
 
   const result = streamText({
     model: llmProvider.chat(),
-    system: systemPrompt(),
+    system: isDevMode ? devModeSystemPrompt() : systemPrompt(),
     messages,
     maxSteps: 5,
     experimental_transform: smoothStream({ chunking: 'word' }),
