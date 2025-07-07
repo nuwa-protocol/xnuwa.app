@@ -18,7 +18,6 @@ env.allowLocalModels = false;
 
 interface Memory {
   id: string;
-  did?: string;
   text: string;
   vector: number[];
   createdAt: number;
@@ -165,9 +164,10 @@ export const MemoryStateStore = create<MemoryStoreState>()(
           const currentDID = await getCurrentDID();
           if (!currentDID) return;
 
+          // 使用单个索引查询并过滤结果
           await memoryDB.memories
-            .where(['did', 'id'])
-            .equals([currentDID, id])
+            .where('did').equals(currentDID)
+            .and(item => item.id === id)
             .delete();
         } catch (error) {
           console.error('Failed to delete memory from DB:', error);
