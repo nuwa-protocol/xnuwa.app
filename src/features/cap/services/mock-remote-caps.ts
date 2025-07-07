@@ -129,7 +129,7 @@ export const mockRemoteCaps: RemoteCap[] = [
     tag: 'security',
     description: 'Generate secure passwords and manage credentials safely.',
     downloads: 2890,
-    version: '2.2.0',
+    version: '2.2.4',
     author: 'SecureTech',
     createdAt: Date.now() - 100 * 24 * 60 * 60 * 1000,
     updatedAt: Date.now() - 1 * 24 * 60 * 60 * 1000,

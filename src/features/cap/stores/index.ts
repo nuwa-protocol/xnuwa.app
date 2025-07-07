@@ -90,7 +90,6 @@ export const CapStateStore = create<CapStoreState>()(
         const newInstalledCap: InstalledCap = {
           ...cap,
           updatedAt: Date.now(),
-          settings: {},
         };
 
         set((state) => ({
@@ -132,7 +131,7 @@ export const CapStateStore = create<CapStoreState>()(
         if (!cap) return;
 
         const newInstalledCap: InstalledCap = {
-          ...cap,
+          ...updatedCap,
           updatedAt: Date.now(),
         };
 

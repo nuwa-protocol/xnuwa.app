@@ -10,10 +10,8 @@ import {
   TabsTrigger,
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
-import { useInstalledCaps } from '../hooks/use-installed-caps';
 import { useRemoteCap } from '../hooks/use-remote-cap';
-import type { RemoteCap } from '../types';
-import { CapCard, type CapDisplayData } from './cap-card';
+import { CapCard } from './cap-card';
 
 interface CapStoreModalProps {
   open?: boolean;
@@ -22,13 +20,19 @@ interface CapStoreModalProps {
 }
 
 export function CapStoreModal({
-  open,
-  onOpenChange,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange,
   children,
 }: CapStoreModalProps) {
   const { t } = useLanguage();
-  const { installCap, uninstallCap, isCapInstalled, installedCaps } =
-    useInstalledCaps();
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  // Use external or internal state management
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const onOpenChange = isControlled 
+    ? externalOnOpenChange 
+    : setInternalOpen;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
@@ -47,34 +51,8 @@ export function CapStoreModal({
     { id: 'security', label: t('capStore.tabs.security') },
   ];
 
-  // Combine remote caps with local state
-  const capDisplayData: CapDisplayData[] = remoteCaps.map((remoteCap) => {
-    const isInstalled = isCapInstalled(remoteCap.id);
-    const localCap = installedCaps[remoteCap.id];
-    const hasUpdate =
-      isInstalled && localCap ? localCap.version !== remoteCap.version : false;
-
-    return {
-      remote: remoteCap,
-      local: localCap || undefined,
-      isInstalled,
-      hasUpdate,
-      installedVersion: localCap?.version,
-    };
-  });
-
-  const handleInstallCap = (remoteCap: RemoteCap) => {
-    installCap(remoteCap);
-  };
-
-  const handleUninstallCap = (capId: string) => {
-    uninstallCap(capId);
-  };
-
   return (
-    <Dialog.Dialog
-      {...(open !== undefined && onOpenChange ? { open, onOpenChange } : {})}
-    >
+    <Dialog.Dialog open={open} onOpenChange={onOpenChange}>
       {children && (
         <Dialog.DialogTrigger asChild>{children}</Dialog.DialogTrigger>
       )}
@@ -171,7 +149,7 @@ export function CapStoreModal({
                             {t('capStore.status.fetching')}
                           </p>
                         </div>
-                      ) : capDisplayData.length === 0 ? (
+                      ) : remoteCaps.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
                           <Package className="size-12 text-muted-foreground mb-4" />
                           <h3 className="text-lg font-medium mb-2">
@@ -185,14 +163,11 @@ export function CapStoreModal({
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-6 min-h-0">
-                          {capDisplayData.map((capData) => (
+                          {remoteCaps.map((cap) => (
                             <CapCard
-                              key={capData.remote.id}
-                              capData={capData}
-                              onInstall={() => handleInstallCap(capData.remote)}
-                              onUninstall={() =>
-                                handleUninstallCap(capData.remote.id)
-                              }
+                              key={cap.id}
+                              cap={cap}
+                              onRun={() => onOpenChange?.(false)}
                             />
                           ))}
                         </div>
