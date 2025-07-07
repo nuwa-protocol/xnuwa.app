@@ -16,8 +16,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
-import { cn, sanitizeText } from '@/shared/utils';
+import { cn, generateUUID, sanitizeText } from '@/shared/utils';
 import { Markdown } from './markdown';
+import { MemoryToolCall } from './memory-tool-call';
 import { MessageActions } from './message-actions';
 import { MessageEditor } from './message-editor';
 import { MessageReasoning } from './message-reasoning';
@@ -182,6 +183,8 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
+                      ) : ['saveMemory', 'queryMemory'].includes(toolName) ? (
+                        <MemoryToolCall toolInvocation={toolInvocation} />
                       ) : null}
                     </div>
                   );
@@ -205,16 +208,9 @@ const PurePreviewMessage = ({
                           result={result}
                           isReadonly={isReadonly}
                         />
-                      ) : toolName === 'requestSuggestions' ? (
-                        <DocumentToolResult
-                          chatId={chatId}
-                          type="request-suggestions"
-                          result={result}
-                          isReadonly={isReadonly}
-                        />
-                      ) : (
-                        <pre>{JSON.stringify(result, null, 2)}</pre>
-                      )}
+                      ) : ['saveMemory', 'queryMemory'].includes(toolName) ? (
+                        <MemoryToolCall toolInvocation={toolInvocation} />
+                      ) : null}
                     </div>
                   );
                 }
@@ -288,6 +284,7 @@ export const ThinkingMessage = () => {
         <div className="flex items-center justify-center gap-1">
           {[...Array(3)].map((_, i) => (
             <motion.div
+              key={`thinking-dot-${generateUUID()}`}
               className="h-3 w-3 rounded-full bg-primary"
               initial={{ x: 0 }}
               animate={{

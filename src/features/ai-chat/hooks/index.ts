@@ -1,3 +1,4 @@
+export * from '../../settings/hooks/use-memory';
 export * from './use-chat-default';
 export * from './use-chat-page';
 export * from './use-chat-session';

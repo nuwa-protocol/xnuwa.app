@@ -7,12 +7,9 @@ import {
 } from 'ai';
 import { ChatStateStore } from '@/features/ai-chat/stores/chat-store';
 import { llmProvider } from '@/features/ai-provider/services';
-import { ModelStateStore } from '@/features/ai-provider/stores';
-import { SettingsStateStore } from '@/features/settings/stores';
 import { generateUUID } from '@/shared/utils';
-import { systemPrompt, systemPromptWithArtifacts } from '../prompts';
-import { createDocument } from '../tools/create-document';
-import { updateDocument } from '../tools/update-document';
+import { systemPrompt } from '../prompts';
+import { tools } from '../tools';
 
 // Error handling function
 function errorHandler(error: unknown) {
@@ -63,33 +60,18 @@ const handleAIRequest = async ({
   messages: Message[];
   signal?: AbortSignal;
 }) => {
-  const { updateMessages, createStreamId } = ChatStateStore.getState();
+  const { updateMessages } = ChatStateStore.getState();
 
   await updateMessages(sessionId, messages);
 
-  // Create streamId for stream resumption
-  const streamId = generateUUID();
-  createStreamId(streamId, sessionId);
-
-  // get selected model
-  const selectedModel = ModelStateStore.getState().selectedModel;
-  const isDevMode = SettingsStateStore.getState().settings.devMode;
-
   const result = streamText({
     model: llmProvider.chat(),
-    system: isDevMode ? systemPromptWithArtifacts() : systemPrompt(),
+    system: systemPrompt(),
     messages,
     maxSteps: 5,
-    experimental_activeTools:
-      selectedModel.supported_parameters.includes('tools') && isDevMode
-        ? ['createDocument', 'updateDocument']
-        : [],
     experimental_transform: smoothStream({ chunking: 'word' }),
     experimental_generateMessageId: generateUUID,
-    tools: {
-      createDocument: createDocument(),
-      updateDocument: updateDocument(),
-    },
+    tools,
     abortSignal: signal,
     async onFinish({ response, reasoning, sources }) {
       const finalMessages = appendResponseMessages({
@@ -99,14 +81,13 @@ const handleAIRequest = async ({
 
       // the appendResponseMessages function above does not append sources to the final messages
       // so we need to append them manually
-      await updateMessages(
-        sessionId,
-        appendSourcesToFinalMessages(
-          finalMessages,
-          response.messages[0].id,
-          sources,
-        ),
+      const finalMessagesWithSources = appendSourcesToFinalMessages(
+        finalMessages,
+        response.messages[0].id,
+        sources,
       );
+
+      await updateMessages(sessionId, finalMessagesWithSources);
     },
   });
 
@@ -117,19 +98,6 @@ const handleAIRequest = async ({
   });
 
   return dataStreamResponse;
-
-  // To do: add stream resumption
-  // const streamContext = getStreamContext();
-
-  // if (streamContext) {
-  //   const resumedStream = await streamContext.resumableStream(
-  //     streamId,
-  //     () => dataStreamResponse.body!
-  //   );
-  //   return new Response(resumedStream);
-  // } else {
-  //   return dataStreamResponse;
-  // }
 };
 
 export { handleAIRequest };

@@ -1,7 +1,7 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import { Monitor, PlayCircle, User } from 'lucide-react';
+import { Brain, Monitor, PlayCircle, User } from 'lucide-react';
 import type React from 'react';
 import { useRef, useState } from 'react';
 import { useAuth } from '@/features/auth/hooks/use-auth';
@@ -11,6 +11,7 @@ import * as Dialog from '@/shared/components/ui';
 import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { useStorage } from '@/shared/hooks/use-storage';
+import { MemoryManagement } from './memory-management';
 import type { SettingCardProps } from './setting-card';
 import { SettingSection } from './setting-section';
 import { SettingsNav } from './settings-nav';
@@ -21,7 +22,8 @@ interface SettingsSection {
   icon: LucideIcon;
   name: string;
   description: string;
-  cardItems: SettingCardProps[];
+  cardItems?: SettingCardProps[];
+  customComponent?: React.ReactNode;
 }
 
 // Update props to support controlled and uncontrolled usage
@@ -168,6 +170,13 @@ export function SettingsModal({
       ],
     },
     {
+      id: 'memory',
+      name:"Memory",
+      description:"Manage your memories",
+      icon: Brain,
+      customComponent: <MemoryManagement />,
+    },
+    {
       id: 'system',
       icon: Monitor,
       name: t('settings.sections.system.title'),
@@ -312,6 +321,7 @@ export function SettingsModal({
               title={activeSection.name}
               description={activeSection.description}
               settingCards={activeSection.cardItems}
+              customComponent={activeSection.customComponent}
             />
           </div>
         </div>
