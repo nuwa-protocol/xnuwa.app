@@ -1,4 +1,4 @@
-import { Folder, MessageSquare, X } from 'lucide-react';
+import { Folder, MessageSquare } from 'lucide-react';
 import {
   Link,
   useLocation,
@@ -6,18 +6,11 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import { useChatSessions } from '@/features/ai-chat/hooks/use-chat-sessions';
+import { CurrentCapIndicator } from '@/features/cap/components/current-cap-indicator';
 import { useCurrentCap } from '@/features/cap/hooks/use-current-cap';
 import { useSidebarSettings } from '@/features/settings/hooks/use-settings-sidebar';
 import { Logo } from '@/shared/components';
-import {
-  Avatar,
-  AvatarImage,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-  Button,
-} from '@/shared/components/ui';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
 
 export function PathBreadcrumb() {
@@ -26,7 +19,7 @@ export function PathBreadcrumb() {
   const [searchParams] = useSearchParams();
   const { sessionsMap } = useChatSessions();
   const { t } = useLanguage();
-  const { currentCap, clearCurrentCap } = useCurrentCap();
+  const { currentCap } = useCurrentCap();
 
   const pathSegments = location.pathname.split('/').filter(Boolean) || [];
   const isChat = pathSegments[0] === 'chat';
@@ -35,15 +28,9 @@ export function PathBreadcrumb() {
   const { mode } = useSidebarSettings();
   const isFloating = mode === 'floating';
 
-  const handleCapClose = () => {
-    clearCurrentCap();
-  };
-
   let breadcrumbContent = null;
 
-  
-
-if (isChat) {
+  if (isChat) {
     const chatId = searchParams.get('cid');
 
     const session = sessionsMap[chatId || ''] || null;
@@ -52,38 +39,28 @@ if (isChat) {
       breadcrumbContent = (
         <>
           <BreadcrumbItem className="text-md font-medium text-foreground">
-          <Button variant="ghost" size="icon" onClick={handleCapClose}>
-              <X className="size-2" />
-            </Button>
-            <Avatar  className="size-6 shrink-0">
-              <AvatarImage
-                src={`https://avatar.vercel.sh/${currentCap.name}`}
-                alt={currentCap.name}
-              />
-            </Avatar>
-            {currentCap.name}
+            <CurrentCapIndicator />
           </BreadcrumbItem>
-          <BreadcrumbItem className="text-md font-medium text-foreground"></BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-          {session?.title || t('nav.sidebar.new')}
-        </BreadcrumbItem>
+            {session?.title || t('nav.sidebar.new')}
+          </BreadcrumbItem>
         </>
       );
     } else {
-    breadcrumbContent = (
-      <>
-        <BreadcrumbItem className="text-md font-medium text-foreground">
-        <MessageSquare className="size-4" />
-        {t('nav.sidebar.chat')}
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          {session?.title || t('nav.sidebar.new')}
-        </BreadcrumbItem>
-      </>
-    );
-  }
+      breadcrumbContent = (
+        <>
+          <BreadcrumbItem className="text-md font-medium text-foreground">
+            <MessageSquare className="size-4" />
+            {t('nav.sidebar.chat')}
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            {session?.title || t('nav.sidebar.new')}
+          </BreadcrumbItem>
+        </>
+      );
+    }
   } else if (isFile) {
     breadcrumbContent = (
       <BreadcrumbItem className="text-md font-medium text-foreground">

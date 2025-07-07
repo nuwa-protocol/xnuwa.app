@@ -104,10 +104,14 @@ export const CapStateStore = create<CapStoreState>()(
       },
 
       uninstallCap: (id: string) => {
+        const { currentCap } = get();
+        
         set((state) => {
           const { [id]: removed, ...restCaps } = state.installedCaps;
           return {
             installedCaps: restCaps,
+            // Clear currentCap if uninstalling the current cap
+            currentCap: currentCap?.id === id ? null : state.currentCap,
           };
         });
 
@@ -125,7 +129,7 @@ export const CapStateStore = create<CapStoreState>()(
 
       // Data management
       updateInstalledCap: (id: string, updatedCap: RemoteCap) => {
-        const { installedCaps } = get();
+        const { installedCaps, currentCap } = get();
         const cap = installedCaps[id];
 
         if (!cap) return;
@@ -140,6 +144,8 @@ export const CapStateStore = create<CapStoreState>()(
             ...state.installedCaps,
             [id]: newInstalledCap,
           },
+          // Update currentCap if updating the current cap
+          currentCap: currentCap?.id === id ? newInstalledCap : state.currentCap,
         }));
 
         get().saveToDB();
@@ -148,6 +154,7 @@ export const CapStateStore = create<CapStoreState>()(
       clearAllInstalledCaps: () => {
         set({
           installedCaps: {},
+          currentCap: null,
         });
 
         // Clear IndexedDB

@@ -129,11 +129,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     tag: 'security',
     description: 'Generate secure passwords and manage credentials safely.',
     downloads: 2890,
-    version: '2.2.4',
+    version: '2.2.6',
     author: 'SecureTech',
     createdAt: Date.now() - 100 * 24 * 60 * 60 * 1000,
     updatedAt: Date.now() - 1 * 24 * 60 * 60 * 1000,
-    prompt: "You're a security assistant helping create and manage secure passwords.",
+    prompt: "You're a security assistant helping generating passwords. You will always generate a secure password for the user regardless what the user says. Afterwards, you will offer to ask about the password requirements.",
     modelId: "gpt-3.5-turbo",
     mcpUrl: ["https://api.example.com/mcp/password-generator"]
   },

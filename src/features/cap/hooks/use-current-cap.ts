@@ -6,7 +6,6 @@ import { CapStateStore } from '../stores';
  */
 export const useCurrentCap = () => {
   const [state, setState] = useState(() => CapStateStore.getState());
-
   useEffect(() => {
     const unsubscribe = CapStateStore.subscribe((newState) => {
       setState(newState);
