@@ -10,8 +10,8 @@ const isDevMode = SettingsStateStore.getState().settings.devMode;
 const userModeTools = {
   //   createDocument: createDocument(),
   //   updateDocument: updateDocument(),
-  saveMemory: saveMemory(),
-  queryMemory: queryMemory(),
+  // saveMemory: saveMemory(),
+  // queryMemory: queryMemory(),
 };
 
 const devModeTools = {
