@@ -10,10 +10,10 @@ import {
   TabsTrigger,
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
-import { useCapRemote } from '../hooks/use-cap-remote';
-import { useInstalledCaps } from '../hooks/use-caps-installed';
-import type { CapDisplayData, RemoteCap } from '../types';
-import { CapCard } from './cap-card';
+import { useInstalledCaps } from '../hooks/use-installed-caps';
+import { useRemoteCap } from '../hooks/use-remote-cap';
+import type { RemoteCap } from '../types';
+import { CapCard, type CapDisplayData } from './cap-card';
 
 interface CapStoreModalProps {
   open?: boolean;
@@ -27,22 +27,15 @@ export function CapStoreModal({
   children,
 }: CapStoreModalProps) {
   const { t } = useLanguage();
-  const {
-    installCap,
-    uninstallCap,
-    isCapInstalled,
-    getInstalledCap,
-    isCapEnabled,
-    enableCap,
-    disableCap,
-  } = useInstalledCaps();
+  const { installCap, uninstallCap, isCapInstalled, installedCaps } =
+    useInstalledCaps();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
 
-  const { remoteCaps, isLoading, error, refetch } = useCapRemote({
+  const { remoteCaps, isLoading, error, refetch } = useRemoteCap({
     searchQuery,
-    category: activeTab,
+    category: activeTab === 'all' ? undefined : activeTab,
   });
 
   const tabs = [
@@ -57,8 +50,7 @@ export function CapStoreModal({
   // Combine remote caps with local state
   const capDisplayData: CapDisplayData[] = remoteCaps.map((remoteCap) => {
     const isInstalled = isCapInstalled(remoteCap.id);
-    const localCap = getInstalledCap(remoteCap.id);
-    const isEnabled = isCapEnabled(remoteCap.id);
+    const localCap = installedCaps[remoteCap.id];
     const hasUpdate =
       isInstalled && localCap ? localCap.version !== remoteCap.version : false;
 
@@ -66,33 +58,17 @@ export function CapStoreModal({
       remote: remoteCap,
       local: localCap || undefined,
       isInstalled,
-      isEnabled,
       hasUpdate,
       installedVersion: localCap?.version,
     };
   });
 
   const handleInstallCap = (remoteCap: RemoteCap) => {
-    // Convert RemoteCap to the format needed for installation
-    installCap({
-      id: remoteCap.id,
-      name: remoteCap.name,
-      tag: remoteCap.tag,
-      description: remoteCap.description,
-      version: remoteCap.version,
-    });
+    installCap(remoteCap);
   };
 
   const handleUninstallCap = (capId: string) => {
     uninstallCap(capId);
-  };
-
-  const handleToggleEnable = (capId: string, currentlyEnabled: boolean) => {
-    if (currentlyEnabled) {
-      disableCap(capId);
-    } else {
-      enableCap(capId);
-    }
   };
 
   return (
@@ -216,12 +192,6 @@ export function CapStoreModal({
                               onInstall={() => handleInstallCap(capData.remote)}
                               onUninstall={() =>
                                 handleUninstallCap(capData.remote.id)
-                              }
-                              onToggleEnable={() =>
-                                handleToggleEnable(
-                                  capData.remote.id,
-                                  capData.isEnabled,
-                                )
                               }
                             />
                           ))}

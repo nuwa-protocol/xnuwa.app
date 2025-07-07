@@ -1,36 +1,30 @@
-// Cap interface for remote caps
-export interface RemoteCap {
+
+// Cap Data Interface
+interface CapData {
+  prompt: string;
+  modelId:string;
+  mcpUrl:string[];
+}
+
+// Remote Cap Interface
+export interface RemoteCap extends CapData {
   id: string;
   name: string;
   tag: string;
   description: string;
   downloads: number;
   version: string;
-  author?: string;
-  createdAt?: number;
-  updatedAt?: number;
-  dependencies?: string[];
-  size?: number;
+  author: string;
+  createdAt: number;
+  updatedAt: number;
 }
 
 // Installed Cap interface (minimal data for locally installed caps)
-export interface InstalledCap {
+export interface InstalledCap extends CapData {
   id: string;
   name: string;
   tag: string;
   description: string;
   version: string;
-  installDate: number;
-  isEnabled?: boolean;
-  settings?: Record<string, any>;
-}
-
-// Combined cap data: remote + local state
-export interface CapDisplayData {
-  remote: RemoteCap;
-  local?: InstalledCap;
-  isInstalled: boolean;
-  isEnabled: boolean;
-  hasUpdate: boolean;
-  installedVersion?: string;
+  updatedAt: number;
 }

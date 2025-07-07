@@ -1,4 +1,4 @@
-import { AlertCircle, Check, Download, Loader2, Power } from 'lucide-react';
+import { AlertCircle, Check, Download, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import {
   Avatar,
@@ -9,21 +9,26 @@ import {
   Card,
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
-import type { CapDisplayData } from '../types';
+import type { InstalledCap, RemoteCap } from '../types';
+
+export interface CapDisplayData {
+  remote: RemoteCap;
+  local?: InstalledCap;
+  isInstalled: boolean;
+  hasUpdate: boolean;
+  installedVersion?: string;
+}
 
 export function CapCard({
   capData,
   onInstall,
   onUninstall,
-  onToggleEnable,
 }: {
   capData: CapDisplayData;
   onInstall: () => void;
   onUninstall: () => void;
-  onToggleEnable: () => void;
 }) {
-  const { remote, local, isInstalled, isEnabled, hasUpdate, installedVersion } =
-    capData;
+  const { remote, isInstalled, hasUpdate, installedVersion } = capData;
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useLanguage();
 
@@ -37,12 +42,6 @@ export function CapCard({
       }
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleToggleEnable = async () => {
-    if (isInstalled) {
-      onToggleEnable();
     }
   };
 
@@ -65,11 +64,6 @@ export function CapCard({
               <Badge variant="secondary" className="text-xs">
                 {remote.tag}
               </Badge>
-              {isInstalled && !isEnabled && (
-                <Badge variant="outline" className="text-xs text-orange-600">
-                  {t('capStore.card.disabled')}
-                </Badge>
-              )}
               {hasUpdate && (
                 <Badge variant="destructive" className="text-xs">
                   {t('capStore.card.update')}
@@ -128,34 +122,9 @@ export function CapCard({
                 )}
               </Button>
 
-              {/* Enable/Disable button (only show if installed) */}
-              {isInstalled && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-xs px-2 py-1 h-6"
-                  onClick={handleToggleEnable}
-                >
-                  <Power
-                    className={`size-3 ${
-                      isEnabled ? 'text-green-600' : 'text-gray-400'
-                    }`}
-                  />
-                </Button>
-              )}
-
               {/* Update indicator */}
               {hasUpdate && <AlertCircle className="size-3 text-orange-500" />}
             </div>
-
-            {/* Install date (if installed) */}
-            {isInstalled && local?.installDate && (
-              <span className="text-xs text-muted-foreground">
-                {t('capStore.card.installDate', {
-                  date: new Date(local.installDate).toLocaleDateString(),
-                })}
-              </span>
-            )}
           </div>
         </div>
       </div>
