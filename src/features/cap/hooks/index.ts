@@ -1,3 +1,3 @@
-export * from './use-cap';
-export * from './use-cap-remote';
-export * from './use-caps-installed';
+export * from './use-cap.ts';
+export * from './use-current-cap.ts';
+export * from './use-remote-cap.ts';

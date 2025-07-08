@@ -1,57 +1,33 @@
-'use client';
+import { useEffect, useState } from 'react';
+import { CapStateStore } from '../stores';
+import type { RemoteCap } from '../types';
 
-import { useCallback } from 'react';
-import { CapStateStore, type InstalledCap } from '@/features/cap/stores';
+/**
+ * Hook for managing the installed caps
+ */
+export const useCap = (remoteCap:RemoteCap) => {
+  const [state, setState] = useState(() => CapStateStore.getState());
 
-// Individual cap management hook
-export const useCap = (id: string) => {
-  const store = CapStateStore();
-  const cap = store.getInstalledCap(id);
-  const isInstalled = store.isCapInstalled(id);
-  const isEnabled = store.isCapEnabled(id);
+  useEffect(() => {
+    const unsubscribe = CapStateStore.subscribe((newState) => {
+      setState(newState);
+    });
+    
+    return unsubscribe;
+  }, []);
 
-  const installCap = useCallback(
-    (capData: Omit<InstalledCap, 'installDate' | 'isEnabled' | 'did'>) => {
-      store.installCap({ ...capData, id });
-    },
-    [id],
-  );
+  const { installCap, uninstallCap, updateInstalledCap, installedCaps } = state;
 
-  const uninstallCap = useCallback(() => {
-    store.uninstallCap(id);
-  }, [id]);
-
-  const enableCap = useCallback(() => {
-    store.enableCap(id);
-  }, [id]);
-
-  const disableCap = useCallback(() => {
-    store.disableCap(id);
-  }, [id]);
-
-  const updateSettings = useCallback(
-    (settings: Record<string, any>) => {
-      store.updateCapSettings(id, settings);
-    },
-    [id],
-  );
-
-  const updateCap = useCallback(
-    (updates: Partial<InstalledCap>) => {
-      store.updateInstalledCap(id, updates);
-    },
-    [id],
-  );
+  const isInstalled = !!installedCaps[remoteCap.id];
+  const installedVersion = installedCaps[remoteCap.id]?.version;
+  const hasUpdate = installedVersion !== remoteCap.version;
 
   return {
-    cap,
     isInstalled,
-    isEnabled,
+    installedVersion,
     installCap,
     uninstallCap,
-    enableCap,
-    disableCap,
-    updateSettings,
-    updateCap,
+    hasUpdate,
+    updateInstalledCap,
   };
 };

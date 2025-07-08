@@ -7,6 +7,7 @@ import {
 } from 'ai';
 import { ChatStateStore } from '@/features/ai-chat/stores/chat-store';
 import { llmProvider } from '@/features/ai-provider/services';
+import { CapStateStore } from '@/features/cap/stores';
 import { SettingsStateStore } from '@/features/settings/stores';
 import { generateUUID } from '@/shared/utils';
 import { devModeSystemPrompt, systemPrompt } from '../prompts';
@@ -65,9 +66,13 @@ const handleAIRequest = async ({
   const isDevMode = SettingsStateStore.getState().settings.devMode;
   await updateMessages(sessionId, messages);
 
+  const { currentCap } = CapStateStore.getState();
+
+  const prompt = isDevMode ? (currentCap? currentCap.prompt: devModeSystemPrompt()) : systemPrompt();
+
   const result = streamText({
     model: llmProvider.chat(),
-    system: isDevMode ? devModeSystemPrompt() : systemPrompt(),
+    system: prompt,
     messages,
     maxSteps: 5,
     experimental_transform: smoothStream({ chunking: 'word' }),
