@@ -1,9 +1,9 @@
 import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import { useNavigate } from 'react-router-dom';
-import { ChatSDKError } from '@/shared/errors/chatsdk-errors';
-import { ErrorHandlers } from '@/shared/errors/error-handler';
 import { generateUUID } from '@/shared/utils';
+import { ChatSDKError } from '../errors/chatsdk-errors';
+import { ErrorHandlers } from '../errors/error-handler';
 import { createClientAIFetch } from '../services';
 import { useUpdateChatTitle } from './use-update-chat-title';
 

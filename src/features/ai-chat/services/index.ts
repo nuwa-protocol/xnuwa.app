@@ -1,6 +1,6 @@
 'use client';
 
-import { ChatSDKError } from '@/shared/errors/chatsdk-errors';
+import { ChatSDKError } from '@/features/ai-chat/errors/chatsdk-errors';
 import { handleAIRequest } from './handler';
 
 export const createClientAIFetch = (): ((

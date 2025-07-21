@@ -10,9 +10,6 @@ import '@fontsource/geist-sans/700.css';
 import '@fontsource/geist-mono/400.css';
 import '@fontsource/geist-mono/700.css';
 
-// initialize global error handler
-import './shared/errors';
-
 // biome-ignore lint/style/noNonNullAssertion: Root element is guaranteed to exist
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
