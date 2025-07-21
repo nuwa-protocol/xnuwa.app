@@ -1,8 +1,7 @@
-'use client';
+'use client';;
 
 import type { Attachment, UIMessage } from 'ai';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useChatDefault } from '@/features/ai-chat/hooks/use-chat-default';
 import Header from '@/layout/components/header';
 import { Messages } from './messages';
@@ -17,11 +16,6 @@ export function Chat({
   initialMessages: Array<UIMessage>;
   isReadonly: boolean;
 }) {
-  const navigate = useNavigate();
-
-  const handleOnResponse = (response: any) => {
-    navigate(`/chat?cid=${id}`);
-  };
 
   const {
     messages,
@@ -33,7 +27,7 @@ export function Chat({
     status,
     stop,
     reload,
-  } = useChatDefault(id, initialMessages, handleOnResponse);
+  } = useChatDefault(id, initialMessages);
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
 

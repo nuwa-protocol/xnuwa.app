@@ -9,9 +9,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useChatSession } from '@/features/ai-chat/hooks/use-chat-session';
 import { Button } from '@/shared/components/ui/button';
 import { Textarea } from '@/shared/components/ui/textarea';
+import { useChatSessions } from '../hooks/use-chat-sessions';
 
 export type MessageEditorProps = {
   chatId: string;
@@ -32,7 +32,7 @@ export function MessageEditor({
   const [draftContent, setDraftContent] = useState<string>(message.content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { deleteMessagesAfterTimestamp } = useChatSession(chatId);
+  const { deleteMessagesAfterTimestamp } = useChatSessions();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -83,7 +83,7 @@ export function MessageEditor({
             // Delete trailing messages using client store
             if (message.createdAt) {
               const messageTime = new Date(message.createdAt).getTime();
-              deleteMessagesAfterTimestamp(messageTime);
+              deleteMessagesAfterTimestamp(chatId,messageTime);
             }
 
             // @ts-expect-error todo: support UIMessage in setMessages

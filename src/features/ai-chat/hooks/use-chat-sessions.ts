@@ -5,6 +5,10 @@ import type { ChatSession } from '@/features/ai-chat/types';
 export const useChatSessions = () => {
   const store = ChatStateStore();
 
+  const getSession = useCallback((id: string) => {
+    return store.readSession(id);
+  }, []);
+
   const deleteSession = useCallback((id: string) => {
     store.deleteSession(id);
   }, []);
@@ -26,11 +30,36 @@ export const useChatSessions = () => {
     );
   }, [store.sessions]);
 
+  const deleteMessagesAfterTimestamp = useCallback(
+    (sessionId: string, timestamp: number) => {
+      const currentSession = store.readSession(sessionId);
+      if (!currentSession) return;
+
+      const updatedMessages = currentSession.messages.filter((msg) => {
+        const messageTime = msg.createdAt
+          ? new Date(msg.createdAt).getTime()
+          : 0;
+        return messageTime < timestamp;
+      });
+
+      const updatedSession: ChatSession = {
+        ...currentSession,
+        messages: updatedMessages,
+        updatedAt: Date.now(),
+      };
+
+      store.updateSession(sessionId, updatedSession);
+    },
+    [store],
+  );
+
   return {
     sessions: getSortedSessions(),
     sessionsMap: store.sessions,
+    getSession,
     deleteSession,
     updateSession,
     clearAllSessions,
+    deleteMessagesAfterTimestamp,
   };
 };

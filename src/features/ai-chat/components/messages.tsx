@@ -3,7 +3,7 @@ import type { UIMessage } from 'ai';
 import equal from 'fast-deep-equal';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
-import { useMessages } from '@/features/ai-chat/hooks/use-messages';
+import { useMessagesUI } from '@/features/ai-chat/hooks/use-messages-ui';
 import { Greeting } from './greeting';
 import { PreviewMessage, ThinkingMessage } from './message';
 
@@ -32,7 +32,7 @@ function PureMessages({
     onViewportEnter,
     onViewportLeave,
     hasSentMessage,
-  } = useMessages({
+  } = useMessagesUI({
     chatId,
     status,
   });

@@ -5,13 +5,15 @@ import { ChatSDKError } from '@/shared/errors/chatsdk-errors';
 import { ErrorHandlers } from '@/shared/errors/error-handler';
 import { generateUUID } from '@/shared/utils';
 import { createClientAIFetch } from '../services';
+import { useUpdateChatTitle } from './use-update-chat-title';
 
 export const useChatDefault = (
   chatId: string,
   initialMessages: UIMessage[],
-  handleOnResponse?: (response: any) => void,
 ) => {
   const navigate = useNavigate();
+  const { updateTitle } = useUpdateChatTitle(chatId);
+
   const handleUseChatError = (error: Error) => {
     let errorMessage: UIMessage;
     if (error instanceof ChatSDKError) {
@@ -27,6 +29,11 @@ export const useChatDefault = (
     }
     // Add error message to chat
     setChatMessages((messages) => [...messages, errorMessage]);
+  };
+
+  const handleOnResponse = () => {
+    updateTitle();
+    navigate(`/chat?cid=${chatId}`);
   };
 
   const {

@@ -7,8 +7,7 @@ import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/features/auth/services';
 import { generateUUID } from '@/shared/utils';
 import { createPersistConfig, db } from '@/storage';
-import { generateTitleFromUserMessage } from '../services';
-import type { ChatSession, StreamRecord } from '../types';
+import type { ChatSession } from '../types';
 
 // ================= Constants ================= //
 export const createInitialChatSession = (): ChatSession => ({
@@ -17,6 +16,7 @@ export const createInitialChatSession = (): ChatSession => ({
   createdAt: Date.now(),
   updatedAt: Date.now(),
   messages: [],
+  cap: null,
 });
 
 // get current DID
@@ -27,38 +27,25 @@ const getCurrentDID = async () => {
 
 // ================= Database Reference ================= //
 
-// 使用统一数据库，不再需要单独的ChatDatabase
 const chatDB = db;
 
 // chat store state interface
 interface ChatStoreState {
   sessions: Record<string, ChatSession>;
 
-  // session management
-  getSession: (id: string) => ChatSession | null;
+  // session CRUD operations
+  createSession: (session?: Partial<ChatSession>) => ChatSession;
+  readSession: (id: string) => ChatSession | null;
   updateSession: (
     id: string,
     updates: Partial<Omit<ChatSession, 'id'>>,
   ) => void;
   deleteSession: (id: string) => void;
 
-  // message management
+  // update messages for a session
   updateMessages: (sessionId: string, messages: Message[]) => void;
-  updateSingleMessage: (
-    sessionId: string,
-    messageId: string,
-    updates: Partial<Message>,
-  ) => void;
-  deleteMessage: (sessionId: string, messageId: string) => void;
-  deleteMessagesAfterTimestamp: (sessionId: string, timestamp: number) => void;
-  getMessages: (sessionId: string) => Message[];
-
-  // stream management
-  createStreamId: (streamId: string, chatId: string) => Promise<void>;
-  getStreamIdsByChatId: (chatId: string) => Promise<string[]>;
-
-  // tool methods
-  updateTitle: (chatId: string) => Promise<void>;
+  
+  // utility methods
   clearAllSessions: () => void;
 
   // data persistence
@@ -88,7 +75,29 @@ export const ChatStateStore = create<ChatStoreState>()(
     (set, get) => ({
       sessions: {},
 
-      getSession: (id: string) => {
+      // Session CRUD operations
+      createSession: (session?: Partial<ChatSession>) => {
+        const newSession: ChatSession = {
+          id: session?.id || generateUUID(),
+          title: session?.title || 'New Chat',
+          createdAt: session?.createdAt || Date.now(),
+          updatedAt: Date.now(),
+          messages: session?.messages || [],
+          cap: session?.cap || null,
+        };
+
+        set((state) => ({
+          sessions: {
+            ...state.sessions,
+            [newSession.id]: newSession,
+          },
+        }));
+
+        get().saveToDB();
+        return newSession;
+      },
+
+      readSession: (id: string) => {
         const { sessions } = get();
         return sessions[id] || null;
       },
@@ -161,6 +170,7 @@ export const ChatStateStore = create<ChatStoreState>()(
               createdAt: Date.now(),
               updatedAt: Date.now(),
               messages: [],
+              cap: null,
             };
           }
 
@@ -187,13 +197,6 @@ export const ChatStateStore = create<ChatStoreState>()(
               },
             };
 
-            // async generate title (if new session and has user message)
-            if (isNewSession && messages.length > 0) {
-              setTimeout(() => {
-                get().updateTitle(sessionId);
-              }, 0);
-            }
-
             return newState;
           }
 
@@ -203,144 +206,7 @@ export const ChatStateStore = create<ChatStoreState>()(
         get().saveToDB();
       },
 
-      updateSingleMessage: (
-        sessionId: string,
-        messageId: string,
-        updates: Partial<Message>,
-      ) => {
-        set((state) => {
-          const session = state.sessions[sessionId];
-          if (!session) return state;
 
-          const updatedMessages = session.messages.map((msg) =>
-            msg.id === messageId ? { ...msg, ...updates } : msg,
-          );
-
-          return {
-            sessions: {
-              ...state.sessions,
-              [sessionId]: {
-                ...session,
-                messages: updatedMessages,
-                updatedAt: Date.now(),
-              },
-            },
-          };
-        });
-
-        get().saveToDB();
-      },
-
-      deleteMessage: (sessionId: string, messageId: string) => {
-        set((state) => {
-          const session = state.sessions[sessionId];
-          if (!session) return state;
-
-          const updatedMessages = session.messages.filter(
-            (msg) => msg.id !== messageId,
-          );
-
-          return {
-            sessions: {
-              ...state.sessions,
-              [sessionId]: {
-                ...session,
-                messages: updatedMessages,
-                updatedAt: Date.now(),
-              },
-            },
-          };
-        });
-
-        get().saveToDB();
-      },
-
-      deleteMessagesAfterTimestamp: (sessionId: string, timestamp: number) => {
-        set((state) => {
-          const session = state.sessions[sessionId];
-          if (!session) return state;
-
-          const updatedMessages = session.messages.filter((msg) => {
-            const messageTime = msg.createdAt
-              ? new Date(msg.createdAt).getTime()
-              : 0;
-            return messageTime < timestamp;
-          });
-
-          return {
-            sessions: {
-              ...state.sessions,
-              [sessionId]: {
-                ...session,
-                messages: updatedMessages,
-                updatedAt: Date.now(),
-              },
-            },
-          };
-        });
-
-        get().saveToDB();
-      },
-
-      getMessages: (sessionId: string) => {
-        const { sessions } = get();
-        return sessions[sessionId]?.messages || [];
-      },
-
-      createStreamId: async (streamId: string, chatId: string) => {
-        try {
-          await chatDB.streams.add({
-            id: streamId,
-            chatId,
-            createdAt: Date.now(),
-          });
-        } catch (error) {
-          console.error('Failed to create stream ID:', error);
-          throw error;
-        }
-      },
-
-      getStreamIdsByChatId: async (chatId: string) => {
-        try {
-          const currentDID = await getCurrentDID();
-          if (!currentDID) return [];
-
-          const streams = await chatDB.streams
-            .where(['did', 'chatId'])
-            .equals([currentDID, chatId])
-            .toArray();
-          // sort by creation time
-          const sortedStreams = streams.sort(
-            (a: StreamRecord, b: StreamRecord) => a.createdAt - b.createdAt,
-          );
-          return sortedStreams.map((stream: StreamRecord) => stream.id);
-        } catch (error) {
-          console.error('Failed to get stream IDs:', error);
-          return [];
-        }
-      },
-
-      updateTitle: async (sessionId: string) => {
-        const session = get().getSession(sessionId);
-        if (!session || session.messages.length === 0) return;
-
-        // find the first user message
-        const firstUserMessage = session.messages.find(
-          (msg) => msg.role === 'user',
-        );
-        if (!firstUserMessage) return;
-
-        try {
-          const title = await generateTitleFromUserMessage({
-            message: firstUserMessage,
-          });
-
-          // directly update session title
-          get().updateSession(sessionId, { title });
-        } catch (error) {
-          console.error('Failed to generate title with AI:', error);
-        }
-      },
 
       clearAllSessions: () => {
         set({

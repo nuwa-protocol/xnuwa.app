@@ -1,4 +1,5 @@
 import type { Message } from 'ai';
+import type { InstalledCap } from '@/features/cap/types';
 
 // client chat interface
 export interface ChatSession {
@@ -7,6 +8,7 @@ export interface ChatSession {
   createdAt: number;
   updatedAt: number;
   messages: Message[];
+  cap: InstalledCap | null;
 }
 
 // stream ID management interface

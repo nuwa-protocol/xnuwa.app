@@ -1,13 +1,13 @@
 import { PlusIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useChatSession } from '@/features/ai-chat/hooks/use-chat-session';
+import { useChatSessions } from '@/features/ai-chat/hooks/use-chat-sessions';
 import { Button } from '@/shared/components/ui/button';
 import { generateUUID } from '@/shared/utils';
 
 export function ArtifactMessagesHeader({ chatId }: { chatId: string }) {
   const navigate = useNavigate();
 
-  const { session } = useChatSession(chatId);
+  const { getSession } = useChatSessions();
 
   const handleNewChat = () => {
     const chatId = generateUUID();
@@ -17,7 +17,7 @@ export function ArtifactMessagesHeader({ chatId }: { chatId: string }) {
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted dark:bg-background shadow-sm">
       <div className="font-semibold text-md">
-        {session ? session.title : 'New Chat'}
+        {getSession(chatId)?.title || 'New Chat'}
       </div>
       <Button
         variant="ghost"
