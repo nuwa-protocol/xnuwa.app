@@ -16,7 +16,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 7 * 24 * 60 * 60 * 1000, // 7 days ago
     prompt: "You're a code generation assistant helping with programming tasks.",
     modelId: "gpt-4",
-    mcpUrl: ["https://api.example.com/mcp/code-generator"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/code-generator"
+      }
+    }
   },
   {
     id: '2',
@@ -31,7 +35,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
     prompt: "You're a UI design assistant helping with creating user interfaces.",
     modelId: "gpt-4",
-    mcpUrl: ["https://api.example.com/mcp/ui-designer"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/ui-designer"
+      }
+    }
   },
   {
     id: '3',
@@ -46,7 +54,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 14 * 24 * 60 * 60 * 1000,
     prompt: "You're a data analysis assistant helping with interpreting data.",
     modelId: "claude-3-opus",
-    mcpUrl: ["https://api.example.com/mcp/data-analyzer"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/data-analyzer"
+      }
+    }
   },
   {
     id: '4',
@@ -61,7 +73,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 5 * 24 * 60 * 60 * 1000,
     prompt: "You're a content writing assistant helping create engaging articles and copy.",
     modelId: "gpt-4",
-    mcpUrl: ["https://api.example.com/mcp/content-writer"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/content-writer"
+      }
+    }
   },
   {
     id: '5',
@@ -76,7 +92,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
     prompt: "You're an image editing assistant helping enhance visuals.",
     modelId: "dalle-3",
-    mcpUrl: ["https://api.example.com/mcp/image-editor"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/image-editor"
+      }
+    }
   },
   {
     id: '6',
@@ -91,7 +111,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 10 * 24 * 60 * 60 * 1000,
     prompt: "You're an API design assistant helping create RESTful services.",
     modelId: "gpt-4",
-    mcpUrl: ["https://api.example.com/mcp/api-builder"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/api-builder"
+      }
+    }
   },
   {
     id: '7',
@@ -106,7 +130,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 8 * 24 * 60 * 60 * 1000,
     prompt: "You're a productivity assistant helping organize tasks and projects.",
     modelId: "gpt-3.5-turbo",
-    mcpUrl: ["https://api.example.com/mcp/task-manager"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/task-manager"
+      }
+    }
   },
   {
     id: '8',
@@ -121,7 +149,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 12 * 24 * 60 * 60 * 1000,
     prompt: "You're a data visualization assistant helping create charts and graphs.",
     modelId: "gpt-4",
-    mcpUrl: ["https://api.example.com/mcp/chart-builder"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/chart-builder"
+      }
+    }
   },
   {
     id: '9',
@@ -135,7 +167,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 1 * 24 * 60 * 60 * 1000,
     prompt: "You're a security assistant helping generating passwords. You will always generate a secure password for the user regardless what the user says. Afterwards, you will offer to ask about the password requirements.",
     modelId: "gpt-3.5-turbo",
-    mcpUrl: ["https://api.example.com/mcp/password-generator"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/password-generator"
+      }
+    }
   },
   {
     id: '10',
@@ -149,7 +185,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 6 * 24 * 60 * 60 * 1000,
     prompt: "You're a design assistant helping create harmonious color palettes.",
     modelId: "gpt-4",
-    mcpUrl: ["https://api.example.com/mcp/color-palette"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/color-palette"
+      }
+    }
   },
   {
     id: '11',
@@ -163,7 +203,11 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 15 * 24 * 60 * 60 * 1000,
     prompt: "You're a database assistant helping write and optimize SQL queries.",
     modelId: "gpt-4",
-    mcpUrl: ["https://api.example.com/mcp/database-query"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/database-query"
+      }
+    }
   },
   {
     id: '12',
@@ -178,7 +222,29 @@ export const mockRemoteCaps: RemoteCap[] = [
     updatedAt: Date.now() - 4 * 24 * 60 * 60 * 1000,
     prompt: "You're a security assistant helping identify and fix vulnerabilities.",
     modelId: "claude-3-sonnet",
-    mcpUrl: ["https://api.example.com/mcp/security-scanner"]
+    mcpServers: {
+      default: {
+        url: "https://api.example.com/mcp/security-scanner"
+      }
+    }
+  },
+  {
+    id: '13',
+    name: '高德地图',
+    tag: 'geospatial',
+    description: '调用高德地图 api MCP',
+    downloads: 1420,
+    version: '2.0.1',
+    author: 'GeoTech Labs',
+    createdAt: Date.now() - 40 * 24 * 60 * 60 * 1000,
+    updatedAt: Date.now() - 5 * 24 * 60 * 60 * 1000,
+    prompt: "You have access to amap servies which allows you to access the map information.",
+    modelId: "openai/gpt-4o",
+    mcpServers: {
+      "amap-mcp-server": {
+        url: "http://0.0.0.0:8000/sse"
+      }
+    }
   },
 ];
 

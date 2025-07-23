@@ -3,7 +3,11 @@
 interface CapData {
   prompt: string;
   modelId:string;
-  mcpUrl:string[];
+  mcpServers: {
+    [name: string]: {
+      url: string;
+    }
+  };
 }
 
 // Remote Cap Interface
