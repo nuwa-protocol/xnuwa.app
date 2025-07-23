@@ -1,8 +1,8 @@
 'use client';
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
-import { FloatingSidebarLayout } from './components/floating-sidebar';
-import Loading from './components/loading';
+import { FloatingSidebarLayout } from '@/features/sidebar/components';
+import Loading from '@/shared/components/loading';
 
 export default function MainLayout() {
   return (

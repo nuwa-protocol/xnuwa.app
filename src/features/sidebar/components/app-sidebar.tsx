@@ -3,7 +3,6 @@
 import { Bug, Package, Search, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CapStoreModal } from '@/features/cap/components';
-import { SearchModal } from '@/features/search/components';
 import { SettingsModal } from '@/features/settings/components';
 import { useSidebarSettings } from '@/features/settings/hooks/use-settings-sidebar';
 import { Logo } from '@/shared/components';
@@ -19,6 +18,7 @@ import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { cn } from '@/shared/utils';
 import { useFloatingSidebar } from './floating-sidebar';
+import { SearchModal } from './search-modal';
 import { SidebarButton } from './sidebar-button';
 import { SidebarHistory } from './sidebar-history';
 import { SidebarToggle } from './sidebar-toggle';

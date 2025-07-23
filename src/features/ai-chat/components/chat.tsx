@@ -1,9 +1,9 @@
-'use client';;
+'use client';
 
 import type { Attachment, UIMessage } from 'ai';
 import { useState } from 'react';
 import { useChatDefault } from '@/features/ai-chat/hooks/use-chat-default';
-import Header from '@/layout/components/header';
+import Header from './header';
 import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';
 
@@ -16,7 +16,6 @@ export function Chat({
   initialMessages: Array<UIMessage>;
   isReadonly: boolean;
 }) {
-
   const {
     messages,
     setMessages: setChatMessages,
@@ -33,7 +32,6 @@ export function Chat({
 
   return (
     <div className="flex flex-col relative min-w-0 h-dvh bg-background">
-
       {/* Chat */}
       <div className={'flex flex-col w-full h-dvh bg-background'}>
         <Header />
