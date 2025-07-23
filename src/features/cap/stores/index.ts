@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/features/auth/services';
-import { createPersistConfig, db } from '@/storage';
+import { createPersistConfig, db } from '@/shared/storage';
 import type { InstalledCap, RemoteCap } from '../types';
 
 // ================= Interfaces ================= //

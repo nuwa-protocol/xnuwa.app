@@ -5,8 +5,8 @@ import type { Message } from 'ai';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/features/auth/services';
+import { createPersistConfig, db } from '@/shared/storage';
 import { generateUUID } from '@/shared/utils';
-import { createPersistConfig, db } from '@/storage';
 import type { ChatSession } from '../types';
 
 // ================= Constants ================= //
@@ -44,7 +44,7 @@ interface ChatStoreState {
 
   // update messages for a session
   updateMessages: (sessionId: string, messages: Message[]) => void;
-  
+
   // utility methods
   clearAllSessions: () => void;
 
@@ -205,8 +205,6 @@ export const ChatStateStore = create<ChatStoreState>()(
 
         get().saveToDB();
       },
-
-
 
       clearAllSessions: () => {
         set({

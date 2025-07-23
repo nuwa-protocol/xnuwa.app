@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "prebuild": "tsx src/caps/build.ts",
     "preview": "vite preview",
     "lint": "biome lint src/",
     "lint:fix": "biome lint --apply src/",

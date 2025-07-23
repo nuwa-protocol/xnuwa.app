@@ -4,9 +4,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/features/auth/services';
-import { createPersistConfig, db } from '@/storage';
-import { fetchAvailableModels } from '../services/models';
-import type { Model } from '../types';
+import { createPersistConfig, db } from '@/shared/storage';
+import { fetchAvailableModels } from './services/models';
+import type { Model } from './types';
 
 export const AUTO_MODEL: Model = {
   id: 'openrouter/auto',

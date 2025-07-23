@@ -9,8 +9,8 @@ import {
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/features/auth/services';
+import { createPersistConfig, db } from '@/shared/storage';
 import { generateUUID } from '@/shared/utils';
-import { createPersistConfig, db } from '@/storage';
 
 env.allowLocalModels = false;
 
@@ -166,8 +166,9 @@ export const MemoryStateStore = create<MemoryStoreState>()(
 
           // 使用单个索引查询并过滤结果
           await memoryDB.memories
-            .where('did').equals(currentDID)
-            .and(item => item.id === id)
+            .where('did')
+            .equals(currentDID)
+            .and((item) => item.id === id)
             .delete();
         } catch (error) {
           console.error('Failed to delete memory from DB:', error);

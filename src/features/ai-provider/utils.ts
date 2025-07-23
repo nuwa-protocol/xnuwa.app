@@ -1,4 +1,4 @@
-import type { Model } from '../types';
+import type { Model } from './types';
 
 export function isFreeModel(model: Model): boolean {
   const { pricing } = model;

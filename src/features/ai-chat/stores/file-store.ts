@@ -3,8 +3,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/features/auth/services';
+import { createPersistConfig, db } from '@/shared/storage';
 import { generateUUID } from '@/shared/utils';
-import { createPersistConfig, db } from '@/storage';
 
 // ================= Constants & Types ================= //
 
