@@ -1,4 +1,4 @@
-'use client';
+'use client';;
 
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
@@ -6,11 +6,7 @@ import cx from 'classnames';
 import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
-import { DocumentPreview } from '@/features/documents/components/document-preview';
-import { DocumentToolCall } from '@/features/documents/components/document-preview-call';
-import { DocumentToolResult } from '@/features/documents/components/document-preview-result';
 import { cn, generateUUID } from '@/shared/utils';
-import { MemoryToolCall } from './memory-tool-call';
 import { MessageActions } from './message-actions';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
@@ -124,22 +120,7 @@ const PurePreviewMessage = ({
                         skeleton: ['getWeather'].includes(toolName),
                       })}
                     >
-                      {toolName === 'createDocument' ? (
-                        <DocumentPreview
-                          chatId={chatId}
-                          isReadonly={isReadonly}
-                          args={args}
-                        />
-                      ) : toolName === 'updateDocument' ? (
-                        <DocumentToolCall
-                          chatId={chatId}
-                          type="update"
-                          args={args}
-                          isReadonly={isReadonly}
-                        />
-                      ) : ['saveMemory', 'queryMemory'].includes(toolName) ? (
-                        <MemoryToolCall toolInvocation={toolInvocation} />
-                      ) : null}
+                      {`${toolName} is called`}
                     </div>
                   );
                 }
@@ -149,22 +130,7 @@ const PurePreviewMessage = ({
 
                   return (
                     <div key={toolCallId}>
-                      {toolName === 'createDocument' ? (
-                        <DocumentPreview
-                          chatId={chatId}
-                          isReadonly={isReadonly}
-                          result={result}
-                        />
-                      ) : toolName === 'updateDocument' ? (
-                        <DocumentToolResult
-                          chatId={chatId}
-                          type="update"
-                          result={result}
-                          isReadonly={isReadonly}
-                        />
-                      ) : ['saveMemory', 'queryMemory'].includes(toolName) ? (
-                        <MemoryToolCall toolInvocation={toolInvocation} />
-                      ) : null}
+                      {`${toolName} result is ${result}`}
                     </div>
                   );
                 }

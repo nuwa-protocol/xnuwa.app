@@ -3,7 +3,6 @@ import {
   FileStateStore,
   MemoryStateStore,
 } from '@/features/ai-chat/stores';
-import { DocumentStateStore } from '@/features/documents/stores';
 import { SettingsStateStore } from '@/features/settings/stores';
 
 // Check if we're in a browser environment
@@ -20,7 +19,6 @@ export const useStorage = () => {
     ChatStateStore.persist.clearStorage();
     SettingsStateStore.persist.clearStorage();
     FileStateStore.persist.clearStorage();
-    DocumentStateStore.persist.clearStorage();
     MemoryStateStore.persist.clearStorage();
 
     // clear localStorage
@@ -43,7 +41,6 @@ export const useStorage = () => {
     ChatStateStore.setState(ChatStateStore.getInitialState());
     SettingsStateStore.setState(SettingsStateStore.getInitialState());
     FileStateStore.setState(FileStateStore.getInitialState());
-    DocumentStateStore.setState(DocumentStateStore.getInitialState());
     MemoryStateStore.setState(MemoryStateStore.getInitialState());
   };
 
@@ -51,7 +48,6 @@ export const useStorage = () => {
     ChatStateStore.persist.rehydrate();
     SettingsStateStore.persist.rehydrate();
     FileStateStore.persist.rehydrate();
-    DocumentStateStore.persist.rehydrate();
     MemoryStateStore.persist.rehydrate();
   };
 

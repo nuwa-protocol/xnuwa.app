@@ -1,7 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import MainLayout from './layout/main-layout';
 import RootLayout from './layout/root-layout';
-import ArtifactPage from './pages/artifact';
 import CallbackPage from './pages/callback';
 import ChatPage from './pages/chat';
 import ErrorPage from './pages/error';
@@ -19,7 +18,6 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
           { index: true, element: <Navigate to="/chat" replace /> },
-          { path: 'artifact', element: <ArtifactPage /> },
           { path: 'chat', element: <ChatPage /> },
           { path: 'mcp-debug', element: <McpDebugPage /> },
         ],

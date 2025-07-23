@@ -1,22 +1,14 @@
 import { ModelStateStore } from '@/features/ai-provider/stores';
 import { SettingsStateStore } from '@/features/settings/stores';
-import { createDocument } from '../tools/create-document';
 import { queryMemory, saveMemory } from '../tools/memory';
-import { updateDocument } from '../tools/update-document';
 
 const selectedModel = ModelStateStore.getState().selectedModel;
 const isDevMode = SettingsStateStore.getState().settings.devMode;
 
 const userModeTools = {
-  //   createDocument: createDocument(),
-  //   updateDocument: updateDocument(),
-  // saveMemory: saveMemory(),
-  // queryMemory: queryMemory(),
 };
 
 const devModeTools = {
-  createDocument: createDocument(),
-  updateDocument: updateDocument(),
   saveMemory: saveMemory(),
   queryMemory: queryMemory(),
 };

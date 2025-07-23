@@ -26,10 +26,6 @@ export const llmProvider = {
       },
     });
   },
-  artifact: () => {
-    const selectedModel = ModelStateStore.getState().selectedModel;
-    return openrouter.chat(selectedModel.id);
-  },
   utility: () => {
     const selectedModel = ModelStateStore.getState().selectedModel;
     return openrouter.chat('openai/gpt-4o-mini');

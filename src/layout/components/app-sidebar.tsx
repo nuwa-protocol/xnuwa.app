@@ -1,6 +1,6 @@
 'use client';
 
-import { Bug, Folder, Package, Search, Settings } from 'lucide-react';
+import { Bug, Package, Search, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CapStoreModal } from '@/features/cap/components';
 import { SearchModal } from '@/features/search/components';
@@ -88,14 +88,6 @@ export function AppSidebar() {
                   variant="secondary"
                 />
               </CapStoreModal>
-            )}
-            {isDevMode && (
-              <SidebarButton
-                icon={Folder}
-                text={t('nav.sidebar.artifact')}
-                onClick={() => {}}
-                variant="secondary"
-              />
             )}
             {isDevMode && (
               <SidebarButton

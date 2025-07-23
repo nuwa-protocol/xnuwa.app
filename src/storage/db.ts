@@ -2,7 +2,6 @@ import Dexie, { type Table } from 'dexie';
 
 class Database extends Dexie {
   chats!: Table<any>;
-  documents!: Table<any>;
   files!: Table<any>;
   fileData!: Table<{ id: string; blob: Blob }>;
   streams!: Table<any>;
@@ -21,7 +20,6 @@ class Database extends Dexie {
 
     this.version(1).stores({
       chats: 'id, did, createdAt, updatedAt',
-      documents: 'id, did, createdAt, updatedAt',
       files: 'id, did, createdAt, updatedAt',
       fileData: 'id',
       streams: 'id, did, chatId, createdAt',

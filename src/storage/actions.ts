@@ -92,7 +92,6 @@ class StorageActions {
         'rw',
         [
           db.chats,
-          db.documents,
           db.files,
           db.fileData,
           db.streams,
@@ -102,7 +101,6 @@ class StorageActions {
         async () => {
           await Promise.all([
             db.chats.clear(),
-            db.documents.clear(),
             db.files.clear(),
             db.fileData.clear(),
             db.streams.clear(),

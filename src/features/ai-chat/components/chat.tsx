@@ -33,7 +33,6 @@ export function Chat({
 
   return (
     <div className="flex flex-col relative min-w-0 h-dvh bg-background">
-      {/* Artifact viewer */}
 
       {/* Chat */}
       <div className={'flex flex-col w-full h-dvh bg-background'}>
