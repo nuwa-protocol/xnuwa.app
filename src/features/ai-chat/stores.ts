@@ -7,7 +7,7 @@ import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/features/auth/services';
 import { createPersistConfig, db } from '@/shared/storage';
 import { generateUUID } from '@/shared/utils';
-import type { ChatSession } from '../types';
+import type { ChatSession } from './types';
 
 // ================= Constants ================= //
 export const createInitialChatSession = (): ChatSession => ({
@@ -145,10 +145,6 @@ export const ChatStateStore = create<ChatStoreState>()(
               .where(['did', 'id'])
               .equals([currentDID, id])
               .delete();
-            await chatDB.streams
-              .where(['did', 'chatId'])
-              .equals([currentDID, id])
-              .delete();
           } catch (error) {
             console.error('Failed to delete from DB:', error);
           }
@@ -215,7 +211,6 @@ export const ChatStateStore = create<ChatStoreState>()(
         const clearDB = async () => {
           try {
             await chatDB.chats.clear();
-            await chatDB.streams.clear();
           } catch (error) {
             console.error('Failed to clear DB:', error);
           }

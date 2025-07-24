@@ -11,7 +11,6 @@ import { MessageActions } from './message-actions';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { MessageText } from './message-text';
-import { PreviewAttachment } from './preview-attachment';
 
 const PurePreviewMessage = ({
   chatId,
@@ -54,21 +53,6 @@ const PurePreviewMessage = ({
               'min-h-96': message.role === 'assistant' && requiresScrollPadding,
             })}
           >
-            {/* render attachments */}
-            {message.experimental_attachments &&
-              message.experimental_attachments.length > 0 && (
-                <div
-                  data-testid={`message-attachments`}
-                  className="flex flex-row justify-end gap-2"
-                >
-                  {message.experimental_attachments.map((attachment) => (
-                    <PreviewAttachment
-                      key={attachment.url}
-                      attachment={attachment}
-                    />
-                  ))}
-                </div>
-              )}
 
             {/* render reasoning */}
             {message.parts?.map((part, index) => {

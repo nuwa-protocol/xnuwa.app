@@ -10,10 +10,3 @@ export interface ChatSession {
   messages: Message[];
   cap: InstalledCap | null;
 }
-
-// stream ID management interface
-export interface StreamRecord {
-  id: string;
-  chatId: string;
-  createdAt: number;
-}

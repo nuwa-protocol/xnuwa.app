@@ -11,24 +11,21 @@ import {
 } from 'lucide-react';
 import type React from 'react';
 import {
-  type ChangeEvent,
   type Dispatch,
   memo,
   type SetStateAction,
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useState
 } from 'react';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
-import { useFiles } from '@/features/ai-chat/hooks/use-files';
 import { useScrollToBottom } from '@/features/ai-chat/hooks/use-scroll-to-bottom';
 import { ModelSelector } from '@/features/ai-provider/components';
 import { toast } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
-import { useLanguage } from '@/shared/hooks/use-language';
-import { PreviewAttachment } from './preview-attachment';
+
 import { SuggestedActions } from './suggested-actions';
 
 function PureMultimodalInput({
@@ -37,8 +34,6 @@ function PureMultimodalInput({
   setInput,
   status,
   stop,
-  attachments,
-  setAttachments,
   messages,
   setMessages,
   append,
@@ -60,8 +55,6 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
-  const { uploadFile } = useFiles();
-  const { t } = useLanguage();
   const isDevMode = useDevMode();
 
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
@@ -92,46 +85,15 @@ function PureMultimodalInput({
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
   const submitForm = useCallback(() => {
-    handleSubmit(undefined, {
-      experimental_attachments: attachments,
-    });
+    handleSubmit(undefined);
 
-    setAttachments([]);
     setLocalStorageInput('');
 
     if (width && width > 768) {
       textareaRef.current?.focus();
     }
-  }, [attachments, handleSubmit, setAttachments, setLocalStorageInput, width]);
+  }, [handleSubmit, setLocalStorageInput, width]);
 
-  const handleFileChange = useCallback(
-    async (event: ChangeEvent<HTMLInputElement>) => {
-      const files = Array.from(event.target.files || []);
-
-      setUploadQueue(files.map((file) => file.name));
-
-      try {
-        const uploadPromises = files.map((file) => uploadFile(file));
-        const uploadedAttachments = await Promise.all(uploadPromises);
-        const successfullyUploadedAttachments = uploadedAttachments.filter(
-          (attachment) => attachment !== undefined,
-        );
-
-        setAttachments((currentAttachments) => [
-          ...currentAttachments,
-          ...successfullyUploadedAttachments,
-        ]);
-      } catch (error) {
-        toast({
-          description: t('upload.errorUploading'),
-          type: 'error',
-        });
-      } finally {
-        setUploadQueue([]);
-      }
-    },
-    [setAttachments, uploadFile, t],
-  );
 
   const { isAtBottom, scrollToBottom } = useScrollToBottom();
 
@@ -168,41 +130,9 @@ function PureMultimodalInput({
         )}
       </AnimatePresence>
 
-      {messages.length === 0 &&
-        attachments.length === 0 &&
-        uploadQueue.length === 0 && <SuggestedActions append={append} />}
+      {messages.length === 0 && <SuggestedActions append={append} />}
 
-      <input
-        type="file"
-        className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none "
-        ref={fileInputRef}
-        multiple
-        onChange={handleFileChange}
-        tabIndex={-1}
-      />
-
-      {(attachments.length > 0 || uploadQueue.length > 0) && (
-        <div
-          data-testid="attachments-preview"
-          className="flex flex-row gap-2 overflow-x-scroll items-end"
-        >
-          {attachments.map((attachment) => (
-            <PreviewAttachment key={attachment.url} attachment={attachment} />
-          ))}
-
-          {uploadQueue.map((filename) => (
-            <PreviewAttachment
-              key={filename}
-              attachment={{
-                url: '',
-                name: filename,
-                contentType: '',
-              }}
-              isUploading={true}
-            />
-          ))}
-        </div>
-      )}
+     
 
       <div
         className={cx(

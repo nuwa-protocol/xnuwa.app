@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  type ChatSession,
-  createInitialChatSession,
-} from '@/features/ai-chat/stores';
-import { convertToUIMessage } from '@/features/ai-chat/utils';
+import { createInitialChatSession } from '../stores';
+import type { ChatSession } from '../types';
+import { convertToUIMessage } from '../utils';
 import { useChatSessions } from './use-chat-sessions';
 
 // Specialized hook for chat page logic

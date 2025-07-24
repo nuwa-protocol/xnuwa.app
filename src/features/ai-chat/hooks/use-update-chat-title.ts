@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
-import { generateTitleFromUserMessage } from '@/features/ai-chat/services';
-import { type ChatSession, ChatStateStore } from '@/features/ai-chat/stores';
+import { generateTitleFromUserMessage } from '../services';
+import { ChatStateStore } from '../stores';
+import type { ChatSession } from '../types';
 
 export const useUpdateChatTitle = (sessionId: string) => {
   const store = ChatStateStore();

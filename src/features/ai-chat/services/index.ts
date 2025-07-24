@@ -1,5 +1,3 @@
-'use client';
-
 import { ChatSDKError } from '@/features/ai-chat/errors/chatsdk-errors';
 import { handleAIRequest } from './handler';
 

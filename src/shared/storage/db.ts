@@ -2,13 +2,9 @@ import Dexie, { type Table } from 'dexie';
 
 class Database extends Dexie {
   chats!: Table<any>;
-  files!: Table<any>;
-  fileData!: Table<{ id: string; blob: Blob }>;
-  streams!: Table<any>;
   caps!: Table<any>;
   settings!: Table<any>;
   models!: Table<any>;
-  memories!: Table<any>;
 
   constructor() {
     if (typeof window === 'undefined') {
@@ -20,13 +16,9 @@ class Database extends Dexie {
 
     this.version(1).stores({
       chats: 'id, did, createdAt, updatedAt',
-      files: 'id, did, createdAt, updatedAt',
-      fileData: 'id',
-      streams: 'id, did, chatId, createdAt',
       caps: 'id, did, installDate, tag',
       settings: 'did',
       models: 'did',
-      memories: 'id, did, createdAt, updatedAt',
     });
   }
 }

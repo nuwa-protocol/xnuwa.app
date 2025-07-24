@@ -1,7 +1,7 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import { Brain, Monitor, PlayCircle, User } from 'lucide-react';
+import { Monitor, PlayCircle, User } from 'lucide-react';
 import type React from 'react';
 import { useRef, useState } from 'react';
 import { useAuth } from '@/features/auth/hooks/use-auth';
@@ -11,7 +11,6 @@ import * as Dialog from '@/shared/components/ui';
 import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { useStorage } from '@/shared/hooks/use-storage';
-import { MemoryManagement } from './memory-management';
 import type { SettingCardProps } from './setting-card';
 import { SettingSection } from './setting-section';
 import { SettingsNav } from './settings-nav';
@@ -169,13 +168,6 @@ export function SettingsModal({
         },
       ],
     },
-    ...(isDevMode ? [{
-      id: 'memory',
-      name: "Memory",
-      description: "Manage your memories",
-      icon: Brain,
-      customComponent: <MemoryManagement />,
-    }] : []),
     {
       id: 'system',
       icon: Monitor,

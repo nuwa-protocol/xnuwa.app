@@ -5,13 +5,11 @@ import {
   smoothStream,
   streamText,
 } from 'ai';
-import { ChatStateStore } from '@/features/ai-chat/stores/chat-store';
+import { ChatStateStore } from '@/features/ai-chat/stores';
 import { llmProvider } from '@/features/ai-provider/services';
 import { CapStateStore } from '@/features/cap/stores';
 import { SettingsStateStore } from '@/features/settings/stores';
 import { generateUUID } from '@/shared/utils';
-import { devModeSystemPrompt, systemPrompt } from '../prompts';
-import { tools } from '../tools';
 
 // Error handling function
 function errorHandler(error: unknown) {
@@ -68,7 +66,7 @@ const handleAIRequest = async ({
 
   const { currentCap } = CapStateStore.getState();
 
-  const prompt = isDevMode ? (currentCap? currentCap.prompt: devModeSystemPrompt()) : systemPrompt();
+  const prompt = 'You are a friendly assistant! Keep your responses concise and helpful.';
 
   const result = streamText({
     model: llmProvider.chat(),
@@ -77,7 +75,7 @@ const handleAIRequest = async ({
     maxSteps: 5,
     experimental_transform: smoothStream({ chunking: 'word' }),
     experimental_generateMessageId: generateUUID,
-    tools,
+    tools: {},
     abortSignal: signal,
     async onFinish({ response, reasoning, sources }) {
       const finalMessages = appendResponseMessages({
