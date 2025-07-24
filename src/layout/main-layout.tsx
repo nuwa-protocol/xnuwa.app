@@ -1,7 +1,7 @@
 'use client';
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
-import { FloatingSidebarLayout } from '@/features/sidebar/components';
+import { SidebarLayout } from '@/features/sidebar/components';
 import Loading from '@/shared/components/loading';
 
 export default function MainLayout() {
@@ -12,9 +12,9 @@ export default function MainLayout() {
         async
       />
       <Suspense fallback={<Loading />}>
-        <FloatingSidebarLayout>
+        <SidebarLayout>
           <Outlet />
-        </FloatingSidebarLayout>
+        </SidebarLayout>
       </Suspense>
     </>
   );

@@ -1,5 +1,3 @@
-'use client';
-
 import { useMemo } from 'react';
 import { SettingsStateStore } from '@/features/settings/stores';
 import { getLocale, type Locale } from './index';

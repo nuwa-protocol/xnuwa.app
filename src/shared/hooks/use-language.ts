@@ -1,6 +1,6 @@
 'use client';
 
-import { useSettings } from '@/features/settings/hooks';
+import { useSettings } from '@/features/settings/hooks/use-settings';
 import { getLocaleText } from '@/shared/locales';
 
 // Language settings hook for unified language access

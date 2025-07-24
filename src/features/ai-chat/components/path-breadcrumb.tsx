@@ -8,7 +8,7 @@ import {
 import { useChatSessions } from '@/features/ai-chat/hooks/use-chat-sessions';
 import { CurrentCapIndicator } from '@/features/cap/components/current-cap-indicator';
 import { useCurrentCap } from '@/features/cap/hooks/use-current-cap';
-import { useSidebarSettings } from '@/features/settings/hooks/use-settings-sidebar';
+import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
 import { Logo } from '@/shared/components';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
@@ -25,7 +25,7 @@ export function PathBreadcrumb() {
   const isChat = pathSegments[0] === 'chat';
   const isFile = pathSegments[0] === 'file';
 
-  const { mode } = useSidebarSettings();
+  const { mode } = useSidebarFloating();
   const isFloating = mode === 'floating';
 
   let breadcrumbContent = null;

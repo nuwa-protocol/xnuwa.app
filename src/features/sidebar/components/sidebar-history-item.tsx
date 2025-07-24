@@ -12,7 +12,7 @@ import {
   SidebarMenuItem,
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
-import { useFloatingSidebar } from './floating-sidebar';
+import { useAppSidebar } from './app-sidebar';
 
 const PureChatItem = ({
   chat,
@@ -27,7 +27,7 @@ const PureChatItem = ({
 }) => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const floatingContext = useFloatingSidebar();
+  const floatingContext = useAppSidebar();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleChatSelect = () => {
@@ -49,6 +49,13 @@ const PureChatItem = ({
         onOpenChange={(open) => {
           setMenuOpen(open);
           floatingContext.stayHovering(open);
+          if (!open) {
+            floatingContext.closeSidebar();
+            // Remove focus from the trigger button to eliminate the ring
+            setTimeout(() => {
+              (document.activeElement as HTMLElement)?.blur();
+            }, 0);
+          }
         }}
       >
         <DropdownMenuTrigger asChild>

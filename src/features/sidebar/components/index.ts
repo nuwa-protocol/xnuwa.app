@@ -1,1 +1,1 @@
-export * from './floating-sidebar';
+export * from './app-sidebar';

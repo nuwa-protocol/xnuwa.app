@@ -35,12 +35,6 @@ interface SettingsState {
     value: UserSettings[K],
   ) => void;
 
-  // sidebar state
-  sidebarCollapsed: boolean;
-  setSidebarCollapsed: (collapsed: boolean) => void;
-  sidebarMode: 'pinned' | 'floating';
-  setSidebarMode: (mode: 'pinned' | 'floating') => void;
-
   // reset settings
   resetSettings: () => void;
 
@@ -56,8 +50,6 @@ const persistConfig = createPersistConfig<SettingsState>({
   getCurrentDID: getCurrentDID,
   partialize: (state) => ({
     settings: state.settings,
-    sidebarCollapsed: state.sidebarCollapsed,
-    sidebarMode: state.sidebarMode,
   }),
   onRehydrateStorage: () => (state?: SettingsState) => {
     if (state) {
@@ -92,16 +84,6 @@ export const SettingsStateStore = create<SettingsState>()(
         get().saveToDB();
       },
 
-      // Sidebar state
-      sidebarCollapsed: false,
-      setSidebarCollapsed: (collapsed: boolean) => {
-        set({ sidebarCollapsed: collapsed });
-      },
-      sidebarMode: 'pinned',
-      setSidebarMode: (mode: 'pinned' | 'floating') => {
-        set({ sidebarMode: mode });
-      },
-
       // Reset functionality
       resetSettings: () => {
         set({
@@ -111,8 +93,6 @@ export const SettingsStateStore = create<SettingsState>()(
             avatar: null,
             devMode: false,
           },
-          sidebarCollapsed: false,
-          sidebarMode: 'pinned',
         });
         get().saveToDB();
       },
@@ -128,8 +108,6 @@ export const SettingsStateStore = create<SettingsState>()(
           if (userSettings) {
             set({
               settings: userSettings.settings,
-              sidebarCollapsed: userSettings.sidebarCollapsed,
-              sidebarMode: userSettings.sidebarMode,
             });
           }
         } catch (error) {
@@ -142,11 +120,10 @@ export const SettingsStateStore = create<SettingsState>()(
         if (typeof window === 'undefined' || !currentDID) return;
 
         try {
-          const { settings, sidebarCollapsed, sidebarMode } = get();
+          const { settings } = get();
           await settingsDB.settings.put({
+            did: currentDID,
             settings,
-            sidebarCollapsed,
-            sidebarMode,
           });
         } catch (error) {
           console.error('Failed to save settings to DB:', error);
