@@ -1,0 +1,1 @@
+export { useCapDev } from './use-cap-dev';

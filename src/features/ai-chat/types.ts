@@ -1,5 +1,5 @@
 import type { Message } from 'ai';
-import type { InstalledCap } from '@/features/cap/types';
+import type { InstalledCap } from '@/features/cap-store/types';
 
 // client chat interface
 export interface ChatSession {

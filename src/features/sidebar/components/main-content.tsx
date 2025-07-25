@@ -1,8 +1,8 @@
 'use client';
 
-import { Bug, Package, Search } from 'lucide-react';
+import { Package, Search, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { CapStoreModal } from '@/features/cap/components';
+import { CapStoreModal } from '@/features/cap-store/components';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
 import { Logo } from '@/shared/components';
 import {
@@ -91,10 +91,10 @@ export function MainContent() {
             )}
             {isDevMode && (
               <SidebarButton
-                icon={Bug}
-                text={'MCP Debug'}
+                icon={Wrench}
+                text={'Cap Dev'}
                 onClick={() => {
-                  navigate('/mcp-debug');
+                  navigate('/cap-dev');
                 }}
                 variant="secondary"
               />

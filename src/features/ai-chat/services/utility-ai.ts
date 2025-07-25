@@ -1,5 +1,5 @@
 import { generateText, type Message } from 'ai';
-import { llmProvider } from '@/features/ai-provider/services';
+import { llmProvider } from '@/features/model-selector/services';
 
 // Generate a title from the first message a user begins a conversation with
 // TODO: currently still using the remote AI models, need to switch to local models

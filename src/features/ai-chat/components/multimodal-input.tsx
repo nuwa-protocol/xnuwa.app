@@ -21,7 +21,7 @@ import {
 } from 'react';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { useScrollToBottom } from '@/features/ai-chat/hooks/use-scroll-to-bottom';
-import { ModelSelectorDialog } from '@/features/ai-provider/components/model-selector';
+import { ModelSelectorDialog } from '@/features/model-selector/components/model-selector';
 import { toast } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';

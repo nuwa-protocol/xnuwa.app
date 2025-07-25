@@ -1,0 +1,1 @@
+export { CapDev } from './components/cap-dev';

@@ -6,7 +6,7 @@ import {
   createNuwaMCPClient,
   type McpTransportType,
   type NuwaMCPClient,
-} from '@/features/mcp';
+} from '@/features/mcp-services';
 
 interface LogEntry {
   type: 'info' | 'error';

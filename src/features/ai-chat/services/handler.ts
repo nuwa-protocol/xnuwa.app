@@ -6,9 +6,8 @@ import {
   streamText,
 } from 'ai';
 import { ChatStateStore } from '@/features/ai-chat/stores';
-import { llmProvider } from '@/features/ai-provider/services';
-import { CapStateStore } from '@/features/cap/stores';
-import { SettingsStateStore } from '@/features/settings/stores';
+import { CapStateStore } from '@/features/cap-store/stores';
+import { llmProvider } from '@/features/model-selector/services';
 import { generateUUID } from '@/shared/utils';
 
 // Error handling function
@@ -60,17 +59,19 @@ const handleAIRequest = async ({
   messages: Message[];
   signal?: AbortSignal;
 }) => {
+  // update the messages state
   const { updateMessages } = ChatStateStore.getState();
-  const isDevMode = SettingsStateStore.getState().settings.devMode;
   await updateMessages(sessionId, messages);
 
   const { currentCap } = CapStateStore.getState();
 
-  const prompt = 'You are a friendly assistant! Keep your responses concise and helpful.';
+  const defaultPrompt =
+    'You are a friendly assistant! Keep your responses concise and helpful.';
+  const defaultModel = 'openai/gpt-4o-mini';
 
   const result = streamText({
-    model: llmProvider.chat(),
-    system: prompt,
+    model: llmProvider.chat(currentCap?.model.id ?? defaultModel),
+    system: currentCap?.prompt ?? defaultPrompt,
     messages,
     maxSteps: 5,
     experimental_transform: smoothStream({ chunking: 'word' }),
@@ -91,6 +92,7 @@ const handleAIRequest = async ({
         sources,
       );
 
+      // update the messages state
       await updateMessages(sessionId, finalMessagesWithSources);
     },
   });

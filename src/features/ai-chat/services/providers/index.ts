@@ -1,6 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { createAuthorizedFetch } from './fetch';
-import { getModelSettings } from './models';
+import { createAuthorizedFetch } from '@/shared/services/authorized-fetch';
 import { createOpenRouter } from './openrouter-provider';
 
 // Settings of Nuwa LLM Gateway
@@ -15,12 +14,11 @@ const openai = createOpenAI(providerSettings);
 
 // Export a provider that dynamically resolves models
 export const llmProvider = {
-  chat: () => {
-    const { modelId } = getModelSettings();
+  chat: (modelId: string) => {
     return openrouter.chat(modelId);
   },
   utility: () => {
     return openrouter.chat('openai/gpt-4o-mini');
   },
-  image: () => openai.image('dall-e-3'),
+  image: (modelId:string) => openai.image(modelId),
 };
