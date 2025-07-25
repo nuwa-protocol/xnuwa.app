@@ -4,9 +4,8 @@ import { useState } from 'react';
 import {
   closeNuwaMCPClient,
   createNuwaMCPClient,
-  type McpTransportType,
-  type NuwaMCPClient,
-} from '@/features/mcp-services';
+} from '@/shared/services/mcp-client';
+import type { McpTransportType, NuwaMCPClient } from '@/shared/types';
 
 interface LogEntry {
   type: 'info' | 'error';

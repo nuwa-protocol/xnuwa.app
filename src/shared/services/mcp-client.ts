@@ -14,8 +14,8 @@ import {
   ResourceSchema,
   type ResourceTemplateDefinition,
   ResourceTemplateSchema,
-} from '../types';
-import { createDidAuthSigner, SignedSSEClientTransport } from './authTransport';
+} from '../types/mcp';
+import { createDidAuthSigner, SignedSSEClientTransport } from './mcp-transport';
 
 /**
  * Cached MCP client instances keyed by server URL.

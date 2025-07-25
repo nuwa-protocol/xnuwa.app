@@ -1,5 +1,3 @@
-'use client';
-
 import { ChevronDownIcon, ChevronUpIcon, LinkIcon } from 'lucide-react';
 import { useState } from 'react';
 

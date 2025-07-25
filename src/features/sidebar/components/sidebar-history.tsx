@@ -1,4 +1,4 @@
-'use client';
+
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useChatSessions } from '@/features/chat/hooks/use-chat-sessions';

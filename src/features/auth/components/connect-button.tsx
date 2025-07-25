@@ -1,5 +1,3 @@
-'use client';
-
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useAuthHandler } from '@/features/auth/hooks/use-auth-handler';
 import { Button } from '@/shared/components/ui/button';

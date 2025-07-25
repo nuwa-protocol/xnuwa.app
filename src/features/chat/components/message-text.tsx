@@ -1,5 +1,3 @@
-'use client';
-
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import { ChevronDownIcon, ChevronUpIcon, PencilIcon } from 'lucide-react';

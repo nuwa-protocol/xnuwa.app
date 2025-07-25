@@ -1,4 +1,3 @@
-'use client';
 import { LogOut, Monitor, Moon, Settings, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -71,12 +70,12 @@ export function SettingsDropdown() {
             className={cn(
               'w-full inline-flex items-center rounded-md text-sm transition-colors py-1.5 px-2',
               'justify-between text-gray-700 hover:bg-gray-100',
-              'dark:text-gray-200 dark:hover:bg-gray-800'
+              'dark:text-gray-200 dark:hover:bg-gray-800',
             )}
           >
             <div className="flex items-center gap-2">
-                <Settings size={16} />
-                Settings
+              <Settings size={16} />
+              Settings
             </div>
           </button>
         </DropdownMenuTrigger>
@@ -186,4 +185,4 @@ export function SettingsDropdown() {
       <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
     </>
   );
-} 
+}

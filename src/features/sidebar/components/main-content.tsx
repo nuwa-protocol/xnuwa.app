@@ -1,5 +1,3 @@
-'use client';
-
 import { Package, Search, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CapStoreModal } from '@/features/cap-store/components';

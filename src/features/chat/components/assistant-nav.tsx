@@ -1,4 +1,3 @@
-'use client';
 import { LogOut, Monitor, Moon, Settings, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

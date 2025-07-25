@@ -1,5 +1,3 @@
-'use client';
-
 import type { LucideIcon } from 'lucide-react';
 import { Monitor, PlayCircle, User } from 'lucide-react';
 import type React from 'react';

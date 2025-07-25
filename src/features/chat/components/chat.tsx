@@ -1,5 +1,3 @@
-'use client';
-
 import type { Attachment, UIMessage } from 'ai';
 import { useState } from 'react';
 import { useChatDefault } from '@/features/chat/hooks/use-chat-default';
