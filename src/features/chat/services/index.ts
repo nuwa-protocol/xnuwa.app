@@ -1,4 +1,4 @@
-import { ChatSDKError } from '@/features/ai-chat/errors/chatsdk-errors';
+import { ChatSDKError } from '../errors/chatsdk-errors';
 import { handleAIRequest } from './handler';
 
 export const createClientAIFetch = (): ((
@@ -12,11 +12,12 @@ export const createClientAIFetch = (): ((
       }
 
       const requestBody = JSON.parse(init.body as string);
-      const { id: sessionId, messages } = requestBody;
+      const { id: sessionId, messages, cap } = requestBody;
 
       const response = await handleAIRequest({
         sessionId,
         messages,
+        cap,
         signal: init?.signal ?? undefined,
       });
 

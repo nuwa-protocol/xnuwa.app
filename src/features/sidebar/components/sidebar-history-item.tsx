@@ -1,7 +1,7 @@
 import { MoreHorizontalIcon, TrashIcon } from 'lucide-react';
 import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ChatSession } from '@/features/ai-chat/types';
+import type { ChatSession } from '@/features/chat/types';
 import {
   DropdownMenu,
   DropdownMenuContent,

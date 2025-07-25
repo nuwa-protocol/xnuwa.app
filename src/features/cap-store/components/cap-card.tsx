@@ -21,7 +21,6 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
-import { useCurrentCap } from '../hooks/use-current-cap';
 import { useInstalledCap } from '../hooks/use-installed-cap';
 import type { RemoteCap } from '../types';
 
@@ -38,7 +37,6 @@ export function CapCard({ cap, onRun }: CapCardProps) {
     isInstalled,
     hasUpdate,
   } = useInstalledCap(cap);
-  const { setCurrentCap } = useCurrentCap();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useLanguage();
 
@@ -79,7 +77,6 @@ export function CapCard({ cap, onRun }: CapCardProps) {
   };
 
   const handleRun = () => {
-    setCurrentCap(cap.id);
     onRun?.();
   };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useChatSessions } from '@/features/ai-chat/hooks/use-chat-sessions';
+import { useChatSessions } from '@/features/chat/hooks/use-chat-sessions';
 import {
   SidebarGroup,
   SidebarGroupContent,

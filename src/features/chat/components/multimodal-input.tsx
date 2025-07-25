@@ -17,11 +17,11 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
 } from 'react';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
-import { useScrollToBottom } from '@/features/ai-chat/hooks/use-scroll-to-bottom';
 import { ModelSelectorDialog } from '@/features/cap-dev/components/model-selector';
+import { useScrollToBottom } from '@/features/chat/hooks/use-scroll-to-bottom';
 import { toast } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
@@ -94,7 +94,6 @@ function PureMultimodalInput({
     }
   }, [handleSubmit, setLocalStorageInput, width]);
 
-
   const { isAtBottom, scrollToBottom } = useScrollToBottom();
 
   useEffect(() => {
@@ -131,8 +130,6 @@ function PureMultimodalInput({
       </AnimatePresence>
 
       {messages.length === 0 && <SuggestedActions append={append} />}
-
-     
 
       <div
         className={cx(

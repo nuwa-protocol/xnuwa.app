@@ -2,7 +2,7 @@
 
 import type { Attachment, UIMessage } from 'ai';
 import { useState } from 'react';
-import { useChatDefault } from '@/features/ai-chat/hooks/use-chat-default';
+import { useChatDefault } from '@/features/chat/hooks/use-chat-default';
 import Header from './header';
 import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';

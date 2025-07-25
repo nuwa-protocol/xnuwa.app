@@ -6,7 +6,6 @@ import CapDevPage from './pages/cap-dev';
 import ChatPage from './pages/chat';
 import ErrorPage from './pages/error';
 import LoginPage from './pages/login';
-import McpDebugPage from './pages/mcp-debug';
 
 const router = createBrowserRouter([
   {
@@ -21,7 +20,6 @@ const router = createBrowserRouter([
           { index: true, element: <Navigate to="/chat" replace /> },
           { path: 'chat', element: <ChatPage /> },
           { path: 'cap-dev', element: <CapDevPage /> },
-          { path: 'mcp-debug', element: <McpDebugPage /> },
         ],
       },
       { path: 'login', element: <LoginPage /> },

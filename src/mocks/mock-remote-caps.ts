@@ -1,5 +1,5 @@
-import type { RemoteCap } from '../types';
-import type { CapFetchParams, CapSearchResponse } from './cap-fetch';
+import type { CapFetchParams, CapSearchResponse } from '../src/features/cap-store/services/cap-fetch';
+import type { RemoteCap } from '../src/features/cap-store/types';
 
 // Mock data for development (will be replaced with real API calls)
 export const mockRemoteCaps: RemoteCap[] = [

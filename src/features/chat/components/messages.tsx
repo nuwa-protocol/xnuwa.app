@@ -3,7 +3,7 @@ import type { UIMessage } from 'ai';
 import equal from 'fast-deep-equal';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
-import { useMessagesUI } from '@/features/ai-chat/hooks/use-messages-ui';
+import { useMessagesUI } from '@/features/chat/hooks/use-messages-ui';
 import { Greeting } from './greeting';
 import { PreviewMessage, ThinkingMessage } from './message';
 

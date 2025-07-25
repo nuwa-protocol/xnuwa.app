@@ -1,4 +1,3 @@
-'use client';
 import { PathBreadcrumb } from './path-breadcrumb';
 
 export default function Header() {

@@ -1,35 +1,7 @@
-interface Model {
-  id: string;
-  name: string;
-  slug: string;
-  providerName: string;
-  providerSlug: string;
-  description: string;
-  context_length: number;
-  pricing: {
-    input_per_million_tokens: number;
-    output_per_million_tokens: number;
-    request_per_k_requests: number;
-    image_per_k_images: number;
-    web_search_per_k_searches: number;
-  };
-  supported_inputs: string[];
-  supported_parameters: string[];
-}
-
-// Cap Data Interface
-interface CapData {
-  prompt: string;
-  model: Model;
-  mcpServers: {
-    [name: string]: {
-      url: string;
-    };
-  };
-}
+import type { Cap } from '@/shared/types/cap';
 
 // Remote Cap Interface
-export interface RemoteCap extends CapData {
+export interface RemoteCap extends Cap {
   id: string;
   name: string;
   tag: string;
@@ -42,7 +14,7 @@ export interface RemoteCap extends CapData {
 }
 
 // Installed Cap interface (minimal data for locally installed caps)
-export interface InstalledCap extends CapData {
+export interface InstalledCap extends Cap {
   id: string;
   name: string;
   tag: string;

@@ -5,12 +5,15 @@ import {
   useNavigate,
   useSearchParams,
 } from 'react-router-dom';
-import { useChatSessions } from '@/features/ai-chat/hooks/use-chat-sessions';
-import { CurrentCapIndicator } from '@/features/cap-store/components/current-cap-indicator';
-import { useCurrentCap } from '@/features/cap-store/hooks/use-current-cap';
+import { useChatSessions } from '@/features/chat/hooks/use-chat-sessions';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
 import { Logo } from '@/shared/components';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from '@/shared/components/ui';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
 
 export function PathBreadcrumb() {
@@ -19,7 +22,6 @@ export function PathBreadcrumb() {
   const [searchParams] = useSearchParams();
   const { sessionsMap } = useChatSessions();
   const { t } = useLanguage();
-  const { currentCap } = useCurrentCap();
 
   const pathSegments = location.pathname.split('/').filter(Boolean) || [];
   const isChat = pathSegments[0] === 'chat';
@@ -35,32 +37,18 @@ export function PathBreadcrumb() {
 
     const session = sessionsMap[chatId || ''] || null;
 
-    if (currentCap) {
-      breadcrumbContent = (
-        <>
-          <BreadcrumbItem className="text-md font-medium text-foreground">
-            <CurrentCapIndicator />
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            {session?.title || t('nav.sidebar.new')}
-          </BreadcrumbItem>
-        </>
-      );
-    } else {
-      breadcrumbContent = (
-        <>
-          <BreadcrumbItem className="text-md font-medium text-foreground">
-            <MessageSquare className="size-4" />
-            {t('nav.sidebar.chat')}
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            {session?.title || t('nav.sidebar.new')}
-          </BreadcrumbItem>
-        </>
-      );
-    }
+    breadcrumbContent = (
+      <>
+        <BreadcrumbItem className="text-md font-medium text-foreground">
+          <MessageSquare className="size-4" />
+          {t('nav.sidebar.chat')}
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          {session?.title || t('nav.sidebar.new')}
+        </BreadcrumbItem>
+      </>
+    );
   } else if (isFile) {
     breadcrumbContent = (
       <BreadcrumbItem className="text-md font-medium text-foreground">

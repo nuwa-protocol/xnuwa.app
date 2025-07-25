@@ -1,4 +1,4 @@
-import { ChatStateStore } from '@/features/ai-chat/stores';
+import { ChatStateStore } from '@/features/chat/stores';
 import { SettingsStateStore } from '@/features/settings/stores';
 
 // Check if we're in a browser environment

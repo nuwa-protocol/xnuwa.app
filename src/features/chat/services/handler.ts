@@ -5,10 +5,10 @@ import {
   smoothStream,
   streamText,
 } from 'ai';
-import { ChatStateStore } from '@/features/ai-chat/stores';
-import { llmProvider } from '@/features/cap-dev/services';
-import { CapStateStore } from '@/features/cap-store/stores';
 import { generateUUID } from '@/shared/utils';
+import { ChatStateStore } from '../stores';
+import type { ChatCap } from '../types';
+import { llmProvider } from './providers';
 
 // Error handling function
 function errorHandler(error: unknown) {
@@ -52,10 +52,12 @@ function appendSourcesToFinalMessages(
 // Handle AI request, entrance of the AI workflow
 const handleAIRequest = async ({
   sessionId,
+  cap,
   messages,
   signal,
 }: {
   sessionId: string;
+  cap: ChatCap;
   messages: Message[];
   signal?: AbortSignal;
 }) => {
@@ -63,15 +65,9 @@ const handleAIRequest = async ({
   const { updateMessages } = ChatStateStore.getState();
   await updateMessages(sessionId, messages);
 
-  const { currentCap } = CapStateStore.getState();
-
-  const defaultPrompt =
-    'You are a friendly assistant! Keep your responses concise and helpful.';
-  const defaultModel = 'openai/gpt-4o-mini';
-
   const result = streamText({
-    model: llmProvider.chat(currentCap?.model.id ?? defaultModel),
-    system: currentCap?.prompt ?? defaultPrompt,
+    model: llmProvider.chat(cap.model.id),
+    system: cap.prompt,
     messages,
     maxSteps: 5,
     experimental_transform: smoothStream({ chunking: 'word' }),

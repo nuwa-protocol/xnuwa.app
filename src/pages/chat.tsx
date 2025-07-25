@@ -1,5 +1,5 @@
-import { Chat } from '@/features/ai-chat/components/chat';
-import { useChatPage } from '@/features/ai-chat/hooks/use-chat-page';
+import { Chat } from '@/features/chat/components/chat';
+import { useChatPage } from '@/features/chat/hooks/use-chat-page';
 import Loading from '@/shared/components/loading';
 
 export default function ChatPage() {
