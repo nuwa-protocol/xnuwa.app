@@ -5,7 +5,7 @@ import type { RemoteCap } from '../types';
 /**
  * Hook for managing the installed caps
  */
-export const useCap = (remoteCap:RemoteCap) => {
+export const useInstalledCap = (remoteCap:RemoteCap) => {
   const [state, setState] = useState(() => CapStateStore.getState());
 
   useEffect(() => {

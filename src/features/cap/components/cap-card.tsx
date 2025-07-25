@@ -21,8 +21,8 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
-import { useCap } from '../hooks/use-cap';
 import { useCurrentCap } from '../hooks/use-current-cap';
+import { useInstalledCap } from '../hooks/use-installed-cap';
 import type { RemoteCap } from '../types';
 
 export interface CapCardProps {
@@ -31,7 +31,13 @@ export interface CapCardProps {
 }
 
 export function CapCard({ cap, onRun }: CapCardProps) {
-  const { installCap, uninstallCap, updateInstalledCap, isInstalled, hasUpdate } = useCap(cap);
+  const {
+    installCap,
+    uninstallCap,
+    updateInstalledCap,
+    isInstalled,
+    hasUpdate,
+  } = useInstalledCap(cap);
   const { setCurrentCap } = useCurrentCap();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useLanguage();
@@ -120,7 +126,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
 
           {/* Version and metadata info */}
           <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-          {cap.author && (
+            {cap.author && (
               <span className="text-xs">
                 {t('capStore.card.by', { author: cap.author })}
               </span>
@@ -154,7 +160,10 @@ export function CapCard({ cap, onRun }: CapCardProps) {
                         size="sm"
                         variant="ghost"
                         className="text-xs px-4 py-2 h-6 relative"
-                        style={{ paddingRight: hasUpdate && isInstalled ? 14 : undefined }}
+                        style={{
+                          paddingRight:
+                            hasUpdate && isInstalled ? 14 : undefined,
+                        }}
                       >
                         <span className="relative inline-block">
                           <Settings className="size-3" />
@@ -169,7 +178,10 @@ export function CapCard({ cap, onRun }: CapCardProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       {hasUpdate && isInstalled && (
-                        <DropdownMenuItem onClick={handleUpdate} disabled={isLoading}>
+                        <DropdownMenuItem
+                          onClick={handleUpdate}
+                          disabled={isLoading}
+                        >
                           <AlertCircle className="size-3 mr-2 text-orange-500" />
                           {isLoading ? (
                             <Loader2 className="size-3 animate-spin" />
