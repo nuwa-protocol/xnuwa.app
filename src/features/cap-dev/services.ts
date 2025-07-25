@@ -1,17 +1,9 @@
-// This file is kept for potential future model functionality
-// Currently no model selection is needed
-
 import { createAuthorizedFetch } from '@/shared/services/authorized-fetch';
-import { ModelStateStore } from './stores';
 import type { Model, OpenRouterAPIResponse, OpenRouterModel } from './types';
 
-/**
- * Fetches the list of available models from OpenRouter API.
- * @returns {Promise<OpenRouterAPIResponse>} The list of available models.
- */
-async function fetchOpenRouterModels(): Promise<OpenRouterAPIResponse> {
+
+async function modelFetch(): Promise<OpenRouterAPIResponse> {
   const authorizedFetch = createAuthorizedFetch();
-  // TODO: change to nuwa endpoint - need to improve the speed of nuwa endpoint
   const endpoint = 'https://test-llm.nuwa.dev/api/v1/models';
   // const endpoint = 'https://openrouter.ai/api/v1/models';
 
@@ -56,8 +48,8 @@ function parseModelInfo(model: OpenRouterModel) {
   };
 }
 
-export async function fetchAvailableModels(): Promise<Model[]> {
-  const openRouterModels = await fetchOpenRouterModels();
+export async function fetchModels(): Promise<Model[]> {
+  const openRouterModels = await modelFetch();
 
   return openRouterModels.data
     .filter((model: OpenRouterModel) => !model.id.includes('openrouter')) // exclude openrouter models
@@ -80,14 +72,3 @@ export async function fetchAvailableModels(): Promise<Model[]> {
       };
     });
 }
-
-export const getModelSettings = (): {
-  modelId: string;
-} => {
-  // get state from store
-  const selectedModel = ModelStateStore.getState().selectedModel;
-
-  return {
-    modelId: selectedModel.id,
-  };
-};

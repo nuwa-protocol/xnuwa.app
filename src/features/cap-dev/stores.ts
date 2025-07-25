@@ -2,7 +2,7 @@
 // Store for managing model selection and favorites
 
 import { create } from 'zustand';
-import { fetchAvailableModels } from './services';
+import { fetchModels } from './services';
 import type { Model } from './types';
 
 export const DefaultModel: Model = {
@@ -55,7 +55,6 @@ interface ModelStateStoreState {
   isLoadingModels: boolean;
   modelsError: Error | null;
   fetchAvailableModels: () => Promise<void>;
-  preloadModels: () => Promise<void>;
   reloadModels: () => Promise<void>;
 }
 
@@ -90,7 +89,7 @@ export const ModelStateStore = create<ModelStateStoreState>()(
       set({ isLoadingModels: true, modelsError: null });
 
       try {
-        const models = await fetchAvailableModels();
+        const models = await fetchModels();
         set({
           availableModels: models,
           isLoadingModels: false,
@@ -104,34 +103,12 @@ export const ModelStateStore = create<ModelStateStoreState>()(
       }
     },
 
-    // preload models (silent loading, no UI state)
-    preloadModels: async () => {
-      const { availableModels } = get();
-
-      // if there is cached data, return
-      if (availableModels) {
-        return;
-      }
-
-      try {
-        const models = await fetchAvailableModels();
-        set({
-          availableModels: models,
-          modelsError: null,
-        });
-        console.log('Models preloaded successfully');
-      } catch (error) {
-        console.warn('Failed to preload models:', error);
-        set({ modelsError: error as Error });
-      }
-    },
-
     // reload models (force refresh)
     reloadModels: async () => {
       set({ isLoadingModels: true, modelsError: null });
 
       try {
-        const models = await fetchAvailableModels();
+        const models = await fetchModels();
         set({
           availableModels: models,
           isLoadingModels: false,
