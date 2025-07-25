@@ -12,8 +12,8 @@ import { createAuthorizedFetch } from './fetch';
 async function fetchOpenRouterModels(): Promise<OpenRouterAPIResponse> {
   const authorizedFetch = createAuthorizedFetch();
   // TODO: change to nuwa endpoint - need to improve the speed of nuwa endpoint
-  // const endpoint = 'https://test-llm.nuwa.dev/api/v1/models';
-  const endpoint = 'https://openrouter.ai/api/v1/models';
+  const endpoint = 'https://test-llm.nuwa.dev/api/v1/models';
+  // const endpoint = 'https://openrouter.ai/api/v1/models';
 
   try {
     const response = await authorizedFetch(endpoint, {
@@ -83,46 +83,11 @@ export async function fetchAvailableModels(): Promise<Model[]> {
 
 export const getModelSettings = (): {
   modelId: string;
-  models: string[];
-  web_search_options: Record<string, any> | undefined;
-  plugins: Record<string, any>[] | undefined;
 } => {
   // get state from store
   const selectedModel = ModelStateStore.getState().selectedModel;
-  const webSearchEnabled = ModelStateStore.getState().webSearchEnabled;
-  const webSearchContextSize = ModelStateStore.getState().webSearchContextSize;
-  const modelSupportWebSearch =
-    selectedModel.supported_parameters.includes('web_search_options');
-
-  // fallback models
-  const models = ['openai/gpt-4o', 'anthropic/claude-sonnet-4'];
-
-  // web search options
-  const web_search_options =
-    modelSupportWebSearch && webSearchEnabled
-      ? {
-          search_context_size: webSearchContextSize,
-        }
-      : undefined;
-  const plugins =
-    !modelSupportWebSearch && webSearchEnabled
-      ? [
-          {
-            id: 'web',
-            max_results:
-              webSearchContextSize === 'low'
-                ? 3
-                : webSearchContextSize === 'medium'
-                  ? 5
-                  : 10,
-          },
-        ]
-      : undefined;
 
   return {
     modelId: selectedModel.id,
-    models,
-    web_search_options,
-    plugins,
   };
 };

@@ -1,7 +1,5 @@
 import { motion } from 'framer-motion';
-import { StarIcon } from 'lucide-react';
 import type React from 'react';
-import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardFooter,
@@ -10,7 +8,6 @@ import {
 } from '@/shared/components/ui/card';
 import { useLocale } from '@/shared/locales/use-locale';
 import { cn } from '@/shared/utils';
-import { useFavoriteModels } from '../hooks/use-favorite-models';
 import type { Model } from '../types';
 import { getModelName, getProviderName } from '../utils';
 import { ProviderAvatar } from './provider-avatar';
@@ -27,7 +24,6 @@ export const ModelCard: React.FC<ModelCardProps> = ({
   onClick,
 }) => {
   const { t } = useLocale();
-  const { isFavorite, toggleFavorite } = useFavoriteModels();
 
   return (
     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -51,24 +47,6 @@ export const ModelCard: React.FC<ModelCardProps> = ({
                 </p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleFavorite(model);
-              }}
-              className="h-8 w-8"
-            >
-              <StarIcon
-                className={cn(
-                  'h-4 w-4',
-                  isFavorite(model.id)
-                    ? 'fill-yellow-400 text-yellow-400'
-                    : 'text-muted-foreground',
-                )}
-              />
-            </Button>
           </div>
         </CardHeader>
         <CardFooter className=" flex flex-col items-start pt-0 space-y-2">

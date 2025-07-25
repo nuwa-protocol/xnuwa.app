@@ -1,5 +1,4 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { ModelStateStore } from '../stores';
 import { createAuthorizedFetch } from './fetch';
 import { getModelSettings } from './models';
 import { createOpenRouter } from './openrouter-provider';
@@ -17,17 +16,10 @@ const openai = createOpenAI(providerSettings);
 // Export a provider that dynamically resolves models
 export const llmProvider = {
   chat: () => {
-    const { modelId, models, web_search_options, plugins } = getModelSettings();
-    return openrouter.chat(modelId, {
-      models,
-      extraBody: {
-        web_search_options,
-        plugins,
-      },
-    });
+    const { modelId } = getModelSettings();
+    return openrouter.chat(modelId);
   },
   utility: () => {
-    const selectedModel = ModelStateStore.getState().selectedModel;
     return openrouter.chat('openai/gpt-4o-mini');
   },
   image: () => openai.image('dall-e-3'),

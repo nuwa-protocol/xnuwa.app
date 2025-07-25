@@ -21,7 +21,7 @@ import {
 } from 'react';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { useScrollToBottom } from '@/features/ai-chat/hooks/use-scroll-to-bottom';
-import { ModelSelector } from '@/features/ai-provider/components';
+import { ModelSelectorDialog } from '@/features/ai-provider/components/model-selector';
 import { toast } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
@@ -180,7 +180,7 @@ function PureMultimodalInput({
             {isDevMode && (
               <AttachmentsButton fileInputRef={fileInputRef} status={status} />
             )}
-            <ModelSelector />
+            <ModelSelectorDialog />
           </div>
 
           <div className="flex items-center">

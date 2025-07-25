@@ -1,4 +1,4 @@
-import { List, Settings, StarIcon } from 'lucide-react';
+import { List } from 'lucide-react';
 import type React from 'react';
 import {
   Sidebar,
@@ -10,7 +10,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/shared/components/ui/sidebar';
-import { useDevMode } from '@/shared/hooks';
 import { useLocale } from '@/shared/locales/use-locale';
 import type { Provider } from '../utils';
 import { ProviderAvatar } from './provider-avatar';
@@ -31,7 +30,6 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
   onProviderChange,
 }) => {
   const { t } = useLocale();
-  const isDevMode = useDevMode();
 
   const handleTabChange = (tab: string) => {
     onTabChange(tab);
@@ -46,26 +44,6 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
-            {isDevMode && (
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={selectedTab === 'auto'}
-                  onClick={() => handleTabChange('auto')}
-                >
-                  <Settings className="h-4 w-4" />
-                  <span>{t('aiProvider.sidebar.tabs.auto')}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                isActive={selectedTab === 'favorite'}
-                onClick={() => handleTabChange('favorite')}
-              >
-                <StarIcon className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                <span>{t('aiProvider.sidebar.tabs.favorite')}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
                 isActive={selectedTab === 'all'}
@@ -82,7 +60,7 @@ export const ModelSelectorSidebar: React.FC<ModelSelectorSidebarProps> = ({
         <SidebarGroupLabel className="sticky top-0 z-10 pb-2 flex-shrink-0">
           {t('aiProvider.sidebar.tabs.providers')}
         </SidebarGroupLabel>
-        <SidebarMenu className="flex h-[calc(80vh-200px)] overflow-auto hide-scrollbar">
+        <SidebarMenu className="flex h-[calc(80vh-160px)] overflow-auto hide-scrollbar">
           {providers.map((provider) => (
             <SidebarMenuItem key={provider.id}>
               <SidebarMenuButton

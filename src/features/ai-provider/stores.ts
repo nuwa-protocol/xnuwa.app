@@ -2,28 +2,29 @@
 // Store for managing model selection and favorites
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { NuwaIdentityKit } from '@/features/auth/services';
-import { createPersistConfig, db } from '@/shared/storage';
 import { fetchAvailableModels } from './services/models';
 import type { Model } from './types';
 
-export const AUTO_MODEL: Model = {
-  id: 'openrouter/auto',
-  name: 'Auto',
-  slug: 'auto',
-  providerName: 'Auto',
-  providerSlug: 'auto',
-  description: 'Automatically select the best model based on your needs.',
-  context_length: 0,
+export const DefaultModel: Model = {
+  id: "openai/gpt-4o-mini",
+  name: " GPT-4o-mini",
+  slug: 'gpt-4o-mini',
+  providerName: 'OpenAI',
+  providerSlug: 'openai',
+  description: 'GPT-4o mini is OpenAI\'s newest model after [GPT-4 Omni](/models/openai/gpt-4o), supporting both text and image inputs with text outputs.\n\nAs their most advanced small model, it is many multiples more affordable than other recent frontier models, and more than 60% cheaper than [GPT-3.5 Turbo](/models/openai/gpt-3.5-turbo). It maintains SOTA intelligence, while being significantly more cost-effective.\n\nGPT-4o mini achieves an 82% score on MMLU and presently ranks higher than GPT-4 on chat preferences [common leaderboards](https://arena.lmsys.org/).\n\nCheck out the [launch announcement](https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/) to learn more.\n\n#multimodal',
+  context_length: 128000,
   pricing: {
-    input_per_million_tokens: 0,
-    output_per_million_tokens: 0,
+    input_per_million_tokens: 0.15,
+    output_per_million_tokens: 0.6,
     request_per_k_requests: 0,
-    image_per_k_images: 0,
+    image_per_k_images: 0.217,
     web_search_per_k_searches: 0,
   },
-  supported_inputs: [],
+  supported_inputs: [
+    'text',
+    'image',
+    'file'
+  ],
   supported_parameters: [
     'max_tokens',
     'temperature',
@@ -43,30 +44,11 @@ export const AUTO_MODEL: Model = {
   ],
 };
 
-// get current DID
-const getCurrentDID = async () => {
-  const { getDid } = await NuwaIdentityKit();
-  return await getDid();
-};
-
-const modelDB = db;
-
 // model store state interface
 interface ModelStateStoreState {
   // model selection state
   selectedModel: Model;
   setSelectedModel: (model: Model) => void;
-
-  // favorites state
-  favoriteModels: Model[];
-  addToFavorites: (model: Model) => void;
-  removeFromFavorites: (modelId: string) => void;
-
-  // web search state
-  webSearchEnabled: boolean;
-  webSearchContextSize: 'low' | 'medium' | 'high';
-  setWebSearchEnabled: (enabled: boolean) => void;
-  setWebSearchContextSize: (size: 'low' | 'medium' | 'high') => void;
 
   // available models state
   availableModels: Model[] | null;
@@ -75,194 +57,92 @@ interface ModelStateStoreState {
   fetchAvailableModels: () => Promise<void>;
   preloadModels: () => Promise<void>;
   reloadModels: () => Promise<void>;
-
-  // data persistence
-  loadFromDB: () => Promise<void>;
-  saveToDB: () => Promise<void>;
 }
-
-// persist configuration
-const persistConfig = createPersistConfig<ModelStateStoreState>({
-  name: 'model-storage',
-  getCurrentDID: getCurrentDID,
-  partialize: (state) => ({
-    selectedModel: state.selectedModel,
-    favoriteModels: state.favoriteModels,
-    webSearchEnabled: state.webSearchEnabled,
-    webSearchContextSize: state.webSearchContextSize,
-  }),
-  onRehydrateStorage: () => (state) => {
-    if (state) {
-      state.loadFromDB();
-      // preload models on store rehydration
-      state.preloadModels();
-    }
-  },
-});
 
 // model store factory
 export const ModelStateStore = create<ModelStateStoreState>()(
-  persist(
-    (set, get) => ({
-      selectedModel: AUTO_MODEL,
-      favoriteModels: [],
-      webSearchEnabled: false,
-      webSearchContextSize: 'low',
+  (set, get) => ({
+    selectedModel: DefaultModel,
 
-      // available models state
-      availableModels: null,
-      isLoadingModels: false,
-      modelsError: null,
+    // available models state
+    availableModels: null,
+    isLoadingModels: false,
+    modelsError: null,
 
-      setSelectedModel: (model: Model) => {
-        set({ selectedModel: model });
-        get().saveToDB();
-      },
+    setSelectedModel: (model: Model) => {
+      set({ selectedModel: model });
+    },
 
-      addToFavorites: (model: Model) => {
-        set((state) => {
-          // avoid duplicates
-          const isAlreadyFavorite = state.favoriteModels.some(
-            (fav) => fav.id === model.id,
-          );
-          if (isAlreadyFavorite) return state;
+    // fetch available models
+    fetchAvailableModels: async () => {
+      const { availableModels, isLoadingModels } = get();
 
-          return {
-            favoriteModels: [...state.favoriteModels, model],
-          };
+      // if there is cached data and not loading, return
+      if (availableModels && !isLoadingModels) {
+        return;
+      }
+
+      // if loading, wait for completion
+      if (isLoadingModels) {
+        return;
+      }
+
+      set({ isLoadingModels: true, modelsError: null });
+
+      try {
+        const models = await fetchAvailableModels();
+        set({
+          availableModels: models,
+          isLoadingModels: false,
+          modelsError: null,
         });
-        get().saveToDB();
-      },
+      } catch (error) {
+        set({
+          modelsError: error as Error,
+          isLoadingModels: false,
+        });
+      }
+    },
 
-      removeFromFavorites: (modelId: string) => {
-        set((state) => ({
-          favoriteModels: state.favoriteModels.filter(
-            (model) => model.id !== modelId,
-          ),
-        }));
-        get().saveToDB();
-      },
+    // preload models (silent loading, no UI state)
+    preloadModels: async () => {
+      const { availableModels } = get();
 
-      setWebSearchEnabled: (enabled: boolean) => {
-        set({ webSearchEnabled: enabled });
-        get().saveToDB();
-      },
+      // if there is cached data, return
+      if (availableModels) {
+        return;
+      }
 
-      setWebSearchContextSize: (size: 'low' | 'medium' | 'high') => {
-        set({ webSearchContextSize: size });
-        get().saveToDB();
-      },
+      try {
+        const models = await fetchAvailableModels();
+        set({
+          availableModels: models,
+          modelsError: null,
+        });
+        console.log('Models preloaded successfully');
+      } catch (error) {
+        console.warn('Failed to preload models:', error);
+        set({ modelsError: error as Error });
+      }
+    },
 
-      // fetch available models
-      fetchAvailableModels: async () => {
-        const { availableModels, isLoadingModels } = get();
+    // reload models (force refresh)
+    reloadModels: async () => {
+      set({ isLoadingModels: true, modelsError: null });
 
-        // if there is cached data and not loading, return
-        if (availableModels && !isLoadingModels) {
-          return;
-        }
-
-        // if loading, wait for completion
-        if (isLoadingModels) {
-          return;
-        }
-
-        set({ isLoadingModels: true, modelsError: null });
-
-        try {
-          const models = await fetchAvailableModels();
-          set({
-            availableModels: models,
-            isLoadingModels: false,
-            modelsError: null,
-          });
-        } catch (error) {
-          set({
-            modelsError: error as Error,
-            isLoadingModels: false,
-          });
-        }
-      },
-
-      // preload models (silent loading, no UI state)
-      preloadModels: async () => {
-        const { availableModels } = get();
-
-        // if there is cached data, return
-        if (availableModels) {
-          return;
-        }
-
-        try {
-          const models = await fetchAvailableModels();
-          set({
-            availableModels: models,
-            modelsError: null,
-          });
-          console.log('Models preloaded successfully');
-        } catch (error) {
-          console.warn('Failed to preload models:', error);
-          set({ modelsError: error as Error });
-        }
-      },
-
-      // reload models (force refresh)
-      reloadModels: async () => {
-        set({ isLoadingModels: true, modelsError: null });
-
-        try {
-          const models = await fetchAvailableModels();
-          set({
-            availableModels: models,
-            isLoadingModels: false,
-            modelsError: null,
-          });
-        } catch (error) {
-          set({
-            modelsError: error as Error,
-            isLoadingModels: false,
-          });
-        }
-      },
-
-      loadFromDB: async () => {
-        if (typeof window === 'undefined') return;
-        try {
-          const currentDID = await getCurrentDID();
-          if (!currentDID) return;
-          const record = await modelDB.models
-            .where('did')
-            .equals(currentDID)
-            .first();
-          if (record) {
-            set({
-              selectedModel: record.selectedModel,
-              favoriteModels: record.favoriteModels,
-              webSearchEnabled: record.webSearchEnabled ?? false,
-            });
-          }
-        } catch (error) {
-          console.error('Failed to load model store from DB:', error);
-        }
-      },
-
-      saveToDB: async () => {
-        if (typeof window === 'undefined') return;
-        try {
-          const currentDID = await getCurrentDID();
-          if (!currentDID) return;
-          const { selectedModel, favoriteModels, webSearchEnabled } = get();
-          await modelDB.models.put({
-            did: currentDID,
-            selectedModel,
-            favoriteModels,
-            webSearchEnabled,
-          });
-        } catch (error) {
-          console.error('Failed to save model store to DB:', error);
-        }
-      },
-    }),
-    persistConfig,
-  ),
+      try {
+        const models = await fetchAvailableModels();
+        set({
+          availableModels: models,
+          isLoadingModels: false,
+          modelsError: null,
+        });
+      } catch (error) {
+        set({
+          modelsError: error as Error,
+          isLoadingModels: false,
+        });
+      }
+    },
+  }),
 );

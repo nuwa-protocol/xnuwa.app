@@ -4,6 +4,7 @@ export function useSelectedModel() {
   const selectedModel = ModelStateStore((state) => state.selectedModel);
   const setSelectedModel = ModelStateStore((state) => state.setSelectedModel);
 
+  console.log(selectedModel)
   return {
     selectedModel,
     setSelectedModel,
