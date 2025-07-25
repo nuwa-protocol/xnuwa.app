@@ -296,13 +296,9 @@ export const ModelSelectorDialog: React.FC = () => {
           )}
         </button>
       </DialogTrigger>
-      <DialogContent
-        className="max-w-6xl h-[80vh] p-0 overflow-hidden"
-      >
+      <DialogContent className="max-w-6xl h-[80vh] p-0 overflow-hidden">
         <DialogTitle className="sr-only">LLM Model Selector</DialogTitle>
-        <Description className="sr-only">
-          Select an LLM model.
-        </Description>
+        <Description className="sr-only">Select an LLM model.</Description>
         <LLMModelSelector onClose={() => setOpen(false)} />
       </DialogContent>
     </Dialog>

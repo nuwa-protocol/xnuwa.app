@@ -2,7 +2,7 @@
 // Store for managing model selection and favorites
 
 import { create } from 'zustand';
-import { fetchAvailableModels } from './services/models';
+import { fetchAvailableModels } from './services';
 import type { Model } from './types';
 
 export const DefaultModel: Model = {

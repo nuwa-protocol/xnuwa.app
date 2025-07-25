@@ -6,8 +6,8 @@ import {
   streamText,
 } from 'ai';
 import { ChatStateStore } from '@/features/ai-chat/stores';
+import { llmProvider } from '@/features/cap-dev/services';
 import { CapStateStore } from '@/features/cap-store/stores';
-import { llmProvider } from '@/features/model-selector/services';
 import { generateUUID } from '@/shared/utils';
 
 // Error handling function
