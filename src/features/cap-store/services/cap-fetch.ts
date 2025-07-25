@@ -1,6 +1,6 @@
 import { DIDAuth } from '@nuwa-ai/identity-kit';
 import { IdentityKitWeb } from '@nuwa-ai/identity-kit-web';
-import { mockFetchRemoteCaps } from '@/mocks/mock-remote-caps';
+import { mockFetchRemoteCaps } from '@/mocks/fetch-caps';
 import type { RemoteCap } from '../types';
 
 export interface CapFetchParams {

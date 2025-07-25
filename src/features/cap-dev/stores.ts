@@ -1,9 +1,13 @@
-// model-store.ts
-// Store for managing model selection and favorites
+// stores.ts
+// Central export for all cap-dev stores
 
 import { create } from 'zustand';
 import { fetchModels } from './services';
 import type { Model } from './types';
+
+// Re-export the CapDevStore
+export { useCapDevStore } from './stores/cap-dev-store';
+export type { LocalCap } from './stores/cap-dev-store';
 
 export const DefaultModel: Model = {
   id: "openai/gpt-4o-mini",

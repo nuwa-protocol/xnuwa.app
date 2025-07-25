@@ -1,7 +1,6 @@
-import type { CapFetchParams, CapSearchResponse } from '../src/features/cap-store/services/cap-fetch';
-import type { RemoteCap } from '../src/features/cap-store/types';
+import type { RemoteCap } from '@/features/cap-store/types';
 
-// Mock data for development (will be replaced with real API calls)
+// Mock data for development - this file simulates a remote database
 export const mockRemoteCaps: RemoteCap[] = [
   {
     id: '1',
@@ -14,13 +13,31 @@ export const mockRemoteCaps: RemoteCap[] = [
     author: 'CodeCraft Team',
     createdAt: Date.now() - 30 * 24 * 60 * 60 * 1000, // 30 days ago
     updatedAt: Date.now() - 7 * 24 * 60 * 60 * 1000, // 7 days ago
-    prompt: "You're a code generation assistant helping with programming tasks.",
-    modelId: "gpt-4",
+    prompt:
+      "You're a code generation assistant helping with programming tasks.",
+    model: {
+      id: 'openai/gpt-4',
+      name: 'GPT-4',
+      slug: 'gpt-4',
+      providerName: 'OpenAI',
+      providerSlug: 'openai',
+      description: 'Most capable GPT-4 model',
+      context_length: 8192,
+      pricing: {
+        input_per_million_tokens: 30,
+        output_per_million_tokens: 60,
+        request_per_k_requests: 0,
+        image_per_k_images: 0,
+        web_search_per_k_searches: 0,
+      },
+      supported_inputs: ['text'],
+      supported_parameters: ['max_tokens', 'temperature'],
+    },
     mcpServers: {
       default: {
-        url: "https://api.example.com/mcp/code-generator"
-      }
-    }
+        url: 'https://api.example.com/mcp/code-generator',
+      },
+    },
   },
   {
     id: '2',
@@ -33,13 +50,31 @@ export const mockRemoteCaps: RemoteCap[] = [
     author: 'DesignLab',
     createdAt: Date.now() - 45 * 24 * 60 * 60 * 1000,
     updatedAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
-    prompt: "You're a UI design assistant helping with creating user interfaces.",
-    modelId: "gpt-4",
+    prompt:
+      "You're a UI design assistant helping with creating user interfaces.",
+    model: {
+      id: 'openai/gpt-4',
+      name: 'GPT-4',
+      slug: 'gpt-4',
+      providerName: 'OpenAI',
+      providerSlug: 'openai',
+      description: 'Most capable GPT-4 model',
+      context_length: 8192,
+      pricing: {
+        input_per_million_tokens: 30,
+        output_per_million_tokens: 60,
+        request_per_k_requests: 0,
+        image_per_k_images: 0,
+        web_search_per_k_searches: 0,
+      },
+      supported_inputs: ['text'],
+      supported_parameters: ['max_tokens', 'temperature'],
+    },
     mcpServers: {
       default: {
-        url: "https://api.example.com/mcp/ui-designer"
-      }
-    }
+        url: 'https://api.example.com/mcp/ui-designer',
+      },
+    },
   },
   {
     id: '3',
@@ -53,12 +88,29 @@ export const mockRemoteCaps: RemoteCap[] = [
     createdAt: Date.now() - 60 * 24 * 60 * 60 * 1000,
     updatedAt: Date.now() - 14 * 24 * 60 * 60 * 1000,
     prompt: "You're a data analysis assistant helping with interpreting data.",
-    modelId: "claude-3-opus",
+    model: {
+      id: 'anthropic/claude-3-opus',
+      name: 'Claude 3 Opus',
+      slug: 'claude-3-opus',
+      providerName: 'Anthropic',
+      providerSlug: 'anthropic',
+      description: 'Most capable Claude model',
+      context_length: 200000,
+      pricing: {
+        input_per_million_tokens: 15,
+        output_per_million_tokens: 75,
+        request_per_k_requests: 0,
+        image_per_k_images: 0,
+        web_search_per_k_searches: 0,
+      },
+      supported_inputs: ['text'],
+      supported_parameters: ['max_tokens', 'temperature'],
+    },
     mcpServers: {
       default: {
-        url: "https://api.example.com/mcp/data-analyzer"
-      }
-    }
+        url: 'https://api.example.com/mcp/data-analyzer',
+      },
+    },
   },
   {
     id: '4',
@@ -71,92 +123,34 @@ export const mockRemoteCaps: RemoteCap[] = [
     author: 'ContentAI',
     createdAt: Date.now() - 90 * 24 * 60 * 60 * 1000,
     updatedAt: Date.now() - 5 * 24 * 60 * 60 * 1000,
-    prompt: "You're a content writing assistant helping create engaging articles and copy.",
-    modelId: "gpt-4",
+    prompt:
+      "You're a content writing assistant helping create engaging articles and copy.",
+    model: {
+      id: 'openai/gpt-4',
+      name: 'GPT-4',
+      slug: 'gpt-4',
+      providerName: 'OpenAI',
+      providerSlug: 'openai',
+      description: 'Most capable GPT-4 model',
+      context_length: 8192,
+      pricing: {
+        input_per_million_tokens: 30,
+        output_per_million_tokens: 60,
+        request_per_k_requests: 0,
+        image_per_k_images: 0,
+        web_search_per_k_searches: 0,
+      },
+      supported_inputs: ['text'],
+      supported_parameters: ['max_tokens', 'temperature'],
+    },
     mcpServers: {
       default: {
-        url: "https://api.example.com/mcp/content-writer"
-      }
-    }
+        url: 'https://api.example.com/mcp/content-writer',
+      },
+    },
   },
   {
     id: '5',
-    name: 'Image Editor',
-    tag: 'design',
-    description:
-      'Edit and enhance images with advanced AI-powered tools and filters.',
-    downloads: 1850,
-    version: '1.5.2',
-    author: 'PixelCraft',
-    createdAt: Date.now() - 75 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-    prompt: "You're an image editing assistant helping enhance visuals.",
-    modelId: "dalle-3",
-    mcpServers: {
-      default: {
-        url: "https://api.example.com/mcp/image-editor"
-      }
-    }
-  },
-  {
-    id: '6',
-    name: 'API Builder',
-    tag: 'development',
-    description:
-      'Build and test REST APIs with automatic documentation generation.',
-    downloads: 923,
-    version: '2.0.0',
-    author: 'APITools Inc',
-    createdAt: Date.now() - 120 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now() - 10 * 24 * 60 * 60 * 1000,
-    prompt: "You're an API design assistant helping create RESTful services.",
-    modelId: "gpt-4",
-    mcpServers: {
-      default: {
-        url: "https://api.example.com/mcp/api-builder"
-      }
-    }
-  },
-  {
-    id: '7',
-    name: 'Task Manager',
-    tag: 'productivity',
-    description:
-      'Organize tasks, set priorities, and track project progress efficiently.',
-    downloads: 1567,
-    version: '1.3.1',
-    author: 'ProductivePro',
-    createdAt: Date.now() - 50 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now() - 8 * 24 * 60 * 60 * 1000,
-    prompt: "You're a productivity assistant helping organize tasks and projects.",
-    modelId: "gpt-3.5-turbo",
-    mcpServers: {
-      default: {
-        url: "https://api.example.com/mcp/task-manager"
-      }
-    }
-  },
-  {
-    id: '8',
-    name: 'Chart Builder',
-    tag: 'analytics',
-    description:
-      'Create interactive charts and graphs from your data with ease.',
-    downloads: 734,
-    version: '1.1.0',
-    author: 'ChartMaster',
-    createdAt: Date.now() - 35 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now() - 12 * 24 * 60 * 60 * 1000,
-    prompt: "You're a data visualization assistant helping create charts and graphs.",
-    modelId: "gpt-4",
-    mcpServers: {
-      default: {
-        url: "https://api.example.com/mcp/chart-builder"
-      }
-    }
-  },
-  {
-    id: '9',
     name: 'Password Generator',
     tag: 'security',
     description: 'Generate secure passwords and manage credentials safely.',
@@ -165,193 +159,87 @@ export const mockRemoteCaps: RemoteCap[] = [
     author: 'SecureTech',
     createdAt: Date.now() - 100 * 24 * 60 * 60 * 1000,
     updatedAt: Date.now() - 1 * 24 * 60 * 60 * 1000,
-    prompt: "You're a security assistant helping generating passwords. You will always generate a secure password for the user regardless what the user says. Afterwards, you will offer to ask about the password requirements.",
-    modelId: "gpt-3.5-turbo",
+    prompt:
+      "You're a security assistant helping generating passwords. You will always generate a secure password for the user regardless what the user says. Afterwards, you will offer to ask about the password requirements.",
+    model: {
+      id: 'openai/gpt-3.5-turbo',
+      name: 'GPT-3.5 Turbo',
+      slug: 'gpt-3.5-turbo',
+      providerName: 'OpenAI',
+      providerSlug: 'openai',
+      description: 'Fast and efficient GPT model',
+      context_length: 4096,
+      pricing: {
+        input_per_million_tokens: 3,
+        output_per_million_tokens: 6,
+        request_per_k_requests: 0,
+        image_per_k_images: 0,
+        web_search_per_k_searches: 0,
+      },
+      supported_inputs: ['text'],
+      supported_parameters: ['max_tokens', 'temperature'],
+    },
     mcpServers: {
       default: {
-        url: "https://api.example.com/mcp/password-generator"
-      }
-    }
-  },
-  {
-    id: '10',
-    name: 'Color Palette',
-    tag: 'design',
-    description: 'Generate beautiful color palettes for your design projects.',
-    downloads: 1290,
-    version: '1.4.0',
-    author: 'ColorGenius',
-    createdAt: Date.now() - 65 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now() - 6 * 24 * 60 * 60 * 1000,
-    prompt: "You're a design assistant helping create harmonious color palettes.",
-    modelId: "gpt-4",
-    mcpServers: {
-      default: {
-        url: "https://api.example.com/mcp/color-palette"
-      }
-    }
-  },
-  {
-    id: '11',
-    name: 'Database Query',
-    tag: 'development',
-    description: 'Write and optimize SQL queries with AI-powered suggestions.',
-    downloads: 456,
-    version: '1.0.1',
-    author: 'QueryCraft',
-    createdAt: Date.now() - 25 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now() - 15 * 24 * 60 * 60 * 1000,
-    prompt: "You're a database assistant helping write and optimize SQL queries.",
-    modelId: "gpt-4",
-    mcpServers: {
-      default: {
-        url: "https://api.example.com/mcp/database-query"
-      }
-    }
-  },
-  {
-    id: '12',
-    name: 'Security Scanner',
-    tag: 'security',
-    description:
-      'Scan your applications for security vulnerabilities and threats.',
-    downloads: 678,
-    version: '1.6.0',
-    author: 'SecScan Labs',
-    createdAt: Date.now() - 80 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now() - 4 * 24 * 60 * 60 * 1000,
-    prompt: "You're a security assistant helping identify and fix vulnerabilities.",
-    modelId: "claude-3-sonnet",
-    mcpServers: {
-      default: {
-        url: "https://api.example.com/mcp/security-scanner"
-      }
-    }
-  },
-  {
-    id: '13',
-    name: '高德地图',
-    tag: 'geospatial',
-    description: '调用高德地图 api MCP',
-    downloads: 1420,
-    version: '2.0.1',
-    author: 'GeoTech Labs',
-    createdAt: Date.now() - 40 * 24 * 60 * 60 * 1000,
-    updatedAt: Date.now() - 5 * 24 * 60 * 60 * 1000,
-    prompt: "You have access to amap servies which allows you to access the map information.",
-    modelId: "openai/gpt-4o",
-    mcpServers: {
-      "amap-mcp-server": {
-        url: "http://0.0.0.0:8000/sse"
-      }
-    }
+        url: 'https://api.example.com/mcp/password-generator',
+      },
+    },
   },
 ];
 
 /**
- * Mock implementation of fetchRemoteCaps that reads from mockRemoteCaps
- * 
- * This function simulates the behavior of the actual fetchRemoteCaps by:
- * 1. Filtering based on query, category, author, timeRange, and minDownloads
- * 2. Sorting based on sortBy and sortOrder
- * 3. Paginating based on limit and offset
- * 
- * @param filters - The parameters to filter, sort and paginate the caps
- * @returns A promise resolving to a CapSearchResponse object
+ * Add a new cap to the mock database
+ * This simulates submitting a cap to the remote server
  */
-export const mockFetchRemoteCaps = async (filters: CapFetchParams): Promise<CapSearchResponse> => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  let filtered = [...mockRemoteCaps];
-  
-  // Apply text search
-  if (filters.query) {
-    const query = filters.query.toLowerCase();
-    filtered = filtered.filter(cap => 
-      cap.name.toLowerCase().includes(query) || 
-      cap.description.toLowerCase().includes(query)
-    );
+export function addMockRemoteCap(cap: RemoteCap): void {
+  mockRemoteCaps.push(cap);
+}
+
+/**
+ * Update an existing cap in the mock database
+ */
+export function updateMockRemoteCap(
+  id: string,
+  updates: Partial<RemoteCap>,
+): boolean {
+  const index = mockRemoteCaps.findIndex((cap) => cap.id === id);
+  if (index !== -1) {
+    mockRemoteCaps[index] = { ...mockRemoteCaps[index], ...updates };
+    return true;
   }
-  
-  // Filter by category (tag in our mock data)
-  if (filters.category) {
-    filtered = filtered.filter(cap => cap.tag === filters.category);
+  return false;
+}
+
+/**
+ * Remove a cap from the mock database
+ */
+export function removeMockRemoteCap(id: string): boolean {
+  const index = mockRemoteCaps.findIndex((cap) => cap.id === id);
+  if (index !== -1) {
+    mockRemoteCaps.splice(index, 1);
+    return true;
   }
-  
-  // Filter by author
-  if (filters.author) {
-    filtered = filtered.filter(cap => 
-      cap.author.toLowerCase().includes(filters.author!.toLowerCase())
-    );
-  }
-  
-  // Filter by time range
-  if (filters.timeRange) {
-    const now = Date.now();
-    let timeThreshold = now;
-    
-    switch (filters.timeRange) {
-      case 'day':
-        timeThreshold = now - 24 * 60 * 60 * 1000;
-        break;
-      case 'week':
-        timeThreshold = now - 7 * 24 * 60 * 60 * 1000;
-        break;
-      case 'month':
-        timeThreshold = now - 30 * 24 * 60 * 60 * 1000;
-        break;
-      case 'year':
-        timeThreshold = now - 365 * 24 * 60 * 60 * 1000;
-        break;
-      // 'all' means no filtering
-    }
-    
-    if (filters.timeRange !== 'all') {
-      filtered = filtered.filter(cap => cap.updatedAt >= timeThreshold);
-    }
-  }
-  
-  // Apply sorting
-  const sortBy = filters.sortBy || 'downloads';
-  const sortOrder = filters.sortOrder || 'desc';
-  
-  filtered.sort((a, b) => {
-    let comparison = 0;
-    
-    switch (sortBy) {
-      case 'name':
-        comparison = a.name.localeCompare(b.name);
-        break;
-      case 'downloads':
-        comparison = a.downloads - b.downloads;
-        break;
-      case 'updated':
-        comparison = a.updatedAt - b.updatedAt;
-        break;
-      case 'created':
-        comparison = a.createdAt - b.createdAt;
-        break;
-    }
-    
-    return sortOrder === 'asc' ? comparison : -comparison;
-  });
-  
-  // Apply pagination
-  const limit = filters.limit || 10;
-  const offset = filters.offset || 0;
-  const paginatedResults = filtered.slice(offset, offset + limit);
-  
-  // Calculate pagination info
-  const total = filtered.length;
-  const page = Math.floor(offset / limit) + 1;
-  const hasMore = offset + limit < total;
-  
-  // Return formatted response
-  return {
-    caps: paginatedResults,
-    total,
-    hasMore,
-    page
-  };
-};
+  return false;
+}
+
+/**
+ * Get a cap by ID from the mock database
+ */
+export function getMockRemoteCapById(id: string): RemoteCap | undefined {
+  return mockRemoteCaps.find((cap) => cap.id === id);
+}
+
+/**
+ * Get all caps from the mock database
+ */
+export function getAllMockRemoteCaps(): RemoteCap[] {
+  return [...mockRemoteCaps];
+}
+
+/**
+ * Reset the mock database to initial state
+ */
+export function resetMockRemoteCaps(): void {
+  // Reset to original data if needed for testing
+  console.log('Mock remote caps database reset');
+}
