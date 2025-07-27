@@ -136,64 +136,17 @@ export function CapCard({ cap, onRun }: CapCardProps) {
 
           {/* Action buttons */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div>
               {isInstalled ? (
-                <>
-                  {/* Run button */}
-                  <Button
-                    size="sm"
-                    variant="default"
-                    className="text-xs px-2 py-1 h-6"
-                    onClick={handleRun}
-                  >
-                    <Play className="size-3 mr-1" />
-                    Run
-                  </Button>
-
-                  {/* Settings dropdown */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-xs px-4 py-2 h-6 relative"
-                        style={{
-                          paddingRight:
-                            hasUpdate && isInstalled ? 14 : undefined,
-                        }}
-                      >
-                        <span className="relative inline-block">
-                          <Settings className="size-3" />
-                          {hasUpdate && isInstalled && (
-                            <span
-                              className="absolute -top-1 -right-1 block h-2 w-2 rounded-full bg-orange-500 border border-white"
-                              style={{ zIndex: 1 }}
-                            />
-                          )}
-                        </span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      {hasUpdate && isInstalled && (
-                        <DropdownMenuItem
-                          onClick={handleUpdate}
-                          disabled={isLoading}
-                        >
-                          <AlertCircle className="size-3 mr-2 text-orange-500" />
-                          {isLoading ? (
-                            <Loader2 className="size-3 animate-spin" />
-                          ) : (
-                            t('capStore.card.update')
-                          )}
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem onClick={handleUninstall}>
-                        <Trash2 className="size-3 mr-2" />
-                        Uninstall
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </>
+                <Button
+                  size="sm"
+                  variant="default"
+                  className="text-xs px-2 py-1 h-6"
+                  onClick={handleRun}
+                >
+                  <Play className="size-3 mr-1" />
+                  Run
+                </Button>
               ) : (
                 /* Install button */
                 <Button
@@ -210,10 +163,51 @@ export function CapCard({ cap, onRun }: CapCardProps) {
                   )}
                 </Button>
               )}
-
-              {/* Update indicator */}
-              {/* {hasUpdate && isInstalled && <AlertCircle className="size-3 text-orange-500" />} */}
             </div>
+            {isInstalled && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-xs px-4 py-2 h-6 relative"
+                    style={{
+                      paddingRight:
+                        hasUpdate && isInstalled ? 14 : undefined,
+                    }}
+                  >
+                    <span className="relative inline-block">
+                      <Settings className="size-3" />
+                      {hasUpdate && isInstalled && (
+                        <span
+                          className="absolute -top-1 -right-1 block h-2 w-2 rounded-full bg-orange-500 border border-white"
+                          style={{ zIndex: 1 }}
+                        />
+                      )}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {hasUpdate && isInstalled && (
+                    <DropdownMenuItem
+                      onClick={handleUpdate}
+                      disabled={isLoading}
+                    >
+                      <AlertCircle className="size-3 mr-2 text-orange-500" />
+                      {isLoading ? (
+                        <Loader2 className="size-3 animate-spin" />
+                      ) : (
+                        t('capStore.card.update')
+                      )}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={handleUninstall}>
+                    <Trash2 className="size-3 mr-2" />
+                    Uninstall
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>

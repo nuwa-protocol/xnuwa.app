@@ -145,7 +145,7 @@ export function SidebarLayout({
         {sidebarMode === 'floating' && (
           <div
             aria-hidden="true"
-            className="fixed left-0 top-0 w-20 h-full z-40 bg-transparent pointer-events-auto"
+            className="fixed left-0 top-0 w-10 h-full z-40 bg-transparent pointer-events-auto"
             onMouseEnter={() => stableSetIsHovering(true)}
             onMouseLeave={() => stableSetIsHovering(false)}
           />
