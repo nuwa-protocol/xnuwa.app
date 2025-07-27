@@ -1,13 +1,13 @@
 import { useState } from 'react';
+import { type LocalCap, useCapDevStore } from '@/features/cap-dev/stores';
 import { Button } from '@/shared/components/ui';
-import { useCapDevStore, type LocalCap } from '@/features/cap-dev/stores';
-import { DashboardLayout, DashboardHeader } from './layout/dashboard-layout';
+import { CapBuilder } from './create/cap-builder';
+import { CapTestEnvironment } from './debug/cap-test-environment';
+import { DashboardHeader, DashboardLayout } from './layout/dashboard-layout';
 import { SectionTabs, tabIcons } from './layout/section-tabs';
-import { MyCapsGallery } from './cap-management/my-caps-gallery';
-import { CapBuilder } from './cap-creation/cap-builder';
-import { SubmitForm } from './cap-submit/submit-form';
-import { CapTestEnvironment } from './cap-debugging/cap-test-environment';
 import { McpToolsSection } from './mcp-tools/mcp-tools-section';
+import { MyCapsGallery } from './my-caps/my-caps-gallery';
+import { SubmitForm } from './submit/submit-form';
 
 type ActiveSection = 'mycaps' | 'create' | 'submit' | 'debug' | 'mcp';
 
@@ -15,7 +15,8 @@ export function CapDev() {
   const { localCaps } = useCapDevStore();
   const [activeSection, setActiveSection] = useState<ActiveSection>('mycaps');
   const [editingCap, setEditingCap] = useState<LocalCap | null>(null);
-  const [selectedCapForAction, setSelectedCapForAction] = useState<LocalCap | null>(null);
+  const [selectedCapForAction, setSelectedCapForAction] =
+    useState<LocalCap | null>(null);
 
   const handleEditCap = (cap: LocalCap) => {
     setEditingCap(cap);
@@ -106,9 +107,7 @@ export function CapDev() {
       label: 'Debug',
       icon: tabIcons.debug,
       content: selectedCapForAction ? (
-        <CapTestEnvironment
-          cap={selectedCapForAction}
-        />
+        <CapTestEnvironment cap={selectedCapForAction} />
       ) : (
         <div className="text-center py-12 text-muted-foreground">
           <p>Select a cap from "My Caps" to debug and test it</p>
@@ -141,11 +140,8 @@ export function CapDev() {
         description="Create, debug, and publish powerful AI capabilities with integrated MCP tools"
         actions={headerActions}
       />
-      
-      <SectionTabs
-        defaultTab={activeSection}
-        tabs={tabs}
-      />
+
+      <SectionTabs value={activeSection} onValueChange={(val) => setActiveSection(val as ActiveSection)} tabs={tabs} />
     </DashboardLayout>
   );
 }

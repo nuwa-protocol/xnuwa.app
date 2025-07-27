@@ -1,13 +1,11 @@
-import { ReactNode } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui';
-import { 
-  Code2, 
-  Upload, 
-  Bug, 
-  Folder, 
-  Settings2,
-  Sparkles
-} from 'lucide-react';
+import { Bug, Code2, Folder, Settings2, Sparkles, Upload } from 'lucide-react';
+import type { ReactNode } from 'react';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/components/ui';
 
 interface SectionTab {
   id: string;
@@ -19,12 +17,24 @@ interface SectionTab {
 
 interface SectionTabsProps {
   defaultTab?: string;
+  value?: string;
+  onValueChange?: (val: string) => void;
   tabs: SectionTab[];
 }
 
-export function SectionTabs({ defaultTab, tabs }: SectionTabsProps) {
+export function SectionTabs({
+  defaultTab,
+  value,
+  onValueChange,
+  tabs,
+}: SectionTabsProps) {
   return (
-    <Tabs defaultValue={defaultTab || tabs[0]?.id} className="w-full">
+    <Tabs
+      value={value}
+      onValueChange={onValueChange}
+      defaultValue={value === undefined ? defaultTab || tabs[0]?.id : undefined}
+      className="w-full"
+    >
       <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 h-auto p-1 bg-muted/50 backdrop-blur-sm">
         {tabs.map((tab) => (
           <TabsTrigger
@@ -44,11 +54,7 @@ export function SectionTabs({ defaultTab, tabs }: SectionTabsProps) {
       </TabsList>
 
       {tabs.map((tab) => (
-        <TabsContent
-          key={tab.id}
-          value={tab.id}
-          className="mt-6 space-y-6"
-        >
+        <TabsContent key={tab.id} value={tab.id} className="mt-6 space-y-6">
           {tab.content}
         </TabsContent>
       ))}
@@ -62,5 +68,5 @@ export const tabIcons = {
   upload: <Upload className="h-4 w-4" />,
   debug: <Bug className="h-4 w-4" />,
   mcp: <Code2 className="h-4 w-4" />,
-  settings: <Settings2 className="h-4 w-4" />
+  settings: <Settings2 className="h-4 w-4" />,
 };
