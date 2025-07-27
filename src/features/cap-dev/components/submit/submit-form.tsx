@@ -14,7 +14,7 @@ import {
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import type { LocalCap } from '@/features/cap-dev/stores';
+import type { LocalCap } from '@/features/cap-dev/stores/model-stores';
 import { type CapSubmitRequest, mockSubmitCap } from '@/mocks/submit-caps';
 import { toast } from '@/shared/components';
 import {

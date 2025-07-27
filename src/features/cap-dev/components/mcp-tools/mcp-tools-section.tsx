@@ -21,7 +21,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  FormLabel,
   Input,
   ScrollArea,
   Select,
@@ -29,7 +28,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Separator,
 } from '@/shared/components/ui';
 import {
   closeNuwaMCPClient,
@@ -53,22 +51,9 @@ interface ConnectionConfig {
   name?: string;
 }
 
-const savedConnections: ConnectionConfig[] = [
-  {
-    url: 'http://localhost:8080/mcp',
-    transport: 'httpStream',
-    name: 'Local Dev Server',
-  },
-  {
-    url: 'https://api.example.com/mcp',
-    transport: 'sse',
-    name: 'Production API',
-  },
-];
-
 export function McpToolsSection() {
   const [url, setUrl] = useState('http://localhost:8080/mcp');
-  const [transport, setTransport] = useState<McpTransportType | ''>('');
+  const [transport, setTransport] = useState<McpTransportType | 'auto'>('auto');
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [client, setClient] = useState<NuwaMCPClient | null>(null);
@@ -105,7 +90,7 @@ export function McpToolsSection() {
 
       const newClient = await createNuwaMCPClient(
         url,
-        transport === '' ? undefined : (transport as McpTransportType),
+        transport === 'auto' ? undefined : (transport as McpTransportType),
       );
 
       setClient(newClient);
@@ -272,7 +257,7 @@ export function McpToolsSection() {
 
   const loadConnection = (config: ConnectionConfig) => {
     setUrl(config.url);
-    setTransport(config.transport);
+    setTransport((config.transport && ['httpStream', 'sse'].includes(config.transport)) ? config.transport : 'auto');
   };
 
   const clearLogs = () => {
@@ -342,48 +327,12 @@ export function McpToolsSection() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Quick Connect */}
-            <div className="space-y-2">
-              <FormLabel className="text-sm font-medium">
-                Quick Connect
-              </FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  const config = savedConnections.find((c) => c.name === value);
-                  if (config) loadConnection(config);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select saved connection..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {savedConnections.map((config) => (
-                    <SelectItem
-                      key={config.name}
-                      value={config.name || config.url}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <div className="flex flex-col">
-                          <span>{config.name || 'Unnamed'}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {config.url}
-                          </span>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Separator />
-
             {/* Manual Connection */}
             <div className="space-y-3">
               <div className="space-y-2">
-                <FormLabel className="text-sm font-medium">
+                <div className="text-sm font-medium">
                   Server URL
-                </FormLabel>
+                </div>
                 <Input
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
@@ -393,19 +342,24 @@ export function McpToolsSection() {
               </div>
 
               <div className="space-y-2">
-                <FormLabel className="text-sm font-medium">Transport</FormLabel>
+                <div className="text-sm font-medium">Transport</div>
                 <Select
                   value={transport}
-                  onValueChange={(value) =>
-                    setTransport(value as McpTransportType | '')
-                  }
+                  onValueChange={(value: string) => {
+                    const allowed = ['auto', 'httpStream', 'sse'];
+                    if (allowed.includes(value)) {
+                      setTransport(value as McpTransportType | 'auto');
+                    } else {
+                      setTransport('auto');
+                    }
+                  }}
                   disabled={connecting || connected}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Auto-detect" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Auto-detect</SelectItem>
+                    <SelectItem value="auto">Auto-detect</SelectItem>
                     <SelectItem value="httpStream">HTTP Stream</SelectItem>
                     <SelectItem value="sse">Server-Sent Events</SelectItem>
                   </SelectContent>

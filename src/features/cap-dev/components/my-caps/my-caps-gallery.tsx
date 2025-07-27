@@ -1,22 +1,30 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Search, Filter, SortAsc, SortDesc, Plus, Grid3X3, List } from 'lucide-react';
 import {
-  Input,
+  Filter,
+  Grid3X3,
+  List,
+  Plus,
+  Search,
+  SortAsc,
+  SortDesc,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { type LocalCap, useCapDevStore } from '@/features/cap-dev/stores/model-stores';
+import {
   Button,
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   Toggle,
 } from '@/shared/components/ui';
-import { useCapDevStore, type LocalCap } from '@/features/cap-dev/stores';
-import { CapCard } from './cap-card';
 import { DashboardGrid } from '../layout/dashboard-layout';
+import { CapCard } from './cap-card';
 
 type SortField = 'name' | 'updatedAt' | 'tag' | 'version';
 type SortOrder = 'asc' | 'desc';
@@ -29,14 +37,14 @@ interface MyCapsGalleryProps {
   onCreateNew?: () => void;
 }
 
-export function MyCapsGallery({ 
-  onEditCap, 
-  onDebugCap, 
+export function MyCapsGallery({
+  onEditCap,
+  onDebugCap,
   onSubmitCap,
-  onCreateNew 
+  onCreateNew,
 }: MyCapsGalleryProps) {
   const { localCaps } = useCapDevStore();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [tagFilter, setTagFilter] = useState<string>('all');
   const [sortField, setSortField] = useState<SortField>('updatedAt');
@@ -45,9 +53,9 @@ export function MyCapsGallery({
 
   // Get unique tags
   const capsArray = localCaps;
-  const uniqueTags = useMemo(() => 
-    [...new Set(capsArray.map(cap => cap.tag))].sort(), 
-    [capsArray]
+  const uniqueTags = useMemo(
+    () => [...new Set(capsArray.map((cap) => cap.tag))].sort(),
+    [capsArray],
   );
 
   // Filter and sort caps
@@ -57,16 +65,17 @@ export function MyCapsGallery({
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(cap => 
-        cap.name.toLowerCase().includes(query) ||
-        cap.description.toLowerCase().includes(query) ||
-        cap.tag.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (cap) =>
+          cap.name.toLowerCase().includes(query) ||
+          cap.description.toLowerCase().includes(query) ||
+          cap.tag.toLowerCase().includes(query),
       );
     }
 
     // Apply tag filter
     if (tagFilter !== 'all') {
-      filtered = filtered.filter(cap => cap.tag === tagFilter);
+      filtered = filtered.filter((cap) => cap.tag === tagFilter);
     }
 
     // Apply sorting
@@ -89,7 +98,7 @@ export function MyCapsGallery({
   }, [capsArray, searchQuery, tagFilter, sortField, sortOrder]);
 
   const toggleSortOrder = () => {
-    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
   };
 
   if (capsArray.length === 0) {
@@ -99,9 +108,12 @@ export function MyCapsGallery({
           <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
             <Plus className="h-6 w-6 text-muted-foreground" />
           </div>
-          <CardTitle className="text-xl text-muted-foreground">No Caps Yet</CardTitle>
+          <CardTitle className="text-xl text-muted-foreground">
+            No Caps Yet
+          </CardTitle>
           <CardDescription className="text-base max-w-md mx-auto">
-            You haven't created any caps yet. Start building your first capability to get started with cap development.
+            You haven't created any caps yet. Start building your first
+            capability to get started with cap development.
           </CardDescription>
           <div className="pt-4">
             <Button onClick={onCreateNew} size="lg">
@@ -167,7 +179,7 @@ export function MyCapsGallery({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Tags</SelectItem>
-            {uniqueTags.map(tag => (
+            {uniqueTags.map((tag) => (
               <SelectItem key={tag} value={tag}>
                 {tag}
               </SelectItem>
@@ -175,7 +187,10 @@ export function MyCapsGallery({
           </SelectContent>
         </Select>
 
-        <Select value={sortField} onValueChange={(value: SortField) => setSortField(value)}>
+        <Select
+          value={sortField}
+          onValueChange={(value: SortField) => setSortField(value)}
+        >
           <SelectTrigger className="w-32">
             <SelectValue />
           </SelectTrigger>
@@ -187,11 +202,7 @@ export function MyCapsGallery({
           </SelectContent>
         </Select>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleSortOrder}
-        >
+        <Button variant="outline" size="sm" onClick={toggleSortOrder}>
           {sortOrder === 'asc' ? (
             <SortAsc className="h-4 w-4" />
           ) : (
@@ -204,7 +215,9 @@ export function MyCapsGallery({
       {filteredAndSortedCaps.length === 0 ? (
         <Card className="border-dashed">
           <CardHeader className="text-center py-8">
-            <CardTitle className="text-muted-foreground">No matching caps</CardTitle>
+            <CardTitle className="text-muted-foreground">
+              No matching caps
+            </CardTitle>
             <CardDescription>
               Try adjusting your search or filter criteria
             </CardDescription>

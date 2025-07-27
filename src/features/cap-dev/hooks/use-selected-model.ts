@@ -1,4 +1,4 @@
-import { ModelStateStore } from '../stores';
+import { ModelStateStore } from '../stores/model-stores';
 
 export function useSelectedModel() {
   const selectedModel = ModelStateStore((state) => state.selectedModel);

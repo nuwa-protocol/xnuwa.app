@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ModelStateStore } from '../stores';
+import { ModelStateStore } from '../stores/model-stores';
 
 export function useAvailableModels() {
   const models = ModelStateStore((state) => state.availableModels);

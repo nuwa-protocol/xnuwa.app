@@ -1,4 +1,4 @@
-import type { LocalCap } from '@/features/cap-dev/stores/cap-dev-store';
+import type { LocalCap } from '@/features/cap-dev/stores/cap-dev-stores';
 import type { RemoteCap } from '@/features/cap-store/types';
 import { addMockRemoteCap } from './mock-remote-caps';
 

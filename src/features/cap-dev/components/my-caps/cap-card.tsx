@@ -4,14 +4,15 @@ import {
   Clock,
   Code2,
   Copy,
-  Edit, MoreVertical,
+  Edit,
+  MoreVertical,
   Settings,
   Tag,
   Trash2,
-  Upload
+  Upload,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useCapDevStore, type LocalCap } from '@/features/cap-dev/stores';
+import { type LocalCap, useCapDevStore } from '@/features/cap-dev/stores/model-stores';
 import {
   AlertDialog,
   AlertDialogAction,

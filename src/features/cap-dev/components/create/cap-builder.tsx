@@ -1,10 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, CheckCircle2, Eye, Loader2, Plus, Save, Wand2, X } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Eye,
+  Loader2,
+  Plus,
+  Save,
+  Wand2,
+  X,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { ModelStateStore } from '@/features/cap-dev/stores';
-import { useCapDevStore, type LocalCap } from '@/features/cap-dev/stores';
+import {
+  type LocalCap,
+  ModelStateStore,
+  useCapDevStore,
+} from '@/features/cap-dev/stores/model-stores';
 import { toast } from '@/shared/components';
 import {
   Button,
@@ -35,6 +47,7 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 import { DashboardGrid } from '../layout/dashboard-layout';
+import { predefinedTags, promptTemplates } from './constants';
 import { ModelConfig } from './model-config';
 import { PromptEditor } from './prompt-editor';
 
@@ -58,48 +71,6 @@ interface CapBuilderProps {
   onSave?: (cap: LocalCap) => void;
   onCancel?: () => void;
 }
-
-const predefinedTags = [
-  'productivity',
-  'development',
-  'content',
-  'analysis',
-  'automation',
-  'communication',
-  'research',
-  'creative',
-  'utility',
-  'education',
-  'business',
-  'personal',
-];
-
-const promptTemplates = [
-  {
-    name: 'Code Assistant',
-    description: 'Help with programming tasks',
-    prompt:
-      'You are a helpful programming assistant. Help the user with coding tasks, explain concepts, and provide best practices. Always write clean, well-documented code.',
-  },
-  {
-    name: 'Content Writer',
-    description: 'Create written content',
-    prompt:
-      'You are a professional content writer. Create engaging, well-structured content that is informative and tailored to the target audience. Maintain a consistent tone and style.',
-  },
-  {
-    name: 'Data Analyst',
-    description: 'Analyze data and provide insights',
-    prompt:
-      'You are a data analyst. Help analyze data, identify patterns, create visualizations, and provide actionable insights. Always explain your methodology and findings clearly.',
-  },
-  {
-    name: 'Research Assistant',
-    description: 'Research and summarize information',
-    prompt:
-      'You are a research assistant. Help gather, analyze, and summarize information from various sources. Provide well-structured research with proper citations and key insights.',
-  },
-];
 
 export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
   const { createCap, updateCap } = useCapDevStore();
@@ -149,14 +120,20 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
           model: selectedModel,
           mcpServers,
         });
-        
-        const updatedCap = { ...editingCap, ...data, model: selectedModel, mcpServers, updatedAt: Date.now() };
-        
+
+        const updatedCap = {
+          ...editingCap,
+          ...data,
+          model: selectedModel,
+          mcpServers,
+          updatedAt: Date.now(),
+        };
+
         toast({
           type: 'success',
           description: `${data.name} has been updated successfully`,
         });
-        
+
         onSave?.(updatedCap);
       } else {
         // Create new cap
@@ -169,12 +146,12 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
           model: selectedModel,
           mcpServers,
         });
-        
+
         toast({
           type: 'success',
           description: `${data.name} has been created successfully`,
         });
-        
+
         onSave?.(newCap);
       }
     } catch (error) {

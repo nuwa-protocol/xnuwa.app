@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { type LocalCap, useCapDevStore } from '@/features/cap-dev/stores';
+import { type LocalCap, useCapDevStore } from '@/features/cap-dev/stores/model-stores';
 import { Button } from '@/shared/components/ui';
 import { CapBuilder } from './create/cap-builder';
-import { CapTestEnvironment } from './debug/cap-test-environment';
 import { DashboardHeader, DashboardLayout } from './layout/dashboard-layout';
 import { SectionTabs, tabIcons } from './layout/section-tabs';
 import { McpToolsSection } from './mcp-tools/mcp-tools-section';
@@ -96,21 +95,6 @@ export function CapDev() {
       ) : (
         <div className="text-center py-12 text-muted-foreground">
           <p>Select a cap from "My Caps" to submit it to the store</p>
-          <Button onClick={() => setActiveSection('mycaps')} className="mt-4">
-            Go to My Caps
-          </Button>
-        </div>
-      ),
-    },
-    {
-      id: 'debug',
-      label: 'Debug',
-      icon: tabIcons.debug,
-      content: selectedCapForAction ? (
-        <CapTestEnvironment cap={selectedCapForAction} />
-      ) : (
-        <div className="text-center py-12 text-muted-foreground">
-          <p>Select a cap from "My Caps" to debug and test it</p>
           <Button onClick={() => setActiveSection('mycaps')} className="mt-4">
             Go to My Caps
           </Button>

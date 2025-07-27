@@ -22,7 +22,6 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-  FormLabel,
   Input,
   ScrollArea,
   Tabs,
@@ -475,9 +474,9 @@ export function EnhancedMcpDebugPanel({
                   {executionResults[selectedTool] && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <FormLabel className="text-sm font-medium">
+                        <div className="text-sm font-medium">
                           Latest Result
-                        </FormLabel>
+                        </div>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -580,9 +579,9 @@ export function EnhancedMcpDebugPanel({
                         {hasResult && (
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <FormLabel className="text-sm font-medium">
+                              <div className="text-sm font-medium">
                                 Result
-                              </FormLabel>
+                              </div>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -662,9 +661,9 @@ export function EnhancedMcpDebugPanel({
                     {hasResult && (
                       <div className="mt-3 space-y-2">
                         <div className="flex items-center justify-between">
-                          <FormLabel className="text-sm font-medium">
+                          <div className="text-sm font-medium">
                             Content
-                          </FormLabel>
+                          </div>
                           <Button
                             variant="ghost"
                             size="sm"

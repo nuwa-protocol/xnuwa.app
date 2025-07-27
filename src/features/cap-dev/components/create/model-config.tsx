@@ -6,7 +6,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { ModelStateStore } from '@/features/cap-dev/stores';
+import { ModelStateStore } from '@/features/cap-dev/stores/model-stores';
 import {
   Avatar,
   AvatarFallback, Badge,
