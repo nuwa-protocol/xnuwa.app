@@ -6,19 +6,12 @@ export interface CapSubmitRequest {
   cap: LocalCap;
   metadata: {
     name: string;
-    version: string;
     description: string;
     tag: string;
     author: string;
-    license?: string;
     homepage?: string;
     repository?: string;
     changelog?: string;
-    minNuwaVersion?: string;
-    compatibility?: string;
-    isPublic?: boolean;
-    allowForking?: boolean;
-    communitySupport?: boolean;
   };
 }
 
@@ -61,11 +54,6 @@ export const mockSubmitCap = async (
     errors.push('Cap prompt is required');
   }
 
-  // Version format validation
-  if (!/^\d+\.\d+\.\d+$/.test(request.metadata.version)) {
-    errors.push('Version must be in format x.y.z');
-  }
-
   if (errors.length > 0) {
     return {
       success: false,
@@ -92,7 +80,6 @@ export const mockSubmitCap = async (
   console.log('Mock cap submitted:', {
     capId: submittedCapId,
     name: request.metadata.name,
-    version: request.metadata.version,
     author: request.metadata.author,
     description: request.metadata.description,
   });
@@ -116,7 +103,7 @@ export const convertLocalToRemoteCap = (
     name: metadata.name,
     description: metadata.description,
     tag: metadata.tag,
-    version: metadata.version,
+    version: '0.0.0',
     author: metadata.author,
     downloads: 0, // New caps start with 0 downloads
     createdAt: Date.now(),

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import type { LocalCap } from '../types';
 import { DashboardHeader, DashboardLayout } from './layout/dashboard-layout';
-import { MyCapsGallery } from './my-caps';
+import { MyCaps } from './my-caps';
 
 export function CapStudio() {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ export function CapStudio() {
         description="Create, test, and publish powerful AI capabilities with integrated MCP tools"
       />
 
-      <MyCapsGallery
+      <MyCaps
         onEditCap={handleEditCap}
         onTestCap={handleTestCap}
         onSubmitCap={handleSubmitCap}

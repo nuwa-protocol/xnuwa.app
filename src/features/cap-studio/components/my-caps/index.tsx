@@ -13,19 +13,19 @@ import type { LocalCap } from '../../types';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { CapCard } from './cap-card';
 
-interface MyCapsGalleryProps {
+interface MyCapsProps {
   onEditCap?: (cap: LocalCap) => void;
   onTestCap?: (cap: LocalCap) => void;
   onSubmitCap?: (cap: LocalCap) => void;
   onCreateNew?: () => void;
 }
 
-export function MyCapsGallery({
+export function MyCaps({
   onEditCap,
   onTestCap,
   onSubmitCap,
   onCreateNew,
-}: MyCapsGalleryProps) {
+}: MyCapsProps) {
   const localCaps = useLocalCaps();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -114,7 +114,6 @@ export function MyCapsGallery({
               onTest={() => onTestCap?.(cap)}
               onSubmit={() => onSubmitCap?.(cap)}
               onClick={() => onEditCap?.(cap)}
-              viewMode="list"
             />
           ))}
         </DashboardGrid>

@@ -1,5 +1,5 @@
-import { Create } from '@/features/cap-studio/components/create';
+import { CapEdit } from '@/features/cap-studio/components/cap-edit';
 
 export default function CapStudioCreatePage() {
-  return <Create />;
+  return <CapEdit />;
 }

@@ -5,7 +5,6 @@ import {
   Loader2,
   Plus,
   Save,
-  Wand2,
   X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -21,15 +20,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -45,7 +37,7 @@ import {
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { ModelSelectorDialog } from '../model-selector';
-import { predefinedTags, promptTemplates } from './constants';
+import { predefinedTags } from './constants';
 import { ModelDetails } from './model-details';
 import { PromptEditor } from './prompt-editor';
 
@@ -182,16 +174,6 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
     }));
   };
 
-  const handleUseTemplate = (template: (typeof promptTemplates)[0]) => {
-    form.setValue('prompt', template.prompt);
-    if (!form.getValues('name')) {
-      form.setValue('name', template.name);
-    }
-    if (!form.getValues('description')) {
-      form.setValue('description', template.description);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -300,7 +282,7 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
               </CardContent>
             </Card>
 
-            {/* Model Configuration (NEW) */}
+            {/* Model Configuration (use Model Selector) */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -336,48 +318,10 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
                     Prompt Configuration
                   </CardTitle>
                   <CardDescription>
-                    Define the behavior and instructions for your cap
+                    This prompt will guide the AI model's behavior when using
+                    your cap
                   </CardDescription>
                 </div>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Wand2 className="h-4 w-4 mr-2" />
-                      Templates
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Prompt Templates</DialogTitle>
-                      <DialogDescription>
-                        Choose a template to get started quickly
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-3">
-                      {promptTemplates.map((template) => (
-                        <Card
-                          key={template.name}
-                          className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => handleUseTemplate(template)}
-                        >
-                          <CardHeader className="pb-2">
-                            <CardTitle className="text-sm">
-                              {template.name}
-                            </CardTitle>
-                            <CardDescription className="text-xs">
-                              {template.description}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent className="pt-0">
-                            <p className="text-xs text-muted-foreground line-clamp-2">
-                              {template.prompt}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </DialogContent>
-                </Dialog>
               </div>
             </CardHeader>
             <CardContent>
@@ -393,10 +337,6 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
                         placeholder="Enter your prompt instructions here..."
                       />
                     </FormControl>
-                    <FormDescription>
-                      This prompt will guide the AI model's behavior when using
-                      your cap
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -411,8 +351,7 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
                 <div>
                   <CardTitle className="text-base">MCP Servers</CardTitle>
                   <CardDescription>
-                    Configure Model Context Protocol servers for additional
-                    capabilities
+                    Only SSE and HTTP Streambale transports are supported.
                   </CardDescription>
                 </div>
                 <Button
@@ -430,9 +369,6 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
               {Object.keys(mcpServers).length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <p>No MCP servers configured</p>
-                  <p className="text-sm">
-                    Add servers to extend your cap's capabilities
-                  </p>
                 </div>
               ) : (
                 <div className="space-y-4">

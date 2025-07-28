@@ -3,7 +3,7 @@ import { useLocalCaps } from '../../hooks';
 import { DashboardLayout } from '../layout/dashboard-layout';
 import { CapBuilder } from './cap-builder';
 
-export function Create() {
+export function CapEdit() {
   const navigate = useNavigate();
   const { id } = useParams();
   const localCaps = useLocalCaps();

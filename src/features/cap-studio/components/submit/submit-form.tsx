@@ -2,13 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AlertCircle,
   CheckCircle2,
-  Eye,
   FileText,
-  Globe,
   Image as ImageIcon,
   Loader2,
-  Lock,
-  Tag,
   Upload,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -17,7 +13,6 @@ import { z } from 'zod';
 import { type CapSubmitRequest, mockSubmitCap } from '@/mocks/submit-caps';
 import { toast } from '@/shared/components';
 import {
-  Badge,
   Button,
   Card,
   CardContent,
@@ -29,7 +24,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   Form,
   FormControl,
   FormDescription,
@@ -38,20 +32,17 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Progress,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Switch,
   Textarea,
 } from '@/shared/components/ui';
-import { generateUUID } from '@/shared/utils';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
 import type { LocalCap } from '../../types';
+import { predefinedTags } from '../cap-edit/constants';
 import { DashboardGrid } from '../layout/dashboard-layout';
-import { PublishDialog } from './publish-dialog';
 
 const submitSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
@@ -60,9 +51,6 @@ const submitSchema = z.object({
     .min(20, 'Description must be at least 20 characters')
     .max(1000, 'Description too long'),
   tag: z.string().min(1, 'Category is required'),
-  version: z
-    .string()
-    .regex(/^\d+\.\d+\.\d+$/, 'Version must be in format x.y.z'),
   author: z.string().min(1, 'Author name is required'),
   keywords: z.string().optional(),
   readme: z.string().min(50, 'README must be at least 50 characters'),
@@ -74,9 +62,6 @@ const submitSchema = z.object({
     .optional()
     .or(z.literal('')),
   isPublic: z.boolean(),
-  termsAccepted: z
-    .boolean()
-    .refine((val) => val === true, 'You must accept the terms'),
 });
 
 type SubmitFormData = z.infer<typeof submitSchema>;
@@ -87,39 +72,11 @@ interface SubmitFormProps {
   onCancel?: () => void;
 }
 
-const predefinedTags = [
-  'productivity',
-  'development',
-  'content',
-  'analysis',
-  'automation',
-  'communication',
-  'research',
-  'creative',
-  'utility',
-  'education',
-  'business',
-  'personal',
-];
-
-const licenses = [
-  'MIT',
-  'Apache-2.0',
-  'GPL-3.0',
-  'BSD-3-Clause',
-  'ISC',
-  'CC-BY-4.0',
-  'Proprietary',
-];
-
 export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
   const { updateCap } = useLocalCapsHandler();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
-  const [showPublishDialog, setShowPublishDialog] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [screenshotFiles, setScreenshotFiles] = useState<File[]>([]);
 
   const form = useForm<SubmitFormData>({
     resolver: zodResolver(submitSchema),
@@ -134,7 +91,6 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
       homepage: '',
       repository: '',
       isPublic: true,
-      termsAccepted: false,
     },
   });
 
@@ -157,78 +113,41 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
     }
   };
 
-  const handleScreenshotUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const files = Array.from(event.target.files || []);
-    const validFiles = files.filter((file) => {
-      if (file.size > 5 * 1024 * 1024) {
-        // 5MB limit per file
-        toast({
-          type: 'error',
-          description: `${file.name} is over 5MB limit`,
-        });
-        return false;
-      }
-      return true;
-    });
+  const handleFormSubmit = async () => {
+    // Trigger validation and show errors
+    const isValid = await form.trigger();
 
-    if (screenshotFiles.length + validFiles.length > 5) {
-      toast({
-        type: 'error',
-        description: 'Maximum 5 screenshots allowed',
-      });
+    if (!isValid) {
+      // Form will show validation errors automatically
       return;
     }
 
-    setScreenshotFiles((prev) => [...prev, ...validFiles]);
+    // Show confirmation dialog
+    setShowConfirmDialog(true);
   };
 
-  const removeScreenshot = (index: number) => {
-    setScreenshotFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = async (data: SubmitFormData) => {
+  const handleConfirmedSubmit = async () => {
+    const data = form.getValues();
     setIsSubmitting(true);
-    setUploadProgress(0);
+    setShowConfirmDialog(false);
 
     try {
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 200);
-
       // Prepare submission request
       const submitRequest: CapSubmitRequest = {
         cap,
         metadata: {
           name: data.name,
-          version: data.version,
           description: data.description,
           tag: data.tag,
           author: data.author,
-          license: data.license,
           homepage: data.homepage || undefined,
           repository: data.repository || undefined,
           changelog: undefined,
-          minNuwaVersion: undefined,
-          compatibility: undefined,
-          isPublic: data.isPublic,
-          allowForking: true,
-          communitySupport: true,
         },
       };
 
       // Submit using mock function
       const result = await mockSubmitCap(submitRequest);
-
-      setUploadProgress(100);
 
       if (result.success) {
         // Update cap status to submitted
@@ -240,7 +159,6 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
         });
 
         onSubmit?.(true, result.capId);
-        setShowPublishDialog(true);
       } else {
         throw new Error(result.message);
       }
@@ -257,7 +175,6 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
       onSubmit?.(false);
     } finally {
       setIsSubmitting(false);
-      setUploadProgress(0);
     }
   };
 
@@ -272,40 +189,22 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
           </p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Dialog open={showPreview} onOpenChange={setShowPreview}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Store Listing Preview</DialogTitle>
-                <DialogDescription>
-                  Preview how your cap will appear in the store
-                </DialogDescription>
-              </DialogHeader>
-              <CapStorePreview
-                data={watchedData}
-                cap={cap}
-                thumbnail={thumbnailFile}
-              />
-            </DialogContent>
-          </Dialog>
-
-          {onCancel && (
-            <Button variant="ghost" size="sm" onClick={onCancel}>
-              Cancel
-            </Button>
-          )}
-        </div>
+        {onCancel && (
+          <Button variant="ghost" size="sm" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          <DashboardGrid cols={2}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleFormSubmit();
+          }}
+          className="space-y-6"
+        >
+          <DashboardGrid cols={1}>
             {/* Basic Information */}
             <Card>
               <CardHeader>
@@ -322,7 +221,14 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                     <FormItem>
                       <FormLabel>Display Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="My Awesome Cap" {...field} />
+                        <Input
+                          placeholder="My Awesome Cap"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.trigger('name');
+                          }}
+                        />
                       </FormControl>
                       <FormDescription>
                         The name shown in the cap store
@@ -343,6 +249,10 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                           placeholder="A comprehensive description of what your cap does and how it helps users..."
                           rows={4}
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.trigger('description');
+                          }}
                         />
                       </FormControl>
                       <FormDescription>
@@ -354,65 +264,32 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                   )}
                 />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="tag"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {predefinedTags.map((tag) => (
-                              <SelectItem key={tag} value={tag}>
-                                {tag}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="version"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Version</FormLabel>
-                        <FormControl>
-                          <Input placeholder="1.0.0" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
                 <FormField
                   control={form.control}
-                  name="keywords"
+                  name="tag"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Keywords (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="ai, assistant, productivity"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Comma-separated keywords to help users find your cap
-                      </FormDescription>
+                      <FormLabel>Category</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          form.trigger('tag');
+                        }}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {predefinedTags.map((tag) => (
+                            <SelectItem key={tag} value={tag}>
+                              {tag}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -420,10 +297,10 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
               </CardContent>
             </Card>
 
-            {/* Author & Legal */}
+            {/* Author */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Author & Legal</CardTitle>
+                <CardTitle className="text-base">Author</CardTitle>
                 <CardDescription>
                   Information about the cap author and licensing
                 </CardDescription>
@@ -436,39 +313,18 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                     <FormItem>
                       <FormLabel>Author Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your Name" {...field} />
+                        <Input
+                          placeholder="Your Name"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.trigger('author');
+                          }}
+                        />
                       </FormControl>
                       <FormDescription>
                         Your name or organization name
                       </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="license"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>License</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {licenses.map((license) => (
-                            <SelectItem key={license} value={license}>
-                              {license}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -481,7 +337,14 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                     <FormItem>
                       <FormLabel>Homepage (Optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://example.com" {...field} />
+                        <Input
+                          placeholder="https://example.com"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.trigger('homepage');
+                          }}
+                        />
                       </FormControl>
                       <FormDescription>
                         Link to your cap's homepage or documentation
@@ -501,6 +364,10 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                         <Input
                           placeholder="https://github.com/user/repo"
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.trigger('repository');
+                          }}
                         />
                       </FormControl>
                       <FormDescription>
@@ -510,81 +377,20 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="isPublic"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                          Public Listing
-                        </FormLabel>
-                        <FormDescription>
-                          Make this cap publicly discoverable in the store
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
               </CardContent>
             </Card>
           </DashboardGrid>
 
-          {/* Documentation */}
+          {/* Thumbnail Upload */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Documentation</CardTitle>
+              <CardTitle className="text-base">Thumbnail</CardTitle>
               <CardDescription>
-                Provide comprehensive documentation for your cap
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="readme"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>README (Markdown)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="# My Cap\n\nDetailed documentation..."
-                        rows={12}
-                        className="font-mono text-sm"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Markdown documentation that will be shown on the cap's
-                      detail page
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Media Upload */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Media Assets</CardTitle>
-              <CardDescription>
-                Upload thumbnail and screenshots to showcase your cap
+                Upload thumbnail to represent your cap
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Thumbnail */}
               <div>
-                <FormLabel className="text-sm font-medium mb-2 block">
-                  Thumbnail (Optional)
-                </FormLabel>
                 <div className="flex items-center space-x-4">
                   {thumbnailFile ? (
                     <div className="relative w-24 h-24 rounded-lg border overflow-hidden">
@@ -614,74 +420,17 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                       accept="image/*"
                       onChange={handleThumbnailUpload}
                       className="hidden"
-                      id={generateUUID()}
                     />
                     <label htmlFor="thumbnail-upload">
                       <Button type="button" variant="outline" size="sm" asChild>
                         <span>
                           <Upload className="h-4 w-4 mr-2" />
-                          Upload Thumbnail
+                          Upload
                         </span>
                       </Button>
                     </label>
                     <p className="text-xs text-muted-foreground mt-1">
-                      PNG, JPG up to 2MB. Recommended: 400x400px
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Screenshots */}
-              <div>
-                <FormLabel className="text-sm font-medium mb-2 block">
-                  Screenshots (Optional)
-                </FormLabel>
-                <div className="space-y-4">
-                  {screenshotFiles.length > 0 && (
-                    <div className="grid grid-cols-5 gap-4">
-                      {screenshotFiles.map((file, index) => (
-                        <div
-                          key={generateUUID()}
-                          className="relative aspect-video rounded-lg border overflow-hidden"
-                        >
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={`Screenshot ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute top-1 right-1 h-6 w-6 p-0"
-                            onClick={() => removeScreenshot(index)}
-                          >
-                            ×
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <div>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleScreenshotUpload}
-                      className="hidden"
-                      id={generateUUID()}
-                    />
-                    <label htmlFor="screenshots-upload">
-                      <Button type="button" variant="outline" size="sm" asChild>
-                        <span>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Add Screenshots
-                        </span>
-                      </Button>
-                    </label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      PNG, JPG up to 5MB each. Maximum 5 screenshots.
-                      Recommended: 1280x720px
+                      PNG, JPG up to 2MB. 400x400px. <br />
                     </p>
                   </div>
                 </div>
@@ -689,47 +438,135 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
             </CardContent>
           </Card>
 
-          {/* Terms & Submit */}
+          {/* Additional Information */}
           <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="termsAccepted"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                      <FormControl>
-                        <input
-                          type="checkbox"
-                          checked={field.value}
-                          onChange={field.onChange}
-                          className="mt-1"
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>I accept the terms and conditions</FormLabel>
-                        <FormDescription>
-                          By submitting this cap, you agree to the Nuwa Store
-                          Terms of Service and Content Policy.
-                        </FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                {isSubmitting && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span>Uploading cap...</span>
-                      <span>{uploadProgress}%</span>
-                    </div>
-                    <Progress value={uploadProgress} className="w-full" />
-                  </div>
+            <CardHeader>
+              <CardTitle className="text-base">
+                Additional Information
+              </CardTitle>
+              <CardDescription>
+                Optional details to enhance your cap listing
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="keywords"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Keywords (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="AI, automation, productivity"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          form.trigger('keywords');
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Comma-separated keywords to help users find your cap
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
                 )}
+              />
 
-                <div className="flex items-center justify-between pt-4 border-t">
+              <FormField
+                control={form.control}
+                name="readme"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>README</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Detailed documentation about your cap..."
+                        rows={6}
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          form.trigger('readme');
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Comprehensive documentation (minimum 50 characters)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="license"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>License</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        form.trigger('license');
+                      }}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select license" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="MIT">MIT</SelectItem>
+                        <SelectItem value="Apache-2.0">Apache 2.0</SelectItem>
+                        <SelectItem value="GPL-3.0">GPL 3.0</SelectItem>
+                        <SelectItem value="BSD-3-Clause">
+                          BSD 3-Clause
+                        </SelectItem>
+                        <SelectItem value="ISC">ISC</SelectItem>
+                        <SelectItem value="Proprietary">Proprietary</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="isPublic"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <input
+                        type="checkbox"
+                        checked={field.value}
+                        onChange={(e) => {
+                          field.onChange(e.target.checked);
+                          form.trigger('isPublic');
+                        }}
+                        className="mt-1"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Make this cap publicly visible</FormLabel>
+                      <FormDescription>
+                        Allow other users to discover and install your cap
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Submit */}
+          <Card className="border-none shadow-none">
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    {form.formState.isValid && form.watch('termsAccepted') ? (
+                    {form.formState.isValid ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                         <span>Ready to submit</span>
@@ -742,27 +579,32 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                     )}
                   </div>
 
-                  <Button
-                    type="submit"
-                    disabled={
-                      isSubmitting ||
-                      !form.formState.isValid ||
-                      !form.watch('termsAccepted')
-                    }
-                    size="lg"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Submit to Store
-                      </>
+                  <div className="flex items-center space-x-2">
+                    {onCancel && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="lg"
+                        onClick={onCancel}
+                        disabled={isSubmitting}
+                      >
+                        Cancel
+                      </Button>
                     )}
-                  </Button>
+                    <Button type="submit" disabled={isSubmitting} size="lg">
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Submit to Store
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -770,11 +612,44 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
         </form>
       </Form>
 
-      <PublishDialog
-        open={showPublishDialog}
-        onOpenChange={setShowPublishDialog}
-        capName={watchedData.name}
-      />
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Confirm Submission</DialogTitle>
+            <DialogDescription>
+              Please review your cap information before submitting to the store
+            </DialogDescription>
+          </DialogHeader>
+          <CapStorePreview
+            data={watchedData}
+            cap={cap}
+            thumbnail={thumbnailFile}
+          />
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmDialog(false)}
+              disabled={isSubmitting}
+            >
+              Go Back
+            </Button>
+            <Button onClick={handleConfirmedSubmit} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Confirm Submit
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -806,21 +681,6 @@ function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
           <p className="text-muted-foreground">
             by {data.author || 'Unknown Author'}
           </p>
-          <div className="flex items-center space-x-2 mt-2">
-            <Badge>
-              <Tag className="h-3 w-3 mr-1" />
-              {data.tag}
-            </Badge>
-            <Badge variant="outline">v{data.version}</Badge>
-            <Badge variant="outline">
-              {data.isPublic ? (
-                <Globe className="h-3 w-3 mr-1" />
-              ) : (
-                <Lock className="h-3 w-3 mr-1" />
-              )}
-              {data.isPublic ? 'Public' : 'Private'}
-            </Badge>
-          </div>
         </div>
       </div>
 
@@ -831,30 +691,6 @@ function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
           {data.description || 'No description provided'}
         </p>
       </div>
-
-      {/* Technical Details */}
-      <div>
-        <h4 className="font-semibold mb-2">Technical Details</h4>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-muted-foreground">Model:</span>
-            <span className="ml-2">{cap.model.name}</span>
-          </div>
-          <div>
-            <span className="text-muted-foreground">MCP Servers:</span>
-            <span className="ml-2">{Object.keys(cap.mcpServers).length}</span>
-          </div>
-          <div>
-            <span className="text-muted-foreground">License:</span>
-            <span className="ml-2">{data.license}</span>
-          </div>
-          <div>
-            <span className="text-muted-foreground">Downloads:</span>
-            <span className="ml-2">0</span>
-          </div>
-        </div>
-      </div>
-
       {/* Links */}
       {(data.homepage || data.repository) && (
         <div>

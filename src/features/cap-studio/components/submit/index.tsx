@@ -7,8 +7,8 @@ export function Submit() {
   const navigate = useNavigate();
   const { id } = useParams();
   const localCaps = useLocalCaps();
-  
-  const cap = localCaps.find(cap => cap.id === id);
+
+  const cap = localCaps.find((cap) => cap.id === id);
 
   const handleSubmit = (success: boolean, capId?: string) => {
     if (success) {
@@ -36,16 +36,7 @@ export function Submit() {
 
   return (
     <DashboardLayout>
-      <DashboardHeader
-        title="Submit Cap"
-        description="Submit your cap to the store for others to discover and use"
-      />
-
-      <SubmitForm
-        cap={cap}
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
-      />
+      <SubmitForm cap={cap} onSubmit={handleSubmit} onCancel={handleCancel} />
     </DashboardLayout>
   );
 }
