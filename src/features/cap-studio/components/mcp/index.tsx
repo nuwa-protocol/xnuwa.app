@@ -7,9 +7,9 @@ export function Mcp() {
   const { id } = useParams();
   const localCaps = useLocalCaps();
 
-  const cap = localCaps.find((cap) => cap.id === id);
+  const cap = id ? localCaps.find((cap) => cap.id === id) : null;
 
-  if (!cap) {
+  if (id && !cap) {
     return (
       <DashboardLayout>
         <DashboardHeader
@@ -25,11 +25,6 @@ export function Mcp() {
 
   return (
     <DashboardLayout>
-      <DashboardHeader
-        title="MCP Tools Debug"
-        description={`Debug and test MCP tools for "${cap.name}"`}
-      />
-
       <McpToolsSection />
     </DashboardLayout>
   );

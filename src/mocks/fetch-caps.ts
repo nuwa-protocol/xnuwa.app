@@ -1,8 +1,9 @@
 import type { CapFetchParams, CapSearchResponse } from '@/features/cap-store/services/cap-fetch';
-import { mockRemoteCaps } from './mock-remote-caps';
+import type { RemoteCap } from '@/features/cap-store/types';
+import remoteCapsMockData from './remote-caps.json';
 
 /**
- * Mock implementation of fetchRemoteCaps that reads from mockRemoteCaps
+ * Mock implementation of fetchRemoteCaps that reads from remote-caps.json
  * 
  * This function simulates the behavior of the actual fetchRemoteCaps by:
  * 1. Filtering based on query, category, author, timeRange, and minDownloads
@@ -16,7 +17,7 @@ export const mockFetchRemoteCaps = async (filters: CapFetchParams): Promise<CapS
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 300));
   
-  let filtered = [...mockRemoteCaps];
+  let filtered = [...(remoteCapsMockData as RemoteCap[])];
   
   // Apply text search
   if (filters.query) {

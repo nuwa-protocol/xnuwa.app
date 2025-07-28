@@ -113,7 +113,7 @@ export function MyCaps({
               onEdit={() => onEditCap?.(cap)}
               onTest={() => onTestCap?.(cap)}
               onSubmit={() => onSubmitCap?.(cap)}
-              onClick={() => onEditCap?.(cap)}
+              onUpdate={() => onSubmitCap?.(cap)}
             />
           ))}
         </DashboardGrid>

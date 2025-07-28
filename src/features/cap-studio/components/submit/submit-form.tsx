@@ -10,7 +10,6 @@ import {
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { type CapSubmitRequest, mockSubmitCap } from '@/mocks/submit-caps';
 import { toast } from '@/shared/components';
 import {
   Button,
@@ -39,7 +38,6 @@ import {
   SelectValue,
   Textarea,
 } from '@/shared/components/ui';
-import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
 import type { LocalCap } from '../../types';
 import { predefinedTags } from '../cap-edit/constants';
 import { DashboardGrid } from '../layout/dashboard-layout';
@@ -64,16 +62,24 @@ const submitSchema = z.object({
   isPublic: z.boolean(),
 });
 
-type SubmitFormData = z.infer<typeof submitSchema>;
+export type SubmitFormData = z.infer<typeof submitSchema>;
 
 interface SubmitFormProps {
   cap: LocalCap;
   onSubmit?: (success: boolean, capId?: string) => void;
   onCancel?: () => void;
+  onConfirmedSubmit: (
+    data: SubmitFormData,
+    thumbnailFile: File | null,
+  ) => Promise<void>;
 }
 
-export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
-  const { updateCap } = useLocalCapsHandler();
+export function SubmitForm({
+  cap,
+  onSubmit,
+  onCancel,
+  onConfirmedSubmit,
+}: SubmitFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -132,36 +138,7 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
     setShowConfirmDialog(false);
 
     try {
-      // Prepare submission request
-      const submitRequest: CapSubmitRequest = {
-        cap,
-        metadata: {
-          name: data.name,
-          description: data.description,
-          tag: data.tag,
-          author: data.author,
-          homepage: data.homepage || undefined,
-          repository: data.repository || undefined,
-          changelog: undefined,
-        },
-      };
-
-      // Submit using mock function
-      const result = await mockSubmitCap(submitRequest);
-
-      if (result.success) {
-        // Update cap status to submitted
-        updateCap(cap.id, { status: 'submitted' });
-
-        toast({
-          type: 'success',
-          description: result.message,
-        });
-
-        onSubmit?.(true, result.capId);
-      } else {
-        throw new Error(result.message);
-      }
+      await onConfirmedSubmit(data, thumbnailFile);
     } catch (error) {
       const errorMessage =
         error instanceof Error

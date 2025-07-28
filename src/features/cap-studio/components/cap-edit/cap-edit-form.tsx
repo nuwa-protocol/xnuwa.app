@@ -1,12 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  Plus,
-  Save,
-  X,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -35,46 +28,61 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
+import type { McpServerConfig } from '../../types';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { ModelSelectorDialog } from '../model-selector';
 import { predefinedTags } from './constants';
+import { McpServersConfig } from './mcp-servers-config';
 import { ModelDetails } from './model-details';
 import { PromptEditor } from './prompt-editor';
 
 const capSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
+  name: z
+    .string()
+    .min(6, 'Name must be at least 6 characters')
+    .max(20, 'Name must be at most 20 characters')
+    .regex(
+      /^[a-z_-]+$/,
+      'Name must contain only lowercase letters, underscores, and dashes, no spaces',
+    ),
+  displayName: z
+    .string()
+    .min(1, 'Display name is required')
+    .max(50, 'Display name too long'),
   description: z
     .string()
-    .min(10, 'Description must be at least 10 characters')
+    .min(20, 'Description must be at least 10 characters')
     .max(500, 'Description too long'),
   tag: z.string().min(1, 'Tag is required'),
-  version: z
-    .string()
-    .regex(/^\d+\.\d+\.\d+$/, 'Version must be in format x.y.z'),
-  prompt: z.string().min(10, 'Prompt must be at least 10 characters'),
+  prompt: z.string(),
 });
 
 type CapFormData = z.infer<typeof capSchema>;
 
-interface CapBuilderProps {
+interface CapEditFormProps {
   editingCap?: LocalCap;
   onSave?: (cap: LocalCap) => void;
   onCancel?: () => void;
 }
 
-export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
+export function CapEditForm({
+  editingCap,
+  onSave,
+  onCancel,
+}: CapEditFormProps) {
   const { createCap, updateCap } = useLocalCapsHandler();
   const { selectedModel } = useSelectedModel();
   const [isSaving, setIsSaving] = useState(false);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [mcpServers, setMcpServers] = useState<Record<string, { url: string }>>(
+  const [mcpServers, setMcpServers] = useState<Record<string, McpServerConfig>>(
     {},
   );
 
   const form = useForm<CapFormData>({
     resolver: zodResolver(capSchema),
+    mode: 'onChange',
     defaultValues: {
       name: editingCap?.name || '',
+      displayName: editingCap?.displayName || '',
       description: editingCap?.description || '',
       tag: editingCap?.tag || '',
       prompt: editingCap?.prompt || '',
@@ -88,6 +96,17 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
   }, [editingCap]);
 
   const handleSave = async (data: CapFormData) => {
+    // Trigger validation for all fields
+    const isValid = await form.trigger();
+
+    if (!isValid) {
+      toast({
+        type: 'error',
+        description: 'Please fix all validation errors before saving',
+      });
+      return;
+    }
+
     if (!selectedModel) {
       toast({
         type: 'error',
@@ -102,6 +121,7 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
         // Update existing cap
         updateCap(editingCap.id, {
           name: data.name,
+          displayName: data.displayName,
           description: data.description,
           tag: data.tag,
           prompt: data.prompt,
@@ -119,7 +139,7 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
 
         toast({
           type: 'success',
-          description: `${data.name} has been updated successfully`,
+          description: `${data.displayName} has been updated successfully`,
         });
 
         onSave?.(updatedCap);
@@ -127,6 +147,7 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
         // Create new cap
         const newCap = createCap({
           name: data.name,
+          displayName: data.displayName,
           description: data.description,
           tag: data.tag,
           prompt: data.prompt,
@@ -137,7 +158,7 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
 
         toast({
           type: 'success',
-          description: `${data.name} has been created successfully`,
+          description: `${data.displayName} has been created successfully`,
         });
 
         onSave?.(newCap);
@@ -152,26 +173,8 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
     }
   };
 
-  const handleAddMcpServer = () => {
-    const name = `server_${Object.keys(mcpServers).length + 1}`;
-    setMcpServers((prev) => ({
-      ...prev,
-      [name]: { url: '' },
-    }));
-  };
-
-  const handleRemoveMcpServer = (name: string) => {
-    setMcpServers((prev) => {
-      const { [name]: removed, ...rest } = prev;
-      return rest;
-    });
-  };
-
-  const handleUpdateMcpServer = (name: string, url: string) => {
-    setMcpServers((prev) => ({
-      ...prev,
-      [name]: { url },
-    }));
+  const handleUpdateMcpServers = (servers: Record<string, McpServerConfig>) => {
+    setMcpServers(servers);
   };
 
   return (
@@ -192,7 +195,11 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
               Cancel
             </Button>
           )}
-          <Button type="submit" disabled={isSaving || !form.formState.isValid}>
+          <Button
+            type="button"
+            disabled={isSaving}
+            onClick={form.handleSubmit(handleSave)}
+          >
             {isSaving ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -226,6 +233,26 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Name</FormLabel>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Unique identifier for your cap.
+                      </p>
+                      <FormControl>
+                        <Input placeholder="my-awesome_cap" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="displayName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Display Name</FormLabel>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Human-readable name shown in the store.
+                      </p>
                       <FormControl>
                         <Input placeholder="My Awesome Cap" {...field} />
                       </FormControl>
@@ -345,85 +372,29 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
           </Card>
 
           {/* MCP Servers */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">MCP Servers</CardTitle>
-                  <CardDescription>
-                    Only SSE and HTTP Streambale transports are supported.
-                  </CardDescription>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddMcpServer}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Server
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {Object.keys(mcpServers).length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>No MCP servers configured</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {Object.entries(mcpServers).map(([name, config]) => (
-                    <div
-                      key={name}
-                      className="flex items-center space-x-4 p-4 border rounded-lg"
-                    >
-                      <div className="flex-1">
-                        <Input
-                          placeholder="Server name"
-                          value={name}
-                          onChange={(e) => {
-                            const newName = e.target.value;
-                            const { [name]: server, ...rest } = mcpServers;
-                            setMcpServers({ ...rest, [newName]: server });
-                          }}
-                          className="mb-2"
-                        />
-                        <Input
-                          placeholder="Server URL"
-                          value={config.url}
-                          onChange={(e) =>
-                            handleUpdateMcpServer(name, e.target.value)
-                          }
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveMcpServer(name)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <McpServersConfig
+            mcpServers={mcpServers}
+            onUpdateMcpServers={handleUpdateMcpServers}
+            capId={editingCap?.id}
+          />
 
           {/* Submit */}
           <div className="flex items-center justify-between pt-6 border-t">
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              {form.formState.isValid ? (
-                <>
-                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <div className="flex items-center space-x-2 text-sm">
+              {Object.keys(form.formState.errors).length === 0 ? (
+                <div className="flex items-center space-x-2 text-green-600">
+                  <CheckCircle2 className="h-4 w-4" />
                   <span>Cap configuration is valid</span>
-                </>
+                </div>
               ) : (
-                <>
-                  <AlertCircle className="h-4 w-4 text-yellow-500" />
-                  <span>Please complete all required fields</span>
-                </>
+                <div className="flex items-center space-x-2 text-red-600">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>
+                    {Object.keys(form.formState.errors).length} error
+                    {Object.keys(form.formState.errors).length > 1 ? 's' : ''}{' '}
+                    found
+                  </span>
+                </div>
               )}
             </div>
 
@@ -435,10 +406,7 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
                   </Button>
                 )}
               </div>
-              <Button
-                type="submit"
-                disabled={isSaving || !form.formState.isValid}
-              >
+              <Button type="submit" disabled={isSaving}>
                 {isSaving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

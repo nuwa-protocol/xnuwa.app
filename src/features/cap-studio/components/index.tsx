@@ -1,4 +1,6 @@
+import { Bug } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/shared/components/ui/button';
 import type { LocalCap } from '../types';
 import { DashboardHeader, DashboardLayout } from './layout/dashboard-layout';
 import { MyCaps } from './my-caps';
@@ -22,11 +24,20 @@ export function CapStudio() {
     navigate('/cap-studio/create');
   };
 
+  const handleGoToMcpDebug = () => {
+    navigate('/cap-studio/mcp');
+  };
+
   return (
     <DashboardLayout>
       <DashboardHeader
         title="Cap Studio"
         description="Create, test, and publish powerful AI capabilities with integrated MCP tools"
+        actions={
+          <Button onClick={handleGoToMcpDebug} variant="outline" size="sm">
+            <Bug className="mr-1" /> MCP Tools
+          </Button>
+        }
       />
 
       <MyCaps

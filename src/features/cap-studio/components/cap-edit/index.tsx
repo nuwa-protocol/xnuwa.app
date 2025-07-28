@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLocalCaps } from '../../hooks';
 import { DashboardLayout } from '../layout/dashboard-layout';
-import { CapBuilder } from './cap-builder';
+import { CapEditForm } from './cap-edit-form';
 
 export function CapEdit() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export function CapEdit() {
 
   return (
     <DashboardLayout>
-      <CapBuilder
+      <CapEditForm
         editingCap={editingCap}
         onSave={handleSave}
         onCancel={handleCancel}

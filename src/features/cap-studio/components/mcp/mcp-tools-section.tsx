@@ -1,6 +1,7 @@
 import {
   Activity,
   AlertCircle,
+  BrushCleaning,
   CheckCircle2,
   Code2,
   Copy,
@@ -35,7 +36,7 @@ import {
 } from '@/shared/services/mcp-client';
 import type { McpTransportType, NuwaMCPClient } from '@/shared/types';
 import { DashboardGrid } from '../layout/dashboard-layout';
-import { EnhancedMcpDebugPanel } from './enhanced-mcp-debug-panel';
+import { McpDebugPanel } from './mcp-debug-panel';
 
 interface LogEntry {
   id: string;
@@ -257,7 +258,11 @@ export function McpToolsSection() {
 
   const loadConnection = (config: ConnectionConfig) => {
     setUrl(config.url);
-    setTransport((config.transport && ['httpStream', 'sse'].includes(config.transport)) ? config.transport : 'auto');
+    setTransport(
+      config.transport && ['httpStream', 'sse'].includes(config.transport)
+        ? config.transport
+        : 'auto',
+    );
   };
 
   const clearLogs = () => {
@@ -330,9 +335,7 @@ export function McpToolsSection() {
             {/* Manual Connection */}
             <div className="space-y-3">
               <div className="space-y-2">
-                <div className="text-sm font-medium">
-                  Server URL
-                </div>
+                <div className="text-sm font-medium">Server URL</div>
                 <Input
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
@@ -483,7 +486,7 @@ export function McpToolsSection() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <EnhancedMcpDebugPanel
+            <McpDebugPanel
               client={client}
               tools={tools}
               toolsMap={toolsMap}
@@ -510,12 +513,11 @@ export function McpToolsSection() {
               </CardDescription>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant="outline">{logs.length} entries</Badge>
               <Button variant="ghost" size="sm" onClick={copyLogs}>
                 <Copy className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="sm" onClick={clearLogs}>
-                <RefreshCw className="h-4 w-4" />
+                <BrushCleaning className="h-4 w-4" />
               </Button>
             </div>
           </div>

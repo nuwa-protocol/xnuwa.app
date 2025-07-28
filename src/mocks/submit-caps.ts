@@ -1,6 +1,8 @@
 import type { RemoteCap } from '@/features/cap-store/types';
 import type { LocalCap } from '@/features/cap-studio/types';
-import { addMockRemoteCap } from './mock-remote-caps';
+import remoteCapsMockData from './remote-caps.json';
+import fs from 'fs';
+import path from 'path';
 
 export interface CapSubmitRequest {
   cap: LocalCap;
@@ -75,7 +77,16 @@ export const mockSubmitCap = async (
   const submittedCapId = `remote_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   const remoteCap = convertLocalToRemoteCap(request.cap, request.metadata);
   remoteCap.id = submittedCapId;
-  addMockRemoteCap(remoteCap);
+  
+  // Add to JSON file
+  try {
+    const currentData = [...(remoteCapsMockData as RemoteCap[]), remoteCap];
+    const jsonPath = path.join(__dirname, 'remote-caps.json');
+    fs.writeFileSync(jsonPath, JSON.stringify(currentData, null, 2));
+  } catch (error) {
+    console.warn('Could not write to JSON file, using in-memory mock:', error);
+  }
+  
   // For mock purposes, we'll just log the submission
   console.log('Mock cap submitted:', {
     capId: submittedCapId,

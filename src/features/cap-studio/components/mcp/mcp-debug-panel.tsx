@@ -38,7 +38,7 @@ interface LogEntry {
   data?: any;
 }
 
-interface EnhancedMcpDebugPanelProps {
+interface McpDebugPanelProps {
   client: NuwaMCPClient;
   tools: string[];
   toolsMap: Record<string, any>;
@@ -58,7 +58,7 @@ const generateUUID = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 };
 
-export function EnhancedMcpDebugPanel({
+export function McpDebugPanel({
   client,
   tools,
   toolsMap,
@@ -66,7 +66,7 @@ export function EnhancedMcpDebugPanel({
   promptsMap,
   resources,
   onLog,
-}: EnhancedMcpDebugPanelProps) {
+}: McpDebugPanelProps) {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [toolFormData, setToolFormData] = useState<any>({});
   const [toolSearchQuery, setToolSearchQuery] = useState('');
@@ -474,9 +474,7 @@ export function EnhancedMcpDebugPanel({
                   {executionResults[selectedTool] && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <div className="text-sm font-medium">
-                          Latest Result
-                        </div>
+                        <div className="text-sm font-medium">Latest Result</div>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -579,9 +577,7 @@ export function EnhancedMcpDebugPanel({
                         {hasResult && (
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <div className="text-sm font-medium">
-                                Result
-                              </div>
+                              <div className="text-sm font-medium">Result</div>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -661,9 +657,7 @@ export function EnhancedMcpDebugPanel({
                     {hasResult && (
                       <div className="mt-3 space-y-2">
                         <div className="flex items-center justify-between">
-                          <div className="text-sm font-medium">
-                            Content
-                          </div>
+                          <div className="text-sm font-medium">Content</div>
                           <Button
                             variant="ghost"
                             size="sm"
