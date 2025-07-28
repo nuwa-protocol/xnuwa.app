@@ -1,4 +1,5 @@
 import { Package, Search, Wrench } from 'lucide-react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CapStoreModal } from '@/features/cap-store/components';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
@@ -33,6 +34,33 @@ export function MainContent() {
   const handleNewChat = () => {
     setOpenMobile(false);
     navigate('/chat');
+  };
+
+  // Add keyboard shortcut for new chat using manual event listener (similar to sidebar toggle)
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Try Cmd+K/Ctrl+K first
+      if (
+        event.key === 'k' &&
+        (event.metaKey || event.ctrlKey) &&
+        !event.shiftKey &&
+        !event.altKey
+      ) {
+        console.log('Manual keyboard shortcut triggered: Cmd+K/Ctrl+K');
+        event.preventDefault();
+        handleNewChat();
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleNewChat]);
+
+  // Get the appropriate keyboard shortcut display based on platform
+  const getShortcutDisplay = () => {
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    return isMac ? '⌘K' : 'Ctrl+K';
   };
 
   const handleMouseEnter = () => {
@@ -70,6 +98,7 @@ export function MainContent() {
               onClick={handleNewChat}
               variant="primary"
               className="my-2"
+              shortcut={getShortcutDisplay()}
             />
             <SearchModal>
               <SidebarButton
