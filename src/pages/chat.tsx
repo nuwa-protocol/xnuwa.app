@@ -1,4 +1,4 @@
-import { Chat } from '@/features/chat/components/chat';
+import { Chat } from '@/features/chat/components';
 import { useChatPage } from '@/features/chat/hooks/use-chat-page';
 import Loading from '@/shared/components/loading';
 
