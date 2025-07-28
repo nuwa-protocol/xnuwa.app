@@ -1,21 +1,24 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Model } from '@/shared/types/model';
+import { generateUUID } from '@/shared/utils';
+
+export type CapStatus = 'draft' | 'submitted';
 
 export interface LocalCap {
   id: string;
   name: string;
   description: string;
   tag: string;
-  version: string;
   prompt: string;
   model: Model;
   mcpServers: Record<string, { url: string }>;
+  status: CapStatus;
   createdAt: number;
   updatedAt: number;
 }
 
-interface CapDevState {
+interface CapStudioState {
   // Local caps being developed
   localCaps: LocalCap[];
   
@@ -34,7 +37,7 @@ interface CapDevState {
   getCapsByTag: (tag: string) => LocalCap[];
 }
 
-export const useCapDevStore = create<CapDevState>()(
+export const useCapStudioStore = create<CapStudioState>()(
   persist(
     (set, get) => ({
       localCaps: [],
@@ -43,7 +46,8 @@ export const useCapDevStore = create<CapDevState>()(
       createCap: (capData) => {
         const newCap: LocalCap = {
           ...capData,
-          id: `local_cap_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: generateUUID(),
+          status: 'draft',
           createdAt: Date.now(),
           updatedAt: Date.now(),
         };
@@ -87,7 +91,6 @@ export const useCapDevStore = create<CapDevState>()(
         const duplicatedCap = get().createCap({
           ...cap,
           name: `${cap.name} (Copy)`,
-          version: '1.0.0', // Reset version for the copy
         });
 
         return duplicatedCap;
@@ -102,7 +105,7 @@ export const useCapDevStore = create<CapDevState>()(
       },
     }),
     {
-      name: 'cap-dev-storage',
+      name: 'cap-studio-storage',
       // Only persist the caps, not the selected state
       partialize: (state) => ({ localCaps: state.localCaps }),
     }

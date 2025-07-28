@@ -20,7 +20,6 @@ import {
   useState,
 } from 'react';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
-import { ModelSelectorDialog } from '@/features/cap-dev/components/model-selector';
 import { useScrollToBottom } from '@/features/chat/hooks/use-scroll-to-bottom';
 import { toast } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
@@ -177,7 +176,6 @@ function PureMultimodalInput({
             {isDevMode && (
               <AttachmentsButton fileInputRef={fileInputRef} status={status} />
             )}
-            <ModelSelectorDialog />
           </div>
 
           <div className="flex items-center">

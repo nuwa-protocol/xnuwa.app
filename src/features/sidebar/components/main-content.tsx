@@ -90,9 +90,9 @@ export function MainContent() {
             {isDevMode && (
               <SidebarButton
                 icon={Wrench}
-                text={'Cap Dev'}
+                text={'Cap Studio'}
                 onClick={() => {
-                  navigate('/cap-dev');
+                  navigate('/cap-studio');
                 }}
                 variant="secondary"
               />

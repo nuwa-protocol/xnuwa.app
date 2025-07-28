@@ -14,7 +14,8 @@ import {
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import type { LocalCap } from '@/features/cap-dev/stores/model-stores';
+import type { LocalCap } from '@/features/cap-studio/stores/model-stores';
+import { useCapStudioStore } from '@/features/cap-studio/stores/model-stores';
 import { type CapSubmitRequest, mockSubmitCap } from '@/mocks/submit-caps';
 import { toast } from '@/shared/components';
 import {
@@ -112,6 +113,7 @@ const licenses = [
 ];
 
 export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
+  const { updateCap } = useCapStudioStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
@@ -230,6 +232,9 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
       setUploadProgress(100);
 
       if (result.success) {
+        // Update cap status to submitted
+        updateCap(cap.id, { status: 'submitted' });
+        
         toast({
           type: 'success',
           description: result.message,

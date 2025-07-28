@@ -1,0 +1,1 @@
+export { CapStudio, CapStudio as CapDev } from './components/cap-studio';

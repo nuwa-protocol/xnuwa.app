@@ -4,10 +4,12 @@ import {
   ArrowDownNarrowWide,
   ArrowDownWideNarrow,
   ArrowUpDown,
+  Bot,
   Search,
 } from 'lucide-react';
 import type React from 'react';
 import { useMemo, useState } from 'react';
+import { Button } from '@/shared/components';
 import {
   Dialog,
   DialogContent,
@@ -23,12 +25,11 @@ import {
 import { SidebarInset, SidebarProvider } from '@/shared/components/ui/sidebar';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { useLocale } from '@/shared/locales/use-locale';
-import { useAvailableModels, useSelectedModel } from '../hooks';
-import type { Model } from '../types';
-import { generateProviders, getModelName } from '../utils';
+import { useAvailableModels, useSelectedModel } from '../../hooks';
+import type { Model } from '../../types';
+import { generateProviders } from '../../utils';
 import { ModelCard } from './model-card';
 import { ModelSelectorSidebar } from './model-selector-sidebar';
-import { ProviderAvatar } from './provider-avatar';
 
 export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
   const { t } = useLocale();
@@ -272,29 +273,15 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
 
 export const ModelSelectorDialog: React.FC = () => {
   const { t } = useLocale();
-  const { selectedModel } = useSelectedModel();
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button
-          className="flex items-center gap-2 px-3 py-2 rounded-xl border bg-background hover:bg-accent transition-colors"
-          type="button"
-        >
-          {selectedModel ? (
-            <>
-              <ProviderAvatar provider={selectedModel.providerName} size="sm" />
-              <span className="truncate max-w-[100px] text-sm">
-                {getModelName(selectedModel)}
-              </span>
-            </>
-          ) : (
-            <span className="text-muted-foreground text-sm">
-              {t('aiProvider.modelSelector.selectModel')}
-            </span>
-          )}
-        </button>
+        <Button variant="outline" size="sm">
+          <Bot />
+          {t('aiProvider.modelSelector.selectModel')}
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-6xl h-[80vh] p-0 overflow-hidden">
         <DialogTitle className="sr-only">LLM Model Selector</DialogTitle>

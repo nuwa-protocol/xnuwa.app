@@ -6,8 +6,8 @@ import { fetchModels } from '../services';
 import type { Model } from '../types';
 
 export type { LocalCap } from './cap-dev-stores';
-// Re-export the CapDevStore
-export { useCapDevStore } from './cap-dev-stores';
+// Re-export the CapStudioStore (with backward compatibility)
+export { useCapStudioStore, useCapStudioStore as useCapDevStore } from './cap-dev-stores';
 
 export const DefaultModel: Model = {
   id: 'openai/gpt-4o-mini',

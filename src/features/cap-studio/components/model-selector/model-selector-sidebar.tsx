@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
 } from '@/shared/components/ui/sidebar';
 import { useLocale } from '@/shared/locales/use-locale';
-import type { Provider } from '../utils';
+import type { Provider } from '../../utils';
 import { ProviderAvatar } from './provider-avatar';
 
 interface ModelSelectorSidebarProps {

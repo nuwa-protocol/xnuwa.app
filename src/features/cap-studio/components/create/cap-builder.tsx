@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AlertCircle,
   CheckCircle2,
-  Eye,
   Loader2,
   Plus,
   Save,
@@ -12,11 +11,11 @@ import {
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { useSelectedModel } from '@/features/cap-studio/hooks';
 import {
   type LocalCap,
-  ModelStateStore,
   useCapDevStore,
-} from '@/features/cap-dev/stores/model-stores';
+} from '@/features/cap-studio/stores/model-stores';
 import { toast } from '@/shared/components';
 import {
   Button,
@@ -47,8 +46,9 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 import { DashboardGrid } from '../layout/dashboard-layout';
+import { ModelSelectorDialog } from '../model-selector/model-selector';
 import { predefinedTags, promptTemplates } from './constants';
-import { ModelConfig } from './model-config';
+import { ModelDetails } from './model-details';
 import { PromptEditor } from './prompt-editor';
 
 const capSchema = z.object({
@@ -74,7 +74,7 @@ interface CapBuilderProps {
 
 export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
   const { createCap, updateCap } = useCapDevStore();
-  const { selectedModel } = ModelStateStore();
+  const { selectedModel } = useSelectedModel();
   const [isSaving, setIsSaving] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [mcpServers, setMcpServers] = useState<Record<string, { url: string }>>(
@@ -87,7 +87,6 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
       name: editingCap?.name || '',
       description: editingCap?.description || '',
       tag: editingCap?.tag || '',
-      version: editingCap?.version || '1.0.0',
       prompt: editingCap?.prompt || '',
     },
   });
@@ -115,7 +114,6 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
           name: data.name,
           description: data.description,
           tag: data.tag,
-          version: data.version,
           prompt: data.prompt,
           model: selectedModel,
           mcpServers,
@@ -141,9 +139,9 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
           name: data.name,
           description: data.description,
           tag: data.tag,
-          version: data.version,
           prompt: data.prompt,
           model: selectedModel,
+          status: 'draft',
           mcpServers,
         });
 
@@ -204,92 +202,38 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
             {editingCap ? 'Edit Cap' : 'Create New Cap'}
           </h3>
           <p className="text-sm text-muted-foreground">
-            {editingCap
-              ? 'Modify your capability'
-              : 'Build a new capability from scratch'}
+            {editingCap ? 'Update your Cap' : 'Build a new Cap from scratch'}
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Cap Preview</DialogTitle>
-                <DialogDescription>
-                  Preview how your cap will look and function
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <strong>Name:</strong>{' '}
-                    {form.watch('name') || 'Untitled Cap'}
-                  </div>
-                  <div>
-                    <strong>Version:</strong> {form.watch('version') || '1.0.0'}
-                  </div>
-                  <div>
-                    <strong>Tag:</strong> {form.watch('tag') || 'None'}
-                  </div>
-                  <div>
-                    <strong>Model:</strong>{' '}
-                    {selectedModel?.name || 'None selected'}
-                  </div>
-                </div>
-                <div>
-                  <strong>Description:</strong>
-                  <p className="text-muted-foreground mt-1">
-                    {form.watch('description') || 'No description provided'}
-                  </p>
-                </div>
-                <div>
-                  <strong>Prompt:</strong>
-                  <div className="mt-1 p-3 bg-muted rounded-md text-sm font-mono">
-                    {form.watch('prompt') || 'No prompt provided'}
-                  </div>
-                </div>
-                <div>
-                  <strong>
-                    MCP Servers ({Object.keys(mcpServers).length}):
-                  </strong>
-                  {Object.keys(mcpServers).length > 0 ? (
-                    <ul className="mt-1 space-y-1 text-sm">
-                      {Object.entries(mcpServers).map(([name, config]) => (
-                        <li key={name} className="flex justify-between">
-                          <span>{name}</span>
-                          <span className="text-muted-foreground">
-                            {config.url || 'No URL'}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-muted-foreground text-sm">
-                      No MCP servers configured
-                    </p>
-                  )}
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
           {onCancel && (
             <Button variant="ghost" size="sm" onClick={onCancel}>
               Cancel
             </Button>
           )}
+          <Button
+                type="submit"
+                disabled={isSaving || !form.formState.isValid}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    {editingCap ? 'Update Cap' : 'Create Cap'}
+                  </>
+                )}
+              </Button>
         </div>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
-          <DashboardGrid cols={2}>
+          <DashboardGrid cols={1}>
             {/* Basic Information */}
             <Card>
               <CardHeader>
@@ -331,7 +275,6 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
                   )}
                 />
 
-                <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="tag"
@@ -359,34 +302,32 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="version"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Version</FormLabel>
-                        <FormControl>
-                          <Input placeholder="1.0.0" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
               </CardContent>
             </Card>
 
-            {/* Model Configuration */}
+            {/* Model Configuration (NEW) */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Model Configuration</CardTitle>
-                <CardDescription>
-                  Choose the AI model for your cap
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base">
+                      Model Configuration
+                    </CardTitle>
+                    <CardDescription>
+                      Choose the AI model for your cap
+                    </CardDescription>
+                  </div>
+                  <ModelSelectorDialog />
+                </div>
               </CardHeader>
               <CardContent>
-                <ModelConfig />
+                {!selectedModel ? (
+                  <div className="text-muted-foreground text-sm">
+                    No model selected
+                  </div>
+                ) : (
+                  <ModelDetails model={selectedModel} />
+                )}
               </CardContent>
             </Card>
           </DashboardGrid>
@@ -556,6 +497,13 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
             </div>
 
             <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
+                {onCancel && (
+                  <Button variant="ghost" onClick={onCancel}>
+                    Cancel
+                  </Button>
+                )}
+              </div>
               <Button
                 type="submit"
                 disabled={isSaving || !form.formState.isValid}

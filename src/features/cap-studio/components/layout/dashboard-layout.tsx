@@ -14,7 +14,7 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
         className,
       )}
     >
-      <div className="container mx-auto py-8 px-4 space-y-8">{children}</div>
+      <div className="max-w-4xl mx-auto py-8 px-8 space-y-8">{children}</div>
     </div>
   );
 }
