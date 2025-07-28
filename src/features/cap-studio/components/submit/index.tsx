@@ -1,12 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCapStudioStore } from '@/features/cap-studio/stores/model-stores';
+import { useLocalCaps } from '../../hooks';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
 import { SubmitForm } from './submit-form';
 
 export function Submit() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { localCaps } = useCapStudioStore();
+  const localCaps = useLocalCaps();
   
   const cap = localCaps.find(cap => cap.id === id);
 

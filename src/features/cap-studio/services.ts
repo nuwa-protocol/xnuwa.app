@@ -1,6 +1,9 @@
 import { createAuthorizedFetch } from '@/shared/services/authorized-fetch';
-import type { Model, OpenRouterAPIResponse, OpenRouterModel } from './types';
-
+import type { Model } from '@/shared/types';
+import type {
+  OpenRouterAPIResponse,
+  OpenRouterModel,
+} from './types/openrouter-model';
 
 async function modelFetch(): Promise<OpenRouterAPIResponse> {
   const authorizedFetch = createAuthorizedFetch();

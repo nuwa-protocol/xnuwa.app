@@ -1,4 +1,4 @@
-import { Submit } from '@/features/cap-studio/components/submit/submit';
+import { Submit } from '@/features/cap-studio/components/submit';
 
 export default function CapStudioSubmitPage() {
   return <Submit />;

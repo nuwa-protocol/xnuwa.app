@@ -1,10 +1,6 @@
 import { Plus, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import {
-  type LocalCap,
-  useCapStudioStore,
-} from '@/features/cap-studio/stores/model-stores';
-import {
   Button,
   Card,
   CardDescription,
@@ -12,6 +8,8 @@ import {
   CardTitle,
   Input,
 } from '@/shared/components/ui';
+import { useLocalCaps } from '../../hooks';
+import type { LocalCap } from '../../types';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { CapCard } from './cap-card';
 
@@ -28,7 +26,7 @@ export function MyCapsGallery({
   onSubmitCap,
   onCreateNew,
 }: MyCapsGalleryProps) {
-  const { localCaps } = useCapStudioStore();
+  const localCaps = useLocalCaps();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Get caps array

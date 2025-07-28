@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import type { LocalCap } from '@/features/cap-studio/stores/model-stores';
+import type { LocalCap } from '../types';
 import { DashboardHeader, DashboardLayout } from './layout/dashboard-layout';
-import { MyCapsGallery } from './my-caps/my-caps-gallery';
+import { MyCapsGallery } from './my-caps';
 
 export function CapStudio() {
   const navigate = useNavigate();

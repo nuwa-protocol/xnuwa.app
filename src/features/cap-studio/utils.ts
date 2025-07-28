@@ -1,4 +1,4 @@
-import type { Model } from './types';
+import type { Model } from '@/shared/types';
 
 export function getModelName(model: Model): string {
   return model.name;

@@ -14,7 +14,6 @@ import {
   Upload,
 } from 'lucide-react';
 import { useState } from 'react';
-import { type LocalCap, useCapStudioStore } from '@/features/cap-studio/stores/model-stores';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,6 +39,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui';
+import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
+import type { LocalCap } from '../../types';
 
 interface CapCardProps {
   cap: LocalCap;
@@ -58,7 +59,7 @@ export function CapCard({
   onClick,
   viewMode = 'grid',
 }: CapCardProps) {
-  const { deleteCap } = useCapStudioStore();
+  const { deleteCap } = useLocalCapsHandler();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleDelete = () => {
@@ -77,7 +78,7 @@ export function CapCard({
 
   if (viewMode === 'list') {
     return (
-      <Card 
+      <Card
         className="hover:shadow-md transition-all duration-200 border-l-4 border-l-primary/20 cursor-pointer"
         onClick={onClick}
       >
@@ -93,8 +94,10 @@ export function CapCard({
                   <h3 className="font-semibold text-base truncate">
                     {cap.name}
                   </h3>
-                  <Badge 
-                    variant={cap.status === 'submitted' ? 'default' : 'secondary'} 
+                  <Badge
+                    variant={
+                      cap.status === 'submitted' ? 'default' : 'secondary'
+                    }
                     className="shrink-0"
                   >
                     {cap.status === 'submitted' ? (
@@ -108,9 +111,6 @@ export function CapCard({
                     <Tag className="h-3 w-3 mr-1" />
                     {cap.tag}
                   </Badge>
-                  <Badge variant="outline" className="shrink-0">
-                    v{cap.version}
-                  </Badge>
                 </div>
 
                 <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
@@ -120,7 +120,9 @@ export function CapCard({
                 <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                   <div className="flex items-center">
                     <Copy className="h-3 w-3 mr-1" />
-                    <span className="font-mono text-xs">{cap.id.slice(0, 8)}...</span>
+                    <span className="font-mono text-xs">
+                      {cap.id.slice(0, 8)}...
+                    </span>
                   </div>
                   <div className="flex items-center">
                     <Clock className="h-3 w-3 mr-1" />
@@ -138,7 +140,11 @@ export function CapCard({
               </div>
             </div>
 
-            <button type='button' className="flex items-center space-x-2 ml-4" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="flex items-center space-x-2 ml-4"
+              onClick={(e) => e.stopPropagation()}
+            >
               {cap.status === 'draft' ? (
                 <Button onClick={onTest} size="sm" variant="outline">
                   <Bug className="h-4 w-4 mr-2" />
@@ -146,9 +152,9 @@ export function CapCard({
                 </Button>
               ) : null}
 
-              <Button 
-                onClick={cap.status === 'draft' ? onSubmit : onEdit} 
-                size="sm" 
+              <Button
+                onClick={cap.status === 'draft' ? onSubmit : onEdit}
+                size="sm"
                 variant={cap.status === 'draft' ? 'default' : 'outline'}
               >
                 {cap.status === 'draft' ? (
@@ -220,7 +226,7 @@ export function CapCard({
   }
 
   return (
-    <Card 
+    <Card
       className="group hover:shadow-lg transition-all duration-200 hover:-translate-y-1 border-0 ring-1 ring-border hover:ring-primary/20 cursor-pointer"
       onClick={onClick}
     >
@@ -273,8 +279,8 @@ export function CapCard({
         <div className="space-y-2">
           <CardTitle className="text-lg line-clamp-1">{cap.name}</CardTitle>
           <div className="flex items-center space-x-2 flex-wrap">
-            <Badge 
-              variant={cap.status === 'submitted' ? 'default' : 'secondary'} 
+            <Badge
+              variant={cap.status === 'submitted' ? 'default' : 'secondary'}
               className="text-xs"
             >
               {cap.status === 'submitted' ? (
@@ -287,9 +293,6 @@ export function CapCard({
             <Badge variant="secondary" className="text-xs">
               <Tag className="h-3 w-3 mr-1" />
               {cap.tag}
-            </Badge>
-            <Badge variant="outline" className="text-xs">
-              v{cap.version}
             </Badge>
           </div>
         </div>
@@ -309,9 +312,7 @@ export function CapCard({
                   <span className="font-mono">{cap.id.slice(0, 8)}...</span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
-                Full ID: {cap.id}
-              </TooltipContent>
+              <TooltipContent>Full ID: {cap.id}</TooltipContent>
             </Tooltip>
 
             <div className="flex items-center">
@@ -337,9 +338,18 @@ export function CapCard({
             {cap.model.name}
           </div>
 
-          <button type='button' className="flex items-center space-x-2 pt-2" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className="flex items-center space-x-2 pt-2"
+            onClick={(e) => e.stopPropagation()}
+          >
             {cap.status === 'draft' ? (
-              <Button onClick={onTest} size="sm" variant="outline" className="flex-1">
+              <Button
+                onClick={onTest}
+                size="sm"
+                variant="outline"
+                className="flex-1"
+              >
                 <Bug className="h-3 w-3 mr-2" />
                 Test
               </Button>

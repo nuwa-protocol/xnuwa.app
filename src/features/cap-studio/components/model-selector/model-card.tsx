@@ -7,8 +7,8 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { useLocale } from '@/shared/locales/use-locale';
+import type { Model } from '@/shared/types';
 import { cn } from '@/shared/utils';
-import type { Model } from '../../types';
 import { getModelName, getProviderName } from '../../utils';
 import { ProviderAvatar } from './provider-avatar';
 

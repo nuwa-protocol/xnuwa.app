@@ -1,14 +1,13 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useCapStudioStore } from '@/features/cap-studio/stores/model-stores';
+import { useParams } from 'react-router-dom';
+import { useLocalCaps } from '../../hooks';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
 import { McpToolsSection } from './mcp-tools-section';
 
 export function Mcp() {
-  const navigate = useNavigate();
   const { id } = useParams();
-  const { localCaps } = useCapStudioStore();
-  
-  const cap = localCaps.find(cap => cap.id === id);
+  const localCaps = useLocalCaps();
+
+  const cap = localCaps.find((cap) => cap.id === id);
 
   if (!cap) {
     return (

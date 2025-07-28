@@ -1,12 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCapStudioStore } from '@/features/cap-studio/stores/model-stores';
+import { useLocalCaps } from '../../hooks';
 import { DashboardLayout } from '../layout/dashboard-layout';
 import { CapBuilder } from './cap-builder';
 
 export function Create() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { localCaps } = useCapStudioStore();
+  const localCaps = useLocalCaps();
 
   const editingCap = id ? localCaps.find((cap) => cap.id === id) : undefined;
 

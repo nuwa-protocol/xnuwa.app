@@ -12,10 +12,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useSelectedModel } from '@/features/cap-studio/hooks';
-import {
-  type LocalCap,
-  useCapDevStore,
-} from '@/features/cap-studio/stores/model-stores';
+import type { LocalCap } from '@/features/cap-studio/types';
 import { toast } from '@/shared/components';
 import {
   Button,
@@ -45,8 +42,9 @@ import {
   SelectValue,
   Textarea,
 } from '@/shared/components/ui';
+import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
 import { DashboardGrid } from '../layout/dashboard-layout';
-import { ModelSelectorDialog } from '../model-selector/model-selector';
+import { ModelSelectorDialog } from '../model-selector';
 import { predefinedTags, promptTemplates } from './constants';
 import { ModelDetails } from './model-details';
 import { PromptEditor } from './prompt-editor';
@@ -73,7 +71,7 @@ interface CapBuilderProps {
 }
 
 export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
-  const { createCap, updateCap } = useCapDevStore();
+  const { createCap, updateCap } = useLocalCapsHandler();
   const { selectedModel } = useSelectedModel();
   const [isSaving, setIsSaving] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -212,22 +210,19 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
               Cancel
             </Button>
           )}
-          <Button
-                type="submit"
-                disabled={isSaving || !form.formState.isValid}
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    {editingCap ? 'Update Cap' : 'Create Cap'}
-                  </>
-                )}
-              </Button>
+          <Button type="submit" disabled={isSaving || !form.formState.isValid}>
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                {editingCap ? 'Update Cap' : 'Create Cap'}
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
@@ -275,33 +270,33 @@ export function CapBuilder({ editingCap, onSave, onCancel }: CapBuilderProps) {
                   )}
                 />
 
-                  <FormField
-                    control={form.control}
-                    name="tag"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {predefinedTags.map((tag) => (
-                              <SelectItem key={tag} value={tag}>
-                                {tag}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <FormField
+                  control={form.control}
+                  name="tag"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {predefinedTags.map((tag) => (
+                            <SelectItem key={tag} value={tag}>
+                              {tag}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 

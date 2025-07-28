@@ -14,8 +14,6 @@ import {
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import type { LocalCap } from '@/features/cap-studio/stores/model-stores';
-import { useCapStudioStore } from '@/features/cap-studio/stores/model-stores';
 import { type CapSubmitRequest, mockSubmitCap } from '@/mocks/submit-caps';
 import { toast } from '@/shared/components';
 import {
@@ -50,6 +48,8 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 import { generateUUID } from '@/shared/utils';
+import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
+import type { LocalCap } from '../../types';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { PublishDialog } from './publish-dialog';
 
@@ -113,7 +113,7 @@ const licenses = [
 ];
 
 export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
-  const { updateCap } = useCapStudioStore();
+  const { updateCap } = useLocalCapsHandler();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
@@ -127,7 +127,6 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
       name: cap.name,
       description: cap.description,
       tag: cap.tag,
-      version: cap.version,
       author: '',
       keywords: '',
       readme: `# ${cap.name}\n\n${cap.description}\n\n## Usage\n\nThis cap provides...\n\n## Features\n\n- Feature 1\n- Feature 2\n- Feature 3\n\n## Requirements\n\n- Model: ${cap.model.name}\n- MCP Servers: ${Object.keys(cap.mcpServers).length > 0 ? Object.keys(cap.mcpServers).join(', ') : 'None'}\n\n## Installation\n\n1. Install from the Nuwa Cap Store\n2. Configure any required MCP servers\n3. Start using the cap!\n`,
@@ -234,7 +233,7 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
       if (result.success) {
         // Update cap status to submitted
         updateCap(cap.id, { status: 'submitted' });
-        
+
         toast({
           type: 'success',
           description: result.message,
@@ -710,7 +709,8 @@ export function SubmitForm({ cap, onSubmit, onCancel }: SubmitFormProps) {
                       <div className="space-y-1 leading-none">
                         <FormLabel>I accept the terms and conditions</FormLabel>
                         <FormDescription>
-                          By submitting this cap, you agree to the  Nuwa Store Terms of Service and Content Policy.
+                          By submitting this cap, you agree to the Nuwa Store
+                          Terms of Service and Content Policy.
                         </FormDescription>
                       </div>
                     </FormItem>

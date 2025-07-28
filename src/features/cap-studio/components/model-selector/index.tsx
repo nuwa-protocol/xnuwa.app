@@ -25,8 +25,8 @@ import {
 import { SidebarInset, SidebarProvider } from '@/shared/components/ui/sidebar';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { useLocale } from '@/shared/locales/use-locale';
+import type { Model } from '@/shared/types';
 import { useAvailableModels, useSelectedModel } from '../../hooks';
-import type { Model } from '../../types';
 import { generateProviders } from '../../utils';
 import { ModelCard } from './model-card';
 import { ModelSelectorSidebar } from './model-selector-sidebar';

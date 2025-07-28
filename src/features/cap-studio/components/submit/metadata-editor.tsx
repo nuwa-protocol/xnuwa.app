@@ -1,33 +1,24 @@
-import { useState, useId } from 'react';
-import { 
-  Plus, 
-  X, 
-  Tag, 
-  User, 
-  Globe, 
-  Calendar,
-  FileText,
-  ExternalLink
-} from 'lucide-react';
+import { FileText, Globe, Plus, Tag, User, X } from 'lucide-react';
+import { useId, useState } from 'react';
+import type { RemoteCap } from '@/features/cap-store/types';
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Button,
   Input,
-  Textarea,
+  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Badge,
-  Label,
   Switch,
+  Textarea,
 } from '@/shared/components/ui';
-import { RemoteCap } from '@/features/cap-store/types';
 
 interface MetadataEditorProps {
   metadata: Partial<RemoteCap>;
@@ -35,9 +26,18 @@ interface MetadataEditorProps {
 }
 
 const commonTags = [
-  'productivity', 'development', 'content', 'analysis', 
-  'automation', 'communication', 'research', 'creative',
-  'utility', 'education', 'business', 'personal'
+  'productivity',
+  'development',
+  'content',
+  'analysis',
+  'automation',
+  'communication',
+  'research',
+  'creative',
+  'utility',
+  'education',
+  'business',
+  'personal',
 ];
 
 const commonLicenses = [
@@ -47,12 +47,15 @@ const commonLicenses = [
   'BSD-3-Clause',
   'ISC',
   'CC-BY-4.0',
-  'Proprietary'
+  'Proprietary',
 ];
 
 export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
   const [customKeywords, setCustomKeywords] = useState<string[]>(
-    metadata.description?.split(',').map(k => k.trim()).filter(Boolean) || []
+    metadata.description
+      ?.split(',')
+      .map((k) => k.trim())
+      .filter(Boolean) || [],
   );
   const [newKeyword, setNewKeyword] = useState('');
 
@@ -82,7 +85,7 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
   };
 
   const removeKeyword = (keyword: string) => {
-    const updated = customKeywords.filter(k => k !== keyword);
+    const updated = customKeywords.filter((k) => k !== keyword);
     setCustomKeywords(updated);
   };
 
@@ -142,15 +145,15 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor={tagId}>Category</Label>
-              <Select 
-                value={metadata.tag || ''} 
+              <Select
+                value={metadata.tag || ''}
                 onValueChange={(value) => updateMetadata({ tag: value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {commonTags.map(tag => (
+                  {commonTags.map((tag) => (
                     <SelectItem key={tag} value={tag}>
                       {tag}
                     </SelectItem>
@@ -212,18 +215,20 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
           )}
 
           <div>
-            <Label className="text-sm text-muted-foreground">Suggested Keywords</Label>
+            <Label className="text-sm text-muted-foreground">
+              Suggested Keywords
+            </Label>
             <div className="flex flex-wrap gap-2 mt-2">
               {commonTags
-                .filter(tag => !customKeywords.includes(tag))
+                .filter((tag) => !customKeywords.includes(tag))
                 .slice(0, 8)
                 .map((tag) => (
-                  <Badge 
-                    key={tag} 
-                    variant="outline" 
+                  <Badge
+                    key={tag}
+                    variant="outline"
                     className="cursor-pointer hover:bg-muted"
                     onClick={() => {
-                      setCustomKeywords(prev => [...prev, tag]);
+                      setCustomKeywords((prev) => [...prev, tag]);
                     }}
                   >
                     <Plus className="h-3 w-3 mr-1" />
@@ -242,22 +247,20 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
             <User className="h-4 w-4 mr-2" />
             Author & Legal
           </CardTitle>
-          <CardDescription>
-            Legal and attribution information
-          </CardDescription>
+          <CardDescription>Legal and attribution information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor={licenseId}>License</Label>
-            <Select 
-              value={metadata.version || 'MIT'} 
+            <Select
+              value={metadata.version || 'MIT'}
               onValueChange={(value) => updateMetadata({ version: value })}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {commonLicenses.map(license => (
+                {commonLicenses.map((license) => (
                   <SelectItem key={license} value={license}>
                     {license}
                   </SelectItem>
@@ -272,7 +275,9 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
               <Input
                 id={homepageId}
                 value={(metadata as any).homepage || ''}
-                onChange={(e) => updateMetadata({ homepage: e.target.value } as any)}
+                onChange={(e) =>
+                  updateMetadata({ homepage: e.target.value } as any)
+                }
                 placeholder="https://example.com"
               />
             </div>
@@ -281,7 +286,9 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
               <Input
                 id={repositoryId}
                 value={(metadata as any).repository || ''}
-                onChange={(e) => updateMetadata({ repository: e.target.value } as any)}
+                onChange={(e) =>
+                  updateMetadata({ repository: e.target.value } as any)
+                }
                 placeholder="https://github.com/user/repo"
               />
             </div>
@@ -310,7 +317,9 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
             </div>
             <Switch
               checked={(metadata as any).isPublic !== false}
-              onCheckedChange={(checked) => updateMetadata({ isPublic: checked } as any)}
+              onCheckedChange={(checked) =>
+                updateMetadata({ isPublic: checked } as any)
+              }
             />
           </div>
 
@@ -323,7 +332,9 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
             </div>
             <Switch
               checked={(metadata as any).allowForking !== false}
-              onCheckedChange={(checked) => updateMetadata({ allowForking: checked } as any)}
+              onCheckedChange={(checked) =>
+                updateMetadata({ allowForking: checked } as any)
+              }
             />
           </div>
 
@@ -336,7 +347,9 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
             </div>
             <Switch
               checked={(metadata as any).communitySupport !== false}
-              onCheckedChange={(checked) => updateMetadata({ communitySupport: checked } as any)}
+              onCheckedChange={(checked) =>
+                updateMetadata({ communitySupport: checked } as any)
+              }
             />
           </div>
         </CardContent>
@@ -359,7 +372,9 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
             <Textarea
               id={changelogId}
               value={(metadata as any).changelog || ''}
-              onChange={(e) => updateMetadata({ changelog: e.target.value } as any)}
+              onChange={(e) =>
+                updateMetadata({ changelog: e.target.value } as any)
+              }
               placeholder="## v1.0.0&#10;- Initial release&#10;- Added feature X&#10;- Fixed bug Y"
               rows={4}
             />
@@ -371,15 +386,19 @@ export function MetadataEditor({ metadata, onChange }: MetadataEditorProps) {
               <Input
                 id={minVersionId}
                 value={(metadata as any).minNuwaVersion || ''}
-                onChange={(e) => updateMetadata({ minNuwaVersion: e.target.value } as any)}
+                onChange={(e) =>
+                  updateMetadata({ minNuwaVersion: e.target.value } as any)
+                }
                 placeholder="1.0.0"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor={compatibilityId}>Compatibility</Label>
-              <Select 
-                value={(metadata as any).compatibility || 'stable'} 
-                onValueChange={(value) => updateMetadata({ compatibility: value } as any)}
+              <Select
+                value={(metadata as any).compatibility || 'stable'}
+                onValueChange={(value) =>
+                  updateMetadata({ compatibility: value } as any)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />

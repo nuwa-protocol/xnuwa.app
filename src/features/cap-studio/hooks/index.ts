@@ -1,3 +1,3 @@
 export { useAvailableModels } from './use-available-models';
-export { useCapDev } from './use-cap-dev';
+export { useLocalCaps } from './use-local-caps';
 export { useSelectedModel } from './use-selected-model';
