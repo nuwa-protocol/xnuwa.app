@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useLocalCaps } from '../../hooks';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
-import { McpToolsSection } from './mcp-tools-section';
+import { McpTools } from './mcp-tools';
 
 export function Mcp() {
   const { id } = useParams();
@@ -25,7 +25,7 @@ export function Mcp() {
 
   return (
     <DashboardLayout>
-      <McpToolsSection />
+      <McpTools />
     </DashboardLayout>
   );
 }

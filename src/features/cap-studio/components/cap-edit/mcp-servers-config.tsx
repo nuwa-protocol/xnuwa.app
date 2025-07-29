@@ -261,7 +261,6 @@ export function McpServersConfig({
                         <SelectValue placeholder="Select transport" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="auto">Auto</SelectItem>
                         <SelectItem value="sse">SSE</SelectItem>
                         <SelectItem value="http-streamable">
                           HTTP Streamable

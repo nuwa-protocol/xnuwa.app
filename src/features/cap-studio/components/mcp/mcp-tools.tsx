@@ -1,9 +1,6 @@
 import {
   Activity,
-  AlertCircle,
   BrushCleaning,
-  CheckCircle2,
-  Code2,
   Copy,
   Plug,
   RefreshCw,
@@ -15,7 +12,6 @@ import {
 import { useState } from 'react';
 import { toast } from '@/shared/components';
 import {
-  Badge,
   Button,
   Card,
   CardContent,
@@ -36,7 +32,7 @@ import {
 } from '@/shared/services/mcp-client';
 import type { McpTransportType, NuwaMCPClient } from '@/shared/types';
 import { DashboardGrid } from '../layout/dashboard-layout';
-import { McpDebugPanel } from './mcp-debug-panel';
+import { McpDebugPanel } from './debug-panel';
 
 interface LogEntry {
   id: string;
@@ -52,9 +48,9 @@ interface ConnectionConfig {
   name?: string;
 }
 
-export function McpToolsSection() {
+export function McpTools() {
   const [url, setUrl] = useState('http://localhost:8080/mcp');
-  const [transport, setTransport] = useState<McpTransportType | 'auto'>('auto');
+  const [transport, setTransport] = useState<McpTransportType | ''>('');
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [client, setClient] = useState<NuwaMCPClient | null>(null);
@@ -86,13 +82,10 @@ export function McpToolsSection() {
     try {
       pushLog({
         type: 'info',
-        message: `Connecting to ${url} with transport: ${transport || 'auto'}`,
+        message: `Connecting to ${url} with transport: ${transport || 'httpStream'}`,
       });
 
-      const newClient = await createNuwaMCPClient(
-        url,
-        transport === 'auto' ? undefined : (transport as McpTransportType),
-      );
+      const newClient = await createNuwaMCPClient(url, transport || undefined);
 
       setClient(newClient);
       setConnected(true);
@@ -183,7 +176,7 @@ export function McpToolsSection() {
     // Set server info
     setServerInfo({
       url,
-      transport: transport || 'auto',
+      transport: transport || 'httpStream',
       toolCount: tools.length,
       promptCount: prompts.length,
       resourceCount: resources.length,
@@ -261,7 +254,7 @@ export function McpToolsSection() {
     setTransport(
       config.transport && ['httpStream', 'sse'].includes(config.transport)
         ? config.transport
-        : 'auto',
+        : '',
     );
   };
 
@@ -292,7 +285,7 @@ export function McpToolsSection() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -301,25 +294,9 @@ export function McpToolsSection() {
             Test and debug Model Context Protocol connections and tools
           </p>
         </div>
-
-        <div className="flex items-center space-x-2">
-          <Badge variant={connected ? 'default' : 'secondary'}>
-            {connected ? (
-              <>
-                <CheckCircle2 className="h-3 w-3 mr-1" />
-                Connected
-              </>
-            ) : (
-              <>
-                <AlertCircle className="h-3 w-3 mr-1" />
-                Disconnected
-              </>
-            )}
-          </Badge>
-        </div>
       </div>
 
-      <DashboardGrid cols={2}>
+      <DashboardGrid cols={3}>
         {/* Connection Panel */}
         <Card>
           <CardHeader>
@@ -349,20 +326,19 @@ export function McpToolsSection() {
                 <Select
                   value={transport}
                   onValueChange={(value: string) => {
-                    const allowed = ['auto', 'httpStream', 'sse'];
+                    const allowed = ['httpStream', 'sse'];
                     if (allowed.includes(value)) {
-                      setTransport(value as McpTransportType | 'auto');
+                      setTransport(value as McpTransportType);
                     } else {
-                      setTransport('auto');
+                      setTransport('');
                     }
                   }}
                   disabled={connecting || connected}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Auto-detect" />
+                    <SelectValue placeholder="Select transport" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="auto">Auto-detect</SelectItem>
                     <SelectItem value="httpStream">HTTP Stream</SelectItem>
                     <SelectItem value="sse">Server-Sent Events</SelectItem>
                   </SelectContent>
@@ -410,7 +386,8 @@ export function McpToolsSection() {
         </Card>
 
         {/* Server Info */}
-        <Card>
+        {/* Server Status & Stats */}
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-base flex items-center">
               <Activity className="h-4 w-4 mr-2" />
@@ -422,51 +399,58 @@ export function McpToolsSection() {
           </CardHeader>
           <CardContent>
             {serverInfo ? (
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-6 text-sm">
                   <div>
                     <span className="text-muted-foreground">URL:</span>
-                    <p className="font-mono text-xs break-all">
+                    <p className="font-mono text-xs break-all mt-1">
                       {serverInfo.url}
                     </p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Transport:</span>
-                    <p className="capitalize">{serverInfo.transport}</p>
+                    <p className="capitalize mt-1">{serverInfo.transport}</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                <div className="grid grid-cols-3 gap-6 pt-4 border-t">
                   <div className="text-center">
-                    <div className="text-xl font-bold text-blue-600">
+                    <div className="text-2xl font-bold text-blue-600">
                       {tools.length}
                     </div>
-                    <div className="text-xs text-muted-foreground">Tools</div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Tools
+                    </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-green-600">
+                    <div className="text-2xl font-bold text-green-600">
                       {prompts.length}
                     </div>
-                    <div className="text-xs text-muted-foreground">Prompts</div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Prompts
+                    </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-purple-600">
+                    <div className="text-2xl font-bold text-purple-600">
                       {resources.length}
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-sm text-muted-foreground mt-1">
                       Resources
                     </div>
                   </div>
                 </div>
 
-                <div className="text-xs text-muted-foreground pt-2 border-t">
+                <div className="text-xs text-muted-foreground pt-4 border-t">
                   Connected: {new Date(serverInfo.connectedAt).toLocaleString()}
                 </div>
               </div>
             ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Connect to a server to view status information</p>
+              <div className="text-center py-12 text-muted-foreground">
+                <Settings className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                <p className="text-base font-medium">No Server Connected</p>
+                <p className="text-sm mt-1">
+                  Connect to a server to view status information
+                </p>
               </div>
             )}
           </CardContent>
@@ -475,28 +459,15 @@ export function McpToolsSection() {
 
       {/* Debug Interface */}
       {connected && client && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center">
-              <Code2 className="h-4 w-4 mr-2" />
-              Debug Interface
-            </CardTitle>
-            <CardDescription>
-              Interactive debugging tools for MCP server capabilities
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <McpDebugPanel
-              client={client}
-              tools={tools}
-              toolsMap={toolsMap}
-              prompts={prompts}
-              promptsMap={promptsMap}
-              resources={resources}
-              onLog={pushLog}
-            />
-          </CardContent>
-        </Card>
+        <McpDebugPanel
+          client={client}
+          tools={tools}
+          toolsMap={toolsMap}
+          prompts={prompts}
+          promptsMap={promptsMap}
+          resources={resources}
+          onLog={pushLog}
+        />
       )}
 
       {/* Debug Logs */}
