@@ -32,7 +32,7 @@ export function Chat({
     <div className="flex flex-col relative min-w-0 h-dvh bg-background">
       {/* Chat */}
       <div className={'flex flex-col w-full h-dvh bg-background'}>
-        <Header />
+        <Header chatId={id} />
         <Messages
           chatId={id}
           status={status}
