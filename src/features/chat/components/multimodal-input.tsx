@@ -20,6 +20,7 @@ import {
   useState,
 } from 'react';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { CapSelector } from '@/features/cap-store/components';
 import { useScrollToBottom } from '@/features/chat/hooks/use-scroll-to-bottom';
 import { toast } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
@@ -173,12 +174,13 @@ function PureMultimodalInput({
 
         <div className="flex justify-between items-center p-2">
           <div className="flex items-center gap-2">
-            {isDevMode && (
-              <AttachmentsButton fileInputRef={fileInputRef} status={status} />
-            )}
+            <CapSelector />
           </div>
 
           <div className="flex items-center">
+            {isDevMode && (
+              <AttachmentsButton fileInputRef={fileInputRef} status={status} />
+            )}
             {status === 'submitted' || status === 'streaming' ? (
               <StopButton stop={stop} setMessages={setMessages} />
             ) : (

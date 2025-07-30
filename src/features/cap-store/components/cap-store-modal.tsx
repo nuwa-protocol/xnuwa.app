@@ -10,8 +10,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui';
-import { useLanguage } from '@/shared/hooks/use-language';
-import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import { useCurrentCap, useLanguage } from '@/shared/hooks';
 import { useRemoteCap } from '../hooks/use-remote-cap';
 import type { InstalledCap } from '../types';
 import { CapCard } from './cap-card';
@@ -43,7 +42,7 @@ export function CapStoreModal({
     category: activeTab === 'all' ? undefined : activeTab,
   });
 
-  const setCurrentCap = CurrentCapStore((state) => state.setCurrentCap);
+  const { setCurrentCap } = useCurrentCap();
 
   const tabs = [
     { id: 'all', label: t('capStore.tabs.all') },

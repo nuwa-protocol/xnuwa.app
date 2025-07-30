@@ -1,7 +1,6 @@
-import { Package, Search, Wrench } from 'lucide-react';
+import { Search, Wrench } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CapStoreModal } from '@/features/cap-store/components';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
 import { Logo } from '@/shared/components';
 import {
@@ -107,15 +106,6 @@ export function MainContent() {
                 variant="secondary"
               />
             </SearchModal>
-            {isDevMode && (
-              <CapStoreModal>
-                <SidebarButton
-                  icon={Package}
-                  text={t('nav.sidebar.capStore')}
-                  variant="secondary"
-                />
-              </CapStoreModal>
-            )}
             {isDevMode && (
               <SidebarButton
                 icon={Wrench}
