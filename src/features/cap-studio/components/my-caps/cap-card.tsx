@@ -122,22 +122,10 @@ export function CapCard({
               Edit
             </Button>
 
-            <Button onClick={onTest} size="sm" variant="outline">
+            <Button onClick={onTest} size="sm" variant="default">
               <Bug className="h-4 w-4 mr-2" />
               Test
             </Button>
-
-            {cap.status === 'draft' ? (
-              <Button onClick={onSubmit} size="sm" variant="default">
-                <Upload className="h-4 w-4 mr-2" />
-                Submit
-              </Button>
-            ) : (
-              <Button onClick={onUpdate} size="sm" variant="default">
-                <Upload className="h-4 w-4 mr-2" />
-                Update
-              </Button>
-            )}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -146,6 +134,17 @@ export function CapCard({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {cap.status === 'draft' ? (
+                  <DropdownMenuItem onClick={onSubmit}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Submit
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={onUpdate}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Update
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleCopyId}>
                   <Copy className="h-4 w-4 mr-2" />
                   Copy Full ID
