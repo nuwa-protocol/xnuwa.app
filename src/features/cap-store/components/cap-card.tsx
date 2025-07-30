@@ -22,11 +22,11 @@ import {
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { useInstalledCap } from '../hooks/use-installed-cap';
-import type { RemoteCap } from '../types';
+import type { InstalledCap, RemoteCap } from '../types';
 
 export interface CapCardProps {
   cap: RemoteCap;
-  onRun?: () => void;
+  onRun?: (cap: InstalledCap) => void;
 }
 
 export function CapCard({ cap, onRun }: CapCardProps) {
@@ -77,7 +77,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
   };
 
   const handleRun = () => {
-    onRun?.();
+    onRun?.(cap);
   };
 
   const handleUpdate = async () => {
@@ -172,8 +172,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
                     variant="ghost"
                     className="text-xs px-4 py-2 h-6 relative"
                     style={{
-                      paddingRight:
-                        hasUpdate && isInstalled ? 14 : undefined,
+                      paddingRight: hasUpdate && isInstalled ? 14 : undefined,
                     }}
                   >
                     <span className="relative inline-block">

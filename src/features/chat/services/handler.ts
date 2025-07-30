@@ -7,7 +7,7 @@ import {
 } from 'ai';
 import { generateUUID } from '@/shared/utils';
 import { ChatStateStore } from '../stores';
-import type { ChatCap } from '../types';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { llmProvider } from './providers';
 
 // Error handling function
@@ -52,22 +52,27 @@ function appendSourcesToFinalMessages(
 // Handle AI request, entrance of the AI workflow
 const handleAIRequest = async ({
   sessionId,
-  cap,
   messages,
   signal,
 }: {
   sessionId: string;
-  cap: ChatCap;
   messages: Message[];
   signal?: AbortSignal;
 }) => {
+  // Get current cap from global state
+  const { currentCap } = CurrentCapStore.getState();
+  
+  if (!currentCap) {
+    throw new Error('No cap selected. Please select a cap to use.');
+  }
+
   // update the messages state
   const { updateMessages } = ChatStateStore.getState();
   await updateMessages(sessionId, messages);
 
   const result = streamText({
-    model: llmProvider.chat(cap.model.id),
-    system: cap.prompt,
+    model: llmProvider.chat(currentCap.model.id),
+    system: currentCap.prompt,
     messages,
     maxSteps: 5,
     experimental_transform: smoothStream({ chunking: 'word' }),

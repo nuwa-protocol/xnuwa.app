@@ -16,7 +16,6 @@ export const createInitialChatSession = (): ChatSession => ({
   createdAt: Date.now(),
   updatedAt: Date.now(),
   messages: [],
-  cap: null,
 });
 
 // get current DID
@@ -83,7 +82,6 @@ export const ChatStateStore = create<ChatStoreState>()(
           createdAt: session?.createdAt || Date.now(),
           updatedAt: Date.now(),
           messages: session?.messages || [],
-          cap: session?.cap || null,
         };
 
         set((state) => ({
@@ -166,7 +164,6 @@ export const ChatStateStore = create<ChatStoreState>()(
               createdAt: Date.now(),
               updatedAt: Date.now(),
               messages: [],
-              cap: null,
             };
           }
 

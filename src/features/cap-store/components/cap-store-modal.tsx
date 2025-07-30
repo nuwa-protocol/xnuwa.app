@@ -1,5 +1,6 @@
 import { Loader2, Package, Search } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from '@/shared/components';
 import * as Dialog from '@/shared/components/ui';
 import {
   Button,
@@ -10,7 +11,9 @@ import {
   TabsTrigger,
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useRemoteCap } from '../hooks/use-remote-cap';
+import type { InstalledCap } from '../types';
 import { CapCard } from './cap-card';
 
 interface CapStoreModalProps {
@@ -26,13 +29,11 @@ export function CapStoreModal({
 }: CapStoreModalProps) {
   const { t } = useLanguage();
   const [internalOpen, setInternalOpen] = useState(false);
-  
+
   // Use external or internal state management
   const isControlled = externalOpen !== undefined;
   const open = isControlled ? externalOpen : internalOpen;
-  const onOpenChange = isControlled 
-    ? externalOnOpenChange 
-    : setInternalOpen;
+  const onOpenChange = isControlled ? externalOnOpenChange : setInternalOpen;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
@@ -42,6 +43,8 @@ export function CapStoreModal({
     category: activeTab === 'all' ? undefined : activeTab,
   });
 
+  const setCurrentCap = CurrentCapStore((state) => state.setCurrentCap);
+
   const tabs = [
     { id: 'all', label: t('capStore.tabs.all') },
     { id: 'development', label: t('capStore.tabs.development') },
@@ -50,6 +53,24 @@ export function CapStoreModal({
     { id: 'productivity', label: t('capStore.tabs.productivity') },
     { id: 'security', label: t('capStore.tabs.security') },
   ];
+
+  const handleRunCap = (cap: InstalledCap) => {
+    // Set this cap as the current cap
+    setCurrentCap({
+      id: cap.id,
+      name: cap.name,
+      prompt: cap.prompt,
+      model: cap.model,
+      mcpServers: cap.mcpServers,
+    });
+
+    onOpenChange?.(false);
+
+    toast({
+      type: 'success',
+      description: `${cap.name} is now active`,
+    });
+  };
 
   return (
     <Dialog.Dialog open={open} onOpenChange={onOpenChange}>
@@ -167,7 +188,7 @@ export function CapStoreModal({
                             <CapCard
                               key={cap.id}
                               cap={cap}
-                              onRun={() => onOpenChange?.(false)}
+                              onRun={handleRunCap}
                             />
                           ))}
                         </div>
