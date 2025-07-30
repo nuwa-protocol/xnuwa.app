@@ -1,13 +1,15 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useLocalCaps } from '../../hooks';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
 import { McpTools } from './mcp-tools';
 
 export function Mcp() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const localCaps = useLocalCaps();
 
   const cap = id ? localCaps.find((cap) => cap.id === id) : null;
+  const serverName = searchParams.get('server');
 
   if (id && !cap) {
     return (
@@ -25,7 +27,7 @@ export function Mcp() {
 
   return (
     <DashboardLayout>
-      <McpTools />
+      <McpTools cap={cap} serverName={serverName} />
     </DashboardLayout>
   );
 }

@@ -9,7 +9,7 @@ import {
   Unplug,
   Zap,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from '@/shared/components';
 import {
   Button,
@@ -31,6 +31,7 @@ import {
   createNuwaMCPClient,
 } from '@/shared/services/mcp-client';
 import type { McpTransportType, NuwaMCPClient } from '@/shared/types';
+import type { LocalCap } from '../../types';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { McpDebugPanel } from './debug-panel';
 
@@ -48,7 +49,12 @@ interface ConnectionConfig {
   name?: string;
 }
 
-export function McpTools() {
+interface McpToolsProps {
+  cap?: LocalCap | null;
+  serverName?: string | null;
+}
+
+export function McpTools({ cap, serverName }: McpToolsProps) {
   const [url, setUrl] = useState('http://localhost:8080/mcp');
   const [transport, setTransport] = useState<McpTransportType | ''>('');
   const [connected, setConnected] = useState(false);
@@ -62,7 +68,7 @@ export function McpTools() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [serverInfo, setServerInfo] = useState<any>(null);
 
-  const pushLog = (entry: Omit<LogEntry, 'id' | 'timestamp'>) => {
+  const pushLog = useCallback((entry: Omit<LogEntry, 'id' | 'timestamp'>) => {
     setLogs((prev) =>
       [
         {
@@ -73,9 +79,22 @@ export function McpTools() {
         ...prev,
       ].slice(0, 100),
     ); // Keep last 100 logs
-  };
+  }, []);
 
-  const handleConnect = async () => {
+  // Auto-populate connection details when server is specified via URL parameter
+  useEffect(() => {
+    if (cap && serverName && cap.mcpServers[serverName]) {
+      const serverConfig = cap.mcpServers[serverName];
+      setUrl(serverConfig.url);
+      setTransport(
+        serverConfig.transport === 'http-stream'
+          ? 'httpStream'
+          : serverConfig.transport,
+      );
+    }
+  }, [cap, serverName, pushLog]);
+
+  const handleConnect = useCallback(async () => {
     if (connecting) return;
 
     setConnecting(true);
@@ -117,7 +136,7 @@ export function McpTools() {
     } finally {
       setConnecting(false);
     }
-  };
+  }, [connecting, url, transport, pushLog]);
 
   const fetchServerCapabilities = async (mcpClient: NuwaMCPClient) => {
     // Fetch tools
