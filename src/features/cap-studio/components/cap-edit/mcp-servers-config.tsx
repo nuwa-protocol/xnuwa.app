@@ -1,4 +1,4 @@
-import { Check, Code, Plus, X } from 'lucide-react';
+import { Check, Code, Edit, Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '@/shared/components/ui';
 
-import type { McpServerConfig } from '../../types';
+import type { McpServerConfig } from '@/shared/types/cap';
 
 interface McpServersConfigProps {
   mcpServers: Record<string, McpServerConfig>;
@@ -32,7 +32,10 @@ export function McpServersConfig({
 }: McpServersConfigProps) {
   const navigate = useNavigate();
   const [isAdding, setIsAdding] = useState(false);
-  const [newServer, setNewServer] = useState<McpServerConfig>({
+  const [editingServer, setEditingServer] = useState<string | null>(null);
+  const [newServer, setNewServer] = useState<
+    McpServerConfig & { name: string }
+  >({
     name: '',
     url: '',
     transport: 'sse',
@@ -42,14 +45,17 @@ export function McpServersConfig({
     url?: string;
   }>({});
 
-  const validateName = (name: string): string | undefined => {
+  const validateName = (
+    name: string,
+    originalName?: string,
+  ): string | undefined => {
     if (!name.trim()) {
       return 'Server name is required';
     }
     if (!/^[a-z-]+$/.test(name)) {
       return 'Name must contain only lowercase letters and dashes';
     }
-    if (mcpServers[name]) {
+    if (mcpServers[name] && name !== originalName) {
       return 'Server name already exists';
     }
     return undefined;
@@ -69,6 +75,7 @@ export function McpServersConfig({
 
   const handleAddServer = () => {
     setIsAdding(true);
+    setEditingServer(null);
     setNewServer({
       name: '',
       url: '',
@@ -77,8 +84,20 @@ export function McpServersConfig({
     setErrors({});
   };
 
+  const handleEditServer = (serverName: string) => {
+    const serverConfig = mcpServers[serverName];
+    setEditingServer(serverName);
+    setIsAdding(false);
+    setNewServer({
+      name: serverName,
+      url: serverConfig.url,
+      transport: serverConfig.transport,
+    });
+    setErrors({});
+  };
+
   const handleConfirmServer = () => {
-    const nameError = validateName(newServer.name);
+    const nameError = validateName(newServer.name, editingServer || undefined);
     const urlError = validateUrl(newServer.url);
 
     setErrors({
@@ -90,17 +109,23 @@ export function McpServersConfig({
       return;
     }
 
-    const updatedServers = {
-      ...mcpServers,
-      [newServer.name]: {
-        name: newServer.name,
-        url: newServer.url,
-        transport: newServer.transport,
-      },
+    let updatedServers = { ...mcpServers };
+
+    if (editingServer && editingServer !== newServer.name) {
+      // Remove the old server entry if name changed
+      const { [editingServer]: removed, ...rest } = updatedServers;
+      updatedServers = rest;
+    }
+
+    // Add/update the server with the new/current name
+    updatedServers[newServer.name] = {
+      url: newServer.url,
+      transport: newServer.transport,
     };
 
     onUpdateMcpServers(updatedServers);
     setIsAdding(false);
+    setEditingServer(null);
     setNewServer({
       name: '',
       url: '',
@@ -111,6 +136,7 @@ export function McpServersConfig({
 
   const handleCancelAdd = () => {
     setIsAdding(false);
+    setEditingServer(null);
     setNewServer({
       name: '',
       url: '',
@@ -147,7 +173,7 @@ export function McpServersConfig({
             variant="outline"
             size="sm"
             onClick={handleAddServer}
-            disabled={isAdding}
+            disabled={isAdding || editingServer !== null}
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Server
@@ -163,22 +189,35 @@ export function McpServersConfig({
               className="flex items-center justify-between p-3 border rounded-lg bg-muted/50"
             >
               <div className="min-w-0 flex-1">
-                <div className="font-medium text-sm truncate">
-                  {config.name}
-                </div>
+                <div className="font-medium text-sm truncate">{serverName}</div>
                 <div className="text-xs text-muted-foreground truncate">
-                  {config.transport.toUpperCase()} • {config.url}
+                  {config.transport === 'httpStream'
+                    ? 'HTTP STREAMABLE'
+                    : config.transport.toUpperCase()}{' '}
+                  • {config.url}
                 </div>
               </div>
               <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEditServer(serverName)}
+                  disabled={isAdding || editingServer !== null}
+                  title="Edit Server"
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit
+                </Button>
                 {capId && (
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => handleTestServer(serverName)}
+                    disabled={isAdding || editingServer !== null}
                   >
-                    <Code />
+                    <Code className="h-4 w-4" />
                     Debug
                   </Button>
                 )}
@@ -187,6 +226,7 @@ export function McpServersConfig({
                   variant="ghost"
                   size="sm"
                   onClick={() => handleRemoveServer(serverName)}
+                  disabled={isAdding || editingServer !== null}
                   title="Remove Server"
                 >
                   <X className="h-4 w-4" />
@@ -195,8 +235,8 @@ export function McpServersConfig({
             </div>
           ))}
 
-          {/* Add new server form */}
-          {isAdding && (
+          {/* Add/Edit server form */}
+          {(isAdding || editingServer) && (
             <Card className="border-2 border-dashed">
               <CardContent className="pt-6">
                 <div className="space-y-4">
@@ -213,7 +253,7 @@ export function McpServersConfig({
                         }));
                         setErrors((prev) => ({
                           ...prev,
-                          name: validateName(value),
+                          name: validateName(value, editingServer || undefined),
                         }));
                       }}
                       className={errors.name ? 'border-red-500' : ''}
@@ -250,7 +290,7 @@ export function McpServersConfig({
                     <Label htmlFor="transport">Transport</Label>
                     <Select
                       value={newServer.transport}
-                      onValueChange={(value: 'sse' | 'http-stream') =>
+                      onValueChange={(value: 'sse' | 'httpStream') =>
                         setNewServer((prev) => ({
                           ...prev,
                           transport: value,
@@ -262,7 +302,7 @@ export function McpServersConfig({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="sse">SSE</SelectItem>
-                        <SelectItem value="http-streamable">
+                        <SelectItem value="httpStream">
                           HTTP Streamable
                         </SelectItem>
                       </SelectContent>
@@ -284,7 +324,7 @@ export function McpServersConfig({
                       onClick={handleConfirmServer}
                     >
                       <Check className="h-4 w-4 mr-2" />
-                      Confirm
+                      {editingServer ? 'Update' : 'Confirm'}
                     </Button>
                   </div>
                 </div>

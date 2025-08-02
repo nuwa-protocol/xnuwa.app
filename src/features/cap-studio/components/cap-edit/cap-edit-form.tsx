@@ -23,8 +23,8 @@ import {
   MultiSelect,
   Textarea,
 } from '@/shared/components/ui';
+import type { McpServerConfig } from '@/shared/types/cap';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
-import type { McpServerConfig } from '../../types';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { ModelSelectorDialog } from '../model-selector';
 import { predefinedTags } from './constants';

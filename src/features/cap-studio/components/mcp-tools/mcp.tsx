@@ -89,11 +89,7 @@ export function Mcp({ cap, serverName }: McpProps) {
     if (cap && serverName && cap.mcpServers[serverName]) {
       const serverConfig = cap.mcpServers[serverName];
       setUrl(serverConfig.url);
-      setTransport(
-        serverConfig.transport === 'http-stream'
-          ? 'httpStream'
-          : serverConfig.transport,
-      );
+      setTransport(serverConfig.transport);
     }
   }, [cap, serverName, pushLog]);
 
@@ -319,7 +315,7 @@ export function Mcp({ cap, serverName }: McpProps) {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate('/cap-studio')}
+          onClick={() => navigate(-1)}
           className="flex items-center space-x-2"
         >
           <ArrowLeft className="h-4 w-4" />
