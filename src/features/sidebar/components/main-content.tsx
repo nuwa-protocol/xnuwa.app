@@ -1,4 +1,4 @@
-import { User, Wrench } from 'lucide-react';
+import { Settings, User, Wrench } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
@@ -15,7 +15,6 @@ import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { cn } from '@/shared/utils';
 import { useAppSidebar } from './app-sidebar';
-import { SettingsDropdown } from './settings-dropdown';
 import { SidebarButton } from './sidebar-button';
 import { SidebarHistory } from './sidebar-history';
 import { SidebarToggle } from './sidebar-toggle';
@@ -106,7 +105,14 @@ export function MainContent() {
               }}
               variant="secondary"
             />
-            <SettingsDropdown />
+            <SidebarButton
+              icon={Settings}
+              text={t('nav.sidebar.settings')}
+              onClick={() => {
+                navigate('/settings');
+              }}
+              variant="secondary"
+            />
             {isDevMode && (
               <SidebarButton
                 icon={Wrench}

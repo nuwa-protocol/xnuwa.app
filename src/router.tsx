@@ -11,6 +11,7 @@ import CapStudioSubmitPage from './pages/cap-studio-submit';
 import ChatPage from './pages/chat';
 import ErrorPage from './pages/error';
 import LoginPage from './pages/login';
+import SettingsPage from './pages/settings';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
           { index: true, element: <Navigate to="/chat" replace /> },
           { path: 'chat', element: <ChatPage /> },
           { path: 'account', element: <AccountPage /> },
+          { path: 'settings', element: <SettingsPage /> },
           { path: 'cap-studio', element: <CapStudioPage /> },
           { path: 'cap-studio/create', element: <CapStudioCreatePage /> },
           { path: 'cap-studio/edit/:id', element: <CapStudioEditPage /> },

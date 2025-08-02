@@ -1,9 +1,7 @@
 import { LogOut, Monitor, Moon, Settings, Sun } from 'lucide-react';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthHandler } from '@/features/auth/hooks';
 import { useAuth } from '@/features/auth/hooks/use-auth';
-import { SettingsModal } from '@/features/settings/components';
 import { useSettings } from '@/features/settings/hooks/use-settings';
 import { useTheme } from '@/shared/components/theme-provider';
 import {
@@ -34,7 +32,6 @@ export function AssistantNav() {
   const { t } = useLanguage();
   const { settings, setSetting } = useSettings();
   const { resetAllStores } = useStorage();
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleLogout = () => {
     resetAllStores();
@@ -73,7 +70,7 @@ export function AssistantNav() {
           {/* Menu Items */}
           <DropdownMenuItem
             className="text-sm px-4 py-2 cursor-pointer items-center"
-            onClick={() => setSettingsOpen(true)}
+            onClick={() => navigate('/settings')}
           >
             <span className="flex items-center gap-2">
               <Settings size={16} />
@@ -170,7 +167,6 @@ export function AssistantNav() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
     </>
   );
 }

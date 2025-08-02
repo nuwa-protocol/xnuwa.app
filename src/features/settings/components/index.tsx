@@ -1,19 +1,19 @@
 import type { LucideIcon } from 'lucide-react';
-import { Monitor, PlayCircle, User } from 'lucide-react';
+import { Monitor, User } from 'lucide-react';
 import type React from 'react';
 import { useRef, useState } from 'react';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useSettings } from '@/features/settings/hooks/use-settings';
 import { toast } from '@/shared/components';
-import * as Dialog from '@/shared/components/ui';
 import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { useStorage } from '@/shared/hooks/use-storage';
 import type { SettingCardProps } from './setting-card';
 import { SettingSection } from './setting-section';
 import { SettingsNav } from './settings-nav';
+import { ThemeSelector } from './theme-selector';
+import { LanguageSelector } from './language-selector';
 
-// Define the type for settingsSections
 interface SettingsSection {
   id: string;
   icon: LucideIcon;
@@ -23,18 +23,7 @@ interface SettingsSection {
   customComponent?: React.ReactNode;
 }
 
-// Update props to support controlled and uncontrolled usage
-interface SettingsModalProps {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  children?: React.ReactNode;
-}
-
-export function SettingsModal({
-  open,
-  onOpenChange,
-  children,
-}: SettingsModalProps) {
+export function Settings() {
   const { t } = useLanguage();
   const [activeSectionIndex, setActiveSectionIndex] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -92,13 +81,31 @@ export function SettingsModal({
     }
   };
 
-  // Settings sections using SettingCard variants
+  // Settings sections
   const settingsSections: SettingsSection[] = [
     {
-      id: 'profile',
+      id: 'general',
+      icon: Monitor,
+      name: t('settings.sections.general.title') || 'General',
+      description:
+        t('settings.sections.general.subtitle') ||
+        'General application settings.',
+      customComponent: (
+        <div className="space-y-6">
+          <div className="rounded-lg border p-4">
+            <ThemeSelector />
+          </div>
+          <div className="rounded-lg border p-4">
+            <LanguageSelector />
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'about',
       icon: User,
-      name: t('settings.sections.profile.title'),
-      description: t('settings.sections.profile.subtitle'),
+      name: t('settings.sections.profile.title')?.replace('Profile', 'About') || 'About',
+      description: t('settings.sections.profile.subtitle') || 'Your profile information.',
       cardItems: [
         {
           variant: 'info',
@@ -142,31 +149,6 @@ export function SettingsModal({
       ],
     },
     {
-      id: 'general',
-      icon: Monitor,
-      name: t('settings.sections.general.title') || 'General',
-      description:
-        t('settings.sections.general.subtitle') ||
-        'General application settings.',
-      cardItems: [
-        {
-          variant: 'single-select',
-          title: t('settings.system.language.title') || 'Language',
-          description:
-            t('settings.system.language.description') ||
-            'Select your preferred language.',
-          value: settings.language,
-          onChange: (value: string) =>
-            setSetting('language', value as 'en' | 'cn'),
-          options: [
-            { label: t('language.english'), value: 'en' },
-            { label: t('language.chinese'), value: 'cn' },
-          ],
-          disabled: false,
-        },
-      ],
-    },
-    {
       id: 'system',
       icon: Monitor,
       name: t('settings.sections.system.title'),
@@ -200,112 +182,31 @@ export function SettingsModal({
         },
       ],
     },
-    ...(isDevMode
-      ? [
-          {
-            id: 'placeholders',
-            icon: PlayCircle,
-            name: t('settings.sections.placeholders.title'),
-            description: t('settings.sections.placeholders.subtitle'),
-            cardItems: [
-              {
-                variant: 'single-input' as const,
-                title: 'Single Input',
-                description: 'A single input with a save button.',
-                value: 'Mock value',
-                onChange: () => {},
-                placeholder: 'Enter something...',
-                buttonLabel: 'Save',
-                onButtonClick: () => {},
-                disabled: false,
-              },
-              {
-                variant: 'single-select' as const,
-                title: 'Single Select',
-                description: 'A single select dropdown.',
-                value: 'option1',
-                onChange: () => {},
-                options: [
-                  { label: 'Option 1', value: 'option1' },
-                  { label: 'Option 2', value: 'option2' },
-                ],
-                disabled: false,
-              },
-              {
-                variant: 'switch' as const,
-                title: 'Switch',
-                description: 'A switch toggle.',
-                checked: true,
-                onChange: () => {},
-                disabled: false,
-              },
-              {
-                variant: 'info' as const,
-                title: 'Info',
-                description: 'An info card with copy.',
-                info: 'Mock info to copy',
-                copyLabel: 'Click to copy',
-                copiedLabel: 'Copied!',
-              },
-              {
-                variant: 'danger-action' as const,
-                title: 'Danger Action',
-                description: 'A dangerous action with confirmation.',
-                buttonLabel: 'Delete',
-                onClick: () => {},
-                disabled: false,
-                confirmationTitle: 'Are you sure?',
-                confirmationDescription: 'This cannot be undone.',
-                confirmationButtonLabel: 'Delete',
-                cancelButtonLabel: 'Cancel',
-              },
-              {
-                variant: 'avatar' as const,
-                title: 'Avatar',
-                description: 'Upload or remove your avatar.',
-                avatarUrl: null,
-                onAvatarChange: () => {},
-                onRemoveAvatar: () => {},
-                onUploadClick: () => {},
-                uploadLabel: 'Upload',
-                removeLabel: 'Remove',
-                fileInputRef: fileInputRef as React.RefObject<HTMLInputElement>,
-                fileTypesHint: 'PNG, JPG, GIF',
-                fallbackUrl: 'https://avatar.vercel.sh/mock',
-              },
-            ],
-          },
-        ]
-      : []),
   ];
 
   const activeSection = settingsSections[activeSectionIndex];
 
   return (
-    <Dialog.Dialog
-      {...(open !== undefined && onOpenChange ? { open, onOpenChange } : {})}
-    >
-      {children && (
-        <Dialog.DialogTrigger asChild>{children}</Dialog.DialogTrigger>
-      )}
-      <Dialog.DialogContent
-        className="fixed left-1/2 top-1/2 z-50 grid -translate-x-1/2 -translate-y-1/2 gap-0 border bg-background p-0 shadow-lg sm:rounded-lg overflow-hidden"
-        style={{
-          width: '80vw',
-          maxWidth: 800,
-          height: '80vh',
-          maxHeight: 700,
-        }}
-        aria-describedby={undefined}
-      >
-        <Dialog.DialogTitle className="sr-only">Settings</Dialog.DialogTitle>
-        <div className="size-full overflow-auto hide-scrollbar">
-          <div className="mx-auto w-full px-16 pb-8">
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <p className="text-muted-foreground">
+            Manage your account settings and preferences.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+          <div className="lg:col-span-1">
             <SettingsNav
               settingsSections={settingsSections}
               setActiveSectionIndex={setActiveSectionIndex}
               activeSectionIndex={activeSectionIndex}
+              variant="vertical"
             />
+          </div>
+          
+          <div className="lg:col-span-3">
             <SettingSection
               key={activeSection.id}
               title={activeSection.name}
@@ -315,7 +216,7 @@ export function SettingsModal({
             />
           </div>
         </div>
-      </Dialog.DialogContent>
-    </Dialog.Dialog>
+      </div>
+    </div>
   );
 }
