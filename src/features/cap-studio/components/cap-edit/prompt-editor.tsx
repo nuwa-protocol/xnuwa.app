@@ -59,7 +59,7 @@ function VariablesDialog({
               type="button"
               className="w-full text-left cursor-pointer hover:bg-muted/30 rounded-md p-2 transition-colors"
               onClick={() => {
-                onVariableSelect(variable.name);
+                onVariableSelect(`\n\n${variable.value}\n`);
                 onOpenChange(false);
               }}
             >

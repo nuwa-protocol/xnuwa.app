@@ -8,12 +8,14 @@ export const predefinedTags = [
 ];
 
 export const promptVariables = [
-  { name: '{{user_geo}}', description: "The user's location" },
-  { name: '{{context}}', description: 'Additional context from MCP servers' },
-  { name: '{{date}}', description: 'Current date and time' },
-  { name: '{{user_name}}', description: "The user's name" },
   {
-    name: '{{previous_response}}',
-    description: 'Previous AI response in the conversation',
+    name: '{{user_geo}}',
+    description: "The user's location",
+    value: `The user's location is {{user_geo}}`,
+  },
+  {
+    name: '{{date}}',
+    description: 'Current date and time',
+    value: `The current time is {{date}}`,
   },
 ];
