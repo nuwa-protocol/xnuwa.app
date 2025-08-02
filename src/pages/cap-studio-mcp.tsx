@@ -1,5 +1,5 @@
-import { Mcp } from '@/features/cap-studio/components/mcp';
+import { McpTools } from '@/features/cap-studio/components/mcp-tools';
 
 export default function CapStudioMcpPage() {
-  return <Mcp />;
+  return <McpTools />;
 }

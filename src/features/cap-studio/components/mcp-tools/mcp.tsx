@@ -1,5 +1,6 @@
 import {
   Activity,
+  ArrowLeft,
   BrushCleaning,
   Copy,
   Plug,
@@ -10,6 +11,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from '@/shared/components';
 import {
   Button,
@@ -49,12 +51,13 @@ interface ConnectionConfig {
   name?: string;
 }
 
-interface McpToolsProps {
+interface McpProps {
   cap?: LocalCap | null;
   serverName?: string | null;
 }
 
-export function McpTools({ cap, serverName }: McpToolsProps) {
+export function Mcp({ cap, serverName }: McpProps) {
+  const navigate = useNavigate();
   const [url, setUrl] = useState('http://localhost:8080/mcp');
   const [transport, setTransport] = useState<McpTransportType | ''>('');
   const [connected, setConnected] = useState(false);
@@ -313,6 +316,15 @@ export function McpTools({ cap, serverName }: McpToolsProps) {
             Test and debug Model Context Protocol connections and tools
           </p>
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/cap-studio')}
+          className="flex items-center space-x-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back</span>
+        </Button>
       </div>
 
       <DashboardGrid cols={3}>

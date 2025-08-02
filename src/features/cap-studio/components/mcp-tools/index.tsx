@@ -1,9 +1,9 @@
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useLocalCaps } from '../../hooks';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
-import { McpTools } from './mcp-tools';
+import { Mcp } from './mcp';
 
-export function Mcp() {
+export function McpTools() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const localCaps = useLocalCaps();
@@ -27,7 +27,7 @@ export function Mcp() {
 
   return (
     <DashboardLayout>
-      <McpTools cap={cap} serverName={serverName} />
+      <Mcp cap={cap} serverName={serverName} />
     </DashboardLayout>
   );
 }
