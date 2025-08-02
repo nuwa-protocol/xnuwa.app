@@ -45,18 +45,8 @@ export class CapResolve {
     }
   }
 
-  private getCurrentDateTime(): string {
-    return new Date().toLocaleString();
-  }
-
   private async resolveVariables(prompt: string): Promise<string> {
     let resolvedPrompt = prompt;
-
-    // Resolve {{date}} variable
-    if (resolvedPrompt.includes('{{date}}')) {
-      const currentDate = this.getCurrentDateTime();
-      resolvedPrompt = resolvedPrompt.replace(/\{\{date\}\}/g, currentDate);
-    }
 
     // Resolve {{user_geo}} variable
     if (resolvedPrompt.includes('{{user_geo}}')) {

@@ -13,9 +13,4 @@ export const promptVariables = [
     description: "The user's location",
     value: `The user's location is {{user_geo}}`,
   },
-  {
-    name: '{{date}}',
-    description: 'Current date and time',
-    value: `The current time is {{date}}`,
-  },
 ];
