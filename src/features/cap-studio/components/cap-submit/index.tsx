@@ -35,7 +35,7 @@ export function Submit() {
         metadata: {
           name: data.name,
           description: data.description,
-          tag: data.tag,
+          tags: data.tags,
           author: data.author,
           homepage: data.homepage || undefined,
           repository: data.repository || undefined,

@@ -1,15 +1,15 @@
+import fs from 'fs';
+import path from 'path';
 import type { RemoteCap } from '@/features/cap-store/types';
 import type { LocalCap } from '@/features/cap-studio/types';
 import remoteCapsMockData from './remote-caps.json';
-import fs from 'fs';
-import path from 'path';
 
 export interface CapSubmitRequest {
   cap: LocalCap;
   metadata: {
     name: string;
     description: string;
-    tag: string;
+    tags: string[];
     author: string;
     homepage?: string;
     repository?: string;
@@ -77,7 +77,7 @@ export const mockSubmitCap = async (
   const submittedCapId = `remote_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   const remoteCap = convertLocalToRemoteCap(request.cap, request.metadata);
   remoteCap.id = submittedCapId;
-  
+
   // Add to JSON file
   try {
     const currentData = [...(remoteCapsMockData as RemoteCap[]), remoteCap];
@@ -86,7 +86,7 @@ export const mockSubmitCap = async (
   } catch (error) {
     console.warn('Could not write to JSON file, using in-memory mock:', error);
   }
-  
+
   // For mock purposes, we'll just log the submission
   console.log('Mock cap submitted:', {
     capId: submittedCapId,
@@ -113,7 +113,7 @@ export const convertLocalToRemoteCap = (
     id: `remote_${localCap.id}`,
     name: metadata.name,
     description: metadata.description,
-    tag: metadata.tag,
+    tags: metadata.tags,
     version: '0.0.0',
     author: metadata.author,
     downloads: 0, // New caps start with 0 downloads

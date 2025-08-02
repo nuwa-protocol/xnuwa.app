@@ -20,11 +20,7 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  MultiSelect,
   Textarea,
 } from '@/shared/components/ui';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
@@ -53,7 +49,7 @@ const capSchema = z.object({
     .string()
     .min(20, 'Description must be at least 10 characters')
     .max(500, 'Description too long'),
-  tag: z.string().min(1, 'Tag is required'),
+  tags: z.array(z.string()),
   prompt: z.string(),
 });
 
@@ -84,7 +80,7 @@ export function CapEditForm({
       name: editingCap?.name || '',
       displayName: editingCap?.displayName || '',
       description: editingCap?.description || '',
-      tag: editingCap?.tag || '',
+      tags: editingCap?.tags || [],
       prompt: editingCap?.prompt || '',
     },
   });
@@ -123,7 +119,7 @@ export function CapEditForm({
           name: data.name,
           displayName: data.displayName,
           description: data.description,
-          tag: data.tag,
+          tags: data.tags,
           prompt: data.prompt,
           model: selectedModel,
           mcpServers,
@@ -149,7 +145,7 @@ export function CapEditForm({
           name: data.name,
           displayName: data.displayName,
           description: data.description,
-          tag: data.tag,
+          tags: data.tags,
           prompt: data.prompt,
           model: selectedModel,
           status: 'draft',
@@ -281,27 +277,25 @@ export function CapEditForm({
 
                 <FormField
                   control={form.control}
-                  name="tag"
+                  name="tags"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {predefinedTags.map((tag) => (
-                            <SelectItem key={tag} value={tag}>
-                              {tag}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Tags</FormLabel>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Select one or more tags that describe your cap.
+                      </p>
+                      <FormControl>
+                        <MultiSelect
+                          options={predefinedTags.map((tag) => ({
+                            label: tag,
+                            value: tag,
+                          }))}
+                          onValueChange={field.onChange}
+                          defaultValue={field.value || []}
+                          placeholder="Select tags..."
+                          className="w-full"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

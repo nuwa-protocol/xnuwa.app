@@ -31,35 +31,18 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
 } from '@/shared/components/ui';
 import type { LocalCap } from '../../types';
-import { predefinedTags } from '../cap-edit/constants';
 import { DashboardGrid } from '../layout/dashboard-layout';
 
 const submitSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
-  description: z
-    .string()
-    .min(20, 'Description must be at least 20 characters')
-    .max(1000, 'Description too long'),
-  tag: z.string().min(1, 'Category is required'),
   author: z.string().min(1, 'Author name is required'),
-  keywords: z.string().optional(),
-  readme: z.string().min(50, 'README must be at least 50 characters'),
-  license: z.string().min(1, 'License is required'),
   homepage: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   repository: z
     .string()
     .url('Must be a valid URL')
     .optional()
     .or(z.literal('')),
-  isPublic: z.boolean(),
 });
 
 export type SubmitFormData = z.infer<typeof submitSchema>;
@@ -87,16 +70,9 @@ export function SubmitForm({
   const form = useForm<SubmitFormData>({
     resolver: zodResolver(submitSchema),
     defaultValues: {
-      name: cap.name,
-      description: cap.description,
-      tag: cap.tag,
       author: '',
-      keywords: '',
-      readme: `# ${cap.name}\n\n${cap.description}\n\n## Usage\n\nThis cap provides...\n\n## Features\n\n- Feature 1\n- Feature 2\n- Feature 3\n\n## Requirements\n\n- Model: ${cap.model.name}\n- MCP Servers: ${Object.keys(cap.mcpServers).length > 0 ? Object.keys(cap.mcpServers).join(', ') : 'None'}\n\n## Installation\n\n1. Install from the Nuwa Cap Store\n2. Configure any required MCP servers\n3. Start using the cap!\n`,
-      license: 'MIT',
       homepage: '',
       repository: '',
-      isPublic: true,
     },
   });
 
@@ -182,95 +158,68 @@ export function SubmitForm({
           className="space-y-6"
         >
           <DashboardGrid cols={1}>
-            {/* Basic Information */}
+            {/* Cap Information - Read Only */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Store Listing</CardTitle>
+                <CardTitle className="text-base">Cap Information</CardTitle>
                 <CardDescription>
-                  Information that will be displayed in the cap store
+                  Basic information about your cap (read-only)
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Display Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="My Awesome Cap"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            form.trigger('name');
-                          }}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        The name shown in the cap store
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="A comprehensive description of what your cap does and how it helps users..."
-                          rows={4}
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            form.trigger('description');
-                          }}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Detailed description shown in the store (20-1000
-                        characters)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="tag"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          form.trigger('tag');
-                        }}
-                        value={field.value}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Name
+                    </div>
+                    <p className="text-sm">{cap.name}</p>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Display Name
+                    </div>
+                    <p className="text-sm">{cap.displayName}</p>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Description
+                  </div>
+                  <p className="text-sm">{cap.description}</p>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Tags
+                  </div>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {cap.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary"
                       >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {predefinedTags.map((tag) => (
-                            <SelectItem key={tag} value={tag}>
-                              {tag}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Model
+                    </div>
+                    <p className="text-sm">{cap.model.name}</p>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">
+                      MCP Servers
+                    </div>
+                    <p className="text-sm">
+                      {Object.keys(cap.mcpServers).length > 0
+                        ? Object.keys(cap.mcpServers).join(', ')
+                        : 'None'}
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -393,6 +342,7 @@ export function SubmitForm({
                   )}
                   <div>
                     <Input
+                      id={`thumbnail-upload-${Math.random()}`}
                       type="file"
                       accept="image/*"
                       onChange={handleThumbnailUpload}
@@ -412,128 +362,6 @@ export function SubmitForm({
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Additional Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">
-                Additional Information
-              </CardTitle>
-              <CardDescription>
-                Optional details to enhance your cap listing
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="keywords"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Keywords (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="AI, automation, productivity"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          form.trigger('keywords');
-                        }}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Comma-separated keywords to help users find your cap
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="readme"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>README</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Detailed documentation about your cap..."
-                        rows={6}
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          form.trigger('readme');
-                        }}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Comprehensive documentation (minimum 50 characters)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="license"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>License</FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        form.trigger('license');
-                      }}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select license" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="MIT">MIT</SelectItem>
-                        <SelectItem value="Apache-2.0">Apache 2.0</SelectItem>
-                        <SelectItem value="GPL-3.0">GPL 3.0</SelectItem>
-                        <SelectItem value="BSD-3-Clause">
-                          BSD 3-Clause
-                        </SelectItem>
-                        <SelectItem value="ISC">ISC</SelectItem>
-                        <SelectItem value="Proprietary">Proprietary</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="isPublic"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <input
-                        type="checkbox"
-                        checked={field.value}
-                        onChange={(e) => {
-                          field.onChange(e.target.checked);
-                          form.trigger('isPublic');
-                        }}
-                        className="mt-1"
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Make this cap publicly visible</FormLabel>
-                      <FormDescription>
-                        Allow other users to discover and install your cap
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
             </CardContent>
           </Card>
 
@@ -654,7 +482,9 @@ function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
           </div>
         )}
         <div className="flex-1">
-          <h3 className="text-xl font-bold">{data.name || 'Untitled Cap'}</h3>
+          <h3 className="text-xl font-bold">
+            {cap.displayName || 'Untitled Cap'}
+          </h3>
           <p className="text-muted-foreground">
             by {data.author || 'Unknown Author'}
           </p>
@@ -665,7 +495,7 @@ function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
       <div>
         <h4 className="font-semibold mb-2">Description</h4>
         <p className="text-muted-foreground">
-          {data.description || 'No description provided'}
+          {cap.description || 'No description provided'}
         </p>
       </div>
       {/* Links */}

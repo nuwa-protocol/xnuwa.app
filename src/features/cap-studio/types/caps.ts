@@ -13,7 +13,7 @@ export interface LocalCap {
   name: string;
   displayName: string;
   description: string;
-  tag: string;
+  tags: string[];
   prompt: string;
   model: Model;
   mcpServers: Record<string, McpServerConfig>;
