@@ -1,4 +1,4 @@
-import { Search, Wrench } from 'lucide-react';
+import { User, Wrench } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
@@ -15,7 +15,6 @@ import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { cn } from '@/shared/utils';
 import { useAppSidebar } from './app-sidebar';
-import { SearchModal } from './search-modal';
 import { SettingsDropdown } from './settings-dropdown';
 import { SidebarButton } from './sidebar-button';
 import { SidebarHistory } from './sidebar-history';
@@ -99,13 +98,15 @@ export function MainContent() {
               className="my-2"
               shortcut={getShortcutDisplay()}
             />
-            <SearchModal>
-              <SidebarButton
-                icon={Search}
-                text={t('nav.sidebar.search')}
-                variant="secondary"
-              />
-            </SearchModal>
+            <SidebarButton
+              icon={User}
+              text={t('nav.sidebar.account')}
+              onClick={() => {
+                navigate('/account');
+              }}
+              variant="secondary"
+            />
+            <SettingsDropdown />
             {isDevMode && (
               <SidebarButton
                 icon={Wrench}
@@ -122,9 +123,7 @@ export function MainContent() {
       <SidebarContent className="mt-2">
         <SidebarHistory />
       </SidebarContent>
-      <SidebarFooter>
-        <SettingsDropdown />
-      </SidebarFooter>
+      <SidebarFooter></SidebarFooter>
     </Sidebar>
   );
 }

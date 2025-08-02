@@ -21,6 +21,7 @@ export const en = {
       artifact: 'Files',
       togglePin: 'Pin',
       toggleUnpin: 'Unpin',
+      account: 'Account',
     },
     profile: {
       toggleTheme: 'Toggle {{mode}} mode',
@@ -163,9 +164,12 @@ export const en = {
     aWeekAgo: 'A week ago',
     older: 'Older',
     loginToSave: 'Sign in with DID to save chat history!',
+    pinnedChats: 'Pinned Chats',
+    recentChats: 'Recent Chats',
+    moreChats: 'More chats',
   },
   search: {
-    searchPlaceholder: 'Search chats, caps, files...',
+    searchPlaceholder: 'Search chats...',
     noChatsHistory: 'No chat history found.',
   },
   chat: {
@@ -230,6 +234,17 @@ export const en = {
     requestSuggestions: 'Request suggestions',
     delete: 'Delete',
     more: 'More',
+    rename: 'Rename',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+  },
+  dialog: {
+    renameChat: {
+      title: 'Rename Chat',
+      placeholder: 'Enter chat name',
+    },
   },
   document: {
     creating: 'Creating',

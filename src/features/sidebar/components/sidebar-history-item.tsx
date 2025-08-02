@@ -1,11 +1,13 @@
-import { MoreHorizontalIcon, TrashIcon } from 'lucide-react';
+import { MoreHorizontalIcon, TrashIcon, EditIcon, PinIcon, PinOffIcon } from 'lucide-react';
 import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ChatSession } from '@/features/chat/types';
+import { RenameDialog } from '@/features/chat/components/rename-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   SidebarMenuAction,
   SidebarMenuButton,
@@ -18,21 +20,40 @@ const PureChatItem = ({
   chat,
   isActive,
   onDelete,
+  onRename,
+  onTogglePin,
   setOpenMobile,
 }: {
   chat: ChatSession;
   isActive: boolean;
   onDelete: (chatId: string) => void;
+  onRename: (chatId: string, newTitle: string) => void;
+  onTogglePin: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
 }) => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const floatingContext = useAppSidebar();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
 
   const handleChatSelect = () => {
     setOpenMobile(false);
     navigate(`/chat?cid=${chat.id}`);
+  };
+
+  const handleRename = () => {
+    setRenameDialogOpen(true);
+    setMenuOpen(false);
+  };
+
+  const handleRenameConfirm = (newTitle: string) => {
+    onRename(chat.id, newTitle);
+  };
+
+  const handleTogglePin = () => {
+    onTogglePin(chat.id);
+    setMenuOpen(false);
   };
 
   return (
@@ -70,6 +91,24 @@ const PureChatItem = ({
 
         <DropdownMenuContent side="bottom" align="end">
           <DropdownMenuItem
+            className="cursor-pointer"
+            onSelect={handleRename}
+          >
+            <EditIcon />
+            <span>{t('actions.rename')}</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onSelect={handleTogglePin}
+          >
+            {chat.pinned ? <PinOffIcon /> : <PinIcon />}
+            <span>{chat.pinned ? t('actions.unpin') : t('actions.pin')}</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem
             className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive dark:text-red-500"
             onSelect={() => onDelete(chat.id)}
           >
@@ -78,6 +117,13 @@ const PureChatItem = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <RenameDialog
+        open={renameDialogOpen}
+        onOpenChange={setRenameDialogOpen}
+        currentName={chat.title}
+        onRename={handleRenameConfirm}
+      />
     </SidebarMenuItem>
   );
 };

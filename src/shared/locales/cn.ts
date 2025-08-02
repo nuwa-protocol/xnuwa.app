@@ -22,6 +22,7 @@ export const cn: typeof en = {
       artifact: '文件',
       togglePin: '固定',
       toggleUnpin: '取消固定',
+      account: '账户',
     },
     profile: {
       toggleTheme: '切换{{mode}}模式',
@@ -162,9 +163,18 @@ export const cn: typeof en = {
     aWeekAgo: '一周前',
     older: '更早',
     loginToSave: '登录 DID 以保存聊天记录！',
+    pinnedChats: '置顶聊天',
+    recentChats: '最近聊天',
+    moreChats: '更多聊天',
+  },
+  dialog: {
+    renameChat: {
+      title: '重命名聊天',
+      placeholder: '输入聊天名称',
+    },
   },
   search: {
-    searchPlaceholder: '搜索聊天、caps、文件...',
+    searchPlaceholder: '搜索聊天...',
     noChatsHistory: '没有找到聊天记录。',
   },
   chat: {
@@ -216,6 +226,11 @@ export const cn: typeof en = {
     requestSuggestions: '请求建议',
     delete: '删除',
     more: '更多',
+    rename: '重命名',
+    pin: '置顶',
+    unpin: '取消置顶',
+    cancel: '取消',
+    confirm: '确认',
   },
   document: {
     creating: '正在创建',
