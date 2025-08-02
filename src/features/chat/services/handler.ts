@@ -60,11 +60,7 @@ const handleAIRequest = async ({
 }) => {
   // Resolve cap configuration
   const capResolve = new CapResolve();
-  const { prompt, model, mcp } = await capResolve.getResolvedConfig();
-
-  // init the mcp clients and get tools
-  await mcp.init();
-  const tools = await mcp.tools();
+  const { prompt, model, tools } = await capResolve.getResolvedConfig();
 
   // update the messages state
   const { updateMessages } = ChatStateStore.getState();
@@ -80,9 +76,6 @@ const handleAIRequest = async ({
     tools,
     abortSignal: signal,
     async onFinish({ response, sources }) {
-      // close MCP clients
-      await mcp.close();
-
       // append response messages
       const finalMessages = appendResponseMessages({
         messages: messages,

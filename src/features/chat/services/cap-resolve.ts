@@ -1,12 +1,11 @@
 import type { LanguageModelV1 } from '@ai-sdk/provider';
-import { createNuwaMCPClient } from '@/shared/services/mcp-client';
+import { GlobalMCPManager } from '@/shared/services/global-mcp-manager';
 import type { CurrentCap } from '@/shared/stores/current-cap-store';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { llmProvider } from './providers';
 
 export class CapResolve {
   private cap: CurrentCap;
-  private mcpClients: Map<string, any> = new Map();
 
   constructor(cap?: CurrentCap) {
     if (cap) {
@@ -17,25 +16,6 @@ export class CapResolve {
         throw new Error('No cap selected. Please select a cap to use.');
       }
       this.cap = currentCap;
-    }
-  }
-
-  async init(): Promise<void> {
-    const mcpServers = this.cap.mcpServers || {};
-
-    for (const [serverName, serverConfig] of Object.entries(mcpServers)) {
-      try {
-        const client = await createNuwaMCPClient(
-          serverConfig.url,
-          serverConfig.transport,
-        );
-        this.mcpClients.set(serverName, client);
-      } catch (error) {
-        console.warn(
-          `Failed to connect to MCP server ${serverName} at ${serverConfig.url}:`,
-          error,
-        );
-      }
     }
   }
 
@@ -98,57 +78,21 @@ export class CapResolve {
     return llmProvider.chat(this.cap.model.id);
   }
 
-  async tools(): Promise<Record<string, any>> {
-    const allTools: Record<string, any> = {};
-
-    // Iterate through all MCP clients
-    for (const [serverName, client] of this.mcpClients.entries()) {
-      try {
-        // Fetch tools from this server
-        const serverTools = await client.tools();
-
-        // Merge tools into the combined tools object
-        // Prefix tool names with server name to avoid conflicts
-        for (const [toolName, toolDefinition] of Object.entries(serverTools)) {
-          const prefixedToolName = `${serverName}_${toolName}`;
-          allTools[prefixedToolName] = {
-            ...(toolDefinition as Record<string, any>),
-            _serverName: serverName,
-            _originalName: toolName,
-          };
-        }
-      } catch (error) {
-        console.warn(
-          `Failed to get tools from MCP server ${serverName}:`,
-          error,
-        );
-        // Continue with other servers even if one fails
-      }
-    }
-
-    return allTools;
-  }
-
-  async close(): Promise<void> {
-    for (const [serverName, client] of this.mcpClients.entries()) {
-      try {
-        await client.close();
-      } catch (error) {
-        console.warn(`Failed to close MCP client ${serverName}:`, error);
-      }
-    }
-    this.mcpClients.clear();
+  async getResolvedTools(): Promise<Record<string, any>> {
+    // Get tools from global manager
+    const mcpManager = GlobalMCPManager.getInstance();
+    return mcpManager.getCurrentTools();
   }
 
   async getResolvedConfig() {
+    // Make sure MCP is initialized through global manager
+    const mcpManager = GlobalMCPManager.getInstance();
+    await mcpManager.initializeForCap(this.cap);
+
     return {
       prompt: await this.getResolvedPrompt(),
       model: this.getResolvedModel(),
-      mcp: {
-        init: () => this.init(),
-        tools: () => this.tools(),
-        close: () => this.close(),
-      },
+      tools: await this.getResolvedTools(),
     };
   }
 }
