@@ -7,8 +7,7 @@ import {
 } from 'ai';
 import { generateUUID } from '@/shared/utils';
 import { ChatStateStore } from '../stores';
-import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import { llmProvider } from './providers';
+import { CapResolve } from './cap-resolve';
 
 // Error handling function
 function errorHandler(error: unknown) {
@@ -59,27 +58,32 @@ const handleAIRequest = async ({
   messages: Message[];
   signal?: AbortSignal;
 }) => {
-  // Get current cap from global state
-  const { currentCap } = CurrentCapStore.getState();
-  
-  if (!currentCap) {
-    throw new Error('No cap selected. Please select a cap to use.');
-  }
+  // Resolve cap configuration
+  const capResolve = new CapResolve();
+  const { prompt, model, mcp } = await capResolve.getResolvedConfig();
+
+  // init the mcp clients and get tools
+  await mcp.init();
+  const tools = await mcp.tools();
 
   // update the messages state
   const { updateMessages } = ChatStateStore.getState();
-  await updateMessages(sessionId, messages);
+  updateMessages(sessionId, messages);
 
   const result = streamText({
-    model: llmProvider.chat(currentCap.model.id),
-    system: currentCap.prompt,
+    model,
+    system: prompt,
     messages,
     maxSteps: 5,
     experimental_transform: smoothStream({ chunking: 'word' }),
     experimental_generateMessageId: generateUUID,
-    tools: {},
+    tools,
     abortSignal: signal,
-    async onFinish({ response, reasoning, sources }) {
+    async onFinish({ response, sources }) {
+      // close MCP clients
+      await mcp.close();
+
+      // append response messages
       const finalMessages = appendResponseMessages({
         messages: messages,
         responseMessages: response.messages,
@@ -94,10 +98,11 @@ const handleAIRequest = async ({
       );
 
       // update the messages state
-      await updateMessages(sessionId, finalMessagesWithSources);
+      updateMessages(sessionId, finalMessagesWithSources);
     },
   });
 
+  // stream the response
   const dataStreamResponse = result.toDataStreamResponse({
     getErrorMessage: errorHandler,
     sendReasoning: true,
