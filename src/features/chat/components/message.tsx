@@ -9,6 +9,8 @@ import { MessageActions } from './message-actions';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { MessageText } from './message-text';
+import { ToolCall } from './tool-call';
+import { ToolResult } from './tool-result';
 
 const PurePreviewMessage = ({
   chatId,
@@ -96,24 +98,29 @@ const PurePreviewMessage = ({
                   const { args } = toolInvocation;
 
                   return (
-                    <div
+                    <ToolCall
                       key={toolCallId}
+                      toolName={toolName}
+                      toolCallId={toolCallId}
+                      args={args}
                       className={cx({
                         skeleton: ['getWeather'].includes(toolName),
                       })}
-                    >
-                      {`${toolName} is called`}
-                    </div>
+                    />
                   );
                 }
 
                 if (state === 'result') {
-                  const { result } = toolInvocation;
+                  const { result, args } = toolInvocation;
 
                   return (
-                    <div key={toolCallId}>
-                      {`${toolName} result is ${result}`}
-                    </div>
+                    <ToolResult
+                      key={toolCallId}
+                      toolName={toolName}
+                      toolCallId={toolCallId}
+                      result={result}
+                      args={args}
+                    />
                   );
                 }
               }
