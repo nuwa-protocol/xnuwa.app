@@ -1,30 +1,10 @@
-import { useState } from 'react';
-import { BalanceCard } from './balance-card';
-import { TopUpModal } from './top-up-modal';
-import { TransactionHistory } from './transaction-history';
+import AppkitContextProvider from './appkit-context';
+import { Wallet } from './wallet';
 
-export function Wallet() {
-  const [showTopUpModal, setShowTopUpModal] = useState(false);
-  const [showUSD, setshowUSD] = useState(false);
-
+export function WalletWithProvider() {
   return (
-    <div className="container mx-auto max-w-2xl p-6 space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Wallet</h1>
-        <p className="text-muted-foreground">
-          Manage your credits and view transaction history
-        </p>
-      </div>
-
-      <BalanceCard
-        onTopUp={() => setShowTopUpModal(true)}
-        showUSD={showUSD}
-        onToggleUSD={setshowUSD}
-      />
-
-      <TransactionHistory showUSD={showUSD} />
-
-      <TopUpModal open={showTopUpModal} onOpenChange={setShowTopUpModal} />
-    </div>
+    <AppkitContextProvider>
+      <Wallet />
+    </AppkitContextProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { Wallet } from '@/features/wallet/components';
+import { WalletWithProvider } from '@/features/wallet/components';
 import { useAccountData } from '@/features/wallet/hooks/use-account-data';
 import Loading from '@/shared/components/loading';
 
@@ -9,5 +9,5 @@ export default function WalletPage() {
     return <Loading />;
   }
 
-  return <Wallet />;
+  return <WalletWithProvider />;
 }

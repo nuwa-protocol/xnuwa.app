@@ -1,15 +1,45 @@
-import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/shared/components/ui/form';
 import { Input } from '@/shared/components/ui/input';
-import { accountApi } from '../services/account-api';
-import { useAccountData } from '../hooks/use-account-data';
+import { useHandlePayment } from '../hooks/use-handle-payment';
+import type { Asset, Network } from '../types';
+import { AssetSelector } from './asset-selector';
+import { NetworkSelector } from './network-selector';
+
+const formSchema = z.object({
+  amount: z
+    .string()
+    .min(1, 'Amount is required')
+    .refine(
+      (val) => !Number.isNaN(Number(val)),
+      'Amount must be a valid number',
+    )
+    .refine((val) => Number(val) > 0, 'Amount must be greater than 0')
+    .refine(
+      (val) => Number(val) <= 1000000,
+      'Amount must be less than $1,000,000',
+    )
+    .refine((val) => Number(val) >= 0.01, 'Minimum amount is $0.01'),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 interface TopUpModalProps {
   open: boolean;
@@ -17,38 +47,51 @@ interface TopUpModalProps {
 }
 
 export function TopUpModal({ open, onOpenChange }: TopUpModalProps) {
-  const [amount, setAmount] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { refreshBalance } = useAccountData();
+  const [selectedAsset, setSelectedAsset] = useState<Asset>('usdt');
+  const [selectedNetwork, setSelectedNetwork] = useState<Network>('ethereum');
+  const [selectedAmountOption, setSelectedAmountOption] = useState<
+    number | 'other' | null
+  >(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    mode: 'onChange',
+    defaultValues: {
+      amount: '',
+    },
+  });
 
-    const numAmount = parseFloat(amount);
-    if (!numAmount || numAmount <= 0) {
-      return;
-    }
+  const { handleCryptoPayment } = useHandlePayment();
 
-    setIsLoading(true);
-    try {
-      const result = await accountApi.topUpBalance({
-        amount: numAmount,
-        paymentMethod: 'credit_card',
+  // Reset form and selections when modal opens
+  useEffect(() => {
+    if (open) {
+      setSelectedAsset('usdt');
+      setSelectedNetwork('ethereum');
+      setSelectedAmountOption(null);
+      form.reset({
+        amount: '',
       });
-
-      if (result.success) {
-        await refreshBalance();
-        setAmount('');
-        onOpenChange(false);
-      }
-    } catch (error) {
-      console.error('Top-up failed:', error);
-    } finally {
-      setIsLoading(false);
     }
+  }, [open, form]);
+
+  const onSubmit = async (data: FormData) => {
+    const numAmount = Number(data.amount);
+    onOpenChange(false);
+    await handleCryptoPayment(selectedAsset, selectedNetwork, numAmount);
   };
 
-  const presetAmounts = [500, 1000, 2500, 5000];
+  const handlePresetAmount = (preset: number) => {
+    setSelectedAmountOption(preset);
+    form.setValue('amount', preset.toString(), { shouldValidate: true });
+  };
+
+  const handleOtherAmount = () => {
+    setSelectedAmountOption('other');
+    form.setValue('amount', '', { shouldValidate: false });
+  };
+
+  const presetAmounts = [1, 5, 10, 20, 50];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -57,58 +100,87 @@ export function TopUpModal({ open, onOpenChange }: TopUpModalProps) {
           <DialogTitle>Buy $NUWA</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="amount" className="block text-sm font-medium mb-2">
-              $NUWA Amount
-            </label>
-            <Input
-              id="amount"
-              type="number"
-              step="1"
-              min="1"
-              placeholder="Enter $NUWA amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <AssetSelector
+              value={selectedAsset}
+              onValueChange={setSelectedAsset}
             />
-            {amount && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Cost: ${(parseFloat(amount) * 0.02).toFixed(2)} USD
-              </p>
-            )}
-          </div>
 
-          <div>
-            <p className="text-sm font-medium mb-2">Quick amounts:</p>
-            <div className="grid grid-cols-4 gap-2">
-              {presetAmounts.map((preset) => (
+            <NetworkSelector
+              value={selectedNetwork}
+              onValueChange={setSelectedNetwork}
+            />
+
+            <div>
+              <p className="text-sm font-medium mb-2">Amount options:</p>
+              <div className="grid grid-cols-3 gap-2">
+                {presetAmounts.map((preset) => (
+                  <Button
+                    key={preset}
+                    type="button"
+                    variant={
+                      selectedAmountOption === preset ? 'default' : 'outline'
+                    }
+                    size="sm"
+                    onClick={() => handlePresetAmount(preset)}
+                  >
+                    ${preset}
+                  </Button>
+                ))}
                 <Button
-                  key={preset}
                   type="button"
-                  variant="outline"
+                  variant={
+                    selectedAmountOption === 'other' ? 'default' : 'outline'
+                  }
                   size="sm"
-                  onClick={() => setAmount(preset.toString())}
+                  onClick={handleOtherAmount}
                 >
-                  ${preset.toLocaleString()}
+                  Other
                 </Button>
-              ))}
+              </div>
             </div>
-          </div>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading || !amount}>
-              {isLoading ? 'Processing...' : 'Buy $NUWA'}
-            </Button>
-          </DialogFooter>
-        </form>
+            {selectedAmountOption === 'other' && (
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter custom amount"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={
+                  form.formState.isSubmitting ||
+                  !selectedAmountOption ||
+                  (selectedAmountOption === 'other' && !form.watch('amount'))
+                }
+              >
+                {form.formState.isSubmitting ? 'Processing...' : 'Buy'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

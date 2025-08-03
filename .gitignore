@@ -50,3 +50,6 @@ public/caps.json
 
 # claude
 .claude
+
+# cursor
+.cursor
