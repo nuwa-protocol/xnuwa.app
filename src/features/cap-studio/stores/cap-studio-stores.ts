@@ -3,16 +3,17 @@ import { persist } from 'zustand/middleware';
 import { generateUUID } from '@/shared/utils';
 import type { LocalCap } from '../types';
 
-
 interface CapStudioState {
   // Local caps being developed
   localCaps: LocalCap[];
 
   // Actions
-  createCap: (cap: Omit<LocalCap, 'id' | 'createdAt' | 'updatedAt'>) => LocalCap;
+  createCap: (
+    cap: Omit<LocalCap, 'id' | 'createdAt' | 'updatedAt'>,
+  ) => LocalCap;
   updateCap: (id: string, updates: Partial<LocalCap>) => void;
   deleteCap: (id: string) => void;
-  
+
   // Utility functions
   getCapById: (id: string) => LocalCap | undefined;
   getCapsByTag: (tag: string) => LocalCap[];
@@ -42,9 +43,7 @@ export const CapStudioStore = create<CapStudioState>()(
       updateCap: (id, updates) => {
         set((state) => ({
           localCaps: state.localCaps.map((cap) =>
-            cap.id === id
-              ? { ...cap, ...updates, updatedAt: Date.now() }
-              : cap
+            cap.id === id ? { ...cap, ...updates, updatedAt: Date.now() } : cap,
           ),
         }));
       },
@@ -60,13 +59,13 @@ export const CapStudioStore = create<CapStudioState>()(
       },
 
       getCapsByTag: (tag) => {
-        return get().localCaps.filter((cap) => cap.tag === tag);
+        return get().localCaps.filter((cap) => cap.tags.includes(tag));
       },
     }),
     {
       name: 'cap-studio-storage',
       // Only persist the caps, not the selected state
       partialize: (state) => ({ localCaps: state.localCaps }),
-    }
-  )
+    },
+  ),
 );
