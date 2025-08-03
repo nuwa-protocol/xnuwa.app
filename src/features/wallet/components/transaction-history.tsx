@@ -4,22 +4,21 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import { useAccountData } from '../hooks/use-account-data';
-import type { Transaction } from '../services/account-api';
+import { useNuwaToUsdRate } from '../hooks/use-nuwa-to-usd-rate';
+import { useWallet } from '../hooks/use-wallet';
+import type { Transaction } from '../types';
 
 function TransactionRow({
   transaction,
   showUSD,
-  usdRate,
 }: {
   transaction: Transaction;
   showUSD: boolean;
-  usdRate: number;
 }) {
-  const isCredit =
-    transaction.type === 'credit' || transaction.type === 'top_up';
-  const amountColor = isCredit ? 'text-green-600' : 'text-red-600';
-  const amountPrefix = isCredit ? '+' : '-';
+  const nuwaToUsdRate = useNuwaToUsdRate();
+  const amountColor =
+    transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600';
+  const amountPrefix = transaction.type === 'deposit' ? '+' : '-';
 
   const formatDate = (timestamp: string) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
@@ -36,10 +35,8 @@ function TransactionRow({
     switch (status) {
       case 'completed':
         return `${baseClasses} bg-green-100 text-green-800`;
-      case 'pending':
+      case 'confirming':
         return `${baseClasses} bg-yellow-100 text-yellow-800`;
-      case 'failed':
-        return `${baseClasses} bg-red-100 text-red-800`;
       default:
         return `${baseClasses} bg-gray-100 text-gray-800`;
     }
@@ -49,7 +46,7 @@ function TransactionRow({
     <div className="flex items-center justify-between py-3 border-b last:border-b-0">
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <span className="font-medium">{transaction.description}</span>
+          <span className="font-medium">{transaction.label}</span>
           <span className={getStatusBadge(transaction.status)}>
             {transaction.status}
           </span>
@@ -60,16 +57,15 @@ function TransactionRow({
       </div>
       <div className={`font-semibold ${amountColor}`}>
         {showUSD
-          ? `${amountPrefix}$${(transaction.amount * usdRate).toFixed(2)} USD`
-          : `${amountPrefix}${transaction.amount.toLocaleString()} $NUWA`}
+          ? `${amountPrefix}$${(transaction.amount).toFixed(6)} USD`
+          : `${amountPrefix}${(transaction.amount * nuwaToUsdRate).toLocaleString()} $NUWA`}
       </div>
     </div>
   );
 }
 
 export function TransactionHistory({ showUSD }: { showUSD: boolean }) {
-  const { transactions, balance } = useAccountData();
-
+  const { transactions } = useWallet();
   return (
     <Card>
       <CardHeader>
@@ -87,7 +83,6 @@ export function TransactionHistory({ showUSD }: { showUSD: boolean }) {
                 key={transaction.id}
                 transaction={transaction}
                 showUSD={showUSD}
-                usdRate={balance.usdRate}
               />
             ))}
           </div>

@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from '@/shared/components/ui/form';
 import { Input } from '@/shared/components/ui/input';
+import { useDevMode } from '@/shared/hooks/use-dev-mode';
 import { useHandlePayment } from '../hooks/use-handle-payment';
 import type { Asset, Network } from '../types';
 import { AssetSelector } from './asset-selector';
@@ -35,8 +36,8 @@ const formSchema = z.object({
     .refine(
       (val) => Number(val) <= 1000000,
       'Amount must be less than $1,000,000',
-    )
-    .refine((val) => Number(val) >= 0.01, 'Minimum amount is $0.01'),
+    ),
+  // .refine((val) => Number(val) >= 0.01, 'Minimum amount is $0.01'),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -52,6 +53,7 @@ export function TopUpModal({ open, onOpenChange }: TopUpModalProps) {
   const [selectedAmountOption, setSelectedAmountOption] = useState<
     number | 'other' | null
   >(null);
+  const isDevMode = useDevMode();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -91,7 +93,9 @@ export function TopUpModal({ open, onOpenChange }: TopUpModalProps) {
     form.setValue('amount', '', { shouldValidate: false });
   };
 
-  const presetAmounts = [1, 5, 10, 20, 50];
+  const presetAmounts = isDevMode
+    ? [0.00001, 1, 5, 10, 20, 50]
+    : [1, 5, 10, 20, 50];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

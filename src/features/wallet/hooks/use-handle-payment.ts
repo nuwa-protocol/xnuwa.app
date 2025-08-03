@@ -1,58 +1,48 @@
-import { type PaymentAsset, pay } from '@reown/appkit-pay';
+import { type PaymentAsset, type PaymentResult, pay } from '@reown/appkit-pay';
+import { assetMap, networkMap, recipientMap } from '../constants';
 import type { Asset, Network } from '../types';
+import { useNuwaToUsdRate } from './use-nuwa-to-usd-rate';
+import { useWallet } from './use-wallet';
 
 export const useHandlePayment = () => {
-  const getRecipientAddress = (network: Network): string => {
-    const recipientMap = {
-      ethereum: '0xb481913003fa9c156144e2c7322976c489e1eeb3',
-      arbitrum: '0xb481913003fa9c156144e2c7322976c489e1eeb3',
-      base: '0xb481913003fa9c156144e2c7322976c489e1eeb3',
-      polygon: '0xb481913003fa9c156144e2c7322976c489e1eeb3',
-      bsc: '0xb481913003fa9c156144e2c7322976c489e1eeb3',
-    };
-    return recipientMap[network];
-  };
-  const getNetworkId = (network: Network): string => {
-    const networkMap = {
-      ethereum: 'eip155:1',
-      arbitrum: 'eip155:42161',
-      base: 'eip155:8453',
-      polygon: 'eip155:137',
-      bsc: 'eip155:56',
-    };
-    return networkMap[network];
-  };
+  const { addTransaction, setBalance, balance } = useWallet();
+  const nuwaToUsdRate = useNuwaToUsdRate();
 
-  const getAssetAddress = (asset: Asset, network: Network): string => {
-    const assetMap = {
-      usdt: {
-        ethereum: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-        arbitrum: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
-        base: '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2',
-        polygon: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
-        bsc: '0x55d398326f99059fF775485246999027B3197955',
-      },
-      usdc: {
-        ethereum: '0xA0b86a33E6441b29a3E0fD77cEE19BC65e30F592',
-        arbitrum: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
-        base: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-        polygon: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
-        bsc: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',
-      },
-    };
-    return assetMap[asset][network];
+  const getRecipientAddress = (network: Network): string => {
+    return recipientMap[network];
   };
 
   const getPaymentAsset = (asset: Asset, network: Network): PaymentAsset => {
     return {
-      network: getNetworkId(network) as any,
-      asset: getAssetAddress(asset, network),
+      network: networkMap[network] as any,
+      asset: assetMap[asset][network],
       metadata: {
         name: asset,
         symbol: asset,
         decimals: asset === 'usdt' ? 6 : 18,
       },
     };
+  };
+
+  const handleSuccess = (result: PaymentResult, amount: number) => {
+    const hash = result.result as `0x${string}`;
+
+    if (hash) {
+      console.log(`Payment successful: ${hash}`);
+
+      setBalance(balance + amount * nuwaToUsdRate);
+
+      addTransaction({
+        id: hash,
+        type: 'deposit',
+        label: 'Deposit',
+        amount: amount,
+        timestamp: Date.now(),
+        status: 'completed',
+      });
+    } else {
+      console.error(`Payment error: ${result.error}`);
+    }
   };
 
   const handleCryptoPayment = async (
@@ -70,7 +60,7 @@ export const useHandlePayment = () => {
     });
 
     if (result.success) {
-      console.log(`Payment successful: ${result.result}`);
+      handleSuccess(result, amount);
     } else {
       console.error(`Payment error: ${result.error}`);
     }

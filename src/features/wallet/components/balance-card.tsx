@@ -6,8 +6,9 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { Switch } from '@/shared/components/ui/switch';
-import { useAccountData } from '../hooks/use-account-data';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
+import { useNuwaToUsdRate } from '../hooks/use-nuwa-to-usd-rate';
+import { useWallet } from '../hooks/use-wallet';
 
 interface BalanceCardProps {
   onTopUp: () => void;
@@ -20,12 +21,13 @@ export function BalanceCard({
   showUSD,
   onToggleUSD,
 }: BalanceCardProps) {
-  const { balance } = useAccountData();
+  const { balance } = useWallet();
+  const nuwaToUsdRate = useNuwaToUsdRate();
   const isDevMode = useDevMode();
 
   const displayValue = showUSD
-    ? `$${(balance.nuwaTokens * balance.usdRate).toFixed(2)}`
-    : `${balance.nuwaTokens.toLocaleString()} $NUWA`;
+    ? `$${(balance / nuwaToUsdRate).toFixed(6)} USD`
+    : `${balance.toLocaleString()} $NUWA`;
 
   return (
     <Card>
@@ -46,13 +48,11 @@ export function BalanceCard({
       <CardContent>
         <div className="space-y-4">
           <div className="space-y-1">
-            <div className="text-3xl font-bold text-blue-600">
-              {displayValue}
-            </div>
+            <div className="text-3xl font-bold">{displayValue}</div>
             <p className="text-sm text-muted-foreground">
               {showUSD
-                ? `${balance.nuwaTokens.toLocaleString()} $NUWA`
-                : `$${(balance.nuwaTokens * balance.usdRate).toFixed(2)} USD`}
+                ? `${balance.toLocaleString()} $NUWA`
+                : `$${(balance / nuwaToUsdRate).toFixed(6)} USD`}
             </p>
           </div>
           <div className="flex gap-2">
@@ -61,16 +61,16 @@ export function BalanceCard({
             </Button>
             {isDevMode && (
               <>
-                <Button 
-                  variant="outline" 
-                  className="flex-1" 
+                <Button
+                  variant="outline"
+                  className="flex-1"
                   onClick={() => console.log('Transfer clicked')}
                 >
                   Transfer
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="flex-1" 
+                <Button
+                  variant="outline"
+                  className="flex-1"
                   onClick={() => console.log('Withdraw clicked')}
                 >
                   Withdraw
