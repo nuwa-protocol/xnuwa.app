@@ -33,9 +33,9 @@ export function Submit() {
       const submitRequest: CapSubmitRequest = {
         cap: cap!,
         metadata: {
-          name: data.name,
-          description: data.description,
-          tags: data.tags,
+          name: cap!.name,
+          description: cap!.description,
+          tags: cap!.tags,
           author: data.author,
           homepage: data.homepage || undefined,
           repository: data.repository || undefined,

@@ -2,7 +2,7 @@
 // Store for managing capability (Cap) installations and their states
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { NuwaIdentityKit } from '@/features/auth/services';
+import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
 import type { InstalledCap, RemoteCap } from './types';
 

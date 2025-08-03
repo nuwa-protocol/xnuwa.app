@@ -1,1 +1,1 @@
-export { NuwaIdentityKit as useAuthHandler } from '@/features/auth/services';
+export { NuwaIdentityKit as useAuthHandler } from '@/shared/services/identity-kit';

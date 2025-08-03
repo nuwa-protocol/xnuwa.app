@@ -3,8 +3,8 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { NuwaIdentityKit } from '@/features/auth/services';
 import type { Locale } from '@/shared/locales';
+import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
 
 // get current DID
