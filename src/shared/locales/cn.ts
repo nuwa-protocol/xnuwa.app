@@ -22,7 +22,7 @@ export const cn: typeof en = {
       artifact: '文件',
       togglePin: '固定',
       toggleUnpin: '取消固定',
-      account: '账户',
+      wallet: '账户',
     },
     profile: {
       toggleTheme: '切换{{mode}}模式',

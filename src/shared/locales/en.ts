@@ -21,7 +21,7 @@ export const en = {
       artifact: 'Files',
       togglePin: 'Pin',
       toggleUnpin: 'Unpin',
-      account: 'Account',
+      wallet: 'Wallet',
     },
     profile: {
       toggleTheme: 'Toggle {{mode}} mode',

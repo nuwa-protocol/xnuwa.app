@@ -7,6 +7,7 @@ import {
 } from '@/shared/components/ui/card';
 import { Switch } from '@/shared/components/ui/switch';
 import { useAccountData } from '../hooks/use-account-data';
+import { useDevMode } from '@/shared/hooks/use-dev-mode';
 
 interface BalanceCardProps {
   onTopUp: () => void;
@@ -20,6 +21,7 @@ export function BalanceCard({
   onToggleUSD,
 }: BalanceCardProps) {
   const { balance } = useAccountData();
+  const isDevMode = useDevMode();
 
   const displayValue = showUSD
     ? `$${(balance.nuwaTokens * balance.usdRate).toFixed(2)}`
@@ -53,9 +55,29 @@ export function BalanceCard({
                 : `$${(balance.nuwaTokens * balance.usdRate).toFixed(2)} USD`}
             </p>
           </div>
-          <Button onClick={onTopUp} className="w-full">
-            Buy Credits
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={onTopUp} className="flex-1">
+              Buy Credits
+            </Button>
+            {isDevMode && (
+              <>
+                <Button 
+                  variant="outline" 
+                  className="flex-1" 
+                  onClick={() => console.log('Transfer clicked')}
+                >
+                  Transfer
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1" 
+                  onClick={() => console.log('Withdraw clicked')}
+                >
+                  Withdraw
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

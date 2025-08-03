@@ -1,4 +1,4 @@
-import { Settings, User, Wrench } from 'lucide-react';
+import { Settings, WalletIcon, Wrench } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
@@ -98,21 +98,14 @@ export function MainContent() {
               shortcut={getShortcutDisplay()}
             />
             <SidebarButton
-              icon={User}
-              text={t('nav.sidebar.account')}
+              icon={WalletIcon}
+              text={t('nav.sidebar.wallet')}
               onClick={() => {
-                navigate('/account');
+                navigate('/wallet');
               }}
               variant="secondary"
             />
-            <SidebarButton
-              icon={Settings}
-              text={t('nav.sidebar.settings')}
-              onClick={() => {
-                navigate('/settings');
-              }}
-              variant="secondary"
-            />
+
             {isDevMode && (
               <SidebarButton
                 icon={Wrench}
@@ -129,7 +122,16 @@ export function MainContent() {
       <SidebarContent className="mt-2">
         <SidebarHistory />
       </SidebarContent>
-      <SidebarFooter></SidebarFooter>
+      <SidebarFooter>
+        <SidebarButton
+          icon={Settings}
+          text={t('nav.sidebar.settings')}
+          onClick={() => {
+            navigate('/settings');
+          }}
+          variant="secondary"
+        />
+      </SidebarFooter>
     </Sidebar>
   );
 }
