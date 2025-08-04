@@ -7,15 +7,15 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { useLocale } from '@/shared/locales/use-locale';
-import type { Model } from '@/shared/types';
+import type { CapModel } from '@/shared/types/cap';
 import { cn } from '@/shared/utils';
 import { getModelName, getProviderName } from '../../utils';
 import { ProviderAvatar } from './provider-avatar';
 
 interface ModelCardProps {
-  model: Model;
+  model: CapModel;
   isSelected: boolean;
-  onClick: (model: Model) => void;
+  onClick: (model: CapModel) => void;
 }
 
 export const ModelCard: React.FC<ModelCardProps> = ({

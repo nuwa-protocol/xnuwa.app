@@ -14,7 +14,7 @@ import {
   ResourceSchema,
   type ResourceTemplateDefinition,
   ResourceTemplateSchema,
-} from '../types/mcp';
+} from '../types/mcp-client';
 import { createDidAuthSigner, SignedSSEClientTransport } from './mcp-transport';
 
 /**

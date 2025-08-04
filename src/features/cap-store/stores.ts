@@ -4,18 +4,18 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
-import type { InstalledCap, RemoteCap } from './types';
+import type { Cap } from '@/shared/types/cap';
 
 // ================= Interfaces ================= //
 
 // Cap store state interface - only handles installed caps
 interface CapStoreState {
-  installedCaps: Record<string, InstalledCap>;
+  installedCaps: Record<string, Cap>;
 
   // Installed cap management
-  installCap: (cap: RemoteCap) => void;
+  installCap: (cap: Cap) => void;
   uninstallCap: (id: string) => void;
-  updateInstalledCap: (id: string, updatedCap: RemoteCap) => void;
+  updateInstalledCap: (id: string, updatedCap: Cap) => void;
 
   // Data management
   clearAllInstalledCaps: () => void;
@@ -60,23 +60,18 @@ export const CapStateStore = create<CapStoreState>()(
       installedCaps: {},
 
       // Installation management
-      installCap: (cap: RemoteCap) => {
+      installCap: (cap: Cap) => {
         const { installedCaps } = get();
 
         // Don't install if already installed
-        if (installedCaps[cap.id]) {
+        if (installedCaps[cap.idName]) {
           return;
         }
-
-        const newInstalledCap: InstalledCap = {
-          ...cap,
-          updatedAt: Date.now(),
-        };
 
         set((state) => ({
           installedCaps: {
             ...state.installedCaps,
-            [cap.id]: newInstalledCap,
+            [cap.idName]: cap,
           },
         }));
 
@@ -104,21 +99,16 @@ export const CapStateStore = create<CapStoreState>()(
       },
 
       // Data management
-      updateInstalledCap: (id: string, updatedCap: RemoteCap) => {
+      updateInstalledCap: (id: string, updatedCap: Cap) => {
         const { installedCaps } = get();
         const cap = installedCaps[id];
 
         if (!cap) return;
 
-        const newInstalledCap: InstalledCap = {
-          ...updatedCap,
-          updatedAt: Date.now(),
-        };
-
         set((state) => ({
           installedCaps: {
             ...state.installedCaps,
-            [id]: newInstalledCap,
+            [id]: updatedCap,
           },
         }));
 
@@ -157,10 +147,10 @@ export const CapStateStore = create<CapStoreState>()(
             .equals(currentDID)
             .toArray();
 
-          const capsMap: Record<string, InstalledCap> = {};
+          const capsMap: Record<string, Cap> = {};
 
-          caps.forEach((cap: InstalledCap) => {
-            capsMap[cap.id] = cap;
+          caps.forEach((cap: Cap) => {
+            capsMap[cap.idName] = cap;
           });
 
           set((state) => ({
@@ -179,7 +169,7 @@ export const CapStateStore = create<CapStoreState>()(
           if (!currentDID) return;
 
           const { installedCaps } = get();
-          const capsToSave = Object.values(installedCaps).map(cap => ({
+          const capsToSave = Object.values(installedCaps).map((cap) => ({
             ...cap,
             did: currentDID,
           }));

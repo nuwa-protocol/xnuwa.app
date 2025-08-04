@@ -1,18 +1,6 @@
 import { useCallback } from 'react';
-import { useCapKitInit } from '@/shared/hooks/use-cap-kit-init';
-import type { LocalCap } from '../types';
-
-export interface CapSubmitRequest {
-  name: string;
-  description: string;
-  cap: LocalCap;
-  capSubmissionMetadata: {
-    author: string;
-    homepage?: string;
-    repository?: string;
-    thumbnail?: string;
-  };
-}
+import { useCapKit } from '@/shared/hooks/use-capkit';
+import type { Cap } from '@/shared/types/cap';
 
 interface CapSubmitResponse {
   success: boolean;
@@ -22,30 +10,26 @@ interface CapSubmitResponse {
 }
 
 export const useSubmitCap = () => {
-  // // mock
-  // const submitCap = () => {};
-  // const isInitializing = true;
-
-  const { initializeCapKit, isInitializing } = useCapKitInit();
+  const { capKit } = useCapKit();
 
   const submitCap = useCallback(
-    async (request: CapSubmitRequest): Promise<CapSubmitResponse> => {
+    async (capData: Cap): Promise<CapSubmitResponse> => {
       try {
-        const kit = await initializeCapKit();
-        if (!kit) {
+        if (!capKit) {
           throw new Error('Failed to initialize CapKit');
         }
 
         // Register the capability using CapKit
-        const cid = await kit.registerCap(request.name, request.description, {
-          cap: request.cap,
-          capSubmissionMetadata: request.capSubmissionMetadata,
-        });
+        const cid = await capKit.registerCap(
+          capData.idName,
+          capData.metadata.description,
+          capData,
+        );
 
         return {
           success: true,
           capId: cid,
-          message: `Capability "${request.name}" registered successfully with CID: ${cid}`,
+          message: `Capability "@${capData.idName}" registered successfully with CID: ${cid}`,
         };
       } catch (error) {
         const errorMessage =
@@ -59,11 +43,10 @@ export const useSubmitCap = () => {
         };
       }
     },
-    [initializeCapKit],
+    [capKit],
   );
 
   return {
     submitCap,
-    isInitializing,
   };
 };

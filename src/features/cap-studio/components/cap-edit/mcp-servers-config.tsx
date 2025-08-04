@@ -17,11 +17,11 @@ import {
   SelectValue,
 } from '@/shared/components/ui';
 
-import type { McpServerConfig } from '@/shared/types/cap';
+import type { CapMcpServerConfig } from '@/shared/types/cap';
 
 interface McpServersConfigProps {
-  mcpServers: Record<string, McpServerConfig>;
-  onUpdateMcpServers: (servers: Record<string, McpServerConfig>) => void;
+  mcpServers: Record<string, CapMcpServerConfig>;
+  onUpdateMcpServers: (servers: Record<string, CapMcpServerConfig>) => void;
   capId?: string;
 }
 
@@ -34,7 +34,7 @@ export function McpServersConfig({
   const [isAdding, setIsAdding] = useState(false);
   const [editingServer, setEditingServer] = useState<string | null>(null);
   const [newServer, setNewServer] = useState<
-    McpServerConfig & { name: string }
+    CapMcpServerConfig & { name: string }
   >({
     name: '',
     url: '',

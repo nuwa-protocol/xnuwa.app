@@ -30,14 +30,16 @@ export function CapSelector() {
             <>
               <Avatar className="size-5">
                 <AvatarImage
-                  src={`https://avatar.vercel.sh/${currentCap.name}`}
-                  alt={currentCap.name}
+                  src={`https://avatar.vercel.sh/${currentCap.metadata.displayName}`}
+                  alt={currentCap.metadata.displayName}
                 />
                 <AvatarFallback className="text-xs">
-                  {currentCap.name.slice(0, 2).toUpperCase()}
+                  {currentCap.metadata.displayName.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-normal">{currentCap.name}</span>
+              <span className="text-sm font-normal">
+                {currentCap.metadata.displayName}
+              </span>
             </>
           ) : (
             <>

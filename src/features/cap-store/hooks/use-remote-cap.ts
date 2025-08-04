@@ -1,9 +1,25 @@
+import * as yaml from 'js-yaml';
 import { useEffect, useState } from 'react';
-import { type CapFetchParams, fetchRemoteCaps } from '../services/cap-fetch';
-import type { RemoteCap } from '../types';
+import { useCapKit } from '@/shared/hooks/use-capkit';
+import type { Cap } from '@/shared/types/cap';
+
+interface CapKitQueryResponse {
+  code: number;
+  data: {
+    items: Array<{
+      id: string;
+      cid: string;
+      name: string;
+    }>;
+    page: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+  };
+}
 
 interface UseRemoteCapState {
-  remoteCaps: RemoteCap[];
+  remoteCaps: Cap[];
   isLoading: boolean;
   error: string | null;
   totalCount: number;
@@ -46,31 +62,61 @@ export function useRemoteCap({
     hasMore: false,
   });
 
+  const { capKit, isLoading: isCapKitLoading } = useCapKit();
+
   const fetchCaps = async (params: UseRemoteCapParams = {}) => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const filters: CapFetchParams = {
-        query: params.searchQuery || searchQuery,
-        category: params.category || category,
-        author: params.author || author,
-        timeRange: params.timeRange || timeRange,
-        sortBy: params.sortBy || sortBy,
-        sortOrder: params.sortOrder || sortOrder,
-        limit: params.limit || limit,
-        offset: ((params.page || page) - 1) * (params.limit || limit),
-      };
+      // const filters: CapFetchParams = {
+      //   query: params.searchQuery || searchQuery,
+      //   category: params.category || category,
+      //   author: params.author || author,
+      //   timeRange: params.timeRange || timeRange,
+      //   sortBy: params.sortBy || sortBy,
+      //   sortOrder: params.sortOrder || sortOrder,
+      //   limit: params.limit || limit,
+      //   offset: ((params.page || page) - 1) * (params.limit || limit),
+      // };
 
-      const response = await fetchRemoteCaps(filters);
+      if (!capKit) {
+        throw new Error('CapKit not initialized');
+      }
+
+      const response: CapKitQueryResponse = await capKit.queryWithName(
+        params.searchQuery,
+      );
+
+      console.log('response', response);
+
+      const remoteCaps: Cap[] = await Promise.all(
+        response.data.items.map(async (item) => {
+          const capData = await capKit.downloadCap(item.cid, 'utf8');
+
+          console.log('capData', capData);
+
+          const capContent: any = yaml.load(capData.data.fileData);
+
+          console.log('capContent', capContent);
+
+          return {
+            idName: capContent.idName,
+            core: capContent.core,
+            metadata: capContent.metadata,
+          };
+        }),
+      );
 
       setState((prev) => ({
         ...prev,
-        remoteCaps: response.caps,
+        remoteCaps,
         isLoading: false,
-        totalCount: response.total,
-        hasMore: response.hasMore,
+        totalCount: response.data.totalItems,
+        hasMore: response.data.page < response.data.totalPages,
         page: params.page || page,
       }));
+
+      console.log('response', response);
 
       return response;
     } catch (err) {
@@ -86,7 +132,7 @@ export function useRemoteCap({
 
   // Auto-fetch when search parameters change
   useEffect(() => {
-    if (initialLoad) {
+    if (initialLoad && !isCapKitLoading) {
       fetchCaps();
     }
   }, [
@@ -99,6 +145,7 @@ export function useRemoteCap({
     limit,
     page,
     initialLoad,
+    isCapKitLoading,
   ]);
 
   const refetch = () => {

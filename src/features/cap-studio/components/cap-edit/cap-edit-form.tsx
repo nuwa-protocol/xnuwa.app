@@ -23,7 +23,7 @@ import {
   MultiSelect,
   Textarea,
 } from '@/shared/components/ui';
-import type { McpServerConfig } from '@/shared/types/cap';
+import type { CapMcpServerConfig } from '@/shared/types/cap';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { ModelSelectorDialog } from '../model-selector';
@@ -33,7 +33,7 @@ import { ModelDetails } from './model-details';
 import { PromptEditor } from './prompt-editor';
 
 const capSchema = z.object({
-  name: z
+  idName: z
     .string()
     .min(6, 'Name must be at least 6 characters')
     .max(20, 'Name must be at most 20 characters')
@@ -72,26 +72,26 @@ export function CapEditForm({
   const { createCap, updateCap } = useLocalCapsHandler();
   const { selectedModel } = useSelectedModel();
   const [isSaving, setIsSaving] = useState(false);
-  const [mcpServers, setMcpServers] = useState<Record<string, McpServerConfig>>(
-    {},
-  );
+  const [mcpServers, setMcpServers] = useState<
+    Record<string, CapMcpServerConfig>
+  >({});
 
   const form = useForm<CapFormData>({
     resolver: zodResolver(capSchema),
     mode: 'onChange',
     defaultValues: {
-      name: editingCap?.name || '',
-      displayName: editingCap?.displayName || '',
-      description: editingCap?.description || '',
-      tags: editingCap?.tags || [],
+      idName: editingCap?.capData.idName || '',
+      displayName: editingCap?.capData.metadata.displayName || '',
+      description: editingCap?.capData.metadata.description || '',
+      tags: editingCap?.capData.metadata.tags || [],
       prompt: {
         value:
-          typeof editingCap?.prompt === 'string'
-            ? editingCap.prompt
-            : editingCap?.prompt?.value || '',
+          typeof editingCap?.capData.core.prompt === 'string'
+            ? editingCap.capData.core.prompt
+            : editingCap?.capData.core.prompt?.value || '',
         suggestions:
-          typeof editingCap?.prompt === 'object'
-            ? editingCap.prompt.suggestions
+          typeof editingCap?.capData.core.prompt === 'object'
+            ? editingCap.capData.core.prompt.suggestions
             : [],
       },
     },
@@ -99,7 +99,7 @@ export function CapEditForm({
 
   useEffect(() => {
     if (editingCap) {
-      setMcpServers(editingCap.mcpServers || {});
+      setMcpServers(editingCap.capData.core.mcpServers || {});
     }
   }, [editingCap]);
 
@@ -128,13 +128,21 @@ export function CapEditForm({
       if (editingCap) {
         // Update existing cap
         updateCap(editingCap.id, {
-          name: data.name,
-          displayName: data.displayName,
-          description: data.description,
-          tags: data.tags,
-          prompt: data.prompt,
-          model: selectedModel,
-          mcpServers,
+          capData: {
+            idName: data.idName,
+            metadata: {
+              displayName: data.displayName,
+              description: data.description,
+              tags: data.tags,
+              author: '',
+              submittedAt: 0,
+            },
+            core: {
+              prompt: data.prompt,
+              model: selectedModel,
+              mcpServers,
+            },
+          },
         });
 
         toast({
@@ -146,14 +154,19 @@ export function CapEditForm({
       } else {
         // Create new cap
         createCap({
-          name: data.name,
-          displayName: data.displayName,
-          description: data.description,
-          tags: data.tags,
-          prompt: data.prompt,
-          model: selectedModel,
-          status: 'draft',
-          mcpServers,
+          idName: data.idName,
+          metadata: {
+            displayName: data.displayName,
+            description: data.description,
+            tags: data.tags,
+            author: '',
+            submittedAt: 0,
+          },
+          core: {
+            prompt: data.prompt,
+            model: selectedModel,
+            mcpServers,
+          },
         });
 
         toast({
@@ -173,7 +186,9 @@ export function CapEditForm({
     }
   };
 
-  const handleUpdateMcpServers = (servers: Record<string, McpServerConfig>) => {
+  const handleUpdateMcpServers = (
+    servers: Record<string, CapMcpServerConfig>,
+  ) => {
     setMcpServers(servers);
   };
 
@@ -229,7 +244,7 @@ export function CapEditForm({
               <CardContent className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="idName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Name</FormLabel>

@@ -25,7 +25,7 @@ import {
 import { SidebarInset, SidebarProvider } from '@/shared/components/ui/sidebar';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { useLocale } from '@/shared/locales/use-locale';
-import type { Model } from '@/shared/types';
+import type { CapModel } from '@/shared/types/cap';
 import { useAvailableModels, useSelectedModel } from '../../hooks';
 import { generateProviders } from '../../utils';
 import { ModelCard } from './model-card';
@@ -111,7 +111,7 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
     return filtered;
   };
 
-  const handleModelSelect = (model: Model) => {
+  const handleModelSelect = (model: CapModel) => {
     setSelectedModel(model);
     onClose();
   };
@@ -130,7 +130,7 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
     return renderModelGrid(filteredModels);
   };
 
-  const renderModelGrid = (modelList: Model[]) => (
+  const renderModelGrid = (modelList: CapModel[]) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {modelList.map((model) => (
         <ModelCard

@@ -86,8 +86,8 @@ export function Mcp({ cap, serverName }: McpProps) {
 
   // Auto-populate connection details when server is specified via URL parameter
   useEffect(() => {
-    if (cap && serverName && cap.mcpServers[serverName]) {
-      const serverConfig = cap.mcpServers[serverName];
+    if (cap && serverName && cap.capData.core.mcpServers[serverName]) {
+      const serverConfig = cap.capData.core.mcpServers[serverName];
       setUrl(serverConfig.url);
       setTransport(serverConfig.transport);
     }

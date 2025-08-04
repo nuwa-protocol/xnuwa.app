@@ -1,18 +1,10 @@
-import {
-  AlertCircle,
-  Download,
-  Loader2,
-  Play,
-  Settings,
-  Trash2,
-} from 'lucide-react';
+import { AlertCircle, Loader2, Play, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from '@/shared/components';
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Badge,
   Button,
   Card,
   DropdownMenu,
@@ -21,22 +13,17 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
+import type { Cap } from '@/shared/types/cap';
 import { useInstalledCap } from '../hooks/use-installed-cap';
-import type { InstalledCap, RemoteCap } from '../types';
 
 export interface CapCardProps {
-  cap: RemoteCap;
-  onRun?: (cap: InstalledCap) => void;
+  cap: Cap;
+  onRun?: (cap: Cap) => void;
 }
 
 export function CapCard({ cap, onRun }: CapCardProps) {
-  const {
-    installCap,
-    uninstallCap,
-    updateInstalledCap,
-    isInstalled,
-    hasUpdate,
-  } = useInstalledCap(cap);
+  const { installCap, uninstallCap, updateInstalledCap, isInstalled } =
+    useInstalledCap(cap);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useLanguage();
 
@@ -46,7 +33,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
       installCap(cap);
       toast({
         type: 'success',
-        description: `${cap.name} has been installed`,
+        description: `${cap.idName} has been installed`,
       });
     } catch (error) {
       toast({
@@ -61,10 +48,10 @@ export function CapCard({ cap, onRun }: CapCardProps) {
   const handleUninstall = async () => {
     setIsLoading(true);
     try {
-      uninstallCap(cap.id);
+      uninstallCap(cap.idName);
       toast({
         type: 'success',
-        description: `${cap.name} has been uninstalled`,
+        description: `${cap.idName} has been uninstalled`,
       });
     } catch (error) {
       toast({
@@ -83,10 +70,10 @@ export function CapCard({ cap, onRun }: CapCardProps) {
   const handleUpdate = async () => {
     setIsLoading(true);
     try {
-      updateInstalledCap(cap.id, cap);
+      updateInstalledCap(cap.idName, cap);
       toast({
         type: 'success',
-        description: `${cap.name} has been updated`,
+        description: `${cap.idName} has been updated`,
       });
     } catch (error) {
       toast({
@@ -103,35 +90,33 @@ export function CapCard({ cap, onRun }: CapCardProps) {
       <div className="flex items-start gap-3">
         <Avatar className="size-10 shrink-0">
           <AvatarImage
-            src={`https://avatar.vercel.sh/${cap.name}`}
-            alt={cap.name}
+            src={`https://avatar.vercel.sh/${cap.idName}`}
+            alt={cap.idName}
           />
-          <AvatarFallback>{cap.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+          <AvatarFallback>
+            {cap.idName.slice(0, 2).toUpperCase()}
+          </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
-            <h3 className="font-medium text-sm truncate">{cap.name}</h3>
-            <div className="flex items-center gap-1">
-              <Badge variant="secondary" className="text-xs">
-                {cap.tag}
-              </Badge>
-            </div>
+            <h3 className="font-medium text-sm truncate">
+              {cap.metadata.displayName}
+              <span className="text-xs text-muted-foreground">
+                @{cap.idName}
+              </span>
+            </h3>
           </div>
           <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-            {cap.description}
+            {cap.metadata.description}
           </p>
 
           {/* Version and metadata info */}
           <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-            {cap.author && (
+            {cap.metadata.author && (
               <span className="text-xs">
-                {t('capStore.card.by', { author: cap.author })}
+                {t('capStore.card.by', { author: cap.metadata.author })}
               </span>
             )}
-            <div className="flex items-center gap-1">
-              <Download className="size-3" />
-              <span>{cap.downloads.toLocaleString()}</span>
-            </div>
           </div>
 
           {/* Action buttons */}
@@ -172,12 +157,12 @@ export function CapCard({ cap, onRun }: CapCardProps) {
                     variant="ghost"
                     className="text-xs px-4 py-2 h-6 relative"
                     style={{
-                      paddingRight: hasUpdate && isInstalled ? 14 : undefined,
+                      paddingRight: isInstalled ? 14 : undefined,
                     }}
                   >
                     <span className="relative inline-block">
                       <Settings className="size-3" />
-                      {hasUpdate && isInstalled && (
+                      {isInstalled && (
                         <span
                           className="absolute -top-1 -right-1 block h-2 w-2 rounded-full bg-orange-500 border border-white"
                           style={{ zIndex: 1 }}
@@ -187,7 +172,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {hasUpdate && isInstalled && (
+                  {isInstalled && (
                     <DropdownMenuItem
                       onClick={handleUpdate}
                       disabled={isLoading}

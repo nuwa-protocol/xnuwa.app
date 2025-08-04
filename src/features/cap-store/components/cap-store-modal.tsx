@@ -11,8 +11,8 @@ import {
   TabsTrigger,
 } from '@/shared/components/ui';
 import { useCurrentCap, useLanguage } from '@/shared/hooks';
+import type { Cap } from '@/shared/types/cap';
 import { useRemoteCap } from '../hooks/use-remote-cap';
-import type { InstalledCap } from '../types';
 import { CapCard } from './cap-card';
 
 interface CapStoreModalProps {
@@ -53,21 +53,15 @@ export function CapStoreModal({
     { id: 'security', label: t('capStore.tabs.security') },
   ];
 
-  const handleRunCap = (cap: InstalledCap) => {
+  const handleRunCap = (cap: Cap) => {
     // Set this cap as the current cap
-    setCurrentCap({
-      id: cap.id,
-      name: cap.name,
-      prompt: cap.prompt,
-      model: cap.model,
-      mcpServers: cap.mcpServers,
-    });
+    setCurrentCap(cap);
 
     onOpenChange?.(false);
 
     toast({
       type: 'success',
-      description: `${cap.name} is now active`,
+      description: `${cap.metadata.displayName} is now active`,
     });
   };
 
@@ -185,7 +179,7 @@ export function CapStoreModal({
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-6 min-h-0">
                           {remoteCaps.map((cap) => (
                             <CapCard
-                              key={cap.id}
+                              key={cap.idName}
                               cap={cap}
                               onRun={handleRunCap}
                             />

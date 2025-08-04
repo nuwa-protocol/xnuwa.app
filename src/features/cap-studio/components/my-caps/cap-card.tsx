@@ -70,7 +70,7 @@ export function CapCard({
     }
   };
 
-  const mcpServerCount = Object.keys(cap.mcpServers).length;
+  const mcpServerCount = Object.keys(cap.capData.core.mcpServers).length;
   const lastUpdated = formatDistanceToNow(new Date(cap.updatedAt), {
     addSuffix: true,
   });
@@ -87,7 +87,7 @@ export function CapCard({
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-1">
                 <h3 className="font-semibold text-base truncate">
-                  {cap.displayName}
+                  {cap.capData.metadata.displayName}
                 </h3>
                 <Badge
                   variant={cap.status === 'submitted' ? 'default' : 'secondary'}
@@ -103,13 +103,13 @@ export function CapCard({
               </div>
 
               <p className="text-sm text-muted-foreground mb-2 line-clamp-2 break-words overflow-hidden">
-                {cap.description}
+                {cap.capData.metadata.description}
               </p>
 
               <div className="flex items-center space-x-4 text-xs text-muted-foreground flex-wrap">
                 <div className="flex items-center">
                   <Bot className="h-3 w-3 mr-1" />
-                  {cap.model.name}
+                  {cap.capData.core.model.name}
                 </div>
                 <div className="flex items-center">
                   <Server className="h-3 w-3 mr-1" />
@@ -177,8 +177,8 @@ export function CapCard({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Cap</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{cap.name}"? This action cannot
-              be undone.
+              Are you sure you want to delete @{cap.capData.idName}? This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

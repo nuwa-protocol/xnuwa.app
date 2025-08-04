@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
+import type { Cap } from '@/shared/types/cap';
 import { generateUUID } from '@/shared/utils';
 import type { LocalCap } from '../types';
 
@@ -19,9 +20,7 @@ interface CapStudioState {
   localCaps: LocalCap[];
 
   // Actions
-  createCap: (
-    cap: Omit<LocalCap, 'id' | 'createdAt' | 'updatedAt'>,
-  ) => LocalCap;
+  createCap: (capData: Cap) => LocalCap;
   updateCap: (id: string, updates: Partial<LocalCap>) => void;
   deleteCap: (id: string) => void;
 
@@ -55,7 +54,7 @@ export const CapStudioStore = create<CapStudioState>()(
 
       createCap: (capData) => {
         const newCap: LocalCap = {
-          ...capData,
+          capData,
           id: generateUUID(),
           status: 'draft',
           createdAt: Date.now(),
@@ -102,7 +101,9 @@ export const CapStudioStore = create<CapStudioState>()(
       },
 
       getCapsByTag: (tag) => {
-        return get().localCaps.filter((cap) => cap.tags.includes(tag));
+        return get().localCaps.filter((cap) =>
+          cap.capData.metadata.tags.includes(tag),
+        );
       },
 
       clearAllCaps: () => {

@@ -1,33 +1,29 @@
 import { useEffect, useState } from 'react';
+import type { Cap } from '@/shared/types/cap';
 import { CapStateStore } from '../stores';
-import type { RemoteCap } from '../types';
 
 /**
  * Hook for managing the installed caps
  */
-export const useInstalledCap = (remoteCap:RemoteCap) => {
+export const useInstalledCap = (cap: Cap) => {
   const [state, setState] = useState(() => CapStateStore.getState());
 
   useEffect(() => {
     const unsubscribe = CapStateStore.subscribe((newState) => {
       setState(newState);
     });
-    
+
     return unsubscribe;
   }, []);
 
   const { installCap, uninstallCap, updateInstalledCap, installedCaps } = state;
 
-  const isInstalled = !!installedCaps[remoteCap.id];
-  const installedVersion = installedCaps[remoteCap.id]?.version;
-  const hasUpdate = installedVersion !== remoteCap.version;
+  const isInstalled = !!installedCaps[cap.idName];
 
   return {
     isInstalled,
-    installedVersion,
     installCap,
     uninstallCap,
-    hasUpdate,
     updateInstalledCap,
   };
 };

@@ -137,8 +137,8 @@ export function SubmitForm({
         <div>
           <h3 className="text-lg font-semibold">Submit Cap to Store</h3>
           <p className="text-sm text-muted-foreground">
-            Publish "{cap.name}" to the Nuwa Cap Store for others to discover
-            and use
+            Publish @{cap.capData.idName} to the Nuwa Cap Store for others to
+            discover and use
           </p>
         </div>
 
@@ -172,27 +172,29 @@ export function SubmitForm({
                     <div className="text-sm font-medium text-muted-foreground">
                       Name
                     </div>
-                    <p className="text-sm">{cap.name}</p>
+                    <p className="text-sm">{cap.capData.idName}</p>
                   </div>
                   <div>
                     <div className="text-sm font-medium text-muted-foreground">
                       Display Name
                     </div>
-                    <p className="text-sm">{cap.displayName}</p>
+                    <p className="text-sm">
+                      {cap.capData.metadata.displayName}
+                    </p>
                   </div>
                 </div>
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">
                     Description
                   </div>
-                  <p className="text-sm">{cap.description}</p>
+                  <p className="text-sm">{cap.capData.metadata.description}</p>
                 </div>
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">
                     Tags
                   </div>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {cap.tags.map((tag) => (
+                    {cap.capData.metadata.tags.map((tag) => (
                       <span
                         key={tag}
                         className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary"
@@ -207,15 +209,15 @@ export function SubmitForm({
                     <div className="text-sm font-medium text-muted-foreground">
                       Model
                     </div>
-                    <p className="text-sm">{cap.model.name}</p>
+                    <p className="text-sm">{cap.capData.core.model.name}</p>
                   </div>
                   <div>
                     <div className="text-sm font-medium text-muted-foreground">
                       MCP Servers
                     </div>
                     <p className="text-sm">
-                      {Object.keys(cap.mcpServers).length > 0
-                        ? Object.keys(cap.mcpServers).join(', ')
+                      {Object.keys(cap.capData.core.mcpServers).length > 0
+                        ? Object.keys(cap.capData.core.mcpServers).join(', ')
                         : 'None'}
                     </p>
                   </div>
@@ -483,7 +485,7 @@ function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
         )}
         <div className="flex-1">
           <h3 className="text-xl font-bold">
-            {cap.displayName || 'Untitled Cap'}
+            {cap.capData.metadata.displayName || 'Untitled Cap'}
           </h3>
           <p className="text-muted-foreground">
             by {data.author || 'Unknown Author'}
@@ -495,7 +497,7 @@ function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
       <div>
         <h4 className="font-semibold mb-2">Description</h4>
         <p className="text-muted-foreground">
-          {cap.description || 'No description provided'}
+          {cap.capData.metadata.description || 'No description provided'}
         </p>
       </div>
       {/* Links */}

@@ -1,10 +1,10 @@
 import { Badge } from '@/shared/components/ui/badge';
-import type { Model } from '@/shared/types';
+import type { CapModel } from '@/shared/types/cap';
 import { getModelName, getProviderName } from '../../utils';
 import { ProviderAvatar } from '../model-selector/provider-avatar';
 
 interface ModelDetailsProps {
-  model: Model;
+  model: CapModel;
 }
 
 export function ModelDetails({ model }: ModelDetailsProps) {

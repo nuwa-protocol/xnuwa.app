@@ -39,9 +39,11 @@ export function MyCaps({
     const query = searchQuery.toLowerCase();
     return capsArray.filter(
       (cap) =>
-        cap.name.toLowerCase().includes(query) ||
-        cap.description.toLowerCase().includes(query) ||
-        cap.tags.some((tag) => tag.toLowerCase().includes(query)),
+        cap.capData.metadata.displayName.toLowerCase().includes(query) ||
+        cap.capData.metadata.description.toLowerCase().includes(query) ||
+        cap.capData.metadata.tags.some((tag) =>
+          tag.toLowerCase().includes(query),
+        ),
     );
   }, [capsArray, searchQuery]);
 

@@ -1,14 +1,11 @@
 import type { Cap } from '@/shared/types';
 
-export type CapStatus = 'draft' | 'submitted';
+export type DevCapStatus = 'draft' | 'submitted';
 
-export interface LocalCap extends Cap {
+export interface LocalCap {
   id: string;
-  name: string;
-  displayName: string;
-  description: string;
-  tags: string[];
-  status: CapStatus;
+  capData: Cap;
+  status: DevCapStatus;
   cid?: string;
   createdAt: number;
   updatedAt: number;

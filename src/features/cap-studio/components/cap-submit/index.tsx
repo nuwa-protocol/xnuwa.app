@@ -2,10 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from '@/shared/components';
 import { useLocalCaps } from '../../hooks';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
-import {
-  type CapSubmitRequest,
-  useSubmitCap,
-} from '../../hooks/use-submit-cap';
+import { useSubmitCap } from '../../hooks/use-submit-cap';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
 import { SubmitForm, type SubmitFormData } from './submit-form';
 
@@ -43,19 +40,17 @@ export function Submit() {
   };
 
   const handleConfirmedSubmit = async (
-    data: SubmitFormData,
+    submitFormData: SubmitFormData,
     thumbnailFile: File | null,
   ) => {
     try {
-      // prepare submit request
-      const capSubmitRequest: CapSubmitRequest = {
-        name: cap.name,
-        description: cap.description,
-        cap: cap,
-        capSubmissionMetadata: {
-          author: data.author,
-          homepage: data.homepage || undefined,
-          repository: data.repository || undefined,
+      const capWithSubmitFormData = {
+        ...cap.capData,
+        metadata: {
+          ...cap.capData.metadata,
+          author: submitFormData.author,
+          homepage: submitFormData.homepage || undefined,
+          repository: submitFormData.repository || undefined,
           thumbnail: thumbnailFile
             ? URL.createObjectURL(thumbnailFile)
             : undefined,
@@ -63,7 +58,7 @@ export function Submit() {
       };
 
       // make the submission
-      const result = await submitCap(capSubmitRequest);
+      const result = await submitCap(capWithSubmitFormData);
 
       console.log('result', result);
 
