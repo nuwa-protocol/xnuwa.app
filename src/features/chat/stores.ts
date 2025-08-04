@@ -249,8 +249,14 @@ export const ChatStateStore = create<ChatStoreState>()(
         if (typeof window === 'undefined') return;
 
         try {
+          const currentDID = await getCurrentDID();
+          if (!currentDID) return;
+
           const { sessions } = get();
-          const chatsToSave = Object.values(sessions);
+          const chatsToSave = Object.values(sessions).map(session => ({
+            ...session,
+            did: currentDID,
+          }));
 
           // use bulkPut to efficiently update data
           await chatDB.chats.bulkPut(chatsToSave);

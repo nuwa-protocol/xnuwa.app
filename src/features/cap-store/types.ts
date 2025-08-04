@@ -21,4 +21,5 @@ export interface InstalledCap extends Cap {
   description: string;
   version: string;
   updatedAt: number;
+  did?: string; // Added for IndexedDB storage
 }

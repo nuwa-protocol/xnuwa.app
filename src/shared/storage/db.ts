@@ -16,7 +16,7 @@ class Database extends Dexie {
 
     this.version(1).stores({
       chats: 'id, did, createdAt, updatedAt',
-      caps: 'id, did, installDate, tag',
+      caps: 'id, did',
       settings: 'did',
       capStudio: 'id, did, createdAt, updatedAt',
     });

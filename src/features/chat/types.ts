@@ -8,4 +8,5 @@ export interface ChatSession {
   updatedAt: number;
   messages: Message[];
   pinned?: boolean;
+  did?: string; // Added for IndexedDB storage
 }

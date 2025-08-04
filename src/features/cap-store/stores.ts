@@ -179,7 +179,10 @@ export const CapStateStore = create<CapStoreState>()(
           if (!currentDID) return;
 
           const { installedCaps } = get();
-          const capsToSave = Object.values(installedCaps);
+          const capsToSave = Object.values(installedCaps).map(cap => ({
+            ...cap,
+            did: currentDID,
+          }));
           await capDB.caps.bulkPut(capsToSave);
         } catch (error) {
           console.error('Failed to save caps to DB:', error);
