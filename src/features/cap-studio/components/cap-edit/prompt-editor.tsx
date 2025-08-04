@@ -43,7 +43,7 @@ function VariablesDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <Button variant="ghost" size="sm" type="button">
           <Variable className="h-4 w-4" />
           Variables
         </Button>
@@ -177,7 +177,7 @@ export function PromptEditor({
           <span className="text-xs text-muted-foreground">
             {wordCount} words
           </span>
-          <Button variant="ghost" size="sm" onClick={openDrawer}>
+          <Button variant="ghost" size="sm" type="button" onClick={openDrawer}>
             <Maximize2 className="h-4 w-4" />
           </Button>
         </div>
@@ -210,7 +210,7 @@ export function PromptEditor({
       <div className="text-xs text-muted-foreground">
         Use variables like{' '}
         <Badge variant="secondary" className="text-xs mx-1">
-          {'{{user_input}}'}
+          {'{{user_geo}}'}
         </Badge>
         to make your prompt dynamic.
       </div>
@@ -261,11 +261,15 @@ export function PromptEditor({
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <Button variant="outline" onClick={handleDrawerCancel}>
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={handleDrawerCancel}
+                  >
                     <X className="h-4 w-4 mr-2" />
                     Cancel
                   </Button>
-                  <Button onClick={handleDrawerSave}>
+                  <Button type="button" onClick={handleDrawerSave}>
                     <Save className="h-4 w-4 mr-2" />
                     Save
                   </Button>
