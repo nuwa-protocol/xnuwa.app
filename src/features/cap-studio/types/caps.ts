@@ -11,4 +11,5 @@ export interface LocalCap extends Cap {
   status: CapStatus;
   createdAt: number;
   updatedAt: number;
+  did?: string; // Added for IndexedDB storage
 }

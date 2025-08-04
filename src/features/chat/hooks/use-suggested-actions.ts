@@ -8,8 +8,6 @@ export interface SuggestedAction {
 export function useSuggestedActions(): SuggestedAction[] {
   const { currentCap: cap } = useCurrentCap();
 
-  console.log(cap);
-
   const suggestedActions =
     cap?.prompt.suggestions?.map((suggestion) => ({
       title: suggestion,

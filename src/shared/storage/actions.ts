@@ -94,12 +94,14 @@ class StorageActions {
           db.chats,
           db.caps,
           db.settings,
+          db.capStudio,
         ],
         async () => {
           await Promise.all([
             db.chats.clear(),
             db.caps.clear(),
             db.settings.clear(),
+            db.capStudio.clear(),
           ]);
         },
       );

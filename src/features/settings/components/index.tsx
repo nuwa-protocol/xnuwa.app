@@ -3,16 +3,17 @@ import { Monitor, User } from 'lucide-react';
 import type React from 'react';
 import { useRef, useState } from 'react';
 import { useAuth } from '@/features/auth/hooks/use-auth';
+import { useAuthHandler } from '@/features/auth/hooks/use-auth-handler';
 import { useSettings } from '@/features/settings/hooks/use-settings';
 import { toast } from '@/shared/components';
 import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { useStorage } from '@/shared/hooks/use-storage';
+import { LanguageSelector } from './language-selector';
 import type { SettingCardProps } from './setting-card';
 import { SettingSection } from './setting-section';
 import { SettingsNav } from './settings-nav';
 import { ThemeSelector } from './theme-selector';
-import { LanguageSelector } from './language-selector';
 
 interface SettingsSection {
   id: string;
@@ -28,9 +29,11 @@ export function Settings() {
   const [activeSectionIndex, setActiveSectionIndex] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isClearing, setIsClearing] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { clearAllStorage } = useStorage();
   const { settings, setSetting } = useSettings();
   const { did } = useAuth();
+  const { logout } = useAuthHandler();
   const [tempName, setTempName] = useState(settings.name);
   const isDevMode = useDevMode();
 
@@ -81,6 +84,28 @@ export function Settings() {
     }
   };
 
+  // Logout logic
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      toast({
+        type: 'success',
+        description:
+          t('settings.profile.logout.success') || 'Successfully logged out',
+      });
+      // The auth guard will handle the redirect to login page
+    } catch (error) {
+      console.error('Failed to logout:', error);
+      toast({
+        type: 'error',
+        description: t('settings.profile.logout.error') || 'Failed to logout',
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   // Settings sections
   const settingsSections: SettingsSection[] = [
     {
@@ -104,8 +129,11 @@ export function Settings() {
     {
       id: 'about',
       icon: User,
-      name: t('settings.sections.profile.title')?.replace('Profile', 'About') || 'About',
-      description: t('settings.sections.profile.subtitle') || 'Your profile information.',
+      name:
+        t('settings.sections.profile.title')?.replace('Profile', 'About') ||
+        'About',
+      description:
+        t('settings.sections.profile.subtitle') || 'Your profile information.',
       cardItems: [
         {
           variant: 'info',
@@ -146,6 +174,24 @@ export function Settings() {
               },
             ] satisfies SettingCardProps[])
           : []),
+        {
+          variant: 'danger-action',
+          title: t('settings.profile.logout.title') || 'Logout',
+          description:
+            t('settings.profile.logout.description') ||
+            'Sign out of your account',
+          buttonLabel: t('settings.profile.logout.button') || 'Logout',
+          onClick: handleLogout,
+          disabled: isLoggingOut,
+          confirmationTitle:
+            t('settings.profile.logout.confirmTitle') || 'Confirm Logout',
+          confirmationDescription:
+            t('settings.profile.logout.confirmDescription') ||
+            'Are you sure you want to logout? You will need to sign in again to continue using the application.',
+          confirmationButtonLabel:
+            t('settings.profile.logout.confirmButton') || 'Logout',
+          cancelButtonLabel: t('settings.profile.logout.cancel') || 'Cancel',
+        },
       ],
     },
     {
@@ -205,7 +251,7 @@ export function Settings() {
               variant="vertical"
             />
           </div>
-          
+
           <div className="lg:col-span-3">
             <SettingSection
               key={activeSection.id}

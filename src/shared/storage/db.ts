@@ -4,7 +4,7 @@ class Database extends Dexie {
   chats!: Table<any>;
   caps!: Table<any>;
   settings!: Table<any>;
-  models!: Table<any>;
+  capStudio!: Table<any>;
 
   constructor() {
     if (typeof window === 'undefined') {
@@ -18,7 +18,7 @@ class Database extends Dexie {
       chats: 'id, did, createdAt, updatedAt',
       caps: 'id, did, installDate, tag',
       settings: 'did',
-      models: 'did',
+      capStudio: 'id, did, createdAt, updatedAt',
     });
   }
 }
