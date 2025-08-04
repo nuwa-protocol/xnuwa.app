@@ -71,9 +71,9 @@ export function CapCard({
   return (
     <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-primary/20">
       <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-start space-x-4 flex-1">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-start space-x-4 flex-1 min-w-0">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
               <Code2 className="h-6 w-6 text-primary" />
             </div>
 
@@ -95,11 +95,11 @@ export function CapCard({
                 </Badge>
               </div>
 
-              <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+              <p className="text-sm text-muted-foreground mb-2 line-clamp-2 break-words overflow-hidden">
                 {cap.description}
               </p>
 
-              <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+              <div className="flex items-center space-x-4 text-xs text-muted-foreground flex-wrap">
                 <div className="flex items-center">
                   <Bot className="h-3 w-3 mr-1" />
                   {cap.model.name}
@@ -116,7 +116,7 @@ export function CapCard({
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 ml-4">
+          <div className="flex items-center space-x-2 shrink-0">
             <Button onClick={onEdit} size="sm" variant="outline">
               <Edit className="h-4 w-4 mr-2" />
               Edit
