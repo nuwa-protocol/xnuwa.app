@@ -423,6 +423,11 @@ export const en = {
         placeholder: 'Enter your name',
         save: 'Save',
       },
+      logout: {
+        title: 'Logout',
+        description: 'Logout from your account',
+        button: 'Logout',
+      },
     },
     system: {
       clearAllStorage: {

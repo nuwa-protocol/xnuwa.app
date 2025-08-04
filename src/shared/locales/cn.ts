@@ -407,6 +407,11 @@ export const cn: typeof en = {
         placeholder: '输入您的姓名',
         save: '保存',
       },
+      logout: {
+        title: '退出登录',
+        description: '退出您的账户',
+        button: '退出登录',
+      },
     },
     system: {
       clearAllStorage: {
