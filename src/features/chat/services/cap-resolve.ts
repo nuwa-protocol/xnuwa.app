@@ -61,7 +61,7 @@ export class CapResolve {
   }
 
   async getResolvedPrompt(): Promise<string> {
-    return await this.resolveVariables(this.cap.prompt);
+    return await this.resolveVariables(this.cap.prompt.value);
   }
 
   getResolvedModel(): LanguageModelV1 {

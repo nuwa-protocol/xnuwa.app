@@ -23,7 +23,7 @@ import {
   MultiSelect,
   Textarea,
 } from '@/shared/components/ui';
-import type { McpServerConfig } from '@/shared/types/cap';
+import type { McpServerConfig, Prompt } from '@/shared/types/cap';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { ModelSelectorDialog } from '../model-selector';
@@ -50,7 +50,10 @@ const capSchema = z.object({
     .min(20, 'Description must be at least 10 characters')
     .max(500, 'Description too long'),
   tags: z.array(z.string()),
-  prompt: z.string(),
+  prompt: z.object({
+    value: z.string(),
+    suggestions: z.array(z.string()).optional(),
+  }),
 });
 
 type CapFormData = z.infer<typeof capSchema>;
@@ -81,7 +84,10 @@ export function CapEditForm({
       displayName: editingCap?.displayName || '',
       description: editingCap?.description || '',
       tags: editingCap?.tags || [],
-      prompt: editingCap?.prompt || '',
+      prompt: {
+        value: typeof editingCap?.prompt === 'string' ? editingCap.prompt : editingCap?.prompt?.value || '',
+        suggestions: typeof editingCap?.prompt === 'object' ? editingCap.prompt.suggestions : [],
+      },
     },
   });
 
@@ -353,8 +359,12 @@ export function CapEditForm({
                   <FormItem>
                     <FormControl>
                       <PromptEditor
-                        value={field.value}
-                        onChange={field.onChange}
+                        value={field.value.value}
+                        onChange={(value) => field.onChange({ ...field.value, value })}
+                        suggestions={field.value.suggestions || []}
+                        onSuggestionsChange={(suggestions) => 
+                          field.onChange({ ...field.value, suggestions })
+                        }
                         placeholder="Enter your prompt instructions here..."
                       />
                     </FormControl>

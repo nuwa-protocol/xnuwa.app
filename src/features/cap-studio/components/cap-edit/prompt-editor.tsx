@@ -21,10 +21,13 @@ import {
 } from '@/shared/components/ui';
 import { cn } from '@/shared/utils';
 import { promptVariables } from './constants';
+import { PromptSuggestions } from './prompt-suggestions';
 
 interface PromptEditorProps {
   value: string;
   onChange: (value: string) => void;
+  suggestions?: string[];
+  onSuggestionsChange?: (suggestions: string[]) => void;
   placeholder?: string;
   className?: string;
 }
@@ -85,6 +88,8 @@ function VariablesDialog({
 export function PromptEditor({
   value,
   onChange,
+  suggestions = [],
+  onSuggestionsChange,
   placeholder,
   className,
 }: PromptEditorProps) {
@@ -215,6 +220,15 @@ export function PromptEditor({
         to make your prompt dynamic.
       </div>
 
+      {/* Prompt Suggestions */}
+      {onSuggestionsChange && (
+        <PromptSuggestions
+          suggestions={suggestions}
+          onSuggestionsChange={onSuggestionsChange}
+          className="pt-4 border-t"
+        />
+      )}
+
       {/* Bottom Drawer */}
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent className="h-[80vh]">
@@ -298,6 +312,15 @@ export function PromptEditor({
                   </div>
                 </TabsContent>
               </Tabs>
+
+              {/* Prompt Suggestions in Drawer */}
+              {onSuggestionsChange && (
+                <PromptSuggestions
+                  suggestions={suggestions}
+                  onSuggestionsChange={onSuggestionsChange}
+                  className="pt-4 border-t"
+                />
+              )}
             </div>
           </div>
         </DrawerContent>

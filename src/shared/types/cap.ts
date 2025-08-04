@@ -5,9 +5,14 @@ export interface McpServerConfig {
   transport: 'httpStream' | 'sse';
 }
 
+export interface Prompt {
+  value: string;
+  suggestions?: string[];
+}
+
 // Cap Data Interface
 export interface Cap {
-  prompt: string;
+  prompt: Prompt;
   model: Model;
   mcpServers: Record<string, McpServerConfig>;
 }

@@ -1,4 +1,4 @@
-import { useLanguage } from '@/shared/hooks/use-language';
+import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 
 export interface SuggestedAction {
   title: string;
@@ -6,9 +6,15 @@ export interface SuggestedAction {
 }
 
 export function useSuggestedActions(): SuggestedAction[] {
-  const { t } = useLanguage();
-  
-  const suggestedActions = t('suggestedActions') as Array<SuggestedAction>;
-  
+  const { currentCap: cap } = useCurrentCap();
+
+  console.log(cap);
+
+  const suggestedActions =
+    cap?.prompt.suggestions?.map((suggestion) => ({
+      title: suggestion,
+      action: suggestion,
+    })) || [];
+
   return suggestedActions;
-} 
+}
