@@ -41,7 +41,7 @@ export function MyCaps({
       (cap) =>
         cap.name.toLowerCase().includes(query) ||
         cap.description.toLowerCase().includes(query) ||
-        cap.tag.toLowerCase().includes(query),
+        cap.tags.some((tag) => tag.toLowerCase().includes(query)),
     );
   }, [capsArray, searchQuery]);
 

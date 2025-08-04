@@ -9,6 +9,7 @@ export interface LocalCap extends Cap {
   description: string;
   tags: string[];
   status: CapStatus;
+  cid?: string;
   createdAt: number;
   updatedAt: number;
   did?: string; // Added for IndexedDB storage

@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { generateUUID } from '@/shared/utils';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
+import { generateUUID } from '@/shared/utils';
 import type { LocalCap } from '../types';
 
 // get current DID
@@ -116,7 +116,10 @@ export const CapStudioStore = create<CapStudioState>()(
             const currentDID = await getCurrentDID();
             if (!currentDID) return;
 
-            await capStudioDB.capStudio.where('did').equals(currentDID).delete();
+            await capStudioDB.capStudio
+              .where('did')
+              .equals(currentDID)
+              .delete();
           } catch (error) {
             console.error('Failed to clear caps from DB:', error);
           }
@@ -141,9 +144,10 @@ export const CapStudioStore = create<CapStudioState>()(
             (a: LocalCap, b: LocalCap) => b.updatedAt - a.updatedAt,
           );
 
-          set((state) => ({
-            localCaps: [...state.localCaps, ...sortedCaps],
-          }));
+          // 直接替换数据，避免重复加载
+          set({
+            localCaps: sortedCaps,
+          });
         } catch (error) {
           console.error('Failed to load caps from DB:', error);
         }
@@ -157,7 +161,10 @@ export const CapStudioStore = create<CapStudioState>()(
           if (!currentDID) return;
 
           const { localCaps } = get();
-          const capsToSave = localCaps.map(cap => ({ ...cap, did: currentDID }));
+          const capsToSave = localCaps.map((cap) => ({
+            ...cap,
+            did: currentDID,
+          }));
           await capStudioDB.capStudio.bulkPut(capsToSave);
         } catch (error) {
           console.error('Failed to save caps to DB:', error);

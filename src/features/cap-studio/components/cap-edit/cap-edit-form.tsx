@@ -38,8 +38,8 @@ const capSchema = z.object({
     .min(6, 'Name must be at least 6 characters')
     .max(20, 'Name must be at most 20 characters')
     .regex(
-      /^[a-z_-]+$/,
-      'Name must contain only lowercase letters, underscores, and dashes, no spaces',
+      /^[a-zA-Z0-9_]+$/,
+      'Name must contain only letters, numbers, and underscores',
     ),
   displayName: z
     .string()

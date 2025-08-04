@@ -14,6 +14,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from '@/shared/components/toast';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,8 +60,14 @@ export function CapCard({
     setShowDeleteDialog(false);
   };
 
-  const handleCopyId = async () => {
-    await navigator.clipboard.writeText(cap.id);
+  const handleCopyCid = async () => {
+    if (cap.cid) {
+      await navigator.clipboard.writeText(cap.cid);
+      toast({
+        type: 'success',
+        description: `Published CID copied: ${cap.cid}`,
+      });
+    }
   };
 
   const mcpServerCount = Object.keys(cap.mcpServers).length;
@@ -145,10 +152,12 @@ export function CapCard({
                     Update
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem onClick={handleCopyId}>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy Full ID
-                </DropdownMenuItem>
+                {cap.status === 'submitted' && cap.cid && (
+                  <DropdownMenuItem onClick={handleCopyCid}>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Published CID
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => setShowDeleteDialog(true)}
