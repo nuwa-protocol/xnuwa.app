@@ -23,7 +23,7 @@ import {
   MultiSelect,
   Textarea,
 } from '@/shared/components/ui';
-import type { McpServerConfig, Prompt } from '@/shared/types/cap';
+import type { McpServerConfig } from '@/shared/types/cap';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { ModelSelectorDialog } from '../model-selector';
@@ -60,7 +60,7 @@ type CapFormData = z.infer<typeof capSchema>;
 
 interface CapEditFormProps {
   editingCap?: LocalCap;
-  onSave?: (cap: LocalCap) => void;
+  onSave?: () => void;
   onCancel?: () => void;
 }
 
@@ -85,8 +85,14 @@ export function CapEditForm({
       description: editingCap?.description || '',
       tags: editingCap?.tags || [],
       prompt: {
-        value: typeof editingCap?.prompt === 'string' ? editingCap.prompt : editingCap?.prompt?.value || '',
-        suggestions: typeof editingCap?.prompt === 'object' ? editingCap.prompt.suggestions : [],
+        value:
+          typeof editingCap?.prompt === 'string'
+            ? editingCap.prompt
+            : editingCap?.prompt?.value || '',
+        suggestions:
+          typeof editingCap?.prompt === 'object'
+            ? editingCap.prompt.suggestions
+            : [],
       },
     },
   });
@@ -131,23 +137,15 @@ export function CapEditForm({
           mcpServers,
         });
 
-        const updatedCap = {
-          ...editingCap,
-          ...data,
-          model: selectedModel,
-          mcpServers,
-          updatedAt: Date.now(),
-        };
-
         toast({
           type: 'success',
           description: `${data.displayName} has been updated successfully`,
         });
 
-        onSave?.(updatedCap);
+        onSave?.();
       } else {
         // Create new cap
-        const newCap = createCap({
+        createCap({
           name: data.name,
           displayName: data.displayName,
           description: data.description,
@@ -163,7 +161,7 @@ export function CapEditForm({
           description: `${data.displayName} has been created successfully`,
         });
 
-        onSave?.(newCap);
+        onSave?.();
       }
     } catch (error) {
       toast({
@@ -360,9 +358,11 @@ export function CapEditForm({
                     <FormControl>
                       <PromptEditor
                         value={field.value.value}
-                        onChange={(value) => field.onChange({ ...field.value, value })}
+                        onChange={(value) =>
+                          field.onChange({ ...field.value, value })
+                        }
                         suggestions={field.value.suggestions || []}
-                        onSuggestionsChange={(suggestions) => 
+                        onSuggestionsChange={(suggestions) =>
                           field.onChange({ ...field.value, suggestions })
                         }
                         placeholder="Enter your prompt instructions here..."
