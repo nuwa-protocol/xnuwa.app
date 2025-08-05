@@ -44,6 +44,17 @@ export function Submit() {
     thumbnailFile: File | null,
   ) => {
     try {
+      // Convert thumbnail file to base64 if provided
+      let thumbnailBase64: string | undefined;
+      if (thumbnailFile) {
+        thumbnailBase64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(thumbnailFile);
+        });
+      }
+
       const capWithSubmitFormData = {
         ...cap.capData,
         metadata: {
@@ -51,9 +62,7 @@ export function Submit() {
           author: submitFormData.author,
           homepage: submitFormData.homepage || undefined,
           repository: submitFormData.repository || undefined,
-          thumbnail: thumbnailFile
-            ? URL.createObjectURL(thumbnailFile)
-            : undefined,
+          thumbnail: thumbnailBase64,
         },
       };
 

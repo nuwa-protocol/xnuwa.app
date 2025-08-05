@@ -1,8 +1,14 @@
-import { MoreHorizontalIcon, TrashIcon, EditIcon, PinIcon, PinOffIcon } from 'lucide-react';
+import {
+  EditIcon,
+  MoreHorizontalIcon,
+  PinIcon,
+  PinOffIcon,
+  TrashIcon,
+} from 'lucide-react';
 import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ChatSession } from '@/features/chat/types';
 import { RenameDialog } from '@/features/chat/components/rename-dialog';
+import type { ChatSession } from '@/features/chat/types';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,10 +64,8 @@ const PureChatItem = ({
 
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild isActive={isActive}>
-        <button type="button" onClick={handleChatSelect}>
-          <span>{chat.title}</span>
-        </button>
+      <SidebarMenuButton isActive={isActive} onClick={handleChatSelect}>
+        <span>{chat.title}</span>
       </SidebarMenuButton>
 
       <DropdownMenu
@@ -90,14 +94,11 @@ const PureChatItem = ({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end">
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onSelect={handleRename}
-          >
+          <DropdownMenuItem className="cursor-pointer" onSelect={handleRename}>
             <EditIcon />
             <span>{t('actions.rename')}</span>
           </DropdownMenuItem>
-          
+
           <DropdownMenuItem
             className="cursor-pointer"
             onSelect={handleTogglePin}
@@ -105,9 +106,9 @@ const PureChatItem = ({
             {chat.pinned ? <PinOffIcon /> : <PinIcon />}
             <span>{chat.pinned ? t('actions.unpin') : t('actions.pin')}</span>
           </DropdownMenuItem>
-          
+
           <DropdownMenuSeparator />
-          
+
           <DropdownMenuItem
             className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive dark:text-red-500"
             onSelect={() => onDelete(chat.id)}

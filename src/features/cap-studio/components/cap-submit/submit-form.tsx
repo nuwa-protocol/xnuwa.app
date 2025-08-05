@@ -1,39 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  AlertCircle,
-  CheckCircle2,
-  FileText,
-  Image as ImageIcon,
-  Loader2,
-  Upload,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { toast } from 'sonner';
-import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Input,
-} from '@/shared/components/ui';
+import { z } from 'zod';
+import { Button, Card, CardContent, Form } from '@/shared/components/ui';
 import type { LocalCap } from '../../types';
-import { DashboardGrid } from '../layout/dashboard-layout';
+import { AuthorForm } from './author-form';
+import { CapInformation } from './cap-information';
+import { SubmissionConfirmationDialog } from './submission-confirmation-dialog';
+import { ThumbnailUpload } from './thumbnail-upload';
 
 const submitSchema = z.object({
   author: z.string().min(1, 'Author name is required'),
@@ -78,20 +54,6 @@ export function SubmitForm({
 
   const watchedData = form.watch();
 
-  const handleThumbnailUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        // 2MB limit
-        toast.error('Thumbnail must be under 2MB');
-        return;
-      }
-      setThumbnailFile(file);
-    }
-  };
-
   const handleFormSubmit = async () => {
     // Trigger validation and show errors
     const isValid = await form.trigger();
@@ -125,6 +87,10 @@ export function SubmitForm({
     }
   };
 
+  const handleFieldChange = (fieldName: keyof SubmitFormData) => {
+    form.trigger(fieldName);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -151,215 +117,20 @@ export function SubmitForm({
           }}
           className="space-y-6"
         >
-          <DashboardGrid cols={1}>
-            {/* Cap Information - Read Only */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Cap Information</CardTitle>
-                <CardDescription>
-                  Basic information about your cap (read-only)
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground">
-                      Name
-                    </div>
-                    <p className="text-sm">{cap.capData.idName}</p>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground">
-                      Display Name
-                    </div>
-                    <p className="text-sm">
-                      {cap.capData.metadata.displayName}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">
-                    Description
-                  </div>
-                  <p className="text-sm">{cap.capData.metadata.description}</p>
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">
-                    Tags
-                  </div>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {cap.capData.metadata.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground">
-                      Model
-                    </div>
-                    <p className="text-sm">{cap.capData.core.model.name}</p>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground">
-                      MCP Servers
-                    </div>
-                    <p className="text-sm">
-                      {Object.keys(cap.capData.core.mcpServers).length > 0
-                        ? Object.keys(cap.capData.core.mcpServers).join(', ')
-                        : 'None'}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Cap Information - Read Only */}
+          <CapInformation cap={cap} />
 
-            {/* Author */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Author</CardTitle>
-                <CardDescription>
-                  Information about the cap author and licensing
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="author"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Author Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your Name"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            form.trigger('author');
-                          }}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Your name or organization name
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="homepage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Homepage (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://example.com"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            form.trigger('homepage');
-                          }}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Link to your cap's homepage or documentation
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="repository"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Repository (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://github.com/user/repo"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            form.trigger('repository');
-                          }}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Link to the source code repository
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-          </DashboardGrid>
+          {/* Author */}
+          <AuthorForm
+            control={form.control}
+            onFieldChange={handleFieldChange}
+          />
 
           {/* Thumbnail Upload */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Thumbnail</CardTitle>
-              <CardDescription>
-                Upload thumbnail to represent your cap
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <div className="flex items-center space-x-4">
-                  {thumbnailFile ? (
-                    <div className="relative w-24 h-24 rounded-lg border overflow-hidden">
-                      <img
-                        src={URL.createObjectURL(thumbnailFile)}
-                        alt="Thumbnail"
-                        className="w-full h-full object-cover"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-1 right-1 h-6 w-6 p-0"
-                        onClick={() => setThumbnailFile(null)}
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="w-24 h-24 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center">
-                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div>
-                    <Input
-                      id={`thumbnail-upload-${Math.random()}`}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleThumbnailUpload}
-                      className="hidden"
-                    />
-                    <label htmlFor="thumbnail-upload">
-                      <Button type="button" variant="outline" size="sm" asChild>
-                        <span>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Upload
-                        </span>
-                      </Button>
-                    </label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      PNG, JPG up to 2MB. 400x400px. <br />
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <ThumbnailUpload
+            thumbnailFile={thumbnailFile}
+            onFileChange={setThumbnailFile}
+          />
 
           {/* Submit */}
           <Card className="border-none shadow-none">
@@ -413,117 +184,16 @@ export function SubmitForm({
         </form>
       </Form>
 
-      {/* Confirmation Dialog */}
-      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Confirm Submission</DialogTitle>
-            <DialogDescription>
-              Please review your cap information before submitting to the store
-            </DialogDescription>
-          </DialogHeader>
-          <CapStorePreview
-            data={watchedData}
-            cap={cap}
-            thumbnail={thumbnailFile}
-          />
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowConfirmDialog(false)}
-              disabled={isSubmitting}
-            >
-              Go Back
-            </Button>
-            <Button onClick={handleConfirmedSubmit} disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Confirm Submit
-                </>
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-interface CapStorePreviewProps {
-  data: SubmitFormData;
-  cap: LocalCap;
-  thumbnail?: File | null;
-}
-
-function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start space-x-4">
-        {thumbnail ? (
-          <img
-            src={URL.createObjectURL(thumbnail)}
-            alt="Thumbnail"
-            className="w-16 h-16 rounded-lg object-cover"
-          />
-        ) : (
-          <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-            <FileText className="h-8 w-8 text-primary" />
-          </div>
-        )}
-        <div className="flex-1">
-          <h3 className="text-xl font-bold">
-            {cap.capData.metadata.displayName || 'Untitled Cap'}
-          </h3>
-          <p className="text-muted-foreground">
-            by {data.author || 'Unknown Author'}
-          </p>
-        </div>
-      </div>
-
-      {/* Description */}
-      <div>
-        <h4 className="font-semibold mb-2">Description</h4>
-        <p className="text-muted-foreground">
-          {cap.capData.metadata.description || 'No description provided'}
-        </p>
-      </div>
-      {/* Links */}
-      {(data.homepage || data.repository) && (
-        <div>
-          <h4 className="font-semibold mb-2">Links</h4>
-          <div className="space-y-1 text-sm">
-            {data.homepage && (
-              <div>
-                <span className="text-muted-foreground">Homepage:</span>
-                <a
-                  href={data.homepage}
-                  className="ml-2 text-primary hover:underline"
-                >
-                  {data.homepage}
-                </a>
-              </div>
-            )}
-            {data.repository && (
-              <div>
-                <span className="text-muted-foreground">Repository:</span>
-                <a
-                  href={data.repository}
-                  className="ml-2 text-primary hover:underline"
-                >
-                  {data.repository}
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <SubmissionConfirmationDialog
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        data={watchedData}
+        cap={cap}
+        thumbnail={thumbnailFile}
+        isSubmitting={isSubmitting}
+        onCancel={() => setShowConfirmDialog(false)}
+        onConfirm={handleConfirmedSubmit}
+      />
     </div>
   );
 }

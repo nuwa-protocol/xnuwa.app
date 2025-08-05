@@ -138,17 +138,10 @@ export function CapCard({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {cap.status === 'draft' ? (
-                  <DropdownMenuItem onClick={onSubmit}>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Submit
-                  </DropdownMenuItem>
-                ) : (
-                  <DropdownMenuItem onClick={onUpdate}>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Update
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem onClick={onSubmit}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Submit
+                </DropdownMenuItem>
                 {cap.status === 'submitted' && cap.cid && (
                   <DropdownMenuItem onClick={handleCopyCid}>
                     <Copy className="h-4 w-4 mr-2" />
