@@ -1,5 +1,6 @@
 import logoBasic from '@/assets/logo-basic.png';
-import { useLanguage } from '@/shared/hooks/use-language';
+import logoBasicDark from '@/assets/logo-basic-dark.png';
+import { useTheme } from '@/shared/components/theme-provider';
 
 interface LogoProps {
   size?: 'small' | 'medium' | 'large' | 'xl' | string;
@@ -7,8 +8,7 @@ interface LogoProps {
 }
 
 export function Logo({ size = 'xl', className = '' }: LogoProps) {
-  const { t } = useLanguage();
-
+  const { resolvedTheme } = useTheme();
   const getSizeClass = (size: string) => {
     switch (size) {
       case 'small':
@@ -28,7 +28,11 @@ export function Logo({ size = 'xl', className = '' }: LogoProps) {
     <div
       className={`flex flex-row gap-3 items-center text-lg font-semibold px-2 rounded-md ${className}`}
     >
-      <img src={logoBasic} alt="logo" className={getSizeClass(size)} />
+      {resolvedTheme === 'dark' ? (
+        <img src={logoBasicDark} alt="logo" className={getSizeClass(size)} />
+      ) : (
+        <img src={logoBasic} alt="logo" className={getSizeClass(size)} />
+      )}
     </div>
   );
 }

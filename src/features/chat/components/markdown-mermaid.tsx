@@ -1,4 +1,4 @@
-import mermaid from "mermaid";
+import mermaid from 'mermaid';
 import React, { useEffect, useId, useState } from 'react';
 
 interface MermaidCodeProps {
@@ -6,14 +6,16 @@ interface MermaidCodeProps {
   className?: string;
 }
 
-export const MermaidCode: React.FC<MermaidCodeProps> = ({ code, className }) => {
+export const MermaidCode: React.FC<MermaidCodeProps> = ({
+  code,
+  className,
+}) => {
   // Use React's built-in ID generator
   const uniqueId = useId().replace(/:/g, '-');
   const [showRaw, setShowRaw] = useState(false);
   const [renderedSvg, setRenderedSvg] = useState<string>('');
   const [renderError, setRenderError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-
 
   useEffect(() => {
     mermaid.initialize({
@@ -27,13 +29,14 @@ export const MermaidCode: React.FC<MermaidCodeProps> = ({ code, className }) => 
         lineColor: '#888888',
         fontSize: '16px',
         edgeLabelBackground: '#ffffff',
-        background: 'transparent'
+        background: 'transparent',
       },
-      flowchart: { 
+      flowchart: {
         curve: 'basis',
-        diagramPadding: 8
+        diagramPadding: 8,
       },
-      themeCSS: '.mermaid { font-family: "Patrick Hand", "Comic Sans MS", cursive; background-color: transparent !important; } .mermaid svg { display: block; margin: 0 auto; }',
+      themeCSS:
+        '.mermaid { font-family: "Patrick Hand", "Comic Sans MS", cursive; background-color: transparent !important; } .mermaid svg { display: block; margin: 0 auto; }',
       deterministicIds: false, // required for handDrawn
       htmlLabels: true,
       look: 'handDrawn',
@@ -53,10 +56,10 @@ export const MermaidCode: React.FC<MermaidCodeProps> = ({ code, className }) => 
     // Set loading state
     setIsLoading(true);
     setRenderError('');
-    
+
     // Create a unique ID for this render
     const diagramId = `mermaid-${uniqueId}-${Date.now()}`;
-    
+
     // Direct rendering approach
     const renderDiagram = async () => {
       try {
@@ -65,32 +68,33 @@ export const MermaidCode: React.FC<MermaidCodeProps> = ({ code, className }) => 
         tempContainer.id = diagramId;
         tempContainer.style.visibility = 'hidden';
         document.body.appendChild(tempContainer);
-        
+
         // Add the mermaid code to the container
         tempContainer.textContent = code;
-        
+
         // Render it
         const { svg } = await mermaid.render(diagramId, code);
-        
+
         // Update state with the result
         setRenderedSvg(svg);
         setRenderError('');
-        
+
         // Cleanup
         if (document.body.contains(tempContainer)) {
           document.body.removeChild(tempContainer);
         }
       } catch (error) {
-        setRenderError(`Rendering error: ${(error as Error).message || 'Unknown error'}`);
+        setRenderError(
+          `Rendering error: ${(error as Error).message || 'Unknown error'}`,
+        );
         setRenderedSvg('');
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     // Run the render
     renderDiagram();
-    
   }, [code, showRaw, uniqueId]);
 
   return (
@@ -100,16 +104,18 @@ export const MermaidCode: React.FC<MermaidCodeProps> = ({ code, className }) => 
           <code>{code}</code>
         </pre>
       ) : (
-        <div 
+        <div
           className={`mermaid-container flex justify-center ${isLoading ? 'opacity-50' : ''}`}
-          dangerouslySetInnerHTML={{ 
-            __html: renderedSvg || (renderError 
-              ? `<div class="text-red-500 p-2">${renderError}</div>` 
-              : '<div class="flex justify-center p-4">Loading diagram...</div>') 
-          }} 
+          dangerouslySetInnerHTML={{
+            __html:
+              renderedSvg ||
+              (renderError
+                ? `<div class="text-red-500 p-2">${renderError}</div>`
+                : '<div class="flex justify-center p-4">Loading diagram...</div>'),
+          }}
         />
       )}
-      <button 
+      <button
         onClick={() => setShowRaw(!showRaw)}
         className="absolute bottom-2 right-2 px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
         type="button"
@@ -118,4 +124,4 @@ export const MermaidCode: React.FC<MermaidCodeProps> = ({ code, className }) => 
       </button>
     </div>
   );
-}; 
+};

@@ -19,7 +19,7 @@ import { SidebarButton } from './sidebar-button';
 import { SidebarHistory } from './sidebar-history';
 import { SidebarToggle } from './sidebar-toggle';
 
-export function MainContent() {
+export function AppSidebarContent() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { setOpenMobile } = useSidebar();
@@ -75,9 +75,11 @@ export function MainContent() {
   return (
     <Sidebar
       className={cn(
-        'group-data-[side=left]:border-r-0 min-w-[250px]',
+        'group-data-[side=left]:border-r-0',
         // Add smooth transition animations
         'transition-all duration-300 ease-in-out',
+        // Custom padding for floating mode
+        sidebarMode === 'floating' && '[&>div:last-child]:ml-2',
       )}
       variant={sidebarVariant}
       onMouseEnter={handleMouseEnter}

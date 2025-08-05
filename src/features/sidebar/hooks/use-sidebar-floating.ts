@@ -4,13 +4,19 @@ import { useSidebarStore } from '../stores';
 export const useSidebarFloating = () => {
   const { collapsed, mode, setCollapsed, setMode } = useSidebarStore();
 
-  const setSidebarCollapsed = useCallback((collapsed: boolean) => {
-    setCollapsed(collapsed);
-  }, [setCollapsed]);
+  const setSidebarCollapsed = useCallback(
+    (collapsed: boolean) => {
+      setCollapsed(collapsed);
+    },
+    [setCollapsed],
+  );
 
-  const setSidebarMode = useCallback((mode: 'pinned' | 'floating') => {
-    setMode(mode);
-  }, [setMode]);
+  const setSidebarMode = useCallback(
+    (mode: 'pinned' | 'floating') => {
+      setMode(mode);
+    },
+    [setMode],
+  );
 
   return {
     collapsed,

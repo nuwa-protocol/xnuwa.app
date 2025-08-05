@@ -81,7 +81,7 @@ export function MessageEditor({
             // Delete trailing messages using client store
             if (message.createdAt) {
               const messageTime = new Date(message.createdAt).getTime();
-              deleteMessagesAfterTimestamp(chatId,messageTime);
+              deleteMessagesAfterTimestamp(chatId, messageTime);
             }
 
             // @ts-expect-error todo: support UIMessage in setMessages

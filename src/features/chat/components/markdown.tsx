@@ -4,7 +4,7 @@ import { useTheme } from '@/shared/components/theme-provider';
 import './markdown.css';
 import React, { ReactNode } from 'react';
 import { getCodeString } from 'rehype-rewrite';
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize from 'rehype-sanitize';
 import { MermaidCode } from './markdown-mermaid';
 
 interface CodeProps {
@@ -17,12 +17,20 @@ interface CodeProps {
   [key: string]: any;
 }
 
-const Code: React.FC<CodeProps> = ({ inline, children = [], className, ...props }) => {
-  const isMermaid = className && /^language-mermaid/.test(className.toLocaleLowerCase());
+const Code: React.FC<CodeProps> = ({
+  inline,
+  children = [],
+  className,
+  ...props
+}) => {
+  const isMermaid =
+    className && /^language-mermaid/.test(className.toLocaleLowerCase());
   // original code component
-  const code: string = props.node?.children 
-    ? getCodeString(props.node.children) 
-    : (Array.isArray(children) && children[0] ? String(children[0]) : '');
+  const code: string = props.node?.children
+    ? getCodeString(props.node.children)
+    : Array.isArray(children) && children[0]
+      ? String(children[0])
+      : '';
 
   if (isMermaid) {
     return <MermaidCode code={code} className={className} />;

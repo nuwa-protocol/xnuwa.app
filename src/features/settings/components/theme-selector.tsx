@@ -1,6 +1,13 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/shared/components/theme-provider';
-import { Tabs, TabsList, TabsTrigger, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
 
 export function ThemeSelector() {
@@ -11,7 +18,9 @@ export function ThemeSelector() {
     <div className="flex items-center justify-between">
       <div>
         <h3 className="text-sm font-medium">{t('nav.menu.theme')}</h3>
-        <p className="text-sm text-muted-foreground">Choose your preferred theme</p>
+        <p className="text-sm text-muted-foreground">
+          Choose your preferred theme
+        </p>
       </div>
       <Tabs
         value={theme}

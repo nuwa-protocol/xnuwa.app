@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthHandler } from '@/features/auth/hooks/use-auth-handler';
 import { Logo } from '@/shared/components/logo';
@@ -15,41 +15,41 @@ export default function CallbackPage() {
 
   const processedRef = useRef(false);
 
-  // useEffect(() => {
-  //   if (processedRef.current) {
-  //     return;
-  //   }
+  useEffect(() => {
+    if (processedRef.current) {
+      return;
+    }
 
-  //   processedRef.current = true;
+    processedRef.current = true;
 
-  //   const process = async () => {
-  //     try {
-  //       await handleCallback(window.location.search);
+    const process = async () => {
+      try {
+        await handleCallback(window.location.search);
 
-  //       setStatus('success');
-  //       setMessage('Authorization successful!');
+        setStatus('success');
+        setMessage('Authorization successful!');
 
-  //       if (window.opener) {
-  //         window.opener.postMessage({ type: 'nuwa-auth-success' }, '*');
-  //         setTimeout(() => window.close(), 1500);
-  //       } else {
-  //         // small delay to let provider autoConnect pick up
-  //         setTimeout(() => navigate('/'), 500);
-  //       }
-  //     } catch (err) {
-  //       console.error('DID callback error:', err);
-  //       setStatus('error');
-  //       setMessage(
-  //         err instanceof Error
-  //           ? err.message
-  //           : 'Failed to process authorization.',
-  //       );
-  //       setTimeout(() => navigate('/login'), 2000);
-  //     }
-  //   };
+        if (window.opener) {
+          window.opener.postMessage({ type: 'nuwa-auth-success' }, '*');
+          setTimeout(() => window.close(), 1500);
+        } else {
+          // small delay to let provider autoConnect pick up
+          setTimeout(() => navigate('/'), 500);
+        }
+      } catch (err) {
+        console.error('DID callback error:', err);
+        setStatus('error');
+        setMessage(
+          err instanceof Error
+            ? err.message
+            : 'Failed to process authorization.',
+        );
+        setTimeout(() => navigate('/login'), 2000);
+      }
+    };
 
-  //   process();
-  // }, [navigate, handleCallback]);
+    process();
+  }, [navigate, handleCallback]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-fuchsia-100 p-4">

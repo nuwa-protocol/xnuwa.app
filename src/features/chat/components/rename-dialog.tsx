@@ -70,7 +70,10 @@ export function RenameDialog({
             <Button type="button" variant="outline" onClick={handleCancel}>
               {t('actions.cancel')}
             </Button>
-            <Button type="submit" disabled={!name.trim() || name.trim() === currentName}>
+            <Button
+              type="submit"
+              disabled={!name.trim() || name.trim() === currentName}
+            >
               {t('actions.confirm')}
             </Button>
           </DialogFooter>

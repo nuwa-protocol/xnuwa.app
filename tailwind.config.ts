@@ -89,6 +89,13 @@ const config: Config = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        theme: {
+          primary: 'hsl(var(--theme-primary))',
+          secondary: 'hsl(var(--theme-secondary))',
+          accent: 'hsl(var(--theme-accent))',
+          muted: 'hsl(var(--theme-muted))',
+          subtle: 'hsl(var(--theme-subtle))',
+        },
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
           foreground: 'hsl(var(--sidebar-foreground))',
@@ -98,6 +105,8 @@ const config: Config = {
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
+          glass: 'hsl(var(--sidebar-glass))',
+          shadow: 'hsl(var(--sidebar-shadow))',
         },
       },
       keyframes: {

@@ -10,7 +10,7 @@ import {
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
 import { SidebarInset, SidebarProvider } from '@/shared/components/ui';
 import { cn } from '@/shared/utils';
-import { MainContent } from './main-content';
+import { AppSidebarContent } from './app-sidebar-content';
 
 // Context for managing sidebar hover state
 const AppSidebarContext = createContext<{
@@ -24,9 +24,7 @@ export const useAppSidebar = () => {
   const context = useContext(AppSidebarContext);
 
   if (!context) {
-    throw new Error(
-      'useAppSidebar must be used within AppSidebarProvider',
-    );
+    throw new Error('useAppSidebar must be used within AppSidebarProvider');
   }
   return context;
 };
@@ -49,7 +47,12 @@ const ContentWrapper = memo(
               '', // Normal layout in pinned mode
         )}
       >
-        <div className={'h-full transition-all duration-300 ease-in-out'}>
+        <div
+          className={cn(
+            'h-full transition-all duration-300 ease-in-out',
+            'relative',
+          )}
+        >
           {children}
         </div>
       </SidebarInset>
@@ -86,10 +89,10 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
             'transition-all duration-300 ease-in-out', // Smooth transition for position changes
             isFloating
               ? 'fixed inset-y-0 left-0 z-50 w-0' // No width, positioned absolutely
-              : 'relative w-64', // Normal layout flow
+              : 'relative', // Normal layout flow
           )}
         >
-          <MainContent />
+          <AppSidebarContent />
         </div>
 
         {/* Main content area - memoized to prevent re-renders */}
@@ -99,9 +102,7 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
   );
 }
 
-export function SidebarLayout({
-  children,
-}: SidebarLayoutProps) {
+export function SidebarLayout({ children }: SidebarLayoutProps) {
   const [isHovering, setIsHovering] = useState(false);
   const [isStaying, setIsStaying] = useState(false);
   const { mode: sidebarMode } = useSidebarFloating();

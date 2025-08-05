@@ -52,8 +52,7 @@ export function AboutSection() {
       <LogoutCard
         title={t('settings.profile.logout.title') || 'Logout'}
         description={
-          t('settings.profile.logout.description') ||
-          'Sign out of your account'
+          t('settings.profile.logout.description') || 'Sign out of your account'
         }
         buttonLabel={t('settings.profile.logout.button') || 'Logout'}
         onClick={handleLogout}

@@ -20,5 +20,5 @@ export const llmProvider = {
   utility: () => {
     return openrouter.chat('openai/gpt-4o-mini');
   },
-  image: (modelId:string) => openai.image(modelId),
+  image: (modelId: string) => openai.image(modelId),
 };
