@@ -41,7 +41,7 @@ export function SidebarToggle() {
           </div>
         </Button>
       </TooltipTrigger>
-      <TooltipContent align="start">
+      <TooltipContent align="end">
         {isPinned ? t('nav.sidebar.toggleUnpin') : t('nav.sidebar.togglePin')}
       </TooltipContent>
     </Tooltip>

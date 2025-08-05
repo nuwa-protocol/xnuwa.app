@@ -253,7 +253,7 @@ export const ChatStateStore = create<ChatStoreState>()(
           if (!currentDID) return;
 
           const { sessions } = get();
-          const chatsToSave = Object.values(sessions).map(session => ({
+          const chatsToSave = Object.values(sessions).map((session) => ({
             ...session,
             did: currentDID,
           }));

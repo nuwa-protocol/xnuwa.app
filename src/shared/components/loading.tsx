@@ -1,4 +1,3 @@
-
 import { useLanguage } from '@/shared/hooks/use-language';
 
 export default function Loading() {

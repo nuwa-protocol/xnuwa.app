@@ -1,4 +1,3 @@
-
 export interface BalanceData {
   nuwaTokens: number;
   usdRate: number; // USD value per NUWA token
@@ -47,9 +46,7 @@ export const accountApi = {
         type: 'debit',
         amount: 763,
         description: 'Chat session with GPT-4',
-        timestamp: new Date(
-          Date.now() - 2 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
+        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         status: 'completed',
       },
       {
@@ -57,9 +54,7 @@ export const accountApi = {
         type: 'credit',
         amount: 500,
         description: 'Weekly $NUWA bonus',
-        timestamp: new Date(
-          Date.now() - 7 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
+        timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         status: 'completed',
       },
       {

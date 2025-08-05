@@ -1,4 +1,4 @@
-import { ArrowRight, Loader2, Shield } from 'lucide-react';
+import { KeyRound, Loader2 } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useAuthHandler } from '@/features/auth/hooks/use-auth-handler';
 import { Button } from '@/shared/components/ui/button';
@@ -28,9 +28,8 @@ export function ConnectButton() {
           </>
         ) : (
           <>
-            <Shield className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
             Sign in with DID
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
+            <KeyRound className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
           </>
         )}
       </Button>

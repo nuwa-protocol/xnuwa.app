@@ -30,15 +30,19 @@ export function SidebarButton({
         'inline-flex items-center rounded-md text-sm transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
         isPrimary && [
-          'bg-white hover:bg-gray-100 shadow-sm border border-gray-200 h-8 px-4',
-          'justify-center relative',
-          'dark:bg-black dark:hover:bg-gray-800 dark:border-gray-700',
+          'bg-gradient-to-r from-theme-primary to-theme-primary/90 hover:from-theme-primary/90 hover:to-theme-primary/80',
+          'text-white shadow-lg shadow-theme-primary/25 border border-theme-primary/20 h-8 px-4',
+          'justify-center relative font-medium',
+          'hover:shadow-xl hover:shadow-theme-primary/30 hover:scale-[1.02]',
+          'transition-all duration-200 ease-out',
         ],
         !isPrimary && [
-          'justify-start py-1.5 px-2 text-gray-700 hover:bg-gray-100',
-          'dark:text-gray-200 dark:hover:bg-gray-800',
+          'justify-start py-1.5 px-2 text-sidebar-foreground',
+          'hover:bg-theme-subtle hover:text-theme-primary',
+          'active:bg-theme-muted',
+          'transition-all duration-150 ease-out',
         ],
-        active && 'bg-gray-100 dark:bg-gray-800',
+        active && 'bg-theme-accent text-theme-primary',
         className,
       )}
     >
@@ -49,10 +53,14 @@ export function SidebarButton({
         {text}
       </span>
       {shortcut && (
-        <kbd className={cn(
-          "text-xs font-mono px-1.5 py-0.5 rounded border",
-          isPrimary ? "absolute right-2 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700" : "ml-auto text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800"
-        )}>
+        <kbd
+          className={cn(
+            'text-xs font-mono px-1.5 py-0.5 rounded border transition-colors',
+            isPrimary
+              ? 'absolute right-2 text-white/70 bg-white/10 border-white/20 backdrop-blur-sm'
+              : 'ml-auto text-sidebar-foreground/60 bg-theme-subtle border-theme-muted',
+          )}
+        >
           {shortcut}
         </kbd>
       )}

@@ -9,16 +9,17 @@ export function LanguageSelector() {
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h3 className="text-sm font-medium">{t('settings.system.language.title') || 'Language'}</h3>
+        <h3 className="text-sm font-medium">
+          {t('settings.system.language.title') || 'Language'}
+        </h3>
         <p className="text-sm text-muted-foreground">
-          {t('settings.system.language.description') || 'Select your preferred language.'}
+          {t('settings.system.language.description') ||
+            'Select your preferred language.'}
         </p>
       </div>
       <Tabs
         value={settings.language}
-        onValueChange={(value) =>
-          setSetting('language', value as 'en' | 'cn')
-        }
+        onValueChange={(value) => setSetting('language', value as 'en' | 'cn')}
       >
         <TabsList className="h-8 bg-muted p-1 rounded-xl border border-muted-foreground/10">
           <TabsTrigger

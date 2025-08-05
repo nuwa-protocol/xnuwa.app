@@ -53,7 +53,6 @@ const PurePreviewMessage = ({
               'min-h-96': message.role === 'assistant' && requiresScrollPadding,
             })}
           >
-
             {/* render reasoning */}
             {message.parts?.map((part, index) => {
               if (part.type !== 'reasoning') return null;
