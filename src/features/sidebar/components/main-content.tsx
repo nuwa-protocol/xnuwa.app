@@ -87,7 +87,7 @@ export function MainContent() {
         <SidebarMenu>
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
-              <Logo />
+              <Logo size="medium" />
               <SidebarToggle />
             </div>
             <SidebarButton
