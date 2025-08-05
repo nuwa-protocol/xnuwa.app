@@ -2,10 +2,10 @@
 // Central export for all cap-dev stores
 
 import { create } from 'zustand';
-import type { Model } from '@/shared/types';
+import type { CapModel } from '@/shared/types/cap';
 import { fetchModels } from '../services';
 
-export const DefaultModel: Model = {
+export const DefaultModel: CapModel = {
   id: 'openai/gpt-4o-mini',
   name: ' GPT-4o-mini',
   slug: 'gpt-4o-mini',
@@ -44,11 +44,11 @@ export const DefaultModel: Model = {
 // model store state interface
 interface ModelStateStoreState {
   // model selection state
-  selectedModel: Model;
-  setSelectedModel: (model: Model) => void;
+  selectedModel: CapModel;
+  setSelectedModel: (model: CapModel) => void;
 
   // available models state
-  availableModels: Model[] | null;
+  availableModels: CapModel[] | null;
   isLoadingModels: boolean;
   modelsError: Error | null;
   fetchAvailableModels: () => Promise<void>;
@@ -64,7 +64,7 @@ export const ModelStateStore = create<ModelStateStoreState>()((set, get) => ({
   isLoadingModels: false,
   modelsError: null,
 
-  setSelectedModel: (model: Model) => {
+  setSelectedModel: (model: CapModel) => {
     set({ selectedModel: model });
   },
 

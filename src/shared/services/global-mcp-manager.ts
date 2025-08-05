@@ -1,5 +1,5 @@
-import type { CurrentCap } from '@/shared/stores/current-cap-store';
 import { createNuwaMCPClient } from '@/shared/services/mcp-client';
+import type { Cap } from '@/shared/types/cap';
 
 interface MCPInstance {
   clients: Map<string, any>;
@@ -21,20 +21,24 @@ class GlobalMCPManager {
     return GlobalMCPManager.instance;
   }
 
-  async initializeForCap(cap: CurrentCap): Promise<Record<string, any>> {
+  async initializeForCap(cap: Cap): Promise<Record<string, any>> {
     // If already initialized for this cap, return existing tools
-    if (this.currentMCPInstance && this.currentCapId === cap.id && this.currentMCPInstance.initialized) {
+    if (
+      this.currentMCPInstance &&
+      this.currentCapId === cap.idName &&
+      this.currentMCPInstance.initialized
+    ) {
       return this.currentMCPInstance.tools;
     }
 
     // Clean up existing instance if switching caps
-    if (this.currentMCPInstance && this.currentCapId !== cap.id) {
+    if (this.currentMCPInstance && this.currentCapId !== cap.idName) {
       await this.cleanup();
     }
 
     // Initialize new MCP instance for the cap
     const clients = new Map<string, any>();
-    const mcpServers = cap.mcpServers || {};
+    const mcpServers = cap.core.mcpServers || {};
 
     // Initialize all MCP clients
     for (const [serverName, serverConfig] of Object.entries(mcpServers)) {
@@ -78,7 +82,7 @@ class GlobalMCPManager {
       tools: allTools,
       initialized: true,
     };
-    this.currentCapId = cap.id;
+    this.currentCapId = cap.idName;
 
     return allTools;
   }
@@ -86,7 +90,10 @@ class GlobalMCPManager {
   async cleanup(): Promise<void> {
     if (this.currentMCPInstance?.initialized) {
       try {
-        for (const [serverName, client] of this.currentMCPInstance.clients.entries()) {
+        for (const [
+          serverName,
+          client,
+        ] of this.currentMCPInstance.clients.entries()) {
           try {
             await client.close();
           } catch (error) {
@@ -97,7 +104,7 @@ class GlobalMCPManager {
         console.warn('Error closing MCP connections:', error);
       }
     }
-    
+
     this.currentMCPInstance = null;
     this.currentCapId = null;
   }

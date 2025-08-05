@@ -1,10 +1,10 @@
-import type { Model } from '@/shared/types';
+import type { CapModel } from '@/shared/types/cap';
 
-export function getModelName(model: Model): string {
+export function getModelName(model: CapModel): string {
   return model.name;
 }
 
-export function getProviderName(model: Model): string {
+export function getProviderName(model: CapModel): string {
   return model.providerName;
 }
 
@@ -14,7 +14,7 @@ export interface Provider {
   count: number;
 }
 
-export function generateProviders(models: Model[]): {
+export function generateProviders(models: CapModel[]): {
   providers: Provider[];
 } {
   const providerMap = new Map<string, { name: string; count: number }>();

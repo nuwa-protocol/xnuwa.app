@@ -52,7 +52,7 @@ function TransactionRow({
           </span>
         </div>
         <p className="text-sm text-muted-foreground">
-          {formatDate(transaction.timestamp)}
+          {formatDate(transaction.timestamp.toString())}
         </p>
       </div>
       <div className={`font-semibold ${amountColor}`}>

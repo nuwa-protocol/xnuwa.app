@@ -87,17 +87,11 @@ export function useRemoteCap({
         params.searchQuery,
       );
 
-      console.log('response', response);
-
       const remoteCaps: Cap[] = await Promise.all(
         response.data.items.map(async (item) => {
           const capData = await capKit.downloadCap(item.cid, 'utf8');
 
-          console.log('capData', capData);
-
           const capContent: any = yaml.load(capData.data.fileData);
-
-          console.log('capContent', capContent);
 
           return {
             idName: capContent.idName,
@@ -115,8 +109,6 @@ export function useRemoteCap({
         hasMore: response.data.page < response.data.totalPages,
         page: params.page || page,
       }));
-
-      console.log('response', response);
 
       return response;
     } catch (err) {

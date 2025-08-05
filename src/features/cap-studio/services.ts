@@ -1,5 +1,5 @@
 import { createAuthorizedFetch } from '@/shared/services/authorized-fetch';
-import type { Model } from '@/shared/types';
+import type { CapModel } from '@/shared/types/cap';
 import type {
   OpenRouterAPIResponse,
   OpenRouterModel,
@@ -51,7 +51,7 @@ function parseModelInfo(model: OpenRouterModel) {
   };
 }
 
-export async function fetchModels(): Promise<Model[]> {
+export async function fetchModels(): Promise<CapModel[]> {
   const openRouterModels = await modelFetch();
 
   return openRouterModels.data
