@@ -13,7 +13,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from '@/shared/components';
+import { toast } from 'sonner';
 import {
   Badge,
   Button,
@@ -260,10 +260,7 @@ export function McpDebugPanel({
         data: { result },
       });
 
-      toast({
-        type: 'success',
-        description: `${selectedTool} completed successfully`,
-      });
+      toast.success(`${selectedTool} completed successfully`);
     } catch (err) {
       onLog({
         type: 'error',
@@ -271,10 +268,7 @@ export function McpDebugPanel({
         data: { tool: selectedTool, error: err },
       });
 
-      toast({
-        type: 'error',
-        description: String(err),
-      });
+      toast.error(String(err));
     }
   };
 
@@ -312,10 +306,7 @@ export function McpDebugPanel({
         data: { result },
       });
 
-      toast({
-        type: 'success',
-        description: `${promptName} completed successfully`,
-      });
+      toast.success(`${promptName} completed successfully`);
     } catch (err) {
       onLog({
         type: 'error',
@@ -323,10 +314,7 @@ export function McpDebugPanel({
         data: { prompt: promptName, error: err },
       });
 
-      toast({
-        type: 'error',
-        description: String(err),
-      });
+      toast.error(String(err));
     }
   };
 
@@ -357,10 +345,7 @@ export function McpDebugPanel({
         data: { result },
       });
 
-      toast({
-        type: 'success',
-        description: `${resourceUri} read successfully`,
-      });
+      toast.success(`${resourceUri} read successfully`);
     } catch (err) {
       onLog({
         type: 'error',
@@ -368,10 +353,7 @@ export function McpDebugPanel({
         data: { resource: resourceUri, error: err },
       });
 
-      toast({
-        type: 'error',
-        description: String(err),
-      });
+      toast.error(String(err));
     }
   };
 
@@ -381,15 +363,9 @@ export function McpDebugPanel({
 
     try {
       await navigator.clipboard.writeText(safeStringify(result.result));
-      toast({
-        type: 'success',
-        description: 'Execution result copied to clipboard',
-      });
+      toast.success('Execution result copied to clipboard');
     } catch (error) {
-      toast({
-        type: 'error',
-        description: 'Failed to copy result to clipboard',
-      });
+      toast.error('Failed to copy result to clipboard');
     }
   };
 

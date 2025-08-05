@@ -22,7 +22,7 @@ import {
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
 import { useScrollToBottom } from '@/features/chat/hooks/use-scroll-to-bottom';
-import { toast } from '@/shared/components';
+import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
@@ -102,10 +102,7 @@ function PureMultimodalInput({
       Object.keys(currentCap.core.mcpServers).length > 0;
 
     if (hasMCPServers && !isCurrentCapMCPInitialized) {
-      toast({
-        type: 'error',
-        description: 'Cap MCP is initializing...',
-      });
+      toast.error('Cap MCP is initializing...');
       return;
     }
 
@@ -191,11 +188,7 @@ function PureMultimodalInput({
               event.preventDefault();
 
               if (status !== 'ready') {
-                toast({
-                  type: 'error',
-                  description:
-                    'Please wait for the model to finish its response!',
-                });
+                toast.error('Please wait for the model to finish its response!');
               } else {
                 submitForm();
               }

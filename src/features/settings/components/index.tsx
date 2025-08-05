@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useAuthHandler } from '@/features/auth/hooks/use-auth-handler';
 import { useSettings } from '@/features/settings/hooks/use-settings';
-import { toast } from '@/shared/components';
+import { toast } from 'sonner';
 import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { useStorage } from '@/shared/hooks/use-storage';
@@ -68,17 +68,11 @@ export function Settings() {
     setIsClearing(true);
     try {
       await clearAllStorage();
-      toast({
-        type: 'success',
-        description: t('settings.system.clearAllStorage.success'),
-      });
+      toast.success(t('settings.system.clearAllStorage.success'));
       window.location.reload();
     } catch (error) {
       console.error('Failed to clear storage:', error);
-      toast({
-        type: 'error',
-        description: t('settings.system.clearAllStorage.error'),
-      });
+      toast.error(t('settings.system.clearAllStorage.error'));
     } finally {
       setIsClearing(false);
     }
@@ -89,18 +83,13 @@ export function Settings() {
     setIsLoggingOut(true);
     try {
       await logout();
-      toast({
-        type: 'success',
-        description:
-          t('settings.profile.logout.success') || 'Successfully logged out',
-      });
+      toast.success(
+        t('settings.profile.logout.success') || 'Successfully logged out',
+      );
       // The auth guard will handle the redirect to login page
     } catch (error) {
       console.error('Failed to logout:', error);
-      toast({
-        type: 'error',
-        description: t('settings.profile.logout.error') || 'Failed to logout',
-      });
+      toast.error(t('settings.profile.logout.error') || 'Failed to logout');
     } finally {
       setIsLoggingOut(false);
     }

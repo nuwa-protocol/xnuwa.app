@@ -14,7 +14,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from '@/shared/components/toast';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -63,10 +63,7 @@ export function CapCard({
   const handleCopyCid = async () => {
     if (cap.cid) {
       await navigator.clipboard.writeText(cap.cid);
-      toast({
-        type: 'success',
-        description: `Published CID copied: ${cap.cid}`,
-      });
+      toast.success(`Published CID copied: ${cap.cid}`);
     }
   };
 

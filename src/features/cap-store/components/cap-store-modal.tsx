@@ -1,6 +1,6 @@
 import { Loader2, Package, RefreshCw, Search } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from '@/shared/components';
+import { toast } from 'sonner';
 import * as Dialog from '@/shared/components/ui';
 import {
   Button,
@@ -59,10 +59,7 @@ export function CapStoreModal({
 
     onOpenChange?.(false);
 
-    toast({
-      type: 'success',
-      description: `${cap.metadata.displayName} is now active`,
-    });
+    toast.success(`${cap.metadata.displayName} is now active`);
   };
 
   return (

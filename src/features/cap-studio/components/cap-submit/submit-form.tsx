@@ -10,7 +10,7 @@ import {
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { toast } from '@/shared/components';
+import { toast } from 'sonner';
 import {
   Button,
   Card,
@@ -85,10 +85,7 @@ export function SubmitForm({
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
         // 2MB limit
-        toast({
-          type: 'error',
-          description: 'Thumbnail must be under 2MB',
-        });
+        toast.error('Thumbnail must be under 2MB');
         return;
       }
       setThumbnailFile(file);
@@ -120,10 +117,7 @@ export function SubmitForm({
         error instanceof Error
           ? error.message
           : 'Failed to submit cap. Please try again.';
-      toast({
-        type: 'error',
-        description: errorMessage,
-      });
+      toast.error(errorMessage);
 
       onSubmit?.(false);
     } finally {

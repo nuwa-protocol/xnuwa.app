@@ -2,10 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, CheckCircle2, Loader2, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { useSelectedModel } from '@/features/cap-studio/hooks';
 import type { LocalCap } from '@/features/cap-studio/types';
-import { toast } from '@/shared/components';
 import {
   Button,
   Card,
@@ -108,18 +108,12 @@ export function CapEditForm({
     const isValid = await form.trigger();
 
     if (!isValid) {
-      toast({
-        type: 'error',
-        description: 'Please fix all validation errors before saving',
-      });
+      toast.warning('Please fix all validation errors before saving');
       return;
     }
 
     if (!selectedModel) {
-      toast({
-        type: 'error',
-        description: 'Please select a model for this cap',
-      });
+      toast.warning('Please select a model for this cap');
       return;
     }
 
@@ -145,10 +139,7 @@ export function CapEditForm({
           },
         });
 
-        toast({
-          type: 'success',
-          description: `${data.displayName} has been updated successfully`,
-        });
+        toast.success(`${data.displayName} has been updated successfully`);
 
         onSave?.();
       } else {
@@ -169,18 +160,12 @@ export function CapEditForm({
           },
         });
 
-        toast({
-          type: 'success',
-          description: `${data.displayName} has been created successfully`,
-        });
+        toast.success(`${data.displayName} has been created successfully`);
 
         onSave?.();
       }
     } catch (error) {
-      toast({
-        type: 'error',
-        description: 'Failed to save cap. Please try again.',
-      });
+      toast.error('Failed to save cap. Please try again.');
     } finally {
       setIsSaving(false);
     }

@@ -1,6 +1,6 @@
 import { Loader2, Play, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from '@/shared/components';
+import { toast } from 'sonner';
 import {
   Avatar,
   AvatarFallback,
@@ -31,15 +31,9 @@ export function CapCard({ cap, onRun }: CapCardProps) {
     setIsLoading(true);
     try {
       installCap(cap);
-      toast({
-        type: 'success',
-        description: `${cap.idName} has been installed`,
-      });
+      toast.success(`${cap.idName} has been installed`);
     } catch (error) {
-      toast({
-        type: 'error',
-        description: t('capStore.card.installFailed'),
-      });
+      toast.error(t('capStore.card.installFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -49,15 +43,9 @@ export function CapCard({ cap, onRun }: CapCardProps) {
     setIsLoading(true);
     try {
       uninstallCap(cap.idName);
-      toast({
-        type: 'success',
-        description: `${cap.idName} has been uninstalled`,
-      });
+      toast.success(`${cap.idName} has been uninstalled`);
     } catch (error) {
-      toast({
-        type: 'error',
-        description: t('capStore.card.uninstallFailed'),
-      });
+      toast.error(t('capStore.card.uninstallFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -65,24 +53,6 @@ export function CapCard({ cap, onRun }: CapCardProps) {
 
   const handleRun = () => {
     onRun?.(cap);
-  };
-
-  const handleUpdate = async () => {
-    setIsLoading(true);
-    try {
-      updateInstalledCap(cap.idName, cap);
-      toast({
-        type: 'success',
-        description: `${cap.idName} has been updated`,
-      });
-    } catch (error) {
-      toast({
-        type: 'error',
-        description: t('capStore.card.updateFailed'),
-      });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (

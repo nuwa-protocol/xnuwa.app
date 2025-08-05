@@ -2,7 +2,7 @@ import { CopyIcon } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
-import { toast } from '@/shared/components';
+import { toast } from 'sonner';
 import {
   Avatar,
   AvatarFallback,
@@ -165,10 +165,7 @@ export function SettingCard(props: SettingCardProps) {
               onClick={async () => {
                 await copyToClipboard(props.info);
                 setCopyState('copied');
-                toast({
-                  type: 'success',
-                  description: props.copiedLabel || 'Copied!',
-                });
+                toast.success(props.copiedLabel || 'Copied!');
                 setTimeout(() => setCopyState('idle'), 1200);
               }}
             >

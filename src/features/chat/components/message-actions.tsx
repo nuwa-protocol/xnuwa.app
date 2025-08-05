@@ -2,7 +2,7 @@ import type { Message } from 'ai';
 import { CopyIcon } from 'lucide-react';
 import { memo } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
-import { toast } from '@/shared/components/toast';
+import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import {
   Tooltip,
@@ -39,18 +39,12 @@ export function PureMessageActions({
                   .trim();
 
                 if (!textFromParts) {
-                  toast({
-                    type: 'error',
-                    description: "There's no text to copy!",
-                  });
+                  toast.error("There's no text to copy!");
                   return;
                 }
 
                 await copyToClipboard(textFromParts);
-                toast({
-                  type: 'success',
-                  description: 'Copied to clipboard!',
-                });
+                toast.success('Copied to clipboard!');
               }}
             >
               <CopyIcon />

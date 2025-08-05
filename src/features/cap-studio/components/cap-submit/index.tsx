@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from '@/shared/components';
+import { toast } from 'sonner';
 import { useLocalCaps } from '../../hooks';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
 import { useSubmitCap } from '../../hooks/use-submit-cap';
@@ -60,16 +60,11 @@ export function Submit() {
       // make the submission
       const result = await submitCap(capWithSubmitFormData);
 
-      console.log('result', result);
-
       if (result.success) {
         // update cap status to submitted
         updateCap(cap.id, { status: 'submitted', cid: result.capId });
 
-        toast({
-          type: 'success',
-          description: result.message,
-        });
+        toast.success(result.message);
 
         handleSubmit(true, result.capId);
       } else {
@@ -80,10 +75,7 @@ export function Submit() {
         error instanceof Error
           ? error.message
           : 'Failed to submit cap. Please try again.';
-      toast({
-        type: 'error',
-        description: errorMessage,
-      });
+      toast.error(errorMessage);
 
       handleSubmit(false);
     }

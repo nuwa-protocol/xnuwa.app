@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/shared/components';
+import { toast } from 'sonner';
 import {
   Button,
   Card,
@@ -116,20 +116,14 @@ export function Mcp({ cap, serverName }: McpProps) {
       // Fetch server capabilities
       await fetchServerCapabilities(newClient);
 
-      toast({
-        type: 'success',
-        description: `Successfully connected to ${url}`,
-      });
+      toast.success(`Successfully connected to ${url}`);
     } catch (err) {
       pushLog({
         type: 'error',
         message: `Connection failed: ${String(err)}`,
       });
 
-      toast({
-        type: 'error',
-        description: String(err),
-      });
+      toast.error(String(err));
 
       await closeNuwaMCPClient(url);
     } finally {
@@ -221,10 +215,7 @@ export function Mcp({ cap, serverName }: McpProps) {
         message: 'Disconnected from MCP server',
       });
 
-      toast({
-        type: 'success',
-        description: 'Successfully disconnected from MCP server',
-      });
+      toast.success('Successfully disconnected from MCP server');
     } catch (err) {
       pushLog({
         type: 'error',
@@ -253,17 +244,11 @@ export function Mcp({ cap, serverName }: McpProps) {
         });
       }
 
-      toast({
-        type: 'success',
-        description: 'MCP server ping successful',
-      });
+      toast.success('MCP server ping successful');
     } catch (err) {
       pushLog({ type: 'error', message: `Server ping failed: ${String(err)}` });
 
-      toast({
-        type: 'error',
-        description: String(err),
-      });
+      toast.error(String(err));
     }
   };
 
@@ -290,15 +275,9 @@ export function Mcp({ cap, serverName }: McpProps) {
 
     try {
       await navigator.clipboard.writeText(logText);
-      toast({
-        type: 'success',
-        description: 'Debug logs copied to clipboard',
-      });
+      toast.success('Debug logs copied to clipboard');
     } catch (error) {
-      toast({
-        type: 'error',
-        description: 'Failed to copy logs to clipboard',
-      });
+      toast.error('Failed to copy logs to clipboard');
     }
   };
 
