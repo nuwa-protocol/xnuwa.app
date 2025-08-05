@@ -108,8 +108,8 @@ export function SidebarHistory() {
   // render recent chats group
   const renderRecentChats = () => {
     return (
-      <SidebarGroup>
-        <SidebarGroupLabel className="flex items-center justify-between">
+      <SidebarGroup className="flex flex-col flex-1 min-h-0">
+        <SidebarGroupLabel className="flex items-center justify-between flex-shrink-0">
           <span>{t('chatHistory.recentChats')}</span>
           <SearchModal>
             <button
@@ -117,11 +117,11 @@ export function SidebarHistory() {
               className="p-1 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-sm transition-colors"
               aria-label={t('nav.sidebar.search')}
             >
-              <SearchIcon className="h-3 w-3" />
+              <SearchIcon className="size-4 font-semibold" />
             </button>
           </SearchModal>
         </SidebarGroupLabel>
-        <SidebarGroupContent>
+        <SidebarGroupContent className="flex-1 overflow-y-auto hide-scrollbar">
           <SidebarMenu>
             {recentChats.map((session) => (
               <ChatItem

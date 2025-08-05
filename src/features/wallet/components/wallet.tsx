@@ -6,7 +6,6 @@ import { TransactionHistory } from './transaction-history';
 
 export function Wallet() {
   const [showTopUpModal, setShowTopUpModal] = useState(false);
-  const [showUSD, setshowUSD] = useState(false);
 
   return (
     <div className="container mx-auto max-w-2xl p-6 space-y-8">
@@ -17,13 +16,9 @@ export function Wallet() {
         </p>
       </div>
 
-      <BalanceCard
-        onTopUp={() => setShowTopUpModal(true)}
-        showUSD={showUSD}
-        onToggleUSD={setshowUSD}
-      />
+      <BalanceCard onTopUp={() => setShowTopUpModal(true)} />
 
-      <TransactionHistory showUSD={showUSD} />
+      <TransactionHistory />
 
       <AppkitContextProvider>
         <TopUpModal open={showTopUpModal} onOpenChange={setShowTopUpModal} />

@@ -34,7 +34,7 @@ export function SearchModal({ children }: { children: React.ReactNode }) {
           onChange={(e) => setQuery(e.target.value)}
           className="w-full rounded-none border-0 border-b focus-visible:ring-0 focus-visible:border-primary"
         />
-        <div className="overflow-y-auto divide-y">
+        <div className="overflow-y-auto divide-y hide-scrollbar">
           {filtered.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
               {t('search.noChatsHistory')}

@@ -8,13 +8,7 @@ import { useNuwaToUsdRate } from '../hooks/use-nuwa-to-usd-rate';
 import { useWallet } from '../hooks/use-wallet';
 import type { Transaction } from '../types';
 
-function TransactionRow({
-  transaction,
-  showUSD,
-}: {
-  transaction: Transaction;
-  showUSD: boolean;
-}) {
+function TransactionRow({ transaction }: { transaction: Transaction }) {
   const nuwaToUsdRate = useNuwaToUsdRate();
   const amountColor =
     transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600';
@@ -42,6 +36,9 @@ function TransactionRow({
     }
   };
 
+  const usdValue = transaction.amount.toFixed(6).toLocaleString();
+  const nuwaValue = (transaction.amount * nuwaToUsdRate).toFixed(6);
+
   return (
     <div className="flex items-center justify-between py-3 border-b last:border-b-0">
       <div className="flex-1">
@@ -55,16 +52,17 @@ function TransactionRow({
           {formatDate(transaction.timestamp.toString())}
         </p>
       </div>
-      <div className={`font-semibold ${amountColor}`}>
-        {showUSD
-          ? `${amountPrefix}$${(transaction.amount).toFixed(6)} USD`
-          : `${amountPrefix}${(transaction.amount * nuwaToUsdRate).toLocaleString()} $NUWA`}
+      <div className={`font-semibold ${amountColor} flex flex-col items-end`}>
+        <div>{`${amountPrefix}$${usdValue} USD`}</div>
+        <div className="text-muted-foreground text-xs">
+          {`${amountPrefix}${nuwaValue} $NUWA`}
+        </div>
       </div>
     </div>
   );
 }
 
-export function TransactionHistory({ showUSD }: { showUSD: boolean }) {
+export function TransactionHistory() {
   const { transactions } = useWallet();
   return (
     <Card>
@@ -79,11 +77,7 @@ export function TransactionHistory({ showUSD }: { showUSD: boolean }) {
         ) : (
           <div className="space-y-0">
             {transactions.map((transaction) => (
-              <TransactionRow
-                key={transaction.id}
-                transaction={transaction}
-                showUSD={showUSD}
-              />
+              <TransactionRow key={transaction.id} transaction={transaction} />
             ))}
           </div>
         )}

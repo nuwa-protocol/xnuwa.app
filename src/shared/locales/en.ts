@@ -427,13 +427,18 @@ export const en = {
         title: 'Logout',
         description: 'Logout from your account',
         button: 'Logout',
+        confirmTitle: 'Are you absolutely sure?',
+        confirmDescription:
+          'You are logging out of your account. You will need to sign in again to continue using the application.',
+        confirmButton: 'Logout',
+        cancel: 'Cancel',
       },
     },
     system: {
       clearAllStorage: {
         title: 'Clear All Storage',
         description:
-          'Permanently delete all stored data including chats, settings, and files',
+          'Permanently delete all stored data including chats and settings',
         warning: 'Warning: This action cannot be undone',
         warningDescription:
           'This will permanently delete all your data including chat history, settings, uploaded files, and documents. You will need to sign in again.',

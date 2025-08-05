@@ -411,6 +411,11 @@ export const cn: typeof en = {
         title: '退出登录',
         description: '退出您的账户',
         button: '退出登录',
+        confirmTitle: '您确定要这样做吗？',
+        confirmDescription:
+          '您将退出您的账户。您需要重新登录才能继续使用应用程序。',
+        confirmButton: '退出登录',
+        cancel: '取消',
       },
     },
     system: {
