@@ -9,7 +9,7 @@ export function useSuggestedActions(): SuggestedAction[] {
   const { currentCap: cap } = useCurrentCap();
 
   const suggestedActions =
-    cap?.prompt.suggestions?.map((suggestion) => ({
+    cap?.core.prompt.suggestions?.map((suggestion) => ({
       title: suggestion,
       action: suggestion,
     })) || [];
