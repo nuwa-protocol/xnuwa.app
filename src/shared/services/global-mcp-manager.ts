@@ -49,9 +49,8 @@ class GlobalMCPManager {
         );
         clients.set(serverName, client);
       } catch (error) {
-        console.warn(
-          `Failed to connect to MCP server ${serverName} at ${serverConfig.url}:`,
-          error,
+        throw new Error(
+          `Failed to connect to MCP server ${serverName} at ${serverConfig.url}: ${error}`,
         );
       }
     }
@@ -97,11 +96,13 @@ class GlobalMCPManager {
           try {
             await client.close();
           } catch (error) {
-            console.warn(`Failed to close MCP client ${serverName}:`, error);
+            throw new Error(
+              `Failed to close MCP client ${serverName}: ${error}`,
+            );
           }
         }
       } catch (error) {
-        console.warn('Error closing MCP connections:', error);
+        throw new Error(`Error closing MCP connections: ${error}`);
       }
     }
 

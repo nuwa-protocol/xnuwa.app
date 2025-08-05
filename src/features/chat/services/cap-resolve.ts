@@ -6,17 +6,17 @@ import { llmProvider } from './providers';
 
 export class CapResolve {
   private cap: Cap;
+  private isCurrentCapMCPError: boolean;
+  private hasMCPServers: boolean;
 
-  constructor(cap?: Cap) {
-    if (cap) {
-      this.cap = cap;
-    } else {
-      const { currentCap } = CurrentCapStore.getState();
-      if (!currentCap) {
-        throw new Error('No cap selected. Please select a cap to use.');
-      }
-      this.cap = currentCap;
+  constructor() {
+    const { currentCap, isCurrentCapMCPError } = CurrentCapStore.getState();
+    if (!currentCap) {
+      throw new Error('No cap selected. Please select a cap to use.');
     }
+    this.cap = currentCap;
+    this.isCurrentCapMCPError = isCurrentCapMCPError;
+    this.hasMCPServers = Object.keys(this.cap.core.mcpServers).length > 0;
   }
 
   private async getUserLocation(): Promise<string> {
@@ -69,16 +69,19 @@ export class CapResolve {
   }
 
   async getResolvedTools(): Promise<Record<string, any>> {
-    // Get tools from global manager
-    const mcpManager = GlobalMCPManager.getInstance();
-    return mcpManager.getCurrentTools();
+    if (this.hasMCPServers && !this.isCurrentCapMCPError) {
+      // Make sure MCP is initialized through global manager
+      const mcpManager = GlobalMCPManager.getInstance();
+      await mcpManager.initializeForCap(this.cap);
+
+      // Get tools from global manager
+      return mcpManager.getCurrentTools();
+    } else {
+      return {};
+    }
   }
 
   async getResolvedConfig() {
-    // Make sure MCP is initialized through global manager
-    const mcpManager = GlobalMCPManager.getInstance();
-    await mcpManager.initializeForCap(this.cap);
-
     return {
       prompt: await this.getResolvedPrompt(),
       model: this.getResolvedModel(),
