@@ -1,4 +1,4 @@
-import { Loader2, Package, Search } from 'lucide-react';
+import { Loader2, Package, RefreshCw, Search } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from '@/shared/components';
 import * as Dialog from '@/shared/components/ui';
@@ -71,7 +71,7 @@ export function CapStoreModal({
         <Dialog.DialogTrigger asChild>{children}</Dialog.DialogTrigger>
       )}
       <Dialog.DialogContent
-        className="fixed left-1/2 top-1/2 z-50 flex flex-col -translate-x-1/2 -translate-y-1/2 gap-0 border bg-background p-0 shadow-lg sm:rounded-lg overflow-hidden"
+        className="fixed left-1/2 top-1/2 z-50 flex flex-col -translate-x-1/2 -translate-y-1/2 gap-0 border bg-background p-0 shadow-lg sm:rounded-lg overflow-hidden [&>button:last-child]:hidden"
         style={{
           width: '90vw',
           maxWidth: 1000,
@@ -89,12 +89,24 @@ export function CapStoreModal({
           <div className="border-b px-6 py-4 shrink-0">
             <div className="flex items-center gap-3 mb-4">
               <Package className="size-6" />
-              <div>
+              <div className="flex-1">
                 <h2 className="text-lg font-semibold">{t('capStore.title')}</h2>
                 <p className="text-sm text-muted-foreground">
                   {t('capStore.description')}
                 </p>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isLoading}
+                className="gap-2"
+              >
+                <RefreshCw
+                  className={`size-4 ${isLoading ? 'animate-spin' : ''}`}
+                />
+                Refresh
+              </Button>
             </div>
 
             {/* Search Bar */}

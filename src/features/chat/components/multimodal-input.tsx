@@ -24,7 +24,9 @@ import { CapSelector } from '@/features/cap-store/components';
 import { useScrollToBottom } from '@/features/chat/hooks/use-scroll-to-bottom';
 import { toast } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
+import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
+import type { Cap } from '@/shared/types/cap';
 
 import { SuggestedActions } from './suggested-actions';
 
@@ -56,6 +58,8 @@ function PureMultimodalInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
   const isDevMode = useDevMode();
+  const { currentCap, isCurrentCapMCPInitialized, isCurrentCapMCPError } =
+    useCurrentCap();
 
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
     'input',
@@ -77,6 +81,13 @@ function PureMultimodalInput({
     setLocalStorageInput(input);
   }, [input, setLocalStorageInput]);
 
+  // Auto focus when chat ID changes (page navigation)
+  useEffect(() => {
+    if (textareaRef.current && width && width > 768) {
+      textareaRef.current.focus();
+    }
+  }, [chatId, width]);
+
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
   };
@@ -85,6 +96,19 @@ function PureMultimodalInput({
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
   const submitForm = useCallback(() => {
+    // Check if Cap has MCP servers and if they are initialized
+    const hasMCPServers =
+      currentCap?.core?.mcpServers &&
+      Object.keys(currentCap.core.mcpServers).length > 0;
+
+    if (hasMCPServers && !isCurrentCapMCPInitialized) {
+      toast({
+        type: 'error',
+        description: 'Cap MCP is initializing...',
+      });
+      return;
+    }
+
     handleSubmit(undefined);
 
     setLocalStorageInput('');
@@ -92,7 +116,14 @@ function PureMultimodalInput({
     if (width && width > 768) {
       textareaRef.current?.focus();
     }
-  }, [handleSubmit, setLocalStorageInput, width]);
+  }, [
+    handleSubmit,
+    setLocalStorageInput,
+    width,
+    currentCap,
+    isCurrentCapMCPInitialized,
+    isCurrentCapMCPError,
+  ]);
 
   const { isAtBottom, scrollToBottom } = useScrollToBottom();
 
@@ -188,6 +219,9 @@ function PureMultimodalInput({
                 input={input}
                 submitForm={submitForm}
                 uploadQueue={uploadQueue}
+                currentCap={currentCap}
+                isCurrentCapMCPInitialized={isCurrentCapMCPInitialized}
+                isCurrentCapMCPError={isCurrentCapMCPError}
               />
             )}
           </div>
@@ -261,11 +295,22 @@ function PureSendButton({
   submitForm,
   input,
   uploadQueue,
+  currentCap,
+  isCurrentCapMCPInitialized,
+  isCurrentCapMCPError,
 }: {
   submitForm: () => void;
   input: string;
   uploadQueue: Array<string>;
+  currentCap: Cap;
+  isCurrentCapMCPInitialized: boolean;
+  isCurrentCapMCPError: boolean;
 }) {
+  // Check if Cap has MCP servers
+  const hasMCPServers =
+    currentCap?.core?.mcpServers &&
+    Object.keys(currentCap.core.mcpServers).length > 0;
+
   return (
     <Button
       data-testid="send-button"
@@ -274,7 +319,11 @@ function PureSendButton({
         event.preventDefault();
         submitForm();
       }}
-      disabled={input.length === 0 || uploadQueue.length > 0}
+      disabled={
+        input.length === 0 ||
+        uploadQueue.length > 0 ||
+        (hasMCPServers && (!isCurrentCapMCPInitialized || isCurrentCapMCPError))
+      }
     >
       <ArrowUpIcon size={14} />
     </Button>
