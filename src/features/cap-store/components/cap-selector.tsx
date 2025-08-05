@@ -37,7 +37,7 @@ export function CapSelector() {
           event.preventDefault();
           setIsModalOpen(true);
         }}
-        className="rounded-xl"
+        className="rounded-2xl"
         type="button"
       >
         <div className="flex items-center gap-2">

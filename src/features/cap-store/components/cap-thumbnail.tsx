@@ -9,7 +9,7 @@ export function CapThumbnail({
   size?: string;
 }) {
   return (
-    <Avatar className={`size-${size} shrink-0 rounded-md`}>
+    <Avatar className={`size-${size} shrink-0 rounded-xl`}>
       <AvatarImage
         src={cap.metadata.thumbnail || `https://avatar.vercel.sh/${cap.idName}`}
         alt={cap.idName}

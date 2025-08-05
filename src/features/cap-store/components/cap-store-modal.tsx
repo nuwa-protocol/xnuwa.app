@@ -59,7 +59,7 @@ export function CapStoreModal({
 
     onOpenChange?.(false);
 
-    toast.success(`${cap.metadata.displayName} is now active`);
+    toast.success(`${cap.metadata.displayName} has been selected`);
   };
 
   return (
