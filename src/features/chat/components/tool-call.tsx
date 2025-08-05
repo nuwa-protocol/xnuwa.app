@@ -1,4 +1,4 @@
-import { ChevronDownIcon, ChevronUpIcon, SettingsIcon } from 'lucide-react';
+import { ChevronDownIcon, ChevronUpIcon, Loader } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/shared/components/ui/badge';
 import {
@@ -35,7 +35,7 @@ export const ToolCall = ({
         <CollapsibleTrigger className="w-full">
           <CardHeader className="rounded-t-lg">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <SettingsIcon className="w-4 h-4 text-blue-500" />
+              <Loader className="w-4 h-4 animate-spin" />
               <span>Tool Call</span>
               <Badge variant="secondary" className="text-xs">
                 {toolName}
