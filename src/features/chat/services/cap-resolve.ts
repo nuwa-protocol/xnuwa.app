@@ -1,13 +1,13 @@
 import type { LanguageModelV1 } from '@ai-sdk/provider';
 import { GlobalMCPManager } from '@/shared/services/global-mcp-manager';
-import type { CurrentCap } from '@/shared/stores/current-cap-store';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import type { Cap } from '@/shared/types/cap';
 import { llmProvider } from './providers';
 
 export class CapResolve {
-  private cap: CurrentCap;
+  private cap: Cap;
 
-  constructor(cap?: CurrentCap) {
+  constructor(cap?: Cap) {
     if (cap) {
       this.cap = cap;
     } else {
@@ -61,11 +61,11 @@ export class CapResolve {
   }
 
   async getResolvedPrompt(): Promise<string> {
-    return await this.resolveVariables(this.cap.prompt.value);
+    return await this.resolveVariables(this.cap.core.prompt.value);
   }
 
   getResolvedModel(): LanguageModelV1 {
-    return llmProvider.chat(this.cap.model.id);
+    return llmProvider.chat(this.cap.core.model.id);
   }
 
   async getResolvedTools(): Promise<Record<string, any>> {
