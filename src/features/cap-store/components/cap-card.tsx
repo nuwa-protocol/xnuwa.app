@@ -1,4 +1,4 @@
-import { AlertCircle, Loader2, Play, Settings, Trash2 } from 'lucide-react';
+import { Loader2, Play, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from '@/shared/components';
 import {
@@ -102,7 +102,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
             <h3 className="font-medium text-sm truncate">
               {cap.metadata.displayName}
               <span className="text-xs text-muted-foreground">
-                @{cap.idName}
+                &nbsp;@{cap.idName}
               </span>
             </h3>
           </div>
@@ -162,29 +162,10 @@ export function CapCard({ cap, onRun }: CapCardProps) {
                   >
                     <span className="relative inline-block">
                       <Settings className="size-3" />
-                      {isInstalled && (
-                        <span
-                          className="absolute -top-1 -right-1 block h-2 w-2 rounded-full bg-orange-500 border border-white"
-                          style={{ zIndex: 1 }}
-                        />
-                      )}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {isInstalled && (
-                    <DropdownMenuItem
-                      onClick={handleUpdate}
-                      disabled={isLoading}
-                    >
-                      <AlertCircle className="size-3 mr-2 text-orange-500" />
-                      {isLoading ? (
-                        <Loader2 className="size-3 animate-spin" />
-                      ) : (
-                        t('capStore.card.update')
-                      )}
-                    </DropdownMenuItem>
-                  )}
                   <DropdownMenuItem onClick={handleUninstall}>
                     <Trash2 className="size-3 mr-2" />
                     Uninstall

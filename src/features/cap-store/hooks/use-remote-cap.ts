@@ -2,6 +2,7 @@ import * as yaml from 'js-yaml';
 import { useEffect, useState } from 'react';
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import type { Cap } from '@/shared/types/cap';
+import { parseCapContent, validateCapContent } from '../utils';
 
 interface CapKitQueryResponse {
   code: number;
@@ -87,23 +88,37 @@ export function useRemoteCap({
         params.searchQuery,
       );
 
-      const remoteCaps: Cap[] = await Promise.all(
+      const remoteCapResults: (Cap | null)[] = await Promise.all(
         response.data.items.map(async (item) => {
-          const capData = await capKit.downloadCap(item.cid, 'utf8');
+          try {
+            const capData = await capKit.downloadCap(item.cid, 'utf8');
+            const downloadContent: unknown = yaml.load(capData.data.fileData);
 
-          const capContent: any = yaml.load(capData.data.fileData);
+            // check if the cap is valid
+            if (!validateCapContent(downloadContent)) {
+              console.warn(
+                `Downloaded cap ${item.id} does not match Cap type specification, skipping...`,
+              );
+              return null;
+            }
 
-          return {
-            idName: capContent.idName,
-            core: capContent.core,
-            metadata: capContent.metadata,
-          };
+            // parse the cap content
+            return parseCapContent(downloadContent);
+          } catch (error) {
+            console.error(`Error processing cap ${item.id}:`, error);
+            return null;
+          }
         }),
+      );
+
+      // filter out invalid caps
+      const validRemoteCaps = remoteCapResults.filter(
+        (cap): cap is Cap => cap !== null,
       );
 
       setState((prev) => ({
         ...prev,
-        remoteCaps,
+        remoteCaps: validRemoteCaps,
         isLoading: false,
         totalCount: response.data.totalItems,
         hasMore: response.data.page < response.data.totalPages,
