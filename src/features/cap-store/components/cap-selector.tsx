@@ -1,9 +1,6 @@
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Button,
   Tooltip,
   TooltipContent,
@@ -11,20 +8,14 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui';
 import { useCurrentCap } from '@/shared/hooks';
+import type { Cap } from '@/shared/types';
 import { CapStoreModal } from './cap-store-modal';
+import { CapThumbnail } from './cap-thumbnail';
 
-const CapInfo = ({ displayName }: { displayName: string }) => (
+const CapInfo = ({ cap }: { cap: Cap }) => (
   <>
-    <Avatar className="size-5">
-      <AvatarImage
-        src={`https://avatar.vercel.sh/${displayName}`}
-        alt={displayName}
-      />
-      <AvatarFallback className="text-xs">
-        {displayName.slice(0, 2).toUpperCase()}
-      </AvatarFallback>
-    </Avatar>
-    <span className="text-sm font-normal">{displayName}</span>
+    <CapThumbnail cap={cap} size="6" />
+    <span className="text-sm font-normal">{cap.metadata.displayName}</span>
   </>
 );
 
@@ -50,7 +41,7 @@ export function CapSelector() {
         type="button"
       >
         <div className="flex items-center gap-2">
-          <CapInfo displayName={currentCap.metadata.displayName} />
+          <CapInfo cap={currentCap} />
           {!isCurrentCapMCPInitialized && (
             <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
           )}

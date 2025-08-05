@@ -2,9 +2,6 @@ import { Loader2, Play, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Button,
   Card,
   DropdownMenu,
@@ -15,6 +12,7 @@ import {
 import { useLanguage } from '@/shared/hooks/use-language';
 import type { Cap } from '@/shared/types/cap';
 import { useInstalledCap } from '../hooks/use-installed-cap';
+import { CapThumbnail } from './cap-thumbnail';
 
 export interface CapCardProps {
   cap: Cap;
@@ -58,15 +56,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
   return (
     <Card className="p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
-        <Avatar className="size-10 shrink-0">
-          <AvatarImage
-            src={`https://avatar.vercel.sh/${cap.idName}`}
-            alt={cap.idName}
-          />
-          <AvatarFallback>
-            {cap.idName.slice(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <CapThumbnail cap={cap} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-medium text-sm truncate">
