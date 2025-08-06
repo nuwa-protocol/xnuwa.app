@@ -4,7 +4,6 @@ import equal from 'fast-deep-equal';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { useMessagesUI } from '@/features/chat/hooks/use-messages-ui';
-import { Greeting } from './greeting';
 import { PreviewMessage, ThinkingMessage } from './message';
 
 interface MessagesProps {
@@ -42,8 +41,6 @@ function PureMessages({
       ref={messagesContainerRef}
       className="flex flex-col min-w-0 gap-6 h-full overflow-y-scroll pt-4 relative"
     >
-      {messages.length === 0 && !isArtifact && <Greeting />}
-
       {messages.map((message, index) => (
         <PreviewMessage
           key={message.id}

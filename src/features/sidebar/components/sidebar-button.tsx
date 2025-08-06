@@ -30,8 +30,8 @@ export function SidebarButton({
         'inline-flex items-center rounded-md text-sm transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
         isPrimary && [
-          'bg-gradient-to-r from-theme-primary to-theme-primary/90 hover:from-theme-primary/90 hover:to-theme-primary/80',
-          'text-white shadow-lg shadow-theme-primary/25 border border-theme-primary/20 h-8 px-4',
+          'bg-gradient-to-br from-theme-primary/80 via-theme-primary to-theme-primary/80 hover:from-theme-primary/90 hover:to-theme-primary/80',
+          'text-white shadow-lg shadow-theme-primary/25 border border-theme-primary/20 h-10 px-4',
           'justify-center relative font-medium',
           'hover:shadow-xl hover:shadow-theme-primary/30 hover:scale-[1.02]',
           'transition-all duration-200 ease-out',
@@ -48,7 +48,7 @@ export function SidebarButton({
     >
       {!isPrimary && Icon && <Icon size={16} className="shrink-0" />}
       <span
-        className={cn(!isPrimary && Icon && 'ml-2', isPrimary && 'font-medium')}
+        className={cn(!isPrimary && Icon && 'ml-2', isPrimary && 'font-bold')}
       >
         {text}
       </span>
@@ -57,7 +57,7 @@ export function SidebarButton({
           className={cn(
             'text-xs font-mono px-1.5 py-0.5 rounded border transition-colors',
             isPrimary
-              ? 'absolute right-2 text-white/70 bg-white/10 border-white/20 backdrop-blur-sm'
+              ? 'absolute right-2 text-white/90 bg-white/20 border-white/20 backdrop-blur-sm'
               : 'ml-auto text-sidebar-foreground/60 bg-theme-subtle border-theme-muted',
           )}
         >

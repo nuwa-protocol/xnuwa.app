@@ -1,7 +1,8 @@
-import { Settings, WalletIcon, Wrench } from 'lucide-react';
+import { Settings, Wrench } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
+import { SidebarWalletCard } from '@/features/wallet/components/sidebar-wallet-card';
 import { Logo } from '@/shared/components';
 import {
   Sidebar,
@@ -89,9 +90,10 @@ export function AppSidebarContent() {
         <SidebarMenu>
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
-              <Logo size="medium" />
+              <Logo size="md" />
               <SidebarToggle />
             </div>
+
             <SidebarButton
               text={t('nav.sidebar.new')}
               onClick={handleNewChat}
@@ -99,14 +101,8 @@ export function AppSidebarContent() {
               className="my-2"
               shortcut={getShortcutDisplay()}
             />
-            <SidebarButton
-              icon={WalletIcon}
-              text={t('nav.sidebar.wallet')}
-              onClick={() => {
-                navigate('/wallet');
-              }}
-              variant="secondary"
-            />
+
+            <SidebarWalletCard className="mb-2" />
 
             {isDevMode && (
               <SidebarButton
