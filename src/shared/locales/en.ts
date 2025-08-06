@@ -432,6 +432,7 @@ export const en = {
           'You are logging out of your account. You will need to sign in again to continue using the application.',
         confirmButton: 'Logout',
         cancel: 'Cancel',
+        success: 'Successfully logged out',
       },
     },
     system: {

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useAuthHandler } from '@/features/auth/hooks/use-auth-handler';
@@ -10,16 +11,16 @@ export function AboutSection() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { did } = useAuth();
   const { logout } = useAuthHandler();
-
+  const navigate = useNavigate();
   // Logout logic
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
       await logout();
+      navigate('/login');
       toast.success(
         t('settings.profile.logout.success') || 'Successfully logged out',
       );
-      // The auth guard will handle the redirect to login page
     } catch (error) {
       console.error('Failed to logout:', error);
       toast.error(t('settings.profile.logout.error') || 'Failed to logout');

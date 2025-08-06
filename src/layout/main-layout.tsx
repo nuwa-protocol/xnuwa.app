@@ -1,4 +1,3 @@
-
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { SidebarLayout } from '@/features/sidebar/components';
