@@ -56,7 +56,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
   return (
     <Card className="p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
-        <CapThumbnail cap={cap} />
+        <CapThumbnail cap={cap} size="lg" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-medium text-sm truncate">

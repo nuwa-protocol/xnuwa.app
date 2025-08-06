@@ -14,7 +14,7 @@ import { CapThumbnail } from './cap-thumbnail';
 
 const CapInfo = ({ cap }: { cap: Cap }) => (
   <>
-    <CapThumbnail cap={cap} size="6" />
+    <CapThumbnail cap={cap} size="sm" />
     <span className="text-sm font-normal">{cap.metadata.displayName}</span>
   </>
 );

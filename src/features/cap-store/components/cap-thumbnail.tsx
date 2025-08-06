@@ -1,20 +1,32 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui';
 import type { Cap } from '@/shared/types';
 
+const sizeClasses = {
+  sm: 'size-6', // 24px
+  md: 'size-8', // 32px
+  lg: 'size-10', // 40px
+  xl: 'size-12', // 48px
+} as const;
+
 export function CapThumbnail({
   cap,
-  size = '10',
+  size = 'md',
 }: {
   cap: Cap;
-  size?: string;
+  size?: keyof typeof sizeClasses;
 }) {
+  const sizeClass = sizeClasses[size] || sizeClasses['md'];
+
   return (
-    <Avatar className={`size-${size} shrink-0 rounded-xl`}>
+    <Avatar className={`${sizeClass} shrink-0 rounded-xl`}>
       <AvatarImage
         src={cap.metadata.thumbnail || `https://avatar.vercel.sh/${cap.idName}`}
         alt={cap.idName}
+        className="object-cover"
       />
-      <AvatarFallback>{cap.idName.slice(0, 2).toUpperCase()}</AvatarFallback>
+      <AvatarFallback className="text-xs">
+        {cap.idName.slice(0, 2).toUpperCase()}
+      </AvatarFallback>
     </Avatar>
   );
 }
