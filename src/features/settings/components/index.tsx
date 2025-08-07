@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Monitor, User } from 'lucide-react';
+import { Monitor, SettingsIcon, User } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { AboutSection, GeneralSection, SystemSection } from './sections';
@@ -31,7 +31,7 @@ export function Settings() {
     },
     {
       id: 'general',
-      icon: Monitor,
+      icon: SettingsIcon,
       name: t('settings.sections.general.title') || 'General',
       description:
         t('settings.sections.general.subtitle') ||

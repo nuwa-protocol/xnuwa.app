@@ -37,16 +37,18 @@ export function SidebarButton({
           'transition-all duration-200 ease-out',
         ],
         !isPrimary && [
+          `font-medium`,
           'justify-start py-1.5 px-2 text-sidebar-foreground',
-          'hover:bg-theme-subtle hover:text-theme-primary',
-          'active:bg-theme-muted',
+          'hover:bg-theme-accent',
           'transition-all duration-150 ease-out',
         ],
         active && 'bg-theme-accent text-theme-primary',
         className,
       )}
     >
-      {!isPrimary && Icon && <Icon size={16} className="shrink-0" />}
+      {!isPrimary && Icon && (
+        <Icon size={16} className="shrink-0 font-medium" />
+      )}
       <span
         className={cn(!isPrimary && Icon && 'ml-2', isPrimary && 'font-bold')}
       >

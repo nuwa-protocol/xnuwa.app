@@ -1,4 +1,4 @@
-import { Settings, Wrench } from 'lucide-react';
+import { Settings2, Wrench } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
@@ -122,7 +122,7 @@ export function AppSidebarContent() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarButton
-          icon={Settings}
+          icon={Settings2}
           text={t('nav.sidebar.settings')}
           onClick={() => {
             navigate('/settings');
