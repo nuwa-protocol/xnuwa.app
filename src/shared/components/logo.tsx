@@ -131,7 +131,22 @@ export function Logo({
     }
   };
 
-  const getSizeClass = (size: string) => {
+  const getSizeClass = () => {
+    if (variant?.startsWith('app-')) {
+      switch (size) {
+        case 'sm':
+          return 'w-8';
+        case 'md':
+          return 'w-12';
+        case 'lg':
+          return 'w-24';
+        case 'xl':
+          return 'w-48';
+        default:
+          return size.startsWith('w-') ? size : `w-${size}`;
+      }
+    }
+
     switch (size) {
       case 'sm':
         return 'w-16';
@@ -149,7 +164,7 @@ export function Logo({
   if (onClick) {
     return (
       <button type="button" onClick={onClick}>
-        <img src={getLogoSrc()} alt="logo" className={getSizeClass(size)} />
+        <img src={getLogoSrc()} alt="logo" className={getSizeClass()} />
       </button>
     );
   }
@@ -158,7 +173,7 @@ export function Logo({
     <div
       className={`flex flex-row gap-3 items-center text-lg font-semibold px-2 rounded-md ${className}`}
     >
-      <img src={getLogoSrc()} alt="logo" className={getSizeClass(size)} />
+      <img src={getLogoSrc()} alt="logo" className={getSizeClass()} />
     </div>
   );
 }
