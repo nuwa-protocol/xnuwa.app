@@ -90,13 +90,18 @@ export function AppSidebarContent() {
         <SidebarMenu>
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
-              <Logo size="md" onClick={() => navigate('/chat')} />
+              <Logo
+                size="md"
+                variant="app-brand"
+                onClick={() => navigate('/chat')}
+                className="rounded-md hover:bg-sidebar-accent"
+              />
               <SidebarToggle />
             </div>
 
             <SidebarButton
               text={t('nav.sidebar.new')}
-              onClick={handleNewChat}
+              href="/chat"
               variant="primary"
               className="my-2"
               shortcut={getShortcutDisplay()}
@@ -108,9 +113,7 @@ export function AppSidebarContent() {
               <SidebarButton
                 icon={Wrench}
                 text={'Cap Studio'}
-                onClick={() => {
-                  navigate('/cap-studio');
-                }}
+                href="/cap-studio"
                 variant="secondary"
               />
             )}
@@ -124,9 +127,7 @@ export function AppSidebarContent() {
         <SidebarButton
           icon={Settings2}
           text={t('nav.sidebar.settings')}
-          onClick={() => {
-            navigate('/settings');
-          }}
+          href="/settings"
           variant="secondary"
         />
       </SidebarFooter>

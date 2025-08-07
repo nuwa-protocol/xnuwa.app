@@ -163,7 +163,7 @@ export function Logo({
 
   if (onClick) {
     return (
-      <button type="button" onClick={onClick}>
+      <button type="button" onClick={onClick} className={className}>
         <img src={getLogoSrc()} alt="logo" className={getSizeClass()} />
       </button>
     );

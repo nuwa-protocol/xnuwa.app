@@ -1,31 +1,36 @@
 import type { LucideIcon } from 'lucide-react';
+import { useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/shared/utils';
 
 interface SidebarButtonProps {
   icon?: LucideIcon;
   text: string;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  href: string;
   className?: string;
   variant?: 'primary' | 'secondary';
-  active?: boolean;
   shortcut?: string;
 }
 
 export function SidebarButton({
   icon: Icon,
   text,
-  onClick,
+  href,
   className,
   variant = 'secondary',
-  active = false,
   shortcut,
 }: SidebarButtonProps) {
+  const navigate = useNavigate();
   const isPrimary = variant === 'primary';
+  const pathname = useLocation().pathname;
+  const isActive = useMemo(() => {
+    return pathname === href;
+  }, [pathname, href]);
 
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={() => navigate(href)}
       className={cn(
         'inline-flex items-center rounded-md text-sm transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
@@ -37,12 +42,13 @@ export function SidebarButton({
           'transition-all duration-200 ease-out',
         ],
         !isPrimary && [
-          `font-medium`,
-          'justify-start py-1.5 px-2 text-sidebar-foreground',
-          'hover:bg-theme-accent',
+          'justify-start py-1.5 px-2',
+          'hover:bg-sidebar-accent',
           'transition-all duration-150 ease-out',
         ],
-        active && 'bg-theme-accent text-theme-primary',
+        isActive &&
+          !isPrimary &&
+          'bg-sidebar-accent text-sidebar-primary font-medium',
         className,
       )}
     >
