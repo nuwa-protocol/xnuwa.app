@@ -63,7 +63,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
               {cap.metadata.displayName}
             </h3>
           </div>
-          <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+          <p className="text-xs text-muted-foreground mb-3 line-clamp-2 h-8 overflow-hidden">
             {cap.metadata.description}
           </p>
 

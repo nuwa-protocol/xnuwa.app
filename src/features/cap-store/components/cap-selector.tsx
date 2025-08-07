@@ -9,6 +9,7 @@ import {
 } from '@/shared/components/ui';
 import { useCurrentCap } from '@/shared/hooks';
 import type { Cap } from '@/shared/types';
+import { useRemoteCap } from '../hooks/use-remote-cap';
 import { CapStoreModal } from './cap-store-modal';
 import { CapThumbnail } from './cap-thumbnail';
 
@@ -27,6 +28,9 @@ export function CapSelector() {
     errorMessage,
   } = useCurrentCap();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Prefetch remote caps when component loads
+  useRemoteCap();
 
   return (
     <TooltipProvider>

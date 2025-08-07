@@ -19,8 +19,8 @@ import {
   TabsTrigger,
   Textarea,
 } from '@/shared/components/ui';
+import { promptVariables } from '@/shared/constants/cap';
 import { cn } from '@/shared/utils';
-import { promptVariables } from './constants';
 import { PromptSuggestions } from './prompt-suggestions';
 
 interface PromptEditorProps {

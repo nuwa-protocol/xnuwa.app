@@ -17,10 +17,10 @@ import {
   MultiSelect,
   Textarea,
 } from '@/shared/components/ui';
+import { predefinedTags } from '@/shared/constants/cap';
 import { useEditForm } from '../../hooks/use-edit-form';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { ModelSelectorDialog } from '../model-selector';
-import { predefinedTags } from './constants';
 import { McpServersConfig } from './mcp-servers-config';
 import { ModelDetails } from './model-details';
 import { PromptEditor } from './prompt-editor';

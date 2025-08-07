@@ -123,13 +123,9 @@ export const en = {
     title: 'Cap Store',
     description: 'Discover and install capabilities to enhance your experience',
     searchPlaceholder: 'Search caps...',
-    tabs: {
+    sidebar: {
+      installed: 'Installed',
       all: 'All Caps',
-      development: 'Development',
-      design: 'Design',
-      analytics: 'Analytics',
-      productivity: 'Productivity',
-      security: 'Security',
     },
     status: {
       loading: 'Loading caps...',

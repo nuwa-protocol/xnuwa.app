@@ -123,13 +123,9 @@ export const cn: typeof en = {
     title: 'Cap 商店',
     description: '发现并安装能力，提升你的体验',
     searchPlaceholder: '搜索能力...',
-    tabs: {
+    sidebar: {
+      installed: '已安装能力',
       all: '所有能力',
-      development: '开发',
-      design: '设计',
-      analytics: '分析',
-      productivity: '效率',
-      security: '安全',
     },
     status: {
       loading: '正在加载能力...',
@@ -416,6 +412,7 @@ export const cn: typeof en = {
           '您将退出您的账户。您需要重新登录才能继续使用应用程序。',
         confirmButton: '退出登录',
         cancel: '取消',
+        success: '退出登录成功',
       },
     },
     system: {

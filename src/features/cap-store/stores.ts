@@ -8,14 +8,40 @@ import type { Cap } from '@/shared/types/cap';
 
 // ================= Interfaces ================= //
 
-// Cap store state interface - only handles installed caps
+// Remote caps state interface
+interface RemoteCapState {
+  remoteCaps: Cap[];
+  isLoading: boolean;
+  error: string | null;
+  totalCount: number;
+  page: number;
+  hasMore: boolean;
+  lastSearchQuery: string;
+}
+
+// Cap store state interface - handles both installed and remote caps
 interface CapStoreState {
   installedCaps: Record<string, Cap>;
+
+  // Remote caps state
+  remoteCapState: RemoteCapState;
 
   // Installed cap management
   installCap: (cap: Cap) => void;
   uninstallCap: (id: string) => void;
   updateInstalledCap: (id: string, updatedCap: Cap) => void;
+
+  // Remote caps management
+  setRemoteCaps: (caps: Cap[]) => void;
+  setRemoteCapLoading: (isLoading: boolean) => void;
+  setRemoteCapError: (error: string | null) => void;
+  setRemoteCapPagination: (pagination: {
+    totalCount: number;
+    page: number;
+    hasMore: boolean;
+  }) => void;
+  setLastSearchQuery: (query: string) => void;
+  clearRemoteCaps: () => void;
 
   // Data management
   clearAllInstalledCaps: () => void;
@@ -58,6 +84,17 @@ export const CapStateStore = create<CapStoreState>()(
     (set, get) => ({
       // Store state
       installedCaps: {},
+
+      // Remote caps state
+      remoteCapState: {
+        remoteCaps: [],
+        isLoading: false,
+        error: null,
+        totalCount: 0,
+        page: 1,
+        hasMore: false,
+        lastSearchQuery: '',
+      },
 
       // Installation management
       installCap: (cap: Cap) => {
@@ -113,6 +150,68 @@ export const CapStateStore = create<CapStoreState>()(
         }));
 
         get().saveToDB();
+      },
+
+      // Remote caps management
+      setRemoteCaps: (caps: Cap[]) => {
+        set((state) => ({
+          remoteCapState: {
+            ...state.remoteCapState,
+            remoteCaps: caps,
+          },
+        }));
+      },
+
+      setRemoteCapLoading: (isLoading: boolean) => {
+        set((state) => ({
+          remoteCapState: {
+            ...state.remoteCapState,
+            isLoading,
+          },
+        }));
+      },
+
+      setRemoteCapError: (error: string | null) => {
+        set((state) => ({
+          remoteCapState: {
+            ...state.remoteCapState,
+            error,
+          },
+        }));
+      },
+
+      setRemoteCapPagination: (pagination: {
+        totalCount: number;
+        page: number;
+        hasMore: boolean;
+      }) => {
+        set((state) => ({
+          remoteCapState: {
+            ...state.remoteCapState,
+            ...pagination,
+          },
+        }));
+      },
+
+      setLastSearchQuery: (query: string) => {
+        set((state) => ({
+          remoteCapState: {
+            ...state.remoteCapState,
+            lastSearchQuery: query,
+          },
+        }));
+      },
+
+      clearRemoteCaps: () => {
+        set((state) => ({
+          remoteCapState: {
+            ...state.remoteCapState,
+            remoteCaps: [],
+            totalCount: 0,
+            page: 1,
+            hasMore: false,
+          },
+        }));
       },
 
       clearAllInstalledCaps: () => {
