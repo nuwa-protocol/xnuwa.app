@@ -7,15 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui';
+import type { CapThumbnail } from '@/shared/types/cap';
+import type { SubmitFormData } from '../../hooks/use-submit-form';
 import type { LocalCap } from '../../types';
-import type { SubmitFormData } from './cap-submit-form';
 
 interface SubmissionConfirmationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: SubmitFormData;
   cap: LocalCap;
-  thumbnail: File | null;
+  thumbnail: CapThumbnail;
   isSubmitting: boolean;
   onCancel: () => void;
   onConfirm: () => Promise<void>;
@@ -67,7 +68,7 @@ export function SubmissionConfirmationDialog({
 interface CapStorePreviewProps {
   data: SubmitFormData;
   cap: LocalCap;
-  thumbnail?: File | null;
+  thumbnail?: CapThumbnail;
 }
 
 function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
@@ -77,7 +78,7 @@ function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
       <div className="flex items-start space-x-4">
         {thumbnail ? (
           <img
-            src={URL.createObjectURL(thumbnail)}
+            src={thumbnail.type === 'file' ? thumbnail.file : thumbnail.url}
             alt="Thumbnail"
             className="w-16 h-16 rounded-lg object-cover"
           />
@@ -86,23 +87,16 @@ function CapStorePreview({ data, cap, thumbnail }: CapStorePreviewProps) {
             <FileText className="h-8 w-8 text-primary" />
           </div>
         )}
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col gap-2">
           <h3 className="text-xl font-bold">
             {cap.capData.metadata.displayName || 'Untitled Cap'}
           </h3>
           <p className="text-muted-foreground">
-            by {data.author || 'Unknown Author'}
+            {cap.capData.metadata.description || 'No description provided'}
           </p>
         </div>
       </div>
 
-      {/* Description */}
-      <div>
-        <h4 className="font-semibold mb-2">Description</h4>
-        <p className="text-muted-foreground">
-          {cap.capData.metadata.description || 'No description provided'}
-        </p>
-      </div>
       {/* Links */}
       {(data.homepage || data.repository) && (
         <div>

@@ -4,12 +4,12 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import type { CapThumbnail } from '@/shared/types/cap';
 import { useLocalCapsHandler } from '../hooks/use-local-caps-handler';
 import { useSubmitCap } from '../hooks/use-submit-cap';
 import type { LocalCap } from '../types';
 
 const submitSchema = z.object({
-  author: z.string().min(1, 'Author name is required'),
   homepage: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   repository: z
     .string()
@@ -27,7 +27,7 @@ interface UseSubmitFormProps {
 export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnail, setThumbnail] = useState<CapThumbnail>(null);
   const navigate = useNavigate();
   const { updateCap } = useLocalCapsHandler();
   const { submitCap } = useSubmitCap();
@@ -35,7 +35,6 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
   const form = useForm<SubmitFormData>({
     resolver: zodResolver(submitSchema),
     defaultValues: {
-      author: '',
       homepage: '',
       repository: '',
     },
@@ -47,30 +46,15 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
     navigate('/cap-studio');
   };
 
-  const processConfirmedSubmit = async (
-    submitFormData: SubmitFormData,
-    thumbnailFile: File | null,
-  ) => {
+  const processConfirmedSubmit = async (submitFormData: SubmitFormData) => {
     try {
-      // Convert thumbnail file to base64 if provided
-      let thumbnailBase64: string | undefined;
-      if (thumbnailFile) {
-        thumbnailBase64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(thumbnailFile);
-        });
-      }
-
       const capWithSubmitFormData = {
         ...cap.capData,
         metadata: {
           ...cap.capData.metadata,
-          author: submitFormData.author,
           homepage: submitFormData.homepage || undefined,
           repository: submitFormData.repository || undefined,
-          thumbnail: thumbnailBase64,
+          thumbnail,
         },
       };
 
@@ -117,7 +101,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
     setShowConfirmDialog(false);
 
     try {
-      await processConfirmedSubmit(data, thumbnailFile);
+      await processConfirmedSubmit(data);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -143,8 +127,8 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
     handleFieldChange,
     isSubmitting,
     showConfirmDialog,
-    thumbnailFile,
-    setThumbnailFile,
+    thumbnail,
+    setThumbnail,
     setShowConfirmDialog,
     watchedData,
   };

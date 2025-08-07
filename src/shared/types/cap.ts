@@ -42,15 +42,22 @@ export const CapCoreSchema = z.object({
   mcpServers: z.record(z.string(), CapMcpServerConfigSchema),
 });
 
+export const CapThumbnailSchema = z
+  .object({
+    type: z.enum(['file', 'url']),
+    file: z.string().optional(),
+    url: z.string().optional(),
+  })
+  .nullable();
+
 export const CapMetadataSchema = z.object({
   displayName: z.string(),
   description: z.string(),
-  author: z.string(),
   tags: z.array(z.string()),
   submittedAt: z.number(),
   homepage: z.string().optional(),
   repository: z.string().optional(),
-  thumbnail: z.string().optional(),
+  thumbnail: CapThumbnailSchema,
 });
 
 export const CapSchema = CapIDSchema.extend({
@@ -64,5 +71,6 @@ export type CapModel = z.infer<typeof CapModelSchema>;
 export type CapPrompt = z.infer<typeof CapPromptSchema>;
 export type CapID = z.infer<typeof CapIDSchema>;
 export type CapCore = z.infer<typeof CapCoreSchema>;
+export type CapThumbnail = z.infer<typeof CapThumbnailSchema>;
 export type CapMetadata = z.infer<typeof CapMetadataSchema>;
 export type Cap = z.infer<typeof CapSchema>;

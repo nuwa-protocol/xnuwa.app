@@ -32,28 +32,6 @@ export function AuthorForm({ control, onFieldChange }: AuthorFormProps) {
       <CardContent className="space-y-4">
         <FormField
           control={control}
-          name="author"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Author Name</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Your Name"
-                  {...field}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    onFieldChange('author');
-                  }}
-                />
-              </FormControl>
-              <FormDescription>Your name or organization name</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={control}
           name="homepage"
           render={({ field }) => (
             <FormItem>

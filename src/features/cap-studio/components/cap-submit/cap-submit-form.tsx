@@ -20,8 +20,8 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
     handleFieldChange,
     isSubmitting,
     showConfirmDialog,
-    thumbnailFile,
-    setThumbnailFile,
+    thumbnail,
+    setThumbnail,
     setShowConfirmDialog,
     watchedData,
   } = useSubmitForm({ cap });
@@ -61,8 +61,8 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
 
           {/* Thumbnail Upload */}
           <ThumbnailUpload
-            thumbnailFile={thumbnailFile}
-            onFileChange={setThumbnailFile}
+            thumbnail={thumbnail}
+            onThumbnailChange={setThumbnail}
           />
 
           {/* Submit */}
@@ -120,7 +120,7 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
         onOpenChange={setShowConfirmDialog}
         data={watchedData}
         cap={cap}
-        thumbnail={thumbnailFile}
+        thumbnail={thumbnail}
         isSubmitting={isSubmitting}
         onCancel={() => setShowConfirmDialog(false)}
         onConfirm={handleConfirmedSubmit}

@@ -69,17 +69,6 @@ export function useRemoteCap({
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // const filters: CapFetchParams = {
-      //   query: params.searchQuery || searchQuery,
-      //   category: params.category || category,
-      //   author: params.author || author,
-      //   timeRange: params.timeRange || timeRange,
-      //   sortBy: params.sortBy || sortBy,
-      //   sortOrder: params.sortOrder || sortOrder,
-      //   limit: params.limit || limit,
-      //   offset: ((params.page || page) - 1) * (params.limit || limit),
-      // };
-
       if (!capKit) {
         throw new Error('CapKit not initialized');
       }

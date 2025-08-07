@@ -61,23 +61,11 @@ export function CapCard({ cap, onRun }: CapCardProps) {
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-medium text-sm truncate">
               {cap.metadata.displayName}
-              <span className="text-xs text-muted-foreground">
-                &nbsp;@{cap.idName}
-              </span>
             </h3>
           </div>
           <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
             {cap.metadata.description}
           </p>
-
-          {/* Version and metadata info */}
-          <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-            {cap.metadata.author && (
-              <span className="text-xs">
-                {t('capStore.card.by', { author: cap.metadata.author })}
-              </span>
-            )}
-          </div>
 
           {/* Action buttons */}
           <div className="flex items-center justify-between">

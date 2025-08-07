@@ -1,9 +1,10 @@
 export const predefinedTags = [
   'AI Model',
-  'Developer',
-  'Content Creator',
+  'Coding',
+  'Content Writing',
   'Research',
   'Crypto',
+  'Tools',
   'Others',
 ];
 
