@@ -1,17 +1,11 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
+import { useParams } from 'react-router-dom';
 import { useLocalCaps } from '../../hooks';
-import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
-import { useSubmitCap } from '../../hooks/use-submit-cap';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
-import { SubmitForm, type SubmitFormData } from './submit-form';
+import { CapSubmitForm } from './cap-submit-form';
 
 export function Submit() {
-  const navigate = useNavigate();
   const { id } = useParams();
   const localCaps = useLocalCaps();
-  const { updateCap } = useLocalCapsHandler();
-  const { submitCap } = useSubmitCap();
 
   const cap = localCaps.find((cap) => cap.id === id);
 
@@ -29,75 +23,9 @@ export function Submit() {
     );
   }
 
-  const handleSubmit = (success: boolean, capId?: string) => {
-    if (success) {
-      navigate('/cap-studio');
-    }
-  };
-
-  const handleCancel = () => {
-    navigate('/cap-studio');
-  };
-
-  const handleConfirmedSubmit = async (
-    submitFormData: SubmitFormData,
-    thumbnailFile: File | null,
-  ) => {
-    try {
-      // Convert thumbnail file to base64 if provided
-      let thumbnailBase64: string | undefined;
-      if (thumbnailFile) {
-        thumbnailBase64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(thumbnailFile);
-        });
-      }
-
-      const capWithSubmitFormData = {
-        ...cap.capData,
-        metadata: {
-          ...cap.capData.metadata,
-          author: submitFormData.author,
-          homepage: submitFormData.homepage || undefined,
-          repository: submitFormData.repository || undefined,
-          thumbnail: thumbnailBase64,
-        },
-      };
-
-      // make the submission
-      const result = await submitCap(capWithSubmitFormData);
-
-      if (result.success) {
-        // update cap status to submitted
-        updateCap(cap.id, { status: 'submitted', cid: result.capId });
-
-        toast.success(result.message);
-
-        handleSubmit(true, result.capId);
-      } else {
-        throw new Error(result.message);
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to submit cap. Please try again.';
-      toast.error(errorMessage);
-
-      handleSubmit(false);
-    }
-  };
-
   return (
     <DashboardLayout>
-      <SubmitForm
-        cap={cap}
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
-        onConfirmedSubmit={handleConfirmedSubmit}
-      />
+      <CapSubmitForm cap={cap} />
     </DashboardLayout>
   );
 }

@@ -31,6 +31,8 @@ export const CapPromptSchema = z.object({
 });
 
 export const CapIDSchema = z.object({
+  id: z.string(),
+  authorDID: z.string(),
   idName: z.string(),
 });
 

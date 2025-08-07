@@ -188,7 +188,7 @@ export function CapStoreModal({
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-6 min-h-0">
                           {remoteCaps.map((cap) => (
                             <CapCard
-                              key={cap.idName}
+                              key={cap.id}
                               cap={cap}
                               onRun={handleRunCap}
                             />

@@ -1,3 +1,8 @@
+import logoAppBlack from '@/assets/logo-app-black.png';
+import logoAppBrand from '@/assets/logo-app-brand.png';
+import logoAppGradient from '@/assets/logo-app-gradient.png';
+import logoAppGradientPink from '@/assets/logo-app-gradient-pink.png';
+import logoAppWhite from '@/assets/logo-app-white.png';
 import logoBasic from '@/assets/logo-basic.png';
 import logoBasicBlack from '@/assets/logo-basic-black.png';
 import logoBasicDark from '@/assets/logo-basic-dark.png';
@@ -41,13 +46,19 @@ type LogoVariant =
   | 'special-black'
   | 'special-gradient'
   | 'special-gradient-pink'
-  | 'special-solid';
+  | 'special-solid'
+  | 'app-black'
+  | 'app-brand'
+  | 'app-gradient'
+  | 'app-gradient-pink'
+  | 'app-white';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | string;
   className?: string;
   variant?: LogoVariant;
   autoTheme?: boolean;
+  onClick?: () => void;
 }
 
 export function Logo({
@@ -55,6 +66,7 @@ export function Logo({
   className = '',
   variant = 'basic',
   autoTheme = true,
+  onClick,
 }: LogoProps) {
   const { resolvedTheme } = useTheme();
 
@@ -104,6 +116,16 @@ export function Logo({
         return logoSpecialGradientPink;
       case 'special-solid':
         return logoSpecialSolid;
+      case 'app-black':
+        return logoAppBlack;
+      case 'app-brand':
+        return logoAppBrand;
+      case 'app-gradient':
+        return logoAppGradient;
+      case 'app-gradient-pink':
+        return logoAppGradientPink;
+      case 'app-white':
+        return logoAppWhite;
       default:
         return logoBasic;
     }
@@ -123,6 +145,14 @@ export function Logo({
         return size.startsWith('w-') ? size : `w-${size}`;
     }
   };
+
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick}>
+        <img src={getLogoSrc()} alt="logo" className={getSizeClass(size)} />
+      </button>
+    );
+  }
 
   return (
     <div

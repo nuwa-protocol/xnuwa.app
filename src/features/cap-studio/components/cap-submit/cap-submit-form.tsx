@@ -1,95 +1,30 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, CheckCircle2, Loader2, Upload } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { z } from 'zod';
 import { Button, Card, CardContent, Form } from '@/shared/components/ui';
+import { useSubmitForm } from '../../hooks/use-submit-form';
 import type { LocalCap } from '../../types';
 import { AuthorForm } from './author-form';
 import { CapInformation } from './cap-information';
 import { SubmissionConfirmationDialog } from './submission-confirmation-dialog';
 import { ThumbnailUpload } from './thumbnail-upload';
 
-const submitSchema = z.object({
-  author: z.string().min(1, 'Author name is required'),
-  homepage: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  repository: z
-    .string()
-    .url('Must be a valid URL')
-    .optional()
-    .or(z.literal('')),
-});
-
-export type SubmitFormData = z.infer<typeof submitSchema>;
-
-interface SubmitFormProps {
+interface CapSubmitFormProps {
   cap: LocalCap;
-  onSubmit?: (success: boolean, capId?: string) => void;
-  onCancel?: () => void;
-  onConfirmedSubmit: (
-    data: SubmitFormData,
-    thumbnailFile: File | null,
-  ) => Promise<void>;
 }
 
-export function SubmitForm({
-  cap,
-  onSubmit,
-  onCancel,
-  onConfirmedSubmit,
-}: SubmitFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-
-  const form = useForm<SubmitFormData>({
-    resolver: zodResolver(submitSchema),
-    defaultValues: {
-      author: '',
-      homepage: '',
-      repository: '',
-    },
-  });
-
-  const watchedData = form.watch();
-
-  const handleFormSubmit = async () => {
-    // Trigger validation and show errors
-    const isValid = await form.trigger();
-
-    if (!isValid) {
-      // Form will show validation errors automatically
-      return;
-    }
-
-    // Show confirmation dialog
-    setShowConfirmDialog(true);
-  };
-
-  const handleConfirmedSubmit = async () => {
-    const data = form.getValues();
-    setIsSubmitting(true);
-    setShowConfirmDialog(false);
-
-    try {
-      await onConfirmedSubmit(data, thumbnailFile);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to submit cap. Please try again.';
-      toast.error(errorMessage);
-
-      onSubmit?.(false);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleFieldChange = (fieldName: keyof SubmitFormData) => {
-    form.trigger(fieldName);
-  };
+export function CapSubmitForm({ cap }: CapSubmitFormProps) {
+  const {
+    form,
+    handleCancel,
+    handleFormSubmit,
+    handleConfirmedSubmit,
+    handleFieldChange,
+    isSubmitting,
+    showConfirmDialog,
+    thumbnailFile,
+    setThumbnailFile,
+    setShowConfirmDialog,
+    watchedData,
+  } = useSubmitForm({ cap });
 
   return (
     <div className="space-y-6">
@@ -102,11 +37,9 @@ export function SubmitForm({
           </p>
         </div>
 
-        {onCancel && (
-          <Button variant="ghost" size="sm" onClick={onCancel}>
-            Cancel
-          </Button>
-        )}
+        <Button variant="ghost" size="sm" onClick={handleCancel}>
+          Cancel
+        </Button>
       </div>
 
       <Form {...form}>
@@ -152,17 +85,15 @@ export function SubmitForm({
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    {onCancel && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="lg"
-                        onClick={onCancel}
-                        disabled={isSubmitting}
-                      >
-                        Cancel
-                      </Button>
-                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      onClick={handleCancel}
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </Button>
                     <Button type="submit" disabled={isSubmitting} size="lg">
                       {isSubmitting ? (
                         <>

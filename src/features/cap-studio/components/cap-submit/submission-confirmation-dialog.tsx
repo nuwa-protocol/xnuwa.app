@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/shared/components/ui';
 import type { LocalCap } from '../../types';
-import type { SubmitFormData } from './submit-form';
+import type { SubmitFormData } from './cap-submit-form';
 
 interface SubmissionConfirmationDialogProps {
   open: boolean;

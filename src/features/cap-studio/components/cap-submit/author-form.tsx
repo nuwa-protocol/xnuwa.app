@@ -13,7 +13,7 @@ import {
   FormMessage,
   Input,
 } from '@/shared/components/ui';
-import type { SubmitFormData } from './submit-form';
+import type { SubmitFormData } from '../../hooks/use-submit-form';
 
 interface AuthorFormProps {
   control: Control<SubmitFormData>;

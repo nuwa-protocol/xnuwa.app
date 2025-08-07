@@ -20,8 +20,8 @@ export function CapThumbnail({
   return (
     <Avatar className={`${sizeClass} shrink-0 rounded-xl`}>
       <AvatarImage
-        src={cap.metadata.thumbnail || `https://avatar.vercel.sh/${cap.idName}`}
-        alt={cap.idName}
+        src={cap.metadata.thumbnail || `https://avatar.vercel.sh/${cap.id}`}
+        alt={cap.id}
         className="object-cover"
       />
       <AvatarFallback className="text-xs">

@@ -11,6 +11,8 @@ interface CurrentCapState {
 }
 
 const defaultCurrentCap: Cap = {
+  id: '1',
+  authorDID: 'default',
   idName: 'default-cap',
   core: {
     prompt: {

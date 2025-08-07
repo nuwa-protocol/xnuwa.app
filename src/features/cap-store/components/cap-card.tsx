@@ -29,7 +29,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
     setIsLoading(true);
     try {
       installCap(cap);
-      toast.success(`${cap.idName} has been installed`);
+      toast.success(`${cap.metadata.displayName} has been installed`);
     } catch (error) {
       toast.error(t('capStore.card.installFailed'));
     } finally {
@@ -40,8 +40,8 @@ export function CapCard({ cap, onRun }: CapCardProps) {
   const handleUninstall = async () => {
     setIsLoading(true);
     try {
-      uninstallCap(cap.idName);
-      toast.success(`${cap.idName} has been uninstalled`);
+      uninstallCap(cap.id);
+      toast.success(`${cap.metadata.displayName} has been uninstalled`);
     } catch (error) {
       toast.error(t('capStore.card.uninstallFailed'));
     } finally {

@@ -1,10 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, CheckCircle2, Loader2, Save } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { z } from 'zod';
-import { useSelectedModel } from '@/features/cap-studio/hooks';
 import type { LocalCap } from '@/features/cap-studio/types';
 import {
   Button,
@@ -23,8 +17,7 @@ import {
   MultiSelect,
   Textarea,
 } from '@/shared/components/ui';
-import type { CapMcpServerConfig } from '@/shared/types/cap';
-import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
+import { useEditForm } from '../../hooks/use-edit-form';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { ModelSelectorDialog } from '../model-selector';
 import { predefinedTags } from './constants';
@@ -32,150 +25,22 @@ import { McpServersConfig } from './mcp-servers-config';
 import { ModelDetails } from './model-details';
 import { PromptEditor } from './prompt-editor';
 
-const capSchema = z.object({
-  idName: z
-    .string()
-    .min(6, 'Name must be at least 6 characters')
-    .max(20, 'Name must be at most 20 characters')
-    .regex(
-      /^[a-zA-Z0-9_]+$/,
-      'Name must contain only letters, numbers, and underscores',
-    ),
-  displayName: z
-    .string()
-    .min(1, 'Display name is required')
-    .max(50, 'Display name too long'),
-  description: z
-    .string()
-    .min(20, 'Description must be at least 10 characters')
-    .max(500, 'Description too long'),
-  tags: z.array(z.string()),
-  prompt: z.object({
-    value: z.string(),
-    suggestions: z.array(z.string()).optional(),
-  }),
-});
-
-type CapFormData = z.infer<typeof capSchema>;
-
 interface CapEditFormProps {
   editingCap?: LocalCap;
-  onSave?: () => void;
-  onCancel?: () => void;
 }
 
-export function CapEditForm({
-  editingCap,
-  onSave,
-  onCancel,
-}: CapEditFormProps) {
-  const { createCap, updateCap } = useLocalCapsHandler();
-  const { selectedModel } = useSelectedModel();
-  const [isSaving, setIsSaving] = useState(false);
-  const [mcpServers, setMcpServers] = useState<
-    Record<string, CapMcpServerConfig>
-  >({});
-
-  const form = useForm<CapFormData>({
-    resolver: zodResolver(capSchema),
-    mode: 'onChange',
-    defaultValues: {
-      idName: editingCap?.capData.idName || '',
-      displayName: editingCap?.capData.metadata.displayName || '',
-      description: editingCap?.capData.metadata.description || '',
-      tags: editingCap?.capData.metadata.tags || [],
-      prompt: {
-        value:
-          typeof editingCap?.capData.core.prompt === 'string'
-            ? editingCap.capData.core.prompt
-            : editingCap?.capData.core.prompt?.value || '',
-        suggestions:
-          typeof editingCap?.capData.core.prompt === 'object'
-            ? editingCap.capData.core.prompt.suggestions
-            : [],
-      },
-    },
+export function CapEditForm({ editingCap }: CapEditFormProps) {
+  const {
+    form,
+    handleFormSave,
+    handleFormCancel,
+    handleUpdateMcpServers,
+    isSaving,
+    selectedModel,
+    mcpServers,
+  } = useEditForm({
+    editingCap,
   });
-
-  useEffect(() => {
-    if (editingCap) {
-      setMcpServers(editingCap.capData.core.mcpServers || {});
-    }
-  }, [editingCap]);
-
-  const handleSave = async (data: CapFormData) => {
-    // Trigger validation for all fields
-    const isValid = await form.trigger();
-
-    if (!isValid) {
-      toast.warning('Please fix all validation errors before saving');
-      return;
-    }
-
-    if (!selectedModel) {
-      toast.warning('Please select a model for this cap');
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      if (editingCap) {
-        // Update existing cap
-        updateCap(editingCap.id, {
-          capData: {
-            idName: data.idName,
-            metadata: {
-              displayName: data.displayName,
-              description: data.description,
-              tags: data.tags,
-              author: '',
-              submittedAt: 0,
-            },
-            core: {
-              prompt: data.prompt,
-              model: selectedModel,
-              mcpServers,
-            },
-          },
-        });
-
-        toast.success(`${data.displayName} has been updated successfully`);
-
-        onSave?.();
-      } else {
-        // Create new cap
-        createCap({
-          idName: data.idName,
-          metadata: {
-            displayName: data.displayName,
-            description: data.description,
-            tags: data.tags,
-            author: '',
-            submittedAt: 0,
-          },
-          core: {
-            prompt: data.prompt,
-            model: selectedModel,
-            mcpServers,
-          },
-        });
-
-        toast.success(`${data.displayName} has been created successfully`);
-
-        onSave?.();
-      }
-    } catch (error) {
-      toast.error('Failed to save cap. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleUpdateMcpServers = (
-    servers: Record<string, CapMcpServerConfig>,
-  ) => {
-    setMcpServers(servers);
-  };
 
   return (
     <div className="space-y-6">
@@ -190,15 +55,13 @@ export function CapEditForm({
         </div>
 
         <div className="flex items-center space-x-2">
-          {onCancel && (
-            <Button variant="ghost" size="sm" onClick={onCancel}>
-              Cancel
-            </Button>
-          )}
+          <Button variant="ghost" size="sm" onClick={handleFormCancel}>
+            Cancel
+          </Button>
           <Button
             type="button"
             disabled={isSaving}
-            onClick={form.handleSubmit(handleSave)}
+            onClick={form.handleSubmit(handleFormSave)}
           >
             {isSaving ? (
               <>
@@ -216,7 +79,10 @@ export function CapEditForm({
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(handleFormSave)}
+          className="space-y-6"
+        >
           <DashboardGrid cols={1}>
             {/* Basic Information */}
             <Card>
@@ -404,11 +270,9 @@ export function CapEditForm({
 
             <div className="flex items-center space-x-2">
               <div className="flex items-center space-x-2">
-                {onCancel && (
-                  <Button variant="ghost" onClick={onCancel}>
-                    Cancel
-                  </Button>
-                )}
+                <Button variant="ghost" onClick={handleFormCancel}>
+                  Cancel
+                </Button>
               </div>
               <Button type="submit" disabled={isSaving}>
                 {isSaving ? (

@@ -64,14 +64,14 @@ export const CapStateStore = create<CapStoreState>()(
         const { installedCaps } = get();
 
         // Don't install if already installed
-        if (installedCaps[cap.idName]) {
+        if (installedCaps[cap.id]) {
           return;
         }
 
         set((state) => ({
           installedCaps: {
             ...state.installedCaps,
-            [cap.idName]: cap,
+            [cap.id]: cap,
           },
         }));
 
@@ -150,7 +150,7 @@ export const CapStateStore = create<CapStoreState>()(
           const capsMap: Record<string, Cap> = {};
 
           caps.forEach((cap: Cap) => {
-            capsMap[cap.idName] = cap;
+            capsMap[cap.id] = cap;
           });
 
           set((state) => ({

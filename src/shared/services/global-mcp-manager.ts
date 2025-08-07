@@ -25,14 +25,14 @@ class GlobalMCPManager {
     // If already initialized for this cap, return existing tools
     if (
       this.currentMCPInstance &&
-      this.currentCapId === cap.idName &&
+      this.currentCapId === cap.id &&
       this.currentMCPInstance.initialized
     ) {
       return this.currentMCPInstance.tools;
     }
 
     // Clean up existing instance if switching caps
-    if (this.currentMCPInstance && this.currentCapId !== cap.idName) {
+    if (this.currentMCPInstance && this.currentCapId !== cap.id) {
       await this.cleanup();
     }
 
@@ -81,7 +81,7 @@ class GlobalMCPManager {
       tools: allTools,
       initialized: true,
     };
-    this.currentCapId = cap.idName;
+    this.currentCapId = cap.id;
 
     return allTools;
   }

@@ -18,7 +18,7 @@ export const useInstalledCap = (cap: Cap) => {
 
   const { installCap, uninstallCap, updateInstalledCap, installedCaps } = state;
 
-  const isInstalled = !!installedCaps[cap.idName];
+  const isInstalled = !!installedCaps[cap.id];
 
   return {
     isInstalled,

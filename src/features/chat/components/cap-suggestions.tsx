@@ -6,6 +6,8 @@ import type { Cap } from '@/shared/types';
 
 const mockCapSuggestions: Cap[] = [
   {
+    id: 'code-assistant',
+    authorDID: 'default',
     idName: 'code-assistant',
     metadata: {
       displayName: 'Code Assistant',
@@ -40,6 +42,8 @@ const mockCapSuggestions: Cap[] = [
     },
   },
   {
+    id: 'research-helper',
+    authorDID: 'default',
     idName: 'research-helper',
     metadata: {
       displayName: 'Research Helper',
@@ -74,6 +78,8 @@ const mockCapSuggestions: Cap[] = [
     },
   },
   {
+    id: 'writing-companion',
+    authorDID: 'default',
     idName: 'writing-companion',
     metadata: {
       displayName: 'Writing Companion',
