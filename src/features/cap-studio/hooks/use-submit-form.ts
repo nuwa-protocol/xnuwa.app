@@ -63,7 +63,11 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
 
       if (result.success) {
         // update cap status to submitted
-        updateCap(cap.id, { status: 'submitted', cid: result.capId });
+        updateCap(cap.id, {
+          status: 'submitted',
+          cid: result.capId,
+          capData: capWithSubmitFormData,
+        });
 
         toast.success(result.message);
 

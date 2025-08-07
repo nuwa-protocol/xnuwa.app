@@ -7,6 +7,10 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@/shared/components/ui';
 import { useLocalCaps } from '../../hooks';
 import type { LocalCap } from '../../types';
@@ -32,12 +36,28 @@ export function MyCaps({
   // Get caps array
   const capsArray = localCaps;
 
-  // Filter caps by search query only
-  const filteredCaps = useMemo(() => {
-    if (!searchQuery) return capsArray;
+  // Separate caps by status
+  const draftCaps = useMemo(() => {
+    const drafts = capsArray.filter((cap) => cap.status === 'draft');
+    if (!searchQuery) return drafts;
 
     const query = searchQuery.toLowerCase();
-    return capsArray.filter(
+    return drafts.filter(
+      (cap) =>
+        cap.capData.metadata.displayName.toLowerCase().includes(query) ||
+        cap.capData.metadata.description.toLowerCase().includes(query) ||
+        cap.capData.metadata.tags.some((tag) =>
+          tag.toLowerCase().includes(query),
+        ),
+    );
+  }, [capsArray, searchQuery]);
+
+  const publishedCaps = useMemo(() => {
+    const published = capsArray.filter((cap) => cap.status === 'submitted');
+    if (!searchQuery) return published;
+
+    const query = searchQuery.toLowerCase();
+    return published.filter(
       (cap) =>
         cap.capData.metadata.displayName.toLowerCase().includes(query) ||
         cap.capData.metadata.description.toLowerCase().includes(query) ||
@@ -94,32 +114,75 @@ export function MyCaps({
         </div>
       </div>
 
-      {/* Caps list */}
-      {filteredCaps.length === 0 ? (
-        <Card className="border-dashed">
-          <CardHeader className="text-center py-8">
-            <CardTitle className="text-muted-foreground">
-              No matching caps
-            </CardTitle>
-            <CardDescription>
-              Try adjusting your search criteria
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      ) : (
-        <DashboardGrid cols={1}>
-          {filteredCaps.map((cap) => (
-            <CapCard
-              key={cap.id}
-              cap={cap}
-              onEdit={() => onEditCap?.(cap)}
-              onTest={() => onTestCap?.(cap)}
-              onSubmit={() => onSubmitCap?.(cap)}
-              onUpdate={() => onSubmitCap?.(cap)}
-            />
-          ))}
-        </DashboardGrid>
-      )}
+      {/* Tabs for draft and published */}
+      <Tabs defaultValue="drafts" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="drafts">Drafts ({draftCaps.length})</TabsTrigger>
+          <TabsTrigger value="published">
+            Published ({publishedCaps.length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="drafts" className="mt-6">
+          {draftCaps.length === 0 ? (
+            <Card className="border-dashed">
+              <CardHeader className="text-center py-8">
+                <CardTitle className="text-muted-foreground">
+                  {searchQuery ? 'No matching draft caps' : 'No draft caps'}
+                </CardTitle>
+                <CardDescription>
+                  {searchQuery
+                    ? 'Try adjusting your search criteria'
+                    : 'Create your first cap to get started'}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ) : (
+            <DashboardGrid cols={1}>
+              {draftCaps.map((cap) => (
+                <CapCard
+                  key={cap.id}
+                  cap={cap}
+                  onEdit={() => onEditCap?.(cap)}
+                  onTest={() => onTestCap?.(cap)}
+                  onSubmit={() => onSubmitCap?.(cap)}
+                />
+              ))}
+            </DashboardGrid>
+          )}
+        </TabsContent>
+
+        <TabsContent value="published" className="mt-6">
+          {publishedCaps.length === 0 ? (
+            <Card className="border-dashed">
+              <CardHeader className="text-center py-8">
+                <CardTitle className="text-muted-foreground">
+                  {searchQuery
+                    ? 'No matching published caps'
+                    : 'No published caps'}
+                </CardTitle>
+                <CardDescription>
+                  {searchQuery
+                    ? 'Try adjusting your search criteria'
+                    : 'Submit your drafts to see them here'}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ) : (
+            <DashboardGrid cols={1}>
+              {publishedCaps.map((cap) => (
+                <CapCard
+                  key={cap.id}
+                  cap={cap}
+                  onEdit={() => onEditCap?.(cap)}
+                  onTest={() => onTestCap?.(cap)}
+                  onUpdate={() => onSubmitCap?.(cap)}
+                />
+              ))}
+            </DashboardGrid>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

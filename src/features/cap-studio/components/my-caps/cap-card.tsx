@@ -2,12 +2,9 @@ import { formatDistanceToNow } from 'date-fns';
 import {
   Bot,
   Bug,
-  CheckCircle,
   Clock,
-  Code2,
   Copy,
   Edit,
-  FileText,
   MoreVertical,
   Server,
   Trash2,
@@ -24,7 +21,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  Badge,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
   Button,
   Card,
   CardContent,
@@ -73,12 +72,23 @@ export function CapCard({
   });
 
   return (
-    <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-primary/20">
+    <Card className="hover:shadow-md hover:shadow-theme-primary/40 shadow-theme-primary/20 transition-all duration-200 border-l-4 border-l-theme-primary/20">
       <CardContent className="p-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start space-x-4 flex-1 min-w-0">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
-              <Code2 className="h-6 w-6 text-primary" />
+            <div className="w-12 h-12 flex items-center justify-center shrink-0">
+              <Avatar className="rounded-lg">
+                <AvatarImage
+                  src={
+                    cap.capData.metadata.thumbnail?.type === 'file'
+                      ? cap.capData.metadata.thumbnail.file
+                      : cap.capData.metadata.thumbnail?.url
+                  }
+                />
+                <AvatarFallback>
+                  {cap.capData.metadata.displayName.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
             </div>
 
             <div className="flex-1 min-w-0">
@@ -86,17 +96,6 @@ export function CapCard({
                 <h3 className="font-semibold text-base truncate">
                   {cap.capData.metadata.displayName}
                 </h3>
-                <Badge
-                  variant={cap.status === 'submitted' ? 'default' : 'secondary'}
-                  className="shrink-0"
-                >
-                  {cap.status === 'submitted' ? (
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                  ) : (
-                    <FileText className="h-3 w-3 mr-1" />
-                  )}
-                  {cap.status === 'submitted' ? 'Published' : 'Draft'}
-                </Badge>
               </div>
 
               <p className="text-sm text-muted-foreground mb-2 line-clamp-2 break-words overflow-hidden">
@@ -121,15 +120,39 @@ export function CapCard({
           </div>
 
           <div className="flex items-center space-x-2 shrink-0">
-            <Button onClick={onEdit} size="sm" variant="outline">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
+            <div className="flex grid grid-cols-2 gap-2">
+              <Button onClick={onEdit} size="sm" variant="outline">
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
 
-            <Button onClick={onTest} size="sm" variant="default">
-              <Bug className="h-4 w-4 mr-2" />
-              Test
-            </Button>
+              <Button onClick={onTest} size="sm" variant="outline">
+                <Bug className="h-4 w-4 mr-2" />
+                Test Cap
+              </Button>
+
+              {cap.status === 'draft' ? (
+                <Button
+                  onClick={onSubmit}
+                  size="sm"
+                  variant="default"
+                  className="col-span-2"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Submit for Publishing
+                </Button>
+              ) : (
+                <Button
+                  onClick={onUpdate}
+                  size="sm"
+                  variant="default"
+                  className="col-span-2"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Update Published Version
+                </Button>
+              )}
+            </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -137,18 +160,17 @@ export function CapCard({
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onSubmit}>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Submit
-                </DropdownMenuItem>
+              <DropdownMenuContent align="start">
                 {cap.status === 'submitted' && cap.cid && (
-                  <DropdownMenuItem onClick={handleCopyCid}>
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy Published CID
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem onClick={handleCopyCid}>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy Published CID
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
                 )}
-                <DropdownMenuSeparator />
+
                 <DropdownMenuItem
                   onClick={() => setShowDeleteDialog(true)}
                   className="text-destructive"
