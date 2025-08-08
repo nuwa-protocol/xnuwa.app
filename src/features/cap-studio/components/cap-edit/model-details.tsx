@@ -41,6 +41,20 @@ export function ModelDetails({ model }: ModelDetailsProps) {
               </div>
             </div>
           )}
+        {model.supported_inputs && model.supported_inputs.length > 0 && (
+          <div className="mt-3">
+            <div className="text-xs text-muted-foreground mb-1">
+              Supported inputs:
+            </div>
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {model.supported_inputs.map((input) => (
+                <Badge key={input} variant="outline" className="text-xs">
+                  {input}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

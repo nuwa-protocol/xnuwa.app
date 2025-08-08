@@ -19,10 +19,10 @@ import {
   useRef,
   useState,
 } from 'react';
+import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
 import { useScrollToBottom } from '@/features/chat/hooks/use-scroll-to-bottom';
-import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
@@ -204,9 +204,9 @@ function PureMultimodalInput({
           </div>
 
           <div className="flex items-center">
-            {isDevMode && (
+            {/* {isDevMode && (
               <AttachmentsButton fileInputRef={fileInputRef} status={status} />
-            )}
+            )} */}
             {status === 'submitted' || status === 'streaming' ? (
               <StopButton stop={stop} setMessages={setMessages} />
             ) : (
