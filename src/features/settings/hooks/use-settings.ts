@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback } from 'react';
 import { SettingsStateStore } from '@/features/settings/stores';
 

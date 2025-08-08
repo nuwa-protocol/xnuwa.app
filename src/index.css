@@ -45,14 +45,25 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    
+    /* Theme colors based on #FF15FB */
+    --theme-primary: 303 100% 54%;
+    --theme-secondary: 303 60% 92%;
+    --theme-accent: 303 80% 88%;
+    --theme-muted: 303 30% 95%;
+    --theme-subtle: 303 15% 98%;
+    
+    /* Sidebar with glassmorphism effect */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent: 240 5.9% 90%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-border: 240 5.9% 90%;
+    --sidebar-ring: 240 10% 3.9%;
+    --sidebar-glass: 0 0% 100% / 0.8;
+    --sidebar-shadow: 240 5.9% 10% / 0.1;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -79,14 +90,25 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
+    
+    /* Theme colors for dark mode */
+    --theme-primary: 303 100% 70%;
+    --theme-secondary: 303 40% 15%;
+    --theme-accent: 303 50% 20%;
+    --theme-muted: 303 20% 8%;
+    --theme-subtle: 303 10% 5%;
+    
+    /* Dark mode sidebar with glassmorphism */
+    --sidebar-background: 240 3.7% 15.9%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 240 3.7% 25%;
+    --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 240 4.9% 83.9%;
+    --sidebar-glass: 240 10% 3.9% / 0.9;
+    --sidebar-shadow: 240 10% 3.9% / 0.2;
   }
 }
 

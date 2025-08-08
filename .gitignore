@@ -47,3 +47,9 @@ test-results/
 
 # cap
 public/caps.json
+
+# claude
+.claude
+
+# cursor
+.cursor

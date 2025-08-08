@@ -21,6 +21,7 @@ export const en = {
       artifact: 'Files',
       togglePin: 'Pin',
       toggleUnpin: 'Unpin',
+      wallet: 'Wallet',
     },
     profile: {
       toggleTheme: 'Toggle {{mode}} mode',
@@ -122,13 +123,9 @@ export const en = {
     title: 'Cap Store',
     description: 'Discover and install capabilities to enhance your experience',
     searchPlaceholder: 'Search caps...',
-    tabs: {
+    sidebar: {
+      installed: 'Installed',
       all: 'All Caps',
-      development: 'Development',
-      design: 'Design',
-      analytics: 'Analytics',
-      productivity: 'Productivity',
-      security: 'Security',
     },
     status: {
       loading: 'Loading caps...',
@@ -163,9 +160,12 @@ export const en = {
     aWeekAgo: 'A week ago',
     older: 'Older',
     loginToSave: 'Sign in with DID to save chat history!',
+    pinnedChats: 'Pinned Chats',
+    recentChats: 'Recent Chats',
+    moreChats: 'More chats',
   },
   search: {
-    searchPlaceholder: 'Search chats, caps, files...',
+    searchPlaceholder: 'Search chats...',
     noChatsHistory: 'No chat history found.',
   },
   chat: {
@@ -230,6 +230,17 @@ export const en = {
     requestSuggestions: 'Request suggestions',
     delete: 'Delete',
     more: 'More',
+    rename: 'Rename',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+  },
+  dialog: {
+    renameChat: {
+      title: 'Rename Chat',
+      placeholder: 'Enter chat name',
+    },
   },
   document: {
     creating: 'Creating',
@@ -408,12 +419,23 @@ export const en = {
         placeholder: 'Enter your name',
         save: 'Save',
       },
+      logout: {
+        title: 'Logout',
+        description: 'Logout from your account',
+        button: 'Logout',
+        confirmTitle: 'Are you absolutely sure?',
+        confirmDescription:
+          'You are logging out of your account. You will need to sign in again to continue using the application.',
+        confirmButton: 'Logout',
+        cancel: 'Cancel',
+        success: 'Successfully logged out',
+      },
     },
     system: {
       clearAllStorage: {
         title: 'Clear All Storage',
         description:
-          'Permanently delete all stored data including chats, settings, and files',
+          'Permanently delete all stored data including chats and settings',
         warning: 'Warning: This action cannot be undone',
         warningDescription:
           'This will permanently delete all your data including chat history, settings, uploaded files, and documents. You will need to sign in again.',

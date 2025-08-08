@@ -39,14 +39,16 @@ export const DevErrorCard = ({ error }: { error: Error | object }) => {
         </div>
         <div className="flex flex-col items-center justify-center p-6">
           <h1 className="text-2xl font-bold">Application Error</h1>
+          <h2 className="text-md font-semibold">
+            This page only shows in development mode
+          </h2>
           <p className="p-4 text-muted-foreground">是时候修bug了! 🐛</p>
         </div>
       </div>
       <Card className=" max-w-3xl mx-auto bg-muted border-red-500 border-2">
         <CardHeader className="flex flex-row items-start justify-between gap-2">
           <div className="font-medium text-red-500">
-            Error: {error instanceof Error ? error.message : 'Unknown'} (Only
-            visible in development mode)
+            Error: {error instanceof Error ? error.message : 'Unknown'}
           </div>
           <CardAction>
             <Button

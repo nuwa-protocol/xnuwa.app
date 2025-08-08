@@ -22,6 +22,7 @@ export const cn: typeof en = {
       artifact: '文件',
       togglePin: '固定',
       toggleUnpin: '取消固定',
+      wallet: '账户',
     },
     profile: {
       toggleTheme: '切换{{mode}}模式',
@@ -122,13 +123,9 @@ export const cn: typeof en = {
     title: 'Cap 商店',
     description: '发现并安装能力，提升你的体验',
     searchPlaceholder: '搜索能力...',
-    tabs: {
+    sidebar: {
+      installed: '已安装能力',
       all: '所有能力',
-      development: '开发',
-      design: '设计',
-      analytics: '分析',
-      productivity: '效率',
-      security: '安全',
     },
     status: {
       loading: '正在加载能力...',
@@ -162,9 +159,18 @@ export const cn: typeof en = {
     aWeekAgo: '一周前',
     older: '更早',
     loginToSave: '登录 DID 以保存聊天记录！',
+    pinnedChats: '置顶聊天',
+    recentChats: '最近聊天',
+    moreChats: '更多聊天',
+  },
+  dialog: {
+    renameChat: {
+      title: '重命名聊天',
+      placeholder: '输入聊天名称',
+    },
   },
   search: {
-    searchPlaceholder: '搜索聊天、caps、文件...',
+    searchPlaceholder: '搜索聊天...',
     noChatsHistory: '没有找到聊天记录。',
   },
   chat: {
@@ -216,6 +222,11 @@ export const cn: typeof en = {
     requestSuggestions: '请求建议',
     delete: '删除',
     more: '更多',
+    rename: '重命名',
+    pin: '置顶',
+    unpin: '取消置顶',
+    cancel: '取消',
+    confirm: '确认',
   },
   document: {
     creating: '正在创建',
@@ -391,6 +402,17 @@ export const cn: typeof en = {
         name: '姓名',
         placeholder: '输入您的姓名',
         save: '保存',
+      },
+      logout: {
+        title: '退出登录',
+        description: '退出您的账户',
+        button: '退出登录',
+        confirmTitle: '您确定要这样做吗？',
+        confirmDescription:
+          '您将退出您的账户。您需要重新登录才能继续使用应用程序。',
+        confirmButton: '退出登录',
+        cancel: '取消',
+        success: '退出登录成功',
       },
     },
     system: {

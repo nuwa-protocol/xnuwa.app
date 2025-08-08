@@ -7,7 +7,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <AuthGuard>
-        <Toaster position="top-center" />
+        <Toaster position="top-center" expand={true} richColors />
         <Outlet />
       </AuthGuard>
     </ThemeProvider>
