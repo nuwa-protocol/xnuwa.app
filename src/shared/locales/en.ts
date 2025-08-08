@@ -17,6 +17,7 @@ export const en = {
       chat: 'Chat',
       settings: 'Settings',
       search: 'Search',
+      campaigns: 'Campaigns',
       capStore: 'Cap Store',
       artifact: 'Files',
       togglePin: 'Pin',

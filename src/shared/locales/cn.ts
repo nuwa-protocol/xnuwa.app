@@ -18,6 +18,7 @@ export const cn: typeof en = {
       chat: '聊天',
       settings: '设置',
       search: '搜索',
+      campaigns: '任务活动',
       capStore: 'Cap 商店',
       artifact: '文件',
       togglePin: '固定',
