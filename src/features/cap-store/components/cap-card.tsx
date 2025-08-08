@@ -1,4 +1,4 @@
-import { Loader2, Play, Settings, Trash2 } from 'lucide-react';
+import { Loader2, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -53,8 +53,17 @@ export function CapCard({ cap, onRun }: CapCardProps) {
     onRun?.(cap);
   };
 
+  const handleCardClick = () => {
+    if (isInstalled) {
+      handleRun();
+    }
+  };
+
   return (
-    <Card className="p-4 hover:shadow-md transition-shadow">
+    <Card
+      className={`p-4 hover:shadow-md transition-shadow ${isInstalled ? 'cursor-pointer' : ''}`}
+      onClick={handleCardClick}
+    >
       <div className="flex items-start gap-3">
         <CapThumbnail cap={cap} size="lg" />
         <div className="flex-1 min-w-0">
@@ -70,23 +79,16 @@ export function CapCard({ cap, onRun }: CapCardProps) {
           {/* Action buttons */}
           <div className="flex items-center justify-between">
             <div>
-              {isInstalled ? (
-                <Button
-                  size="sm"
-                  variant="default"
-                  className="text-xs px-2 py-1 h-6"
-                  onClick={handleRun}
-                >
-                  <Play className="size-3 mr-1" />
-                  Run
-                </Button>
-              ) : (
+              {!isInstalled && (
                 /* Install button */
                 <Button
                   size="sm"
                   variant="outline"
                   className="text-xs px-2 py-1 h-6"
-                  onClick={handleInstall}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleInstall();
+                  }}
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -104,6 +106,7 @@ export function CapCard({ cap, onRun }: CapCardProps) {
                     size="sm"
                     variant="ghost"
                     className="text-xs px-4 py-2 h-6 relative"
+                    onClick={(e) => e.stopPropagation()}
                     style={{
                       paddingRight: isInstalled ? 14 : undefined,
                     }}

@@ -2,6 +2,7 @@
 // Store for managing capability (Cap) installations and their states
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { defaultCap } from '@/shared/constants/cap';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
 import type { Cap } from '@/shared/types/cap';
@@ -83,7 +84,9 @@ export const CapStateStore = create<CapStoreState>()(
   persist(
     (set, get) => ({
       // Store state
-      installedCaps: {},
+      installedCaps: {
+        [defaultCap.id]: defaultCap,
+      },
 
       // Remote caps state
       remoteCapState: {

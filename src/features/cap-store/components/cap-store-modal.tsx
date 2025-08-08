@@ -28,11 +28,13 @@ interface CapStoreModalProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   children?: React.ReactNode;
+  initialActiveSection?: string;
 }
 
 export function CapStoreModal({
   open: externalOpen,
   onOpenChange: externalOnOpenChange,
+  initialActiveSection = 'installed',
   children,
 }: CapStoreModalProps) {
   const { t } = useLanguage();
@@ -44,7 +46,7 @@ export function CapStoreModal({
   const onOpenChange = isControlled ? externalOnOpenChange : setInternalOpen;
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeSection, setActiveSection] = useState('all');
+  const [activeSection, setActiveSection] = useState(initialActiveSection);
 
   // State for installed caps
   const [installedCaps, setInstalledCaps] = useState<Cap[]>([]);
