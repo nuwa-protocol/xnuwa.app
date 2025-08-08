@@ -12,9 +12,9 @@ const mockCapSuggestions: Cap[] = [
     metadata: {
       displayName: 'Code Assistant',
       description: 'Help with programming tasks and code review',
-      author: 'Nuwa',
       tags: ['Programming', 'Development'],
       submittedAt: Date.now(),
+      thumbnail: null,
     },
     core: {
       prompt: {
@@ -48,9 +48,9 @@ const mockCapSuggestions: Cap[] = [
     metadata: {
       displayName: 'Research Helper',
       description: 'Find and summarize information from various sources',
-      author: 'Nuwa',
       tags: ['Research', 'Analysis'],
       submittedAt: Date.now(),
+      thumbnail: null,
     },
     core: {
       prompt: {
@@ -84,9 +84,9 @@ const mockCapSuggestions: Cap[] = [
     metadata: {
       displayName: 'Writing Companion',
       description: 'Assist with creative writing and content creation',
-      author: 'Nuwa',
       tags: ['Writing', 'Creative'],
       submittedAt: Date.now(),
+      thumbnail: null,
     },
     core: {
       prompt: {

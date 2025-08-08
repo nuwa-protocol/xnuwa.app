@@ -94,8 +94,8 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
           displayName: data.displayName,
           description: data.description,
           tags: data.tags,
-          author: '',
           submittedAt: 0,
+          thumbnail: null,
         },
         core: {
           prompt: data.prompt,
@@ -120,8 +120,8 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
         displayName: data.displayName,
         description: data.description,
         tags: data.tags,
-        author: '',
         submittedAt: 0,
+        thumbnail: null,
       },
       core: {
         prompt: data.prompt,

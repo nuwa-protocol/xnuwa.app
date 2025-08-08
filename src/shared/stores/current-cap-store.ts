@@ -58,8 +58,11 @@ const defaultCurrentCap: Cap = {
     description:
       'OpenAI ChatGPT 4o is continually updated by OpenAI to point to the current version of GPT-4o used by ChatGPT. It therefore differs slightly from the API version of [GPT-4o](/models/openai/gpt-4o) in that it has additional RLHF. It is intended for research and evaluation.\n\nOpenAI notes that this model is not suited for production use-cases as it may be removed or redirected to another model in the future.',
     tags: ['ai', 'chatbot', 'openai'],
-    author: '',
     submittedAt: 0,
+    thumbnail: {
+      type: 'url',
+      url: 'https://unpkg.com/@lobehub/icons-static-png@1.60.0/light/openai.png',
+    },
   },
 };
 

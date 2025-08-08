@@ -54,6 +54,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
           ...cap.capData.metadata,
           homepage: submitFormData.homepage || undefined,
           repository: submitFormData.repository || undefined,
+          submittedAt: Date.now(),
           thumbnail,
         },
       };
