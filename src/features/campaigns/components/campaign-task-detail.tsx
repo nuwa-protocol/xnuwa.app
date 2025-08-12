@@ -1,16 +1,16 @@
+import { ArrowLeft, CheckCircle, Lightbulb, Trophy, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Badge } from '../../../shared/components/ui/badge';
+import { Button } from '../../../shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '../../../shared/components/ui/card';
-import { Button } from '../../../shared/components/ui/button';
-import { Badge } from '../../../shared/components/ui/badge';
-import { ArrowLeft, CheckCircle, Trophy, Users, Lightbulb } from 'lucide-react';
-import { campaignService } from '../services';
 import { useCampaignTaskActions } from '../hooks';
+import { campaignService } from '../services';
 import type { CampaignTask } from '../types';
 
 export function CampaignTaskDetail() {
@@ -48,11 +48,11 @@ export function CampaignTaskDetail() {
       setTask((prev) =>
         prev
           ? {
-              ...prev,
-              completed: true,
-              completedAt: new Date(),
-              category: 'completed',
-            }
+            ...prev,
+            completed: true,
+            completedAt: new Date(),
+            category: 'completed',
+          }
           : null,
       );
     } catch (error) {
@@ -93,27 +93,15 @@ export function CampaignTaskDetail() {
     );
   }
 
-  const getDifficultyColor = (difficulty: CampaignTask['difficulty']) => {
-    switch (difficulty) {
-      case 'easy':
-        return 'bg-theme-primary/20 text-theme-primary border-theme-primary/30';
-      case 'medium':
-        return 'bg-theme-primary/30 text-theme-primary border-theme-primary/50';
-      case 'hard':
-        return 'bg-theme-primary/40 text-theme-primary border-theme-primary/70';
-      default:
-        return 'bg-muted text-muted-foreground border-muted';
-    }
-  };
 
   const getCategoryColor = (category: CampaignTask['category']) => {
     switch (category) {
       case 'daily':
-        return 'bg-theme-primary/20 text-theme-primary border-theme-primary/30';
+        return 'bg-primary/20 text-primary border-primary/30';
       case 'ongoing':
-        return 'bg-theme-primary/30 text-theme-primary border-theme-primary/50';
+        return 'bg-primary/30 text-primary border-primary/50';
       case 'completed':
-        return 'bg-theme-primary/40 text-theme-primary border-theme-primary/70';
+        return 'bg-primary/40 text-primary border-primary/70';
       default:
         return 'bg-muted text-muted-foreground border-muted';
     }
@@ -134,7 +122,7 @@ export function CampaignTaskDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <Card
-              className={`border-l-4 ${task.completed ? 'border-l-theme-primary bg-muted/30' : 'border-l-theme-primary/50'}`}
+              className={`border-l-4 ${task.completed ? 'border-l-primary bg-muted/30' : 'border-l-primary/50'}`}
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -143,16 +131,10 @@ export function CampaignTaskDetail() {
                     <div>
                       <CardTitle className="text-2xl">{task.title}</CardTitle>
                       <div className="flex items-center gap-2 mt-2">
-                        <Badge className={getCategoryColor(task.category)}>
-                          {task.category}
-                        </Badge>
-                        <Badge className={getDifficultyColor(task.difficulty)}>
-                          {task.difficulty}
-                        </Badge>
                         {task.completed && (
                           <Badge
                             variant="outline"
-                            className="border-theme-primary text-theme-primary"
+                            className="border-primary text-primary"
                           >
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Completed
@@ -167,7 +149,7 @@ export function CampaignTaskDetail() {
                 <div className="space-y-6">
                   <div>
                     <h3 className="font-semibold mb-2 flex items-center gap-2">
-                      <Lightbulb className="h-4 w-4 text-theme-primary" />
+                      <Lightbulb className="h-4 w-4 text-primary" />
                       Description
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
@@ -178,7 +160,7 @@ export function CampaignTaskDetail() {
                   {task.requirements && task.requirements.length > 0 && (
                     <div>
                       <h3 className="font-semibold mb-2 flex items-center gap-2">
-                        <Users className="h-4 w-4 text-theme-primary" />
+                        <Users className="h-4 w-4 text-primary" />
                         Requirements
                       </h3>
                       <ul className="space-y-1">
@@ -187,7 +169,7 @@ export function CampaignTaskDetail() {
                             key={`requirement-${index}-${requirement.slice(0, 10)}`}
                             className="text-sm text-muted-foreground flex items-center gap-2"
                           >
-                            <div className="w-1.5 h-1.5 bg-theme-primary rounded-full flex-shrink-0"></div>
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0"></div>
                             {requirement}
                           </li>
                         ))}
@@ -198,7 +180,7 @@ export function CampaignTaskDetail() {
                   {task.completedAt && (
                     <div>
                       <h3 className="font-semibold mb-2">Completion Details</h3>
-                      <div className="text-sm text-theme-primary bg-theme-primary/5 p-3 rounded-lg border border-theme-primary/20">
+                      <div className="text-sm text-primary bg-primary/5 p-3 rounded-lg border border-primary/20">
                         <div className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4" />
                           <span>
@@ -221,15 +203,15 @@ export function CampaignTaskDetail() {
           </div>
 
           <div className="space-y-6">
-            <Card className="border-theme-primary/20">
+            <Card className="border-primary/20">
               <CardHeader>
                 <CardTitle className="text-lg">Reward</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="bg-theme-primary/5 p-4 rounded-lg border border-theme-primary/20">
-                    <Trophy className="h-8 w-8 text-theme-primary mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-theme-primary">
+                  <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+                    <Trophy className="h-8 w-8 text-primary mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-primary">
                       {task.points}
                     </div>
                     <div className="text-sm text-muted-foreground">Points</div>
@@ -238,7 +220,7 @@ export function CampaignTaskDetail() {
               </CardContent>
             </Card>
 
-            <Card className="border-theme-primary/20">
+            <Card className="border-primary/20">
               <CardHeader>
                 <CardTitle className="text-lg">Actions</CardTitle>
               </CardHeader>
@@ -248,7 +230,7 @@ export function CampaignTaskDetail() {
                     <Button
                       onClick={handleCompleteTask}
                       disabled={completing}
-                      className="w-full bg-theme-primary hover:bg-theme-primary/90 text-white"
+                      className="w-full bg-primary hover:bg-primary/90 text-white"
                       size="lg"
                     >
                       {completing ? 'Completing...' : 'Mark as Complete'}
@@ -257,7 +239,7 @@ export function CampaignTaskDetail() {
 
                   <Button
                     variant="outline"
-                    className="w-full border-theme-primary/30 text-theme-primary hover:bg-theme-primary hover:text-white"
+                    className="w-full border-primary/30 text-primary hover:bg-primary hover:text-white"
                     onClick={() => navigate('/campaigns')}
                   >
                     View All Tasks
@@ -265,7 +247,7 @@ export function CampaignTaskDetail() {
 
                   <Button
                     variant="ghost"
-                    className="w-full text-muted-foreground hover:text-theme-primary hover:bg-theme-primary/5"
+                    className="w-full text-muted-foreground hover:text-primary hover:bg-primary/5"
                   >
                     Share Achievement
                   </Button>
@@ -274,7 +256,7 @@ export function CampaignTaskDetail() {
             </Card>
 
             {task.unlockConditions && task.unlockConditions.length > 0 && (
-              <Card className="border-theme-primary/20">
+              <Card className="border-primary/20">
                 <CardHeader>
                   <CardTitle className="text-lg">Unlock Conditions</CardTitle>
                 </CardHeader>
@@ -285,7 +267,7 @@ export function CampaignTaskDetail() {
                         key={`condition-${index}-${condition.slice(0, 10)}`}
                         className="text-sm text-muted-foreground flex items-start gap-2"
                       >
-                        <div className="w-1.5 h-1.5 bg-theme-primary rounded-full flex-shrink-0 mt-2"></div>
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0 mt-2"></div>
                         {condition}
                       </li>
                     ))}

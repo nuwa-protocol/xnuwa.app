@@ -5,9 +5,7 @@ export const useCampaignTasks = () => {
   const { tasks, loading, error, fetchTasks, clearError } = useCampaignStore();
 
   useEffect(() => {
-    if (tasks.length === 0) {
-      fetchTasks();
-    }
+    fetchTasks();
   }, [tasks.length, fetchTasks]);
 
   return {
@@ -23,9 +21,7 @@ export const useCampaignStats = () => {
   const { stats, fetchStats } = useCampaignStore();
 
   useEffect(() => {
-    if (!stats) {
-      fetchStats();
-    }
+    fetchStats();
   }, [stats, fetchStats]);
 
   return { stats, refresh: fetchStats };

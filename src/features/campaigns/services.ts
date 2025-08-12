@@ -1,4 +1,4 @@
-import type { CampaignTask, CampaignStats, CampaignCategory } from './types';
+import type { CampaignCategory, CampaignStats, CampaignTask } from './types';
 
 // Mock data for demonstration - in real app this would come from API
 const mockTasks: CampaignTask[] = [
@@ -28,7 +28,7 @@ const mockTasks: CampaignTask[] = [
     id: '3',
     title: 'Daily Check-in',
     description: 'Visit the platform and check your dashboard',
-    category: 'daily',
+    category: 'ongoing',
     points: 50,
     difficulty: 'easy',
     completed: false,
@@ -60,7 +60,7 @@ const mockTasks: CampaignTask[] = [
     id: '6',
     title: 'Daily Exploration',
     description: 'Try a new AI model or feature today',
-    category: 'daily',
+    category: 'ongoing',
     points: 75,
     difficulty: 'medium',
     completed: false,
