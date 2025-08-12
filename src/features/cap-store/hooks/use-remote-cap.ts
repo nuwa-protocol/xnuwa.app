@@ -153,6 +153,26 @@ export function useRemoteCap() {
     return Promise.resolve(null);
   };
 
+  const downloadCap = async (capCid: string) => {
+    if (!capKit) {
+      throw new Error('CapKit not initialized');
+    }
+
+    const capData = await capKit.downloadCap(capCid, 'utf8');
+    const downloadContent: unknown = yaml.load(capData.data.fileData);
+
+    // check if the cap is valid
+    if (!validateCapContent(downloadContent)) {
+      console.warn(
+        `Downloaded cap ${capCid} does not match Cap type specification, skipping...`,
+      );
+      return null;
+    }
+
+    // parse the cap content
+    return parseCapContent(downloadContent);
+  };
+
   return {
     remoteCaps: remoteCapState.remoteCaps,
     isLoading: remoteCapState.isLoading,
@@ -166,5 +186,6 @@ export function useRemoteCap() {
     goToPage,
     nextPage,
     previousPage,
+    downloadCap,
   };
 }

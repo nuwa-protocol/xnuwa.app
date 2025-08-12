@@ -1,4 +1,4 @@
-import { Settings2, Trophy, Wrench } from 'lucide-react';
+import { Settings2, Wrench } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
@@ -108,13 +108,6 @@ export function AppSidebarContent() {
             />
 
             <SidebarWalletCard className="mb-2" />
-
-            <SidebarButton
-              icon={Trophy}
-              text={t('nav.sidebar.campaigns')}
-              href="/campaigns"
-              variant="secondary"
-            />
 
             {isDevMode && (
               <SidebarButton
