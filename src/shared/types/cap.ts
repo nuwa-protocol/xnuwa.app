@@ -1,5 +1,28 @@
-import { z } from 'zod';
+// re-export types from @nuwa-ai/cap-kit
+export type {
+  Cap,
+  CapCore,
+  CapID,
+  CapMcpServerConfig,
+  CapMetadata,
+  CapModel,
+  CapPrompt,
+  CapThumbnail,
+} from '@nuwa-ai/cap-kit';
 
+// re-export schemas from @nuwa-ai/cap-kit
+export {
+  CapCoreSchema,
+  CapIDSchema,
+  CapMcpServerConfigSchema,
+  CapMetadataSchema,
+  CapModelSchema,
+  CapPromptSchema,
+  CapSchema,
+  CapThumbnailSchema,
+} from '@nuwa-ai/cap-kit';
+
+/*
 // Zod schemas as single source of truth
 export const CapMcpServerConfigSchema = z.object({
   url: z.string(),
@@ -13,7 +36,7 @@ export const CapModelSchema = z.object({
   providerName: z.string(),
   providerSlug: z.string(),
   description: z.string(),
-  context_length: z.number(),
+  contextLength: z.number(),
   pricing: z.object({
     input_per_million_tokens: z.number(),
     output_per_million_tokens: z.number(),
@@ -74,3 +97,4 @@ export type CapCore = z.infer<typeof CapCoreSchema>;
 export type CapThumbnail = z.infer<typeof CapThumbnailSchema>;
 export type CapMetadata = z.infer<typeof CapMetadataSchema>;
 export type Cap = z.infer<typeof CapSchema>;
+*/

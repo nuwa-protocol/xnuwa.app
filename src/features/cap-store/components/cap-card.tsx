@@ -1,131 +1,66 @@
-import { Loader2, Settings, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { MoreHorizontal } from 'lucide-react';
 import {
-  Button,
   Card,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui';
-import { useLanguage } from '@/shared/hooks/use-language';
-import type { Cap } from '@/shared/types/cap';
-import { useInstalledCap } from '../hooks/use-installed-cap';
-import { CapThumbnail } from './cap-thumbnail';
+import type { CapMetadata } from '@/shared/types/cap';
+import { CapAvatar } from './cap-avatar';
 
-export interface CapCardProps {
-  cap: Cap;
-  onRun?: (cap: Cap) => void;
+interface CapCardActions {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
 }
 
-export function CapCard({ cap, onRun }: CapCardProps) {
-  const { installCap, uninstallCap, updateInstalledCap, isInstalled } =
-    useInstalledCap(cap);
-  const [isLoading, setIsLoading] = useState(false);
-  const { t } = useLanguage();
+export interface CapCardProps {
+  capMetadata: CapMetadata;
+  onClick: () => void;
+  actions?: CapCardActions[];
+}
 
-  const handleInstall = async () => {
-    setIsLoading(true);
-    try {
-      installCap(cap);
-      toast.success(`${cap.metadata.displayName} has been installed`);
-    } catch (error) {
-      toast.error(t('capStore.card.installFailed'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleUninstall = async () => {
-    setIsLoading(true);
-    try {
-      uninstallCap(cap.id);
-      toast.success(`${cap.metadata.displayName} has been uninstalled`);
-    } catch (error) {
-      toast.error(t('capStore.card.uninstallFailed'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRun = () => {
-    onRun?.(cap);
-  };
-
-  const handleCardClick = () => {
-    if (isInstalled) {
-      handleRun();
-    }
-  };
-
+export function CapCard({ capMetadata, onClick, actions }: CapCardProps) {
   return (
     <Card
-      className={`p-4 hover:shadow-md transition-shadow ${isInstalled ? 'cursor-pointer' : ''}`}
-      onClick={handleCardClick}
+      className={`p-4 hover:shadow-md transition-shadow cursor-pointer`}
+      onClick={onClick}
     >
-      <div className="flex items-start gap-3">
-        <CapThumbnail cap={cap} size="lg" />
+      <div className="flex items-center gap-3">
+        <CapAvatar
+          capName={capMetadata.displayName}
+          capThumbnail={capMetadata.thumbnail}
+          size="lg"
+        />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-medium text-sm truncate">
-              {cap.metadata.displayName}
-            </h3>
-          </div>
-          <p className="text-xs text-muted-foreground mb-3 line-clamp-2 h-8 overflow-hidden">
-            {cap.metadata.description}
+          <h3 className="font-medium text-sm truncate">
+            {capMetadata.displayName}
+          </h3>
+          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+            {capMetadata.description}
           </p>
-
-          {/* Action buttons */}
-          <div className="flex items-center justify-between">
-            <div>
-              {!isInstalled && (
-                /* Install button */
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-xs px-2 py-1 h-6"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleInstall();
-                  }}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <Loader2 className="size-3 animate-spin" />
-                  ) : (
-                    t('capStore.card.install')
-                  )}
-                </Button>
-              )}
-            </div>
-            {isInstalled && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-xs px-4 py-2 h-6 relative"
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                      paddingRight: isInstalled ? 14 : undefined,
-                    }}
-                  >
-                    <span className="relative inline-block">
-                      <Settings className="size-3" />
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={handleUninstall}>
-                    <Trash2 className="size-3 mr-2" />
-                    Uninstall
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="p-1.5 hover:bg-muted rounded-sm transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+              <span className="sr-only">More Actions</span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {actions?.map((action) => (
+              <DropdownMenuItem key={action.label} onClick={action.onClick}>
+                {action.icon}
+                {action.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </Card>
   );

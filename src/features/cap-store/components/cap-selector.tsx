@@ -10,12 +10,12 @@ import {
 import { useCurrentCap } from '@/shared/hooks';
 import type { Cap } from '@/shared/types';
 import { useRemoteCap } from '../hooks/use-remote-cap';
+import { CapAvatar } from './cap-avatar';
 import { CapStoreModal } from './cap-store-modal';
-import { CapThumbnail } from './cap-thumbnail';
 
 const CapInfo = ({ cap }: { cap: Cap }) => (
   <>
-    <CapThumbnail cap={cap} size="sm" />
+    <CapAvatar capName={cap.metadata.displayName} capThumbnail={cap.metadata.thumbnail} size="sm" />
     <span className="text-sm font-normal">{cap.metadata.displayName}</span>
   </>
 );
@@ -41,7 +41,7 @@ export function CapSelector() {
           event.preventDefault();
           setIsModalOpen(true);
         }}
-        className="rounded-2xl"
+        className="rounded-lg"
         type="button"
       >
         <div className="flex items-center gap-2">

@@ -35,7 +35,7 @@ export const defaultCap: Cap = {
       providerSlug: 'openai',
       description:
         'OpenAI ChatGPT 4o is continually updated by OpenAI to point to the current version of GPT-4o used by ChatGPT. It therefore differs slightly from the API version of [GPT-4o](/models/openai/gpt-4o) in that it has additional RLHF. It is intended for research and evaluation.\n\nOpenAI notes that this model is not suited for production use-cases as it may be removed or redirected to another model in the future.',
-      context_length: 128000,
+      contextLength: 128000,
       pricing: {
         input_per_million_tokens: 5,
         output_per_million_tokens: 15,

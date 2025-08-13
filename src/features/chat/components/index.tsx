@@ -48,9 +48,6 @@ export function Chat({
             setMessages={setChatMessages}
           />
         </div>
-        {/* <CapSuggestions
-          onCapSelect={(capId) => console.log('Cap selected:', capId)}
-        /> */}
       </div>
     </CenteredWelcome>
   );
