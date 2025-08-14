@@ -11,3 +11,9 @@ export type InstalledCap = {
   isFavorite: boolean;
   lastUsedAt: number | null;
 };
+
+export type CapStoreSidebarSection = {
+  id: string;
+  label: string;
+  type: 'section' | 'tag' | 'divider';
+};

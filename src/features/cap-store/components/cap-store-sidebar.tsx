@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react';
 import { Input } from '@/shared/components/ui';
 import { predefinedTags } from '@/shared/constants/cap';
 import { useDebounceValue, useLanguage } from '@/shared/hooks';
+import type { CapStoreSidebarSection } from '../types';
 
 export interface CapStoreSidebarProps {
   activeSection: CapStoreSidebarSection;
@@ -24,11 +25,7 @@ export interface CapStoreSidebarProps {
   onSearchChange: (query: string) => void;
 }
 
-export type CapStoreSidebarSection = {
-  id: string;
-  label: string;
-  type: 'section' | 'tag' | 'divider';
-};
+
 
 export function CapStoreSidebar({
   activeSection,

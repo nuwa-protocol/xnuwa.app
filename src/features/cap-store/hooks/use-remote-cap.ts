@@ -13,7 +13,7 @@ interface UseRemoteCapParams {
  * Hook for accessing the remote caps with advanced filtering, sorting, and pagination
  */
 export function useRemoteCap() {
-  const { capKit, isLoading: isCapKitLoading } = useCapKit();
+  const { capKit } = useCapKit();
   const { remoteCaps, setRemoteCaps } = CapStateStore();
   const [lastSearchParams, setLastSearchParams] = useState<UseRemoteCapParams>(
     {},
@@ -26,7 +26,7 @@ export function useRemoteCap() {
     const {
       searchQuery: queryString = '',
       page: pageNum = 0,
-      size: sizeNum = 5,
+      size: sizeNum = 50,
       tags: tagsArray = [],
     } = params;
 
@@ -39,7 +39,6 @@ export function useRemoteCap() {
         throw new Error('CapKit not initialized');
       }
 
-      // const response = await capKit.queryWithName(queryString);
       const response = await capKit.queryWithName(
         queryString,
         tagsArray,

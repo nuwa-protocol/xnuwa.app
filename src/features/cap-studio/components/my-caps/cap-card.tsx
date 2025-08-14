@@ -25,7 +25,6 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Badge,
   Button,
   Card,
   CardContent,
@@ -116,19 +115,7 @@ export function CapCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <CardContent className="p-4">
-        {cap.status === 'submitted' && (
-          <Badge
-            variant="secondary"
-            className="ml-14 w-fit text-xs mb-1 cursor-pointer hover:bg-background/80 transition-colors flex items-center gap-1"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCopyCid();
-            }}
-          >
-            <Copy className="h-3 w-3" />
-            Published
-          </Badge>
-        )}
+
         <div className="flex items-center justify-between gap-4">
           {(isMultiSelectMode || isHovered) && (
             <div className="flex items-center">
@@ -247,13 +234,10 @@ export function CapCard({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
                   {cap.status === 'submitted' && cap.cid && (
-                    <>
-                      <DropdownMenuItem onClick={handleCopyCid}>
-                        <Copy className="h-4 w-4 mr-2" />
-                        Copy Published CID
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
+                    <DropdownMenuItem onClick={handleCopyCid}>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy Published CID
+                    </DropdownMenuItem>
                   )}
 
                   <DropdownMenuItem onClick={onTest}>

@@ -28,7 +28,6 @@ export const useCapStore = () => {
         throw new Error('Cap CID is required for downloading cap');
       }
       const capData = await downloadCap(capCid);
-      console.log(capData);
       addInstalledCap({
         capData,
         isFavorite: true,
@@ -52,7 +51,11 @@ export const useCapStore = () => {
   };
 
   const runCap = async (capId: string, capCid?: string) => {
+    console.log(capId);
     const installedCap = installedCaps[capId];
+
+    console.log(installedCap);
+
     if (!installedCap) {
       if (!capCid) {
         throw new Error('Cap CID is required for downloading cap');
@@ -63,6 +66,7 @@ export const useCapStore = () => {
         isFavorite: false,
         lastUsedAt: Date.now(),
       });
+      setCurrentCap(capData);
     } else {
       updateInstalledCap(capId, {
         lastUsedAt: Date.now(),

@@ -1,5 +1,4 @@
 import { AlertCircle, Loader2 } from 'lucide-react';
-import { useState } from 'react';
 import {
   Button,
   Tooltip,
@@ -9,29 +8,29 @@ import {
 } from '@/shared/components/ui';
 import { useCurrentCap } from '@/shared/hooks';
 import type { Cap } from '@/shared/types';
-import { useRemoteCap } from '../hooks/use-remote-cap';
 import { CapAvatar } from './cap-avatar';
 import { CapStoreModal } from './cap-store-modal';
+import { CapStoreModalProvider, useCapStoreModal } from './cap-store-modal-context';
 
 const CapInfo = ({ cap }: { cap: Cap }) => (
   <>
-    <CapAvatar capName={cap.metadata.displayName} capThumbnail={cap.metadata.thumbnail} size="sm" />
+    <CapAvatar
+      capName={cap.metadata.displayName}
+      capThumbnail={cap.metadata.thumbnail}
+      size="sm"
+    />
     <span className="text-sm font-normal">{cap.metadata.displayName}</span>
   </>
 );
 
-export function CapSelector() {
+function CapSelectorButton() {
   const {
     currentCap,
     isCurrentCapMCPInitialized,
     isCurrentCapMCPError,
     errorMessage,
   } = useCurrentCap();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Prefetch remote caps when component loads
-  useRemoteCap();
-
+  const { openModal } = useCapStoreModal();
   return (
     <TooltipProvider>
       <Button
@@ -39,7 +38,7 @@ export function CapSelector() {
         size="sm"
         onClick={(event) => {
           event.preventDefault();
-          setIsModalOpen(true);
+          openModal();
         }}
         className="rounded-lg"
         type="button"
@@ -64,8 +63,15 @@ export function CapSelector() {
           </TooltipContent>
         </Tooltip>
       )}
-
-      <CapStoreModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </TooltipProvider>
+  );
+}
+
+export function CapSelector() {
+  return (
+    <CapStoreModalProvider>
+      <CapSelectorButton />
+      <CapStoreModal />
+    </CapStoreModalProvider>
   );
 }

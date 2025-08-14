@@ -3,16 +3,16 @@ import { Button } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import type { Cap } from '@/shared/types/cap';
 import { useCapStore } from '../hooks/use-cap-store';
-import type { RemoteCap } from '../types';
+import type { CapStoreSidebarSection, RemoteCap } from '../types';
+import { sortCapsByMetadata } from '../utils';
 import { CapCard } from './cap-card';
 
 export interface CapStoreContentProps {
   caps: (Cap | RemoteCap)[];
-  activeSection: string;
+  activeSection: CapStoreSidebarSection;
   isLoading?: boolean;
   error?: string | null;
   onRefresh?: () => void;
-  onCapClick: (cap: Cap | RemoteCap) => void;
 }
 
 export function CapStoreContent({
@@ -21,18 +21,19 @@ export function CapStoreContent({
   isLoading = false,
   error = null,
   onRefresh,
-  onCapClick,
 }: CapStoreContentProps) {
   const { t } = useLanguage();
   const {
-    runCap,
     addCapToFavorite,
     removeCapFromFavorite,
     removeCapFromRecents,
     isCapFavorite,
   } = useCapStore();
 
-  const isShowingInstalled = ['favorites', 'recent'].includes(activeSection);
+  const isShowingInstalled = ['favorites', 'recent'].includes(activeSection.id);
+
+  // sort the caps by metadata
+  const sortedCaps = sortCapsByMetadata(caps);
 
   // Function to get actions based on cap type and active section
   const getCapActions = (cap: Cap | RemoteCap) => {
@@ -50,11 +51,12 @@ export function CapStoreContent({
       actions.push({
         icon: <Star className="size-4" />,
         label: 'Add to Favorites',
-        onClick: () => addCapToFavorite(cap.id, isRemoteCap ? cap.cid : undefined),
+        onClick: () =>
+          addCapToFavorite(cap.id, isRemoteCap ? cap.cid : undefined),
       });
     }
 
-    if (activeSection === 'recent') {
+    if (activeSection.id === 'recent') {
       actions.push({
         icon: <Clock className="size-4" />,
         label: 'Remove from Recents',
@@ -93,49 +95,49 @@ export function CapStoreContent({
     );
   }
 
-  if (caps.length === 0) {
+  if (sortedCaps.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
         <Package className="size-12 text-muted-foreground mb-4" />
         <h3 className="text-lg font-medium mb-2">
-          {getEmptyStateTitle(activeSection, t)}
+          {getEmptyStateTitle(activeSection.id, t)}
         </h3>
         <p className="text-muted-foreground max-w-md">
-          {getEmptyStateDescription(activeSection, t)}
+          {getEmptyStateDescription(activeSection.id, t)}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-6 min-h-0">
-      {caps.length > 0 &&
-        caps.map((cap) => {
-          // Type guard to check if cap is RemoteCap (has cid property)
-          const isRemoteCap = 'cid' in cap;
+    <div className="space-y-6">
+      {/* Section Title with Count */}
+      <div className="flex items-center justify-between border-b border-muted-foreground/20 pb-2">
+        <h2 className="text-lg font-medium">
+          {activeSection.label} ({sortedCaps.length})
+        </h2>
+      </div>
 
-          if (isRemoteCap) {
-            // RemoteCap type - use cid as unique key
-            return (
-              <CapCard
-                key={cap.id}
-                capMetadata={cap.metadata}
-                onClick={() => onCapClick?.(cap)}
-                actions={getCapActions(cap)}
-              />
-            );
-          } else {
-            // Cap type - use id as unique key
-            return (
-              <CapCard
-                key={cap.id}
-                capMetadata={cap.metadata}
-                onClick={() => onCapClick?.(cap)}
-                actions={getCapActions(cap)}
-              />
-            );
-          }
-        })}
+      {/* Caps Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-6 min-h-0">
+        {sortedCaps.length > 0 &&
+          sortedCaps.map((cap) => {
+            // Type guard to check if cap is RemoteCap (has cid property)
+            const isRemoteCap = 'cid' in cap;
+
+            if (isRemoteCap) {
+              // RemoteCap type - use cid as unique key
+              return (
+                <CapCard key={cap.id} cap={cap} actions={getCapActions(cap)} />
+              );
+            } else {
+              // Cap type - use id as unique key
+              return (
+                <CapCard key={cap.id} cap={cap} actions={getCapActions(cap)} />
+              );
+            }
+          })}
+      </div>
     </div>
   );
 }
