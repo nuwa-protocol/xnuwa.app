@@ -12,6 +12,7 @@ export interface CapStoreContentProps {
   isLoading?: boolean;
   error?: string | null;
   onRefresh?: () => void;
+  onCapClick: (cap: Cap | RemoteCap) => void;
 }
 
 export function CapStoreContent({
@@ -20,6 +21,7 @@ export function CapStoreContent({
   isLoading = false,
   error = null,
   onRefresh,
+  onCapClick,
 }: CapStoreContentProps) {
   const { t } = useLanguage();
   const {
@@ -118,7 +120,7 @@ export function CapStoreContent({
               <CapCard
                 key={cap.id}
                 capMetadata={cap.metadata}
-                onClick={() => runCap(cap.id, cap.cid)}
+                onClick={() => onCapClick?.(cap)}
                 actions={getCapActions(cap)}
               />
             );
@@ -128,7 +130,7 @@ export function CapStoreContent({
               <CapCard
                 key={cap.id}
                 capMetadata={cap.metadata}
-                onClick={() => runCap(cap.id)}
+                onClick={() => onCapClick?.(cap)}
                 actions={getCapActions(cap)}
               />
             );

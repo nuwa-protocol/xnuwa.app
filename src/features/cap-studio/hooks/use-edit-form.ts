@@ -44,7 +44,7 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
   const navigate = useNavigate();
   const { did } = useAuth();
   const { createCap, updateCap } = useLocalCapsHandler();
-  const { selectedModel } = useSelectedModel();
+  const { selectedModel, setSelectedModel } = useSelectedModel();
   const [isSaving, setIsSaving] = useState(false);
   const [mcpServers, setMcpServers] = useState<
     Record<string, CapMcpServerConfig>
@@ -74,8 +74,12 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
   useEffect(() => {
     if (editingCap) {
       setMcpServers(editingCap.capData.core.mcpServers || {});
+      // Set the selected model to the cap's configured model
+      if (editingCap.capData.core.model) {
+        setSelectedModel(editingCap.capData.core.model);
+      }
     }
-  }, [editingCap]);
+  }, [editingCap, setSelectedModel]);
 
   const handleUpdateMcpServers = (
     servers: Record<string, CapMcpServerConfig>,

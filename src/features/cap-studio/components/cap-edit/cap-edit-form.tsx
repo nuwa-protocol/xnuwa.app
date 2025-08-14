@@ -14,13 +14,12 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  MultiSelect,
   Textarea,
 } from '@/shared/components/ui';
-import { predefinedTags } from '@/shared/constants/cap';
 import { useEditForm } from '../../hooks/use-edit-form';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { ModelSelectorDialog } from '../model-selector';
+import { CapTags } from './cap-tags';
 import { McpServersConfig } from './mcp-servers-config';
 import { ModelDetails } from './model-details';
 import { PromptEditor } from './prompt-editor';
@@ -155,15 +154,10 @@ export function CapEditForm({ editingCap }: CapEditFormProps) {
                         Select one or more tags that describe your cap.
                       </p>
                       <FormControl>
-                        <MultiSelect
-                          options={predefinedTags.map((tag) => ({
-                            label: tag,
-                            value: tag,
-                          }))}
-                          onValueChange={field.onChange}
-                          defaultValue={field.value || []}
-                          placeholder="Select tags..."
-                          className="w-full"
+                        <CapTags
+                          value={field.value || []}
+                          onChange={field.onChange}
+                          placeholder="Search tags..."
                         />
                       </FormControl>
                       <FormMessage />

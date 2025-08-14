@@ -16,7 +16,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Input } from '@/shared/components/ui';
 import { predefinedTags } from '@/shared/constants/cap';
-import { useLanguage } from '@/shared/hooks';
+import { useDebounceValue, useLanguage } from '@/shared/hooks';
 
 export interface CapStoreSidebarProps {
   activeSection: CapStoreSidebarSection;
@@ -37,6 +37,8 @@ export function CapStoreSidebar({
 }: CapStoreSidebarProps) {
   const { t } = useLanguage();
   const [searchValue, setSearchValue] = useState('');
+  const [debouncedSearchValue, setDebouncedSearchValue] = useDebounceValue('', 500)
+
 
   const sidebarSections: CapStoreSidebarSection[] = [
     {
@@ -104,14 +106,19 @@ export function CapStoreSidebar({
     setSearchValue('');
   }, [activeSection]);
 
+  useEffect(() => {
+    onSearchChange(debouncedSearchValue);
+  }, [debouncedSearchValue]);
+
   const handleSearchChange = (value: string) => {
-    setSearchValue(value);
-    onSearchChange(value);
+    setSearchValue(value)
+    setDebouncedSearchValue(value)
   };
 
   const handleClearSearch = () => {
     setSearchValue('');
     onSearchChange('');
+    setDebouncedSearchValue('');
   };
 
   return (

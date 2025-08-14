@@ -35,7 +35,7 @@ export function CapStoreModal({
   const [activeSection, setActiveSection] = useState(initialActiveSection);
 
   const { remoteCaps, isLoading, error, fetchCaps, refetch } = useRemoteCap();
-  const { getRecentCaps, getFavoriteCaps } = useCapStore();
+  const { getRecentCaps, getFavoriteCaps, runCap } = useCapStore();
 
   const handleSearchChange = (query: string) => {
     if (activeSection.type === 'tag') {
@@ -52,6 +52,16 @@ export function CapStoreModal({
     } else if (section.id === 'all') {
       fetchCaps({ searchQuery: '' });
     }
+  };
+
+  const handleCapClick = (cap: Cap | RemoteCap) => {
+    const isRemoteCap = 'cid' in cap;
+    if (isRemoteCap) {
+      runCap(cap.id, cap.cid);
+    } else {
+      runCap(cap.id);
+    }
+    onOpenChange?.(false);
   };
 
   // Determine which caps to display based on active section
@@ -104,6 +114,7 @@ export function CapStoreModal({
                 isLoading={isLoading}
                 error={error}
                 onRefresh={() => refetch()}
+                onCapClick={handleCapClick}
               />
             </div>
           </div>
