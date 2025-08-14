@@ -46,7 +46,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
     navigate('/cap-studio');
   };
 
-  const processConfirmedSubmit = async (submitFormData: SubmitFormData) => {
+  const processConfirmedSubmit = async (submitFormData: SubmitFormData, thumbnailOverride?: CapThumbnail) => {
     try {
       const capWithSubmitFormData = {
         ...cap.capData,
@@ -55,7 +55,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
           homepage: submitFormData.homepage || undefined,
           repository: submitFormData.repository || undefined,
           submittedAt: Date.now(),
-          thumbnail,
+          thumbnail: thumbnailOverride !== undefined ? thumbnailOverride : thumbnail,
         },
       };
 
@@ -120,6 +120,29 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
     }
   };
 
+  const handleDirectSubmit = async (thumbnail?: CapThumbnail, homepage?: string, repository?: string) => {
+    setIsSubmitting(true);
+    
+    const submitFormData = {
+      homepage: homepage || '',
+      repository: repository || '',
+    };
+
+    try {
+      await processConfirmedSubmit(submitFormData, thumbnail);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to submit cap. Please try again.';
+      toast.error(errorMessage);
+
+      navigate('/cap-studio');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleFieldChange = (fieldName: keyof SubmitFormData) => {
     form.trigger(fieldName);
   };
@@ -129,6 +152,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
     handleCancel,
     handleFormSubmit,
     handleConfirmedSubmit,
+    handleDirectSubmit,
     handleFieldChange,
     isSubmitting,
     showConfirmDialog,

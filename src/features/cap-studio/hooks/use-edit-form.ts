@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { useAuth } from '@/features/auth/hooks';
-import type { CapMcpServerConfig } from '@/shared/types/cap';
+import type { CapMcpServerConfig, CapThumbnail } from '@/shared/types/cap';
 import type { LocalCap } from '../types';
 import { useLocalCapsHandler } from './use-local-caps-handler';
 import { useSelectedModel } from './use-selected-model';
@@ -32,6 +32,12 @@ const capSchema = z.object({
     value: z.string(),
     suggestions: z.array(z.string()).optional(),
   }),
+  homepage: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  repository: z
+    .string()
+    .url('Must be a valid URL')
+    .optional()
+    .or(z.literal('')),
 });
 
 type CapFormData = z.infer<typeof capSchema>;
@@ -68,6 +74,8 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
             ? editingCap.capData.core.prompt.suggestions
             : [],
       },
+      homepage: editingCap?.capData.metadata.homepage || '',
+      repository: editingCap?.capData.metadata.repository || '',
     },
   });
 
@@ -87,7 +95,11 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
     setMcpServers(servers);
   };
 
-  const handleUpdateCap = async (editingCap: LocalCap, data: CapFormData) => {
+  const handleUpdateCap = async (
+    editingCap: LocalCap,
+    data: CapFormData,
+    thumbnail?: CapThumbnail,
+  ) => {
     // Update existing cap
     updateCap(editingCap.id, {
       capData: {
@@ -99,7 +111,12 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
           description: data.description,
           tags: data.tags,
           submittedAt: 0,
-          thumbnail: null,
+          thumbnail:
+            thumbnail !== undefined
+              ? thumbnail
+              : editingCap.capData.metadata.thumbnail || null,
+          homepage: data.homepage || undefined,
+          repository: data.repository || undefined,
         },
         core: {
           prompt: data.prompt,
@@ -114,7 +131,10 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
     navigate('/cap-studio');
   };
 
-  const handleCreateCap = async (data: CapFormData) => {
+  const handleCreateCap = async (
+    data: CapFormData,
+    thumbnail?: CapThumbnail,
+  ) => {
     // Create new cap
     createCap({
       id: `${did}:${data.idName}`,
@@ -125,7 +145,9 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
         description: data.description,
         tags: data.tags,
         submittedAt: 0,
-        thumbnail: null,
+        thumbnail: thumbnail || null,
+        homepage: data.homepage || undefined,
+        repository: data.repository || undefined,
       },
       core: {
         prompt: data.prompt,
@@ -139,7 +161,10 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
     navigate('/cap-studio');
   };
 
-  const handleFormSave = async (data: CapFormData) => {
+  const handleFormSave = async (
+    data: CapFormData,
+    thumbnail?: CapThumbnail,
+  ) => {
     // Trigger validation for all fields
     const isValid = await form.trigger();
 
@@ -157,9 +182,9 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
     try {
       if (editingCap) {
         // Update existing cap
-        handleUpdateCap(editingCap, data);
+        handleUpdateCap(editingCap, data, thumbnail);
       } else {
-        handleCreateCap(data);
+        handleCreateCap(data, thumbnail);
       }
     } catch (error) {
       toast.error('Failed to save cap. Please try again.');
