@@ -8,8 +8,7 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
-import { useNuwaToUsdRate } from '../hooks/use-nuwa-to-usd-rate';
-import { useWallet } from '../hooks/use-wallet';
+import { usePaymentHubRgas } from '@/shared/hooks/usePaymentHub';
 import { TestnetFaucetDialog } from './testnet-faucet-dialog';
 
 interface BalanceCardProps {
@@ -17,13 +16,12 @@ interface BalanceCardProps {
 }
 
 export function BalanceCard({ onTopUp }: BalanceCardProps) {
-  const { balance } = useWallet();
-  const nuwaToUsdRate = useNuwaToUsdRate();
+  const { amount, usd } = usePaymentHubRgas();
   const isDevMode = useDevMode();
   const [showFaucetDialog, setShowFaucetDialog] = useState(false);
 
-  const nuwaValue = balance.toLocaleString();
-  const usdValue = (balance / nuwaToUsdRate).toFixed(6);
+  const rgasValue = amount;
+  const usdValue = usd;
 
   return (
     <>
@@ -39,8 +37,8 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
                 <WalletIcon className="w-5 h-5 text-theme-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold">Balance</CardTitle>
-                <p className="text-sm text-muted-foreground">Testnet</p>
+                <CardTitle className="text-lg font-semibold">PaymentHub Balance</CardTitle>
+                <p className="text-sm text-muted-foreground">RGas on Testnet</p>
               </div>
             </div>
             <div className="flex items-center">
@@ -68,6 +66,7 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
                   USD
                 </div>
               </div>
+              <div className="text-sm text-muted-foreground">{rgasValue} RGas</div>
               {/* 
               <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30 border border-border/50">
                 <div className="p-1.5 rounded-md bg-theme-primary/10">
