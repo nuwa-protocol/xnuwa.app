@@ -13,6 +13,7 @@ export const useUpdateChatTitle = (sessionId: string) => {
     const firstMessage = session.messages[0];
 
     if (!firstMessage) return;
+    if (session.title !== 'New Chat') return;
 
     const title = await generateTitleFromUserMessage({ message: firstMessage });
 
