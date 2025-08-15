@@ -1,12 +1,14 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { createAuthorizedFetch } from '@/shared/services/authorized-fetch';
 import { createOpenRouter } from './openrouter-provider';
+import { createPaymentFetch } from '@/shared/services/payment-fetch';
+import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 
 // Settings of Nuwa LLM Gateway
+const baseURL = LLM_GATEWAY_BASE_URL;
 const providerSettings = {
   apiKey: 'NOT-USED', // specify a fake api key to avoid provider errors
-  baseURL: 'https://test-llm.nuwa.dev/api/v1',
-  fetch: createAuthorizedFetch(),
+  baseURL,
+  fetch: createPaymentFetch(baseURL),
 };
 
 const openrouter = createOpenRouter(providerSettings);
