@@ -19,7 +19,7 @@ const formatTransactionLabel = (transaction: PaymentTransaction) => {
   if (transaction.info.type === 'generate-title') {
     return 'Chat Title Generation';
   }
-  return `AI Reply to "${transaction.info.message?.slice(0, 15)}${transaction.info.message?.length && transaction.info.message.length > 15 ? '...' : ''}"`;
+  return `AI Request - "${transaction.info.message?.slice(0, 15)}${transaction.info.message?.length && transaction.info.message.length > 15 ? '...' : ''}"`;
 };
 
 interface TransactionItemProps {

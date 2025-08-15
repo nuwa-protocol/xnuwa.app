@@ -48,7 +48,7 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
                 onClick={() => setShowFaucetDialog(true)}
               >
                 <CircleDollarSign className="w-3.5 h-3.5" />
-                More Balance
+                Get More Balance
               </Button>
             </div>
           </div>
