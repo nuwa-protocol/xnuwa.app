@@ -80,31 +80,76 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
 
   // validate simplified Cap input format
   const validateSimplifiedCap = (capData: any): SimplifiedCapInput | null => {
-    // basic structure validation
+    // validate idName
     if (!capData.idName || typeof capData.idName !== 'string') {
       throw new Error('Missing or invalid idName');
+    }
+    if (capData.idName.length < 6) {
+      throw new Error('idName must be at least 6 characters');
+    }
+    if (capData.idName.length > 20) {
+      throw new Error('idName must be at most 20 characters');
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(capData.idName)) {
+      throw new Error('idName must contain only letters, numbers, and underscores');
     }
 
     if (!capData.metadata || typeof capData.metadata !== 'object') {
       throw new Error('Missing metadata');
     }
 
+    // validate displayName
     if (
       !capData.metadata.displayName ||
       typeof capData.metadata.displayName !== 'string'
     ) {
       throw new Error('Missing displayName in metadata');
     }
+    if (capData.metadata.displayName.length < 1) {
+      throw new Error('Display name is required');
+    }
+    if (capData.metadata.displayName.length > 50) {
+      throw new Error('Display name too long (max 50 characters)');
+    }
 
+    // validate description
     if (
       !capData.metadata.description ||
       typeof capData.metadata.description !== 'string'
     ) {
       throw new Error('Missing description in metadata');
     }
+    if (capData.metadata.description.length < 20) {
+      throw new Error('Description must be at least 20 characters');
+    }
+    if (capData.metadata.description.length > 500) {
+      throw new Error('Description too long (max 500 characters)');
+    }
 
+    // validate tags
     if (!capData.metadata.tags || !Array.isArray(capData.metadata.tags)) {
       throw new Error('Missing or invalid tags in metadata');
+    }
+    if (!capData.metadata.tags.every((tag: any) => typeof tag === 'string')) {
+      throw new Error('All tags must be strings');
+    }
+
+    // validate optional homepage URL
+    if (capData.metadata.homepage && capData.metadata.homepage !== '') {
+      try {
+        new URL(capData.metadata.homepage);
+      } catch {
+        throw new Error('Homepage must be a valid URL');
+      }
+    }
+
+    // validate optional repository URL
+    if (capData.metadata.repository && capData.metadata.repository !== '') {
+      try {
+        new URL(capData.metadata.repository);
+      } catch {
+        throw new Error('Repository must be a valid URL');
+      }
     }
 
     if (!capData.core || typeof capData.core !== 'object') {
@@ -364,22 +409,22 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
               <pre className="text-xs font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap">
                 {`[
   {
-    "idName": "my-cap",
+    "idName": "my_awesome_cap",
     "metadata": {
-      "displayName": "My Cap",
-      "description": "Description of the cap",
-      "tags": ["tag1", "tag2"],
+      "displayName": "My Awesome Cap",
+      "description": "A detailed description of what this cap does and how it helps users accomplish their tasks effectively",
+      "tags": ["productivity", "assistant"],
       "thumbnail": {
         "type": "url",
         "url": "https://example.com/thumbnail.png"
       },
-      "homepage": "https://example.com" (optional),
-      "repository": "https://github.com/user/repo" (optional)
+      "homepage": "https://example.com",
+      "repository": "https://github.com/user/repo"
     },
     "core": {
       "prompt": {
-        "value": "System prompt for the cap",
-        "suggestions": ["suggestion1", "suggestion2"] (optional)
+        "value": "You are a helpful assistant that...",
+        "suggestions": ["How can I help you today?", "What would you like to know?"]
       },
       "modelId": "openai/gpt-4o-mini",
       "mcpServers": {
@@ -387,12 +432,21 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
           "url": "npm:@example/mcp-server",
           "transport": "httpStream"
         }
-      } (optional)
+      }
     }
   }
 ]
 
-Note: The following fields are automatically generated:
+Validation Rules:
+- idName: 6-20 chars, letters/numbers/underscores only (no dashes)
+- displayName: 1-50 characters required
+- description: 20-500 characters required
+- tags: array of strings required
+- homepage/repository: valid URLs (optional)
+- thumbnail/mcpServers: optional
+- prompt.suggestions: optional array
+
+Auto-generated fields:
 - id: "authorDID:idName"
 - authorDID: from your authentication
 - submittedAt: current timestamp`}

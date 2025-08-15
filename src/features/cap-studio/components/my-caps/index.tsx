@@ -123,10 +123,18 @@ export function MyCaps({
             You haven't created any caps yet. Start building your first
             capability to get started with cap development.
           </CardDescription>
-          <div className="pt-4">
+          <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
             <Button onClick={onCreateNew} size="lg">
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Cap
+            </Button>
+            <Button
+              onClick={() => navigate('/cap-studio/batch-create')}
+              variant="outline"
+              size="lg"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Batch Create
             </Button>
           </div>
         </CardHeader>
