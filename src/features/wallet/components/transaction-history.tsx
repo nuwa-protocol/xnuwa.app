@@ -73,7 +73,7 @@ export function TransactionHistory() {
                   }
                   return undefined;
                 })()}
-                paidAt={tx.payment?.paidAt}
+                paidAt={new Date(tx.timestamp).toISOString()}
                 stream={tx.stream}
               />
             ))}
