@@ -51,10 +51,7 @@ export const useCapStore = () => {
   };
 
   const runCap = async (capId: string, capCid?: string) => {
-    console.log(capId);
     const installedCap = installedCaps[capId];
-
-    console.log(installedCap);
 
     if (!installedCap) {
       if (!capCid) {

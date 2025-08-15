@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
-import { usePaymentHubRgas } from '@/shared/hooks/usePaymentHub';
+import { usePaymentHubRgas } from '@/shared/hooks/use-payment-hub';
 import { TestnetFaucetDialog } from './testnet-faucet-dialog';
 
 interface BalanceCardProps {
@@ -37,8 +37,8 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
                 <WalletIcon className="w-5 h-5 text-theme-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold">PaymentHub Balance</CardTitle>
-                <p className="text-sm text-muted-foreground">RGas on Testnet</p>
+                <CardTitle className="text-lg font-semibold">Balance</CardTitle>
+                <p className="text-sm text-muted-foreground">Testnet</p>
               </div>
             </div>
             <div className="flex items-center">
@@ -66,7 +66,7 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
                   USD
                 </div>
               </div>
-              <div className="text-sm text-muted-foreground">{rgasValue} RGas</div>
+              {/* <div className="text-sm text-muted-foreground">{rgasValue} RGas</div> */}
               {/* 
               <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30 border border-border/50">
                 <div className="p-1.5 rounded-md bg-theme-primary/10">

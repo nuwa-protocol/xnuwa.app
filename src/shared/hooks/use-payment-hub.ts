@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getPaymentHubClient } from '@/shared/services/payment-clients';
 
-function formatBigIntWithDecimals(value: bigint, decimals: number, fractionDigits: number): string {
+function formatBigIntWithDecimals(
+  value: bigint,
+  decimals: number,
+  fractionDigits: number,
+): string {
   const negative = value < 0n;
   const v = negative ? -value : value;
   const base = 10n ** BigInt(decimals);
   const integer = v / base;
   let fraction = (v % base).toString().padStart(decimals, '0');
-  if (fractionDigits >= 0) fraction = fraction.slice(0, Math.min(decimals, fractionDigits));
+  if (fractionDigits >= 0)
+    fraction = fraction.slice(0, Math.min(decimals, fractionDigits));
   const fracPart = fractionDigits > 0 ? `.${fraction}` : '';
   return `${negative ? '-' : ''}${integer.toString()}${fracPart}`;
 }
@@ -39,5 +44,3 @@ export function usePaymentHubRgas(defaultAssetId = '0x3::gas_coin::RGas') {
 
   return { loading, error, amount, usd, refetch };
 }
-
-

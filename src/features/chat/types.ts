@@ -1,5 +1,14 @@
 import type { Message } from 'ai';
 
+export type ChatPaymentType = 'generate-title' | 'chat-message';
+
+export interface ChatPayment {
+  type: ChatPaymentType;
+  message?: string;
+  ctxId: string;
+  timestamp: number;
+}
+
 // client chat interface
 export interface ChatSession {
   id: string;
@@ -7,6 +16,7 @@ export interface ChatSession {
   createdAt: number;
   updatedAt: number;
   messages: Message[];
+  payments: ChatPayment[];
   pinned?: boolean;
   did?: string; // Added for IndexedDB storage
 }

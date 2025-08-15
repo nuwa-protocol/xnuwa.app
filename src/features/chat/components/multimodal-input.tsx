@@ -188,12 +188,10 @@ function PureMultimodalInput({
               event.preventDefault();
 
               if (status !== 'ready') {
-                toast.error(
-                  'Please wait for the model to finish its response!',
-                );
-              } else {
-                submitForm();
+                console.warn('The model is not ready to respond. Currnet status:', status);
               }
+
+              submitForm();
             }
           }}
         />

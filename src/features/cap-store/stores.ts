@@ -84,8 +84,6 @@ export const CapStateStore = create<CapStoreState>()(
           return;
         }
 
-        console.log('addInstalledCap', cap);
-
         set((state) => ({
           installedCaps: {
             ...state.installedCaps,
