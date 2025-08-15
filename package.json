@@ -30,7 +30,7 @@
     "@icons-pack/react-simple-icons": "^13.7.0",
     "@lobehub/icons": "^2.9.0",
     "@modelcontextprotocol/sdk": "^1.13.2",
-    "@nuwa-ai/cap-kit": "^0.3.7",
+    "@nuwa-ai/cap-kit": "^0.3.8",
     "@nuwa-ai/identity-kit": "^0.4.0",
     "@nuwa-ai/identity-kit-web": "^0.3.5",
     "@openrouter/ai-sdk-provider": "^0.7.2",
