@@ -160,12 +160,6 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
       throw new Error('Missing prompt in core');
     }
 
-    if (
-      !capData.core.prompt.value ||
-      typeof capData.core.prompt.value !== 'string'
-    ) {
-      throw new Error('Missing prompt value');
-    }
 
     if (!capData.core.modelId || typeof capData.core.modelId !== 'string') {
       throw new Error('Missing modelId in core');

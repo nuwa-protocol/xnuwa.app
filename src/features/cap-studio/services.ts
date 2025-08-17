@@ -7,8 +7,7 @@ import type {
 
 async function modelFetch(): Promise<OpenRouterAPIResponse> {
   const authorizedFetch = createAuthorizedFetch();
-  const endpoint = 'https://test-llm.nuwa.dev/api/v1/models';
-  // const endpoint = 'https://openrouter.ai/api/v1/models';
+  const endpoint = 'https://openrouter.ai/api/v1/models';
 
   try {
     const response = await authorizedFetch(endpoint, {

@@ -47,24 +47,28 @@ export function useRemoteCap() {
       );
 
       const remoteCaps: RemoteCap[] =
-        response.data?.items?.map((item) => {
-          return {
-            cid: item.cid,
-            version: item.version,
-            id: item.id,
-            idName: item.name,
-            authorDID: item.id.split(':')[0],
-            metadata: {
-              displayName: item.displayName,
-              description: item.description,
-              tags: item.tags,
-              repository: item.repository,
-              homepage: item.homepage,
-              submittedAt: item.submittedAt,
-              thumbnail: item.thumbnail,
-            },
-          };
-        }) || [];
+        response.data?.items
+          ?.filter((item) => {
+            return item.displayName !== 'nuwa_test';
+          })
+          .map((item) => {
+            return {
+              cid: item.cid,
+              version: item.version,
+              id: item.id,
+              idName: item.name,
+              authorDID: item.id.split(':')[0],
+              metadata: {
+                displayName: item.displayName,
+                description: item.description,
+                tags: item.tags,
+                repository: item.repository,
+                homepage: item.homepage,
+                submittedAt: item.submittedAt,
+                thumbnail: item.thumbnail,
+              },
+            };
+          }) || [];
 
       setRemoteCaps(remoteCaps);
 

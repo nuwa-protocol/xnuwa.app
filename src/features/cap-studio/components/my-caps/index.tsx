@@ -8,9 +8,11 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  Progress,
 } from '@/shared/components/ui';
 import { useLocalCaps } from '../../hooks';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
+import { useSubmitCap } from '../../hooks/use-submit-cap';
 import type { LocalCap } from '../../types';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { CapCard } from './cap-card';
@@ -20,9 +22,7 @@ interface MyCapsProps {
   onTestCap?: (cap: LocalCap) => void;
   onSubmitCap?: (cap: LocalCap) => void;
   onCreateNew?: () => void;
-  onBatchCreate?: (caps: LocalCap[]) => void;
   onBulkDelete?: (caps: LocalCap[]) => void;
-  onBulkPublish?: (caps: LocalCap[]) => void;
 }
 
 export function MyCaps({
@@ -30,14 +30,13 @@ export function MyCaps({
   onTestCap,
   onSubmitCap,
   onCreateNew,
-  onBatchCreate,
   onBulkDelete,
-  onBulkPublish,
 }: MyCapsProps) {
   const navigate = useNavigate();
   const localCaps = useLocalCaps();
   const [searchQuery, setSearchQuery] = useState('');
-  const { createCap, deleteCap } = useLocalCapsHandler();
+  const { deleteCap } = useLocalCapsHandler();
+  const { bulkSubmitCaps, bulkProgress } = useSubmitCap();
 
   // Multi-select state
   const [selectedCapIds, setSelectedCapIds] = useState<Set<string>>(new Set());
@@ -78,17 +77,14 @@ export function MyCaps({
     clearSelection();
   };
 
-  const handleBulkPublish = () => {
+  const handleBulkPublish = async () => {
     const selectedCaps = allCaps.filter((cap) => selectedCapIds.has(cap.id));
-    selectedCaps.forEach((cap) => {
-      if (onSubmitCap) {
-        onSubmitCap(cap);
-      }
-    });
-    if (onBulkPublish) {
-      onBulkPublish(selectedCaps);
+    try {
+      await bulkSubmitCaps(selectedCaps);
+      clearSelection();
+    } catch (error) {
+      console.error('Bulk publish failed:', error);
     }
-    clearSelection();
   };
 
   // Get and filter all caps
@@ -144,6 +140,51 @@ export function MyCaps({
 
   return (
     <div className="space-y-6">
+      {/* Bulk submission progress bar */}
+      {bulkProgress.isSubmitting && (
+        <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-sm text-blue-800 dark:text-blue-200">
+                  Publishing Caps ({bulkProgress.completed}/{bulkProgress.total})
+                </CardTitle>
+                {bulkProgress.currentCap && (
+                  <CardDescription className="text-xs text-blue-600 dark:text-blue-300">
+                    Currently publishing: {bulkProgress.currentCap}
+                  </CardDescription>
+                )}
+              </div>
+            </div>
+            <Progress
+              value={(bulkProgress.completed / bulkProgress.total) * 100}
+              className="w-full"
+            />
+          </CardHeader>
+        </Card>
+      )}
+
+      {/* Error display */}
+      {bulkProgress.errors.length > 0 && !bulkProgress.isSubmitting && (
+        <Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-sm text-red-800 dark:text-red-200">
+              Bulk Publish Errors ({bulkProgress.errors.length})
+            </CardTitle>
+            <div className="space-y-2 mt-2">
+              {bulkProgress.errors.map((error) => (
+                <div
+                  key={error.capName}
+                  className="text-xs text-red-600 dark:text-red-300"
+                >
+                  <strong>{error.capName}:</strong> {error.error}
+                </div>
+              ))}
+            </div>
+          </CardHeader>
+        </Card>
+      )}
+
       {/* Header with controls */}
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
         <div className="flex items-center space-x-2">
@@ -191,9 +232,13 @@ export function MyCaps({
                       onClick={handleBulkPublish}
                       variant="default"
                       size="sm"
+                      disabled={bulkProgress.isSubmitting}
                     >
                       <Send className="h-4 w-4 mr-2" />
-                      Publish ({selectedCaps.length})
+                      {bulkProgress.isSubmitting
+                        ? `Publishing... (${bulkProgress.completed}/${bulkProgress.total})`
+                        : `Publish (${selectedCaps.length})`
+                      }
                     </Button>
                   )}
                 </>

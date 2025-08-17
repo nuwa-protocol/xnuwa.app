@@ -25,11 +25,13 @@ const formatTransactionLabel = (transaction: PaymentTransaction) => {
 interface TransactionItemProps {
   transaction: PaymentTransaction;
   onSelect: (transaction: PaymentTransaction) => void;
+  index: number;
 }
 
 export function TransactionItem({
   transaction,
   onSelect,
+  index,
 }: TransactionItemProps) {
   return (
     <Button
@@ -37,11 +39,14 @@ export function TransactionItem({
       className="w-full justify-between p-2 h-auto hover:bg-muted/30 rounded-sm"
       onClick={() => onSelect(transaction)}
     >
-      <div className="text-left">
-        <p className="text-sm font-medium">{formatTransactionLabel(transaction)}</p>
-        <p className="text-xs text-muted-foreground">
-          {formatDate(transaction.details?.timestamp || 0)}
-        </p>
+      <div className="flex items-center gap-3 text-left">
+        <span className="text-xs text-muted-foreground font-mono">#{index + 1}</span>
+        <div>
+          <p className="text-sm font-medium">{formatTransactionLabel(transaction)}</p>
+          <p className="text-xs text-muted-foreground">
+            {formatDate(transaction.details?.timestamp || 0)}
+          </p>
+        </div>
       </div>
       <div className="text-right">
         {!transaction.details ? <p className="text-sm font-medium">
