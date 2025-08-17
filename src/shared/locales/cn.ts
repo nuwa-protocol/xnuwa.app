@@ -147,6 +147,7 @@ export const cn: typeof en = {
       noFavoriteCapsDesc: '您还没有收藏任何能力。浏览商店并收藏您喜欢的能力。',
       noRecentCapsDesc: '您最近还没有使用任何能力。试试运行一个能力吧。',
       noInstalledCapsDesc: '您还没有安装任何能力。浏览商店寻找要安装的能力。',
+      noMoreCaps: '已经到底了',
     },
     card: {
       update: '有可用更新',

@@ -126,7 +126,7 @@ export const en = {
     searchPlaceholder: 'Search caps...',
     sidebar: {
       favorites: 'Favorite Caps',
-      recent: 'Recent Caps', 
+      recent: 'Recent Caps',
       installed: 'Installed',
       all: 'All Caps',
     },
@@ -145,9 +145,13 @@ export const en = {
           'Try adjusting your search terms or browse different categories.',
         category: 'No caps available in this category yet.',
       },
-      noFavoriteCapsDesc: 'You haven\'t marked any caps as favorites yet. Browse the store and favorite caps you like.',
-      noRecentCapsDesc: 'You haven\'t used any caps recently. Try running a cap to see it here.',
-      noInstalledCapsDesc: 'You haven\'t installed any caps yet. Browse the store to find caps to install.',
+      noFavoriteCapsDesc:
+        "You haven't marked any caps as favorites yet. Browse the store and favorite caps you like.",
+      noRecentCapsDesc:
+        "You haven't used any caps recently. Try running a cap to see it here.",
+      noInstalledCapsDesc:
+        "You haven't installed any caps yet. Browse the store to find caps to install.",
+      noMoreCaps: 'You have reached the end of the list.',
     },
     card: {
       update: 'Update Available',

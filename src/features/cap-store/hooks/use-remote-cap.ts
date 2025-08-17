@@ -20,9 +20,12 @@ export function useRemoteCap() {
   );
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
 
-  const fetchCaps = async (params: UseRemoteCapParams = {}) => {
+  const fetchCaps = async (params: UseRemoteCapParams = {}, append = false) => {
     const {
       searchQuery: queryString = '',
       page: pageNum = 0,
@@ -30,7 +33,13 @@ export function useRemoteCap() {
       tags: tagsArray = [],
     } = params;
 
-    setIsLoading(true);
+    if (append) {
+      setIsLoadingMore(true);
+    } else {
+      setIsLoading(true);
+      setCurrentPage(0);
+      setHasMoreData(true);
+    }
     setError(null);
     setLastSearchParams(params);
 
@@ -46,7 +55,7 @@ export function useRemoteCap() {
         sizeNum,
       );
 
-      const remoteCaps: RemoteCap[] =
+      const newRemoteCaps: RemoteCap[] =
         response.data?.items
           ?.filter((item) => {
             return item.displayName !== 'nuwa_test';
@@ -70,21 +79,46 @@ export function useRemoteCap() {
             };
           }) || [];
 
-      setRemoteCaps(remoteCaps);
+      // Check if we have more data
+      const totalItems = response.data?.items?.length || 0;
+      setHasMoreData(totalItems === sizeNum);
+
+      if (append) {
+        setRemoteCaps([...remoteCaps, ...newRemoteCaps]);
+        setCurrentPage(pageNum);
+      } else {
+        setRemoteCaps(newRemoteCaps);
+        setCurrentPage(pageNum);
+      }
 
       setIsLoading(false);
+      setIsLoadingMore(false);
 
       return response;
     } catch (err) {
       console.error('Error fetching caps:', err);
       setError('Failed to fetch caps. Please try again.');
       setIsLoading(false);
+      setIsLoadingMore(false);
       throw err;
     }
   };
 
   const refetch = () => {
     fetchCaps(lastSearchParams);
+  };
+
+  const loadMore = async () => {
+    if (!hasMoreData || isLoadingMore) return;
+
+    const nextPage = currentPage + 1;
+    return fetchCaps(
+      {
+        ...lastSearchParams,
+        page: nextPage,
+      },
+      true,
+    );
   };
 
   const goToPage = (newPage: number) => {
@@ -97,8 +131,11 @@ export function useRemoteCap() {
   return {
     remoteCaps,
     isLoading,
+    isLoadingMore,
+    hasMoreData,
     error,
     fetchCaps,
+    loadMore,
     goToPage,
     refetch,
   };

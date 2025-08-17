@@ -6,17 +6,20 @@ const sizeClasses = {
   sm: 'size-6', // 24px
   md: 'size-8', // 32px
   lg: 'size-10', // 40px
-  xl: 'size-12', // 48px
+  xl: 'size-16', // 48px
 } as const;
+
 
 export function CapAvatar({
   capName,
   capThumbnail,
   size = 'md',
+  className,
 }: {
   capName: string;
   capThumbnail: CapThumbnail;
   size?: keyof typeof sizeClasses;
+  className?: string;
 }) {
   const sizeClass = sizeClasses[size] || sizeClasses['md'];
 
@@ -25,7 +28,7 @@ export function CapAvatar({
 
   return (
     <Avatar
-      className={`${sizeClass} shrink-0 rounded-sm ${isDark ? 'bg-foreground' : 'bg-background'}`}
+      className={`${sizeClass} ${isDark ? 'bg-foreground' : 'bg-background'} ${className}`}
     >
       <AvatarImage
         src={

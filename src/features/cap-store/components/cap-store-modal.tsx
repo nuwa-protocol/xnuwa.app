@@ -14,7 +14,7 @@ export function CapStoreModal() {
   const { t } = useLanguage();
   const { toggleModal, isOpen, activeSection, setActiveSection } = useCapStoreModal();
 
-  const { remoteCaps, isLoading, error, fetchCaps, refetch } = useRemoteCap();
+  const { remoteCaps, isLoading, isLoadingMore, hasMoreData, error, fetchCaps, loadMore, refetch } = useRemoteCap();
   const { getRecentCaps, getFavoriteCaps } = useCapStore();
 
   const handleSearchChange = (query: string) => {
@@ -73,14 +73,17 @@ export function CapStoreModal() {
           />
 
           {/* Content Area */}
-          <div className="flex-1 min-h-0 overflow-auto">
-            <div className="p-6">
+          <div className="flex-1 min-h-0">
+            <div className="h-full">
               <CapStoreContent
                 caps={displayCaps}
                 activeSection={activeSection}
                 isLoading={isLoading}
+                isLoadingMore={isLoadingMore}
+                hasMoreData={hasMoreData}
                 error={error}
                 onRefresh={() => refetch()}
+                onLoadMore={loadMore}
               />
             </div>
           </div>
