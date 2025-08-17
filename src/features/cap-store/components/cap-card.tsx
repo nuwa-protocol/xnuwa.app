@@ -1,4 +1,4 @@
-import { Loader2, MoreHorizontal } from 'lucide-react';
+import { Clock, Loader2, MoreHorizontal, Star } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import {
   Card,
@@ -9,27 +9,29 @@ import {
 } from '@/shared/components/ui';
 import type { Cap } from '@/shared/types/cap';
 import { useCapStore } from '../hooks/use-cap-store';
+import { useRemoteCap } from '../hooks/use-remote-cap';
 import type { RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
 import { useCapStoreModal } from './cap-store-modal-context';
 
-interface CapCardActions {
-  icon: React.ReactNode;
-  label: string;
-  onClick: () => void;
-}
-
 export interface CapCardProps {
   cap: Cap | RemoteCap;
-  actions?: CapCardActions[];
 }
 
-export function CapCard({ cap, actions }: CapCardProps) {
-  const { runCap } = useCapStore();
-  const { closeModal } = useCapStoreModal();
+export function CapCard({ cap }: CapCardProps) {
+  const {
+    addCapToFavorite,
+    removeCapFromFavorite,
+    removeCapFromRecents,
+    isCapFavorite,
+  } = useCapStore();
   const [isLoading, setIsLoading] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [descriptionClamp, setDescriptionClamp] = useState<number>(2);
+
+  const { downloadCap } = useRemoteCap();
+  const { activeSection, setSelectedCap } = useCapStoreModal();
+  const { installedCaps } = useCapStore();
 
   /**
    * Dynamically calculate the description line number, so that the title (up to 2 lines) and description together take up 4 lines.
@@ -54,21 +56,57 @@ export function CapCard({ cap, actions }: CapCardProps) {
   }, [cap]);
 
   const handleCapClick = async (cap: Cap | RemoteCap) => {
-    setIsLoading(true);
-    try {
-      const isRemoteCap = 'cid' in cap;
-      if (isRemoteCap) {
-        await runCap(cap.id, cap.cid);
-      } else {
-        await runCap(cap.id);
+    const installedCap = installedCaps[cap.id];
+    if (installedCap) {
+      setSelectedCap(installedCap);
+    } else {
+      if ('cid' in cap) {
+        setIsLoading(true);
+        try {
+          const downloadedCap = await downloadCap(cap);
+          setSelectedCap(downloadedCap);
+        } finally {
+          setIsLoading(false);
+        }
       }
-      closeModal();
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  const getCapActions = (cap: Cap | RemoteCap) => {
+    const actions = [];
+
+    const isRemoteCap = 'cid' in cap;
+
+    if (isCapFavorite(cap.id)) {
+      actions.push({
+        icon: <Star className="size-4" />,
+        label: 'Remove from Favorites',
+        onClick: () => removeCapFromFavorite(cap.id),
+      });
+    } else {
+      actions.push({
+        icon: <Star className="size-4" />,
+        label: 'Add to Favorites',
+        onClick: () =>
+          addCapToFavorite(cap.id, isRemoteCap ? cap.cid : undefined),
+      });
+    }
+
+    if (activeSection.id === 'recent') {
+      actions.push({
+        icon: <Clock className="size-4" />,
+        label: 'Remove from Recents',
+        onClick: () => removeCapFromRecents(cap.id),
+      });
+    }
+
+    return actions;
+  };
+
   const capMetadata = cap.metadata;
+
+  const actions = getCapActions(cap);
+
   return (
     <Card
       className={`p-4 hover:shadow-md transition-shadow cursor-pointer hover:scale-105 hover:shadow-lg transition-all ${isLoading ? 'opacity-75 pointer-events-none' : ''}`}
@@ -82,13 +120,20 @@ export function CapCard({ cap, actions }: CapCardProps) {
           className="rounded-md"
         />
         <div className="flex-1 min-w-0">
-          <h3 ref={titleRef} className="font-medium text-md leading-5 line-clamp-2">
+          <h3
+            ref={titleRef}
+            className="font-medium text-md leading-5 line-clamp-2"
+          >
             {capMetadata.displayName}
           </h3>
           {descriptionClamp > 0 ? (
             <p
               className="text-xs text-muted-foreground mt-1 leading-5 overflow-hidden"
-              style={{ display: '-webkit-box', WebkitLineClamp: descriptionClamp, WebkitBoxOrient: 'vertical' as any }}
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: descriptionClamp,
+                WebkitBoxOrient: 'vertical' as any,
+              }}
             >
               {capMetadata.description}
             </p>

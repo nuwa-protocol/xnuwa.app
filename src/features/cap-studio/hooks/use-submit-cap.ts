@@ -76,29 +76,35 @@ export const useSubmitCap = () => {
         const cap = caps[i];
         const displayName = cap.capData.metadata.displayName;
 
-        setBulkProgress(prev => ({
+        setBulkProgress((prev) => ({
           ...prev,
           currentCap: displayName,
         }));
 
         try {
           await capKit.registerCap(cap.capData);
-          setBulkProgress(prev => ({
+          setBulkProgress((prev) => ({
             ...prev,
             completed: prev.completed + 1,
           }));
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Failed to submit capability';
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'Failed to submit capability';
           errors.push({ capName: displayName, error: errorMessage });
-          setBulkProgress(prev => ({
+          setBulkProgress((prev) => ({
             ...prev,
             completed: prev.completed + 1,
-            errors: [...prev.errors, { capName: displayName, error: errorMessage }],
+            errors: [
+              ...prev.errors,
+              { capName: displayName, error: errorMessage },
+            ],
           }));
         }
       }
 
-      setBulkProgress(prev => ({
+      setBulkProgress((prev) => ({
         ...prev,
         isSubmitting: false,
         currentCap: undefined,

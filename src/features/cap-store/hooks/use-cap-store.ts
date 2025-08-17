@@ -29,6 +29,7 @@ export const useCapStore = () => {
       }
       const capData = await downloadCap(capCid);
       addInstalledCap({
+        cid: capCid,
         capData,
         isFavorite: true,
         lastUsedAt: null,
@@ -59,6 +60,7 @@ export const useCapStore = () => {
       }
       const capData = await downloadCap(capCid);
       addInstalledCap({
+        cid: capCid,
         capData,
         isFavorite: false,
         lastUsedAt: Date.now(),
@@ -114,6 +116,7 @@ export const useCapStore = () => {
   };
 
   return {
+    installedCaps,
     runCap,
     getFavoriteCaps,
     addCapToFavorite,

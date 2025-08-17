@@ -51,41 +51,42 @@ export const SourceCard = ({
       (f: any) => f.rel === 'icon' && getMaxSize(f.sizes) >= 180,
       (f: any) => f.rel === 'icon' && getMaxSize(f.sizes) >= 128,
       (f: any) => f.rel === 'icon' && getMaxSize(f.sizes) >= 64,
-      
+
       // Apple touch icons (usually high quality)
       (f: any) => f.rel === 'apple-touch-icon' && getMaxSize(f.sizes) >= 152,
-      
+
       // Standard sizes
       (f: any) => f.rel === 'icon' && f.sizes === '32x32',
       (f: any) => f.rel === 'icon' && f.sizes === '16x16',
-      
+
       // Flexible size icons
       (f: any) => f.rel === 'icon' && f.sizes && f.sizes.includes('32'),
       (f: any) => f.rel === 'icon' && f.sizes && f.sizes.includes('16'),
-      
+
       // Any icon with PNG type (usually higher quality than ICO)
       (f: any) => f.rel === 'icon' && f.type === 'image/png',
-      
+
       // Any icon with SVG type (scalable)
       (f: any) => f.rel === 'icon' && f.type === 'image/svg+xml',
-      
+
       // Any icon with specified type
       (f: any) => f.rel === 'icon' && f.type,
-      
+
       // Any icon relation
       (f: any) => f.rel === 'icon',
-      
+
       // Apple touch icon as fallback
       (f: any) => f.rel === 'apple-touch-icon',
-      
+
       // Shortcut icon as fallback
       (f: any) => f.rel === 'shortcut icon',
-      
+
       // Any favicon-like entry
-      (f: any) => f.href && (f.href.includes('favicon') || f.href.includes('icon')),
-      
+      (f: any) =>
+        f.href && (f.href.includes('favicon') || f.href.includes('icon')),
+
       // Last resort - first entry
-      () => true
+      () => true,
     ];
 
     for (const priorityFn of priorityOrder) {
@@ -100,7 +101,7 @@ export const SourceCard = ({
             return null;
           }
         }
-        
+
         // Return absolute URLs as-is
         return selected.href || null;
       }
@@ -112,12 +113,12 @@ export const SourceCard = ({
   const faviconUrl = getBestFavicon();
   const hostname = url
     ? (() => {
-      try {
-        return new URL(url).hostname;
-      } catch {
-        return url;
-      }
-    })()
+        try {
+          return new URL(url).hostname;
+        } catch {
+          return url;
+        }
+      })()
     : '';
 
   if (!isExternalUrl) {

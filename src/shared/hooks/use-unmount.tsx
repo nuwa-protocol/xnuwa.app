@@ -1,10 +1,10 @@
-import * as React from "react";
+import * as React from 'react';
 
 /**
  * A React hook that runs a cleanup function when the component unmounts.
- * 
+ *
  * @param fn - The cleanup function to run on unmount
- * 
+ *
  * @example
  * ```tsx
  * function MyComponent() {
@@ -12,14 +12,14 @@ import * as React from "react";
  *     // Cleanup logic here
  *     console.log('Component is unmounting');
  *   });
- * 
+ *
  *   return <div>Hello world</div>;
  * }
  * ```
  */
 export function useUnmount(fn: () => void): void {
-  if (typeof fn !== "function") {
-    throw new Error("useUnmount expects a function as argument");
+  if (typeof fn !== 'function') {
+    throw new Error('useUnmount expects a function as argument');
   }
 
   const fnRef = React.useRef(fn);

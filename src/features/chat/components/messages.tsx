@@ -40,8 +40,13 @@ function PureMessages({
       className="flex flex-col min-w-0 gap-6 h-full overflow-y-scroll pt-4 relative"
     >
       {messages.map((message, index) => {
-        const isStreaming = status === 'streaming' && messages.length - 1 === index;
-        const isStreamingReasoning = isStreaming && message.role === 'assistant' && message.parts?.some((part) => part.type === 'reasoning') && !message.parts?.some((part) => part.type === 'text');
+        const isStreaming =
+          status === 'streaming' && messages.length - 1 === index;
+        const isStreamingReasoning =
+          isStreaming &&
+          message.role === 'assistant' &&
+          message.parts?.some((part) => part.type === 'reasoning') &&
+          !message.parts?.some((part) => part.type === 'text');
         return (
           <PreviewMessage
             key={message.id}
@@ -56,7 +61,7 @@ function PureMessages({
               hasSentMessage && index === messages.length - 1
             }
           />
-        )
+        );
       })}
 
       {status === 'submitted' &&

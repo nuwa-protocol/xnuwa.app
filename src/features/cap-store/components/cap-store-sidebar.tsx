@@ -4,12 +4,12 @@ import {
   Code,
   Coins,
   Grid3X3,
-  Heart,
   History,
   MoreHorizontal,
   Package,
   PenTool,
   Search,
+  Star,
   Wrench,
   X,
 } from 'lucide-react';
@@ -17,25 +17,19 @@ import { useEffect, useState } from 'react';
 import { Input } from '@/shared/components/ui';
 import { predefinedTags } from '@/shared/constants/cap';
 import { useDebounceValue, useLanguage } from '@/shared/hooks';
+import { useRemoteCap } from '../hooks/use-remote-cap';
 import type { CapStoreSidebarSection } from '../types';
+import { useCapStoreModal } from './cap-store-modal-context';
 
-export interface CapStoreSidebarProps {
-  activeSection: CapStoreSidebarSection;
-  onSectionChange: (section: CapStoreSidebarSection) => void;
-  onSearchChange: (query: string) => void;
-}
-
-
-
-export function CapStoreSidebar({
-  activeSection,
-  onSectionChange,
-  onSearchChange,
-}: CapStoreSidebarProps) {
+export function CapStoreSidebar() {
   const { t } = useLanguage();
   const [searchValue, setSearchValue] = useState('');
-  const [debouncedSearchValue, setDebouncedSearchValue] = useDebounceValue('', 500)
-
+  const [debouncedSearchValue, setDebouncedSearchValue] = useDebounceValue(
+    '',
+    500,
+  );
+  const { fetchCaps } = useRemoteCap();
+  const { setActiveSection, activeSection } = useCapStoreModal();
 
   const sidebarSections: CapStoreSidebarSection[] = [
     {
@@ -65,7 +59,7 @@ export function CapStoreSidebar({
     if (type === 'section') {
       switch (sectionId) {
         case 'favorites':
-          return Heart;
+          return Star;
         case 'recent':
           return History;
         case 'all':
@@ -99,23 +93,49 @@ export function CapStoreSidebar({
     return Package;
   };
 
+  // reset search value when active section changes
   useEffect(() => {
     setSearchValue('');
   }, [activeSection]);
 
+  // fetch caps when debounced search value changes
   useEffect(() => {
-    onSearchChange(debouncedSearchValue);
+    handleDebouncedSearchChange(debouncedSearchValue);
   }, [debouncedSearchValue]);
 
+  // handle search change
   const handleSearchChange = (value: string) => {
-    setSearchValue(value)
-    setDebouncedSearchValue(value)
+    setSearchValue(value);
+    setDebouncedSearchValue(value);
   };
 
+  // handle clear search
   const handleClearSearch = () => {
     setSearchValue('');
-    onSearchChange('');
+    handleDebouncedSearchChange('');
     setDebouncedSearchValue('');
+  };
+
+  // handle debounced search change
+  const handleDebouncedSearchChange = (value: string) => {
+    if (activeSection.type === 'tag') {
+      fetchCaps({
+        searchQuery: debouncedSearchValue,
+        tags: [activeSection.label],
+      });
+    } else if (activeSection.type === 'section') {
+      fetchCaps({ searchQuery: debouncedSearchValue });
+    }
+  };
+
+  // handle active section change
+  const handleActiveSectionChange = (section: CapStoreSidebarSection) => {
+    setActiveSection(section);
+    if (section.type === 'tag') {
+      fetchCaps({ tags: [section.label] });
+    } else if (section.id === 'all') {
+      fetchCaps({ searchQuery: '' });
+    }
   };
 
   return (
@@ -169,11 +189,12 @@ export function CapStoreSidebar({
               <button
                 key={section.id}
                 type="button"
-                onClick={() => onSectionChange(section)}
-                className={`w-full text-left px-2.5 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2.5 ${selected
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-foreground hover:bg-muted'
-                  }`}
+                onClick={() => handleActiveSectionChange(section)}
+                className={`w-full text-left px-2.5 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2.5 ${
+                  selected
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-foreground hover:bg-muted'
+                }`}
               >
                 <IconComponent className="size-4 shrink-0" />
                 <span className="truncate">{section.label}</span>

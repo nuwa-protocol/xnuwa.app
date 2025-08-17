@@ -115,7 +115,6 @@ export function CapCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <CardContent className="p-4">
-
         <div className="flex items-center justify-between gap-4">
           {(isMultiSelectMode || isHovered) && (
             <div className="flex items-center">
@@ -259,7 +258,6 @@ export function CapCard({
             </div>
           )}
         </div>
-
       </CardContent>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

@@ -10,7 +10,10 @@ import { useCurrentCap } from '@/shared/hooks';
 import type { Cap } from '@/shared/types';
 import { CapAvatar } from './cap-avatar';
 import { CapStoreModal } from './cap-store-modal';
-import { CapStoreModalProvider, useCapStoreModal } from './cap-store-modal-context';
+import {
+  CapStoreModalProvider,
+  useCapStoreModal,
+} from './cap-store-modal-context';
 
 const CapInfo = ({ cap }: { cap: Cap }) => (
   <>

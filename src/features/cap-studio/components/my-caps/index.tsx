@@ -147,7 +147,8 @@ export function MyCaps({
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-sm text-blue-800 dark:text-blue-200">
-                  Publishing Caps ({bulkProgress.completed}/{bulkProgress.total})
+                  Publishing Caps ({bulkProgress.completed}/{bulkProgress.total}
+                  )
                 </CardTitle>
                 {bulkProgress.currentCap && (
                   <CardDescription className="text-xs text-blue-600 dark:text-blue-300">
@@ -237,8 +238,7 @@ export function MyCaps({
                       <Send className="h-4 w-4 mr-2" />
                       {bulkProgress.isSubmitting
                         ? `Publishing... (${bulkProgress.completed}/${bulkProgress.total})`
-                        : `Publish (${selectedCaps.length})`
-                      }
+                        : `Publish (${selectedCaps.length})`}
                     </Button>
                   )}
                 </>

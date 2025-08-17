@@ -1,4 +1,11 @@
-import { CalendarArrowDown, CalendarArrowUp, CalendarIcon, ListFilter, SortAsc, X } from 'lucide-react';
+import {
+  CalendarArrowDown,
+  CalendarArrowUp,
+  CalendarIcon,
+  ListFilter,
+  SortAsc,
+  X,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Calendar } from '@/shared/components/ui/calendar';
@@ -178,7 +185,11 @@ export function TransactionHistory() {
                           : 'Pick a date'}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="end" side="right">
+                    <PopoverContent
+                      className="w-auto p-0"
+                      align="end"
+                      side="right"
+                    >
                       <Calendar
                         mode="single"
                         selected={filterDate}

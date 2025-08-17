@@ -40,21 +40,23 @@ export function TransactionItem({
       onClick={() => onSelect(transaction)}
     >
       <div className="flex items-center gap-3 text-left">
-        <span className="text-xs text-muted-foreground font-mono">#{index + 1}</span>
+        <span className="text-xs text-muted-foreground font-mono">
+          #{index + 1}
+        </span>
         <div>
-          <p className="text-sm font-medium">{formatTransactionLabel(transaction)}</p>
+          <p className="text-sm font-medium">
+            {formatTransactionLabel(transaction)}
+          </p>
           <p className="text-xs text-muted-foreground">
             {formatDate(transaction.details?.timestamp || 0)}
           </p>
         </div>
       </div>
       <div className="text-right">
-        {!transaction.details ? <p className="text-sm font-medium">
-          No transaction record
-        </p> : transaction.details.status === "pending" ? (
-          <p className="text-sm font-medium">
-            Pending...
-          </p>
+        {!transaction.details ? (
+          <p className="text-sm font-medium">No transaction record</p>
+        ) : transaction.details.status === 'pending' ? (
+          <p className="text-sm font-medium">Pending...</p>
         ) : (
           <p className="text-sm font-medium">
             {formatCost(transaction.details?.payment?.costUsd) || '$0.00'}

@@ -91,7 +91,9 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
       throw new Error('idName must be at most 20 characters');
     }
     if (!/^[a-zA-Z0-9_]+$/.test(capData.idName)) {
-      throw new Error('idName must contain only letters, numbers, and underscores');
+      throw new Error(
+        'idName must contain only letters, numbers, and underscores',
+      );
     }
 
     if (!capData.metadata || typeof capData.metadata !== 'object') {
@@ -160,16 +162,12 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
       throw new Error('Missing prompt in core');
     }
 
-
     if (!capData.core.modelId || typeof capData.core.modelId !== 'string') {
       throw new Error('Missing modelId in core');
     }
 
     // validate model exists
-    if (
-      !models ||
-      !models.find((model) => model.id === capData.core.modelId)
-    ) {
+    if (!models || !models.find((model) => model.id === capData.core.modelId)) {
       throw new Error(`Model with ID "${capData.core.modelId}" not found`);
     }
 

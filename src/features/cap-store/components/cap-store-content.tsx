@@ -1,87 +1,55 @@
-import { Clock, Loader2, Package, Star } from 'lucide-react';
+import { Loader2, Package } from 'lucide-react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observer';
-import type { Cap } from '@/shared/types/cap';
 import { useCapStore } from '../hooks/use-cap-store';
-import type { CapStoreSidebarSection, RemoteCap } from '../types';
+import { useRemoteCap } from '../hooks/use-remote-cap';
 import { CapCard } from './cap-card';
+import { CapDetails } from './cap-details';
+import { useCapStoreModal } from './cap-store-modal-context';
 
-export interface CapStoreContentProps {
-  caps: (Cap | RemoteCap)[];
-  activeSection: CapStoreSidebarSection;
-  isLoading?: boolean;
-  isLoadingMore?: boolean;
-  hasMoreData?: boolean;
-  error?: string | null;
-  onRefresh?: () => void;
-  onLoadMore?: () => void;
-}
-
-export function CapStoreContent({
-  caps,
-  activeSection,
-  isLoading = false,
-  isLoadingMore = false,
-  hasMoreData = false,
-  error = null,
-  onRefresh,
-  onLoadMore,
-}: CapStoreContentProps) {
+export function CapStoreContent() {
   const { t } = useLanguage();
+  const { activeSection, selectedCap } = useCapStoreModal();
   const {
-    addCapToFavorite,
-    removeCapFromFavorite,
-    removeCapFromRecents,
-    isCapFavorite,
-  } = useCapStore();
+    remoteCaps,
+    isFetching,
+    isLoadingMore,
+    hasMoreData,
+    error,
+    loadMore,
+    refetch,
+  } = useRemoteCap();
+  const { getRecentCaps, getFavoriteCaps } = useCapStore();
 
+  // get caps based on active section
+  const caps =
+    activeSection.id === 'favorites'
+      ? getFavoriteCaps()
+      : activeSection.id === 'recent'
+        ? getRecentCaps()
+        : remoteCaps;
+
+  // check if showing installed caps
   const isShowingInstalledCaps = ['favorites', 'recent'].includes(
     activeSection.id,
   );
 
+  // infinite scroll trigger and loading indicator
   const { ref: loadingTriggerRef } = useIntersectionObserver({
     threshold: 0.5,
     freezeOnceVisible: false,
     onChange: (isIntersecting) => {
       if (isIntersecting) {
-        onLoadMore?.();
+        loadMore();
       }
     },
   });
 
-
-  // Function to get actions based on cap type and active section
-  const getCapActions = (cap: Cap | RemoteCap) => {
-    const actions = [];
-
-    const isRemoteCap = 'cid' in cap;
-
-    if (isCapFavorite(cap.id)) {
-      actions.push({
-        icon: <Star className="size-4" />,
-        label: 'Remove from Favorites',
-        onClick: () => removeCapFromFavorite(cap.id),
-      });
-    } else {
-      actions.push({
-        icon: <Star className="size-4" />,
-        label: 'Add to Favorites',
-        onClick: () =>
-          addCapToFavorite(cap.id, isRemoteCap ? cap.cid : undefined),
-      });
-    }
-
-    if (activeSection.id === 'recent') {
-      actions.push({
-        icon: <Clock className="size-4" />,
-        label: 'Remove from Recents',
-        onClick: () => removeCapFromRecents(cap.id),
-      });
-    }
-
-    return actions;
-  };
+  // Show cap details if a cap is selected
+  if (selectedCap) {
+    return <CapDetails />;
+  }
 
   if (error && !isShowingInstalledCaps) {
     return (
@@ -93,14 +61,14 @@ export function CapStoreContent({
         <p className="text-muted-foreground max-w-md mb-4">
           {t('capStore.status.errorDesc')}
         </p>
-        <Button variant="outline" onClick={onRefresh}>
+        <Button variant="outline" onClick={refetch}>
           {t('capStore.status.tryAgain')}
         </Button>
       </div>
     );
   }
 
-  if (isLoading && !isShowingInstalledCaps) {
+  if (isFetching && !isShowingInstalledCaps) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
         <Loader2 className="size-12 text-muted-foreground mb-4 animate-spin" />
@@ -127,15 +95,8 @@ export function CapStoreContent({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Fixed Section Title */}
-      <div className="flex items-center justify-between border-b border-muted-foreground/20 m-6">
-        <h2 className="text-lg font-medium pb-2">{activeSection.label}</h2>
-      </div>
-
       {/* Caps Grid Container with ScrollArea */}
-      <ScrollArea
-        className="flex-1"
-      >
+      <ScrollArea className="flex-1">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-6 py-2">
           {caps.length > 0 &&
             caps.map((cap) => {
@@ -144,22 +105,10 @@ export function CapStoreContent({
 
               if (isRemoteCap) {
                 // RemoteCap type - use cid as unique key
-                return (
-                  <CapCard
-                    key={cap.id}
-                    cap={cap}
-                    actions={getCapActions(cap)}
-                  />
-                );
+                return <CapCard key={cap.id} cap={cap} />;
               } else {
                 // Cap type - use id as unique key
-                return (
-                  <CapCard
-                    key={cap.id}
-                    cap={cap}
-                    actions={getCapActions(cap)}
-                  />
-                );
+                return <CapCard key={cap.id} cap={cap} />;
               }
             })}
         </div>
@@ -170,7 +119,7 @@ export function CapStoreContent({
             <div ref={loadingTriggerRef} />
             {isLoadingMore && (
               <div className="flex justify-center py-4">
-                <Loader2 className="size-6 text-muted-foreground animate-spin" />
+                <Loader2 className="size-8 text-muted-foreground animate-spin" />
               </div>
             )}
             {!hasMoreData && caps.length > 0 && (

@@ -1,51 +1,14 @@
 import * as Dialog from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
-import type { Cap } from '@/shared/types/cap';
-import { useCapStore } from '../hooks/use-cap-store';
-import { useRemoteCap } from '../hooks/use-remote-cap';
-import type { CapStoreSidebarSection, RemoteCap } from '../types';
 import { CapStoreContent } from './cap-store-content';
+import { CapStoreHeader } from './cap-store-header';
 import { useCapStoreModal } from './cap-store-modal-context';
 import { CapStoreSidebar } from './cap-store-sidebar';
 
-
-
 export function CapStoreModal() {
   const { t } = useLanguage();
-  const { toggleModal, isOpen, activeSection, setActiveSection } = useCapStoreModal();
 
-  const { remoteCaps, isLoading, isLoadingMore, hasMoreData, error, fetchCaps, loadMore, refetch } = useRemoteCap();
-  const { getRecentCaps, getFavoriteCaps } = useCapStore();
-
-  const handleSearchChange = (query: string) => {
-    if (activeSection.type === 'tag') {
-      fetchCaps({ searchQuery: query, tags: [activeSection.label] });
-    } else if (activeSection.type === 'section') {
-      fetchCaps({ searchQuery: query });
-    }
-  };
-
-  const handleActiveSectionChange = (section: CapStoreSidebarSection) => {
-    setActiveSection(section);
-    if (section.type === 'tag') {
-      fetchCaps({ tags: [section.label] });
-    } else if (section.id === 'all') {
-      fetchCaps({ searchQuery: '' });
-    }
-  };
-
-  // Determine which caps to display based on active section
-  const getDisplayCaps = (): (Cap | RemoteCap)[] => {
-    if (activeSection.id === 'favorites') {
-      return getFavoriteCaps();
-    } else if (activeSection.id === 'recent') {
-      return getRecentCaps();
-    } else {
-      return remoteCaps;
-    }
-  };
-
-  const displayCaps: (Cap | RemoteCap)[] = getDisplayCaps();
+  const { toggleModal, isOpen } = useCapStoreModal();
 
   return (
     <Dialog.Dialog open={isOpen} onOpenChange={toggleModal}>
@@ -66,25 +29,14 @@ export function CapStoreModal() {
 
         {/* Main Content with Sidebar */}
         <div className="flex-1 min-h-0 flex">
-          <CapStoreSidebar
-            activeSection={activeSection}
-            onSectionChange={handleActiveSectionChange}
-            onSearchChange={handleSearchChange}
-          />
+          <CapStoreSidebar />
 
           {/* Content Area */}
-          <div className="flex-1 min-h-0">
-            <div className="h-full">
-              <CapStoreContent
-                caps={displayCaps}
-                activeSection={activeSection}
-                isLoading={isLoading}
-                isLoadingMore={isLoadingMore}
-                hasMoreData={hasMoreData}
-                error={error}
-                onRefresh={() => refetch()}
-                onLoadMore={loadMore}
-              />
+          <div className="flex-1 min-h-0 flex flex-col">
+            <CapStoreHeader />
+
+            <div className="flex-1 min-h-0">
+              <CapStoreContent />
             </div>
           </div>
         </div>

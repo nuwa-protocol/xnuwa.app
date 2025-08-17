@@ -188,7 +188,10 @@ function PureMultimodalInput({
               event.preventDefault();
 
               if (status !== 'ready') {
-                console.warn('The model is not ready to respond. Currnet status:', status);
+                console.warn(
+                  'The model is not ready to respond. Currnet status:',
+                  status,
+                );
               }
 
               submitForm();

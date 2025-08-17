@@ -131,11 +131,17 @@ export const AIReasoningTrigger = memo(
       >
         {children ?? (
           <>
-            <span><Brain className='size-4 text-muted-foreground' /></span>
+            <span>
+              <Brain className="size-4 text-muted-foreground" />
+            </span>
             {isStreaming && duration === 0 ? (
               <p>Reasoning...</p>
             ) : (
-              <p>{duration === 0 ? 'Reasoned for a few seconds' : `Reasoned for ${duration} seconds`}</p>
+              <p>
+                {duration === 0
+                  ? 'Reasoned for a few seconds'
+                  : `Reasoned for ${duration} seconds`}
+              </p>
             )}
             <ChevronDownIcon
               className={cn(
@@ -159,7 +165,10 @@ export type AIReasoningContentProps = ComponentProps<
 export const AIReasoningContent = memo(
   ({ className, children, ...props }: AIReasoningContentProps) => (
     <CollapsibleContent
-      className={cn('mt-4 text-muted-foreground text-xs pl-4 text-zinc-600 dark:text-zinc-400 border-l flex flex-col gap-4', className)}
+      className={cn(
+        'mt-4 text-muted-foreground text-xs pl-4 text-zinc-600 dark:text-zinc-400 border-l flex flex-col gap-4',
+        className,
+      )}
       {...props}
     >
       <Markdown>{children}</Markdown>
@@ -176,12 +185,12 @@ interface MessageReasoningProps {
   content: string;
 }
 
-export const MessageReasoning = ({ isStreaming, content }: MessageReasoningProps) => {
+export const MessageReasoning = ({
+  isStreaming,
+  content,
+}: MessageReasoningProps) => {
   return (
-    <AIReasoning
-      className="w-full"
-      isStreaming={isStreaming}
-    >
+    <AIReasoning className="w-full" isStreaming={isStreaming}>
       <AIReasoningTrigger />
       <AIReasoningContent>{content}</AIReasoningContent>
     </AIReasoning>

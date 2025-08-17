@@ -1,5 +1,9 @@
 import { IdentityKitWeb } from '@nuwa-ai/identity-kit-web';
-import { createHttpClient, RoochPaymentChannelContract, PaymentHubClient } from '@nuwa-ai/payment-kit';
+import {
+  createHttpClient,
+  RoochPaymentChannelContract,
+  PaymentHubClient,
+} from '@nuwa-ai/payment-kit';
 import type { PaymentChannelHttpClient } from '@nuwa-ai/payment-kit';
 import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 
@@ -23,7 +27,9 @@ export async function getHttpClient(): Promise<PaymentChannelHttpClient> {
   return httpClientPromise;
 }
 
-export async function getPaymentHubClient(defaultAssetId?: string): Promise<PaymentHubClient> {
+export async function getPaymentHubClient(
+  defaultAssetId?: string,
+): Promise<PaymentHubClient> {
   if (!hubClientPromise) {
     hubClientPromise = (async () => {
       const { env, signer } = await getIdentityEnvAndSigner();
@@ -33,10 +39,12 @@ export async function getPaymentHubClient(defaultAssetId?: string): Promise<Paym
         network: chain?.network,
         debug: !!chain?.debug,
       });
-      return new PaymentHubClient({ contract, signer, defaultAssetId: defaultAssetId || '0x3::gas_coin::RGas' });
+      return new PaymentHubClient({
+        contract,
+        signer,
+        defaultAssetId: defaultAssetId || '0x3::gas_coin::RGas',
+      });
     })();
   }
   return hubClientPromise;
 }
-
-

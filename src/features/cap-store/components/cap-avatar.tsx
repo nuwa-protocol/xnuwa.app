@@ -9,7 +9,6 @@ const sizeClasses = {
   xl: 'size-16', // 48px
 } as const;
 
-
 export function CapAvatar({
   capName,
   capThumbnail,

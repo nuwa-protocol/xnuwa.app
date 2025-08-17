@@ -106,10 +106,17 @@ export function CapSubmitForm({
                 Model
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <ProviderAvatar provider={cap.capData.core.model.providerName} size="sm" />
+                <ProviderAvatar
+                  provider={cap.capData.core.model.providerName}
+                  size="sm"
+                />
                 <div>
-                  <p className="text-sm font-medium">{getModelName(cap.capData.core.model)}</p>
-                  <p className="text-xs text-muted-foreground">{getProviderName(cap.capData.core.model)}</p>
+                  <p className="text-sm font-medium">
+                    {getModelName(cap.capData.core.model)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {getProviderName(cap.capData.core.model)}
+                  </p>
                 </div>
               </div>
             </div>

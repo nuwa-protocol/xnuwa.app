@@ -7,6 +7,14 @@ import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
 import type { InstalledCap, RemoteCap } from './types';
 
+// Search parameters interface
+export interface UseRemoteCapParams {
+  searchQuery?: string;
+  tags?: string[];
+  page?: number;
+  size?: number;
+}
+
 // ================= Interfaces ================= //
 
 // Cap store state interface - handles both installed and remote caps
@@ -16,6 +24,12 @@ interface CapStoreState {
 
   // Remote cap management
   remoteCaps: RemoteCap[];
+  isFetching: boolean;
+  isLoadingMore: boolean;
+  error: string | null;
+  hasMoreData: boolean;
+  currentPage: number;
+  lastSearchParams: UseRemoteCapParams;
 
   // Installed Cap management
   addInstalledCap: (cap: InstalledCap) => void;
@@ -27,6 +41,12 @@ interface CapStoreState {
 
   // Remote cap management
   setRemoteCaps: (caps: RemoteCap[]) => void;
+  setIsFetching: (fetching: boolean) => void;
+  setIsLoadingMore: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  setHasMoreData: (hasMore: boolean) => void;
+  setCurrentPage: (page: number) => void;
+  setLastSearchParams: (params: UseRemoteCapParams) => void;
 
   // Data persistence
   loadFromDB: () => Promise<void>;
@@ -67,6 +87,7 @@ export const CapStateStore = create<CapStoreState>()(
       // Store state
       installedCaps: {
         [defaultCap.id]: {
+          cid: defaultCap.id,
           capData: defaultCap,
           isFavorite: false,
           lastUsedAt: null,
@@ -74,6 +95,12 @@ export const CapStateStore = create<CapStoreState>()(
       },
 
       remoteCaps: [],
+      isFetching: false,
+      isLoadingMore: false,
+      error: null,
+      hasMoreData: true,
+      currentPage: 0,
+      lastSearchParams: {},
 
       // Installation management
       addInstalledCap: (cap: InstalledCap) => {
@@ -88,6 +115,7 @@ export const CapStateStore = create<CapStoreState>()(
           installedCaps: {
             ...state.installedCaps,
             [cap.capData.id]: {
+              cid: cap.cid,
               capData: cap.capData,
               isFavorite: cap.isFavorite,
               lastUsedAt: cap.lastUsedAt,
@@ -146,6 +174,30 @@ export const CapStateStore = create<CapStoreState>()(
         set({ remoteCaps: caps });
       },
 
+      setIsFetching: (fetching: boolean) => {
+        set({ isFetching: fetching });
+      },
+
+      setIsLoadingMore: (loading: boolean) => {
+        set({ isLoadingMore: loading });
+      },
+
+      setError: (error: string | null) => {
+        set({ error });
+      },
+
+      setHasMoreData: (hasMore: boolean) => {
+        set({ hasMoreData: hasMore });
+      },
+
+      setCurrentPage: (page: number) => {
+        set({ currentPage: page });
+      },
+
+      setLastSearchParams: (params: UseRemoteCapParams) => {
+        set({ lastSearchParams: params });
+      },
+
       // Data persistence methods
       loadFromDB: async () => {
         if (typeof window === 'undefined') return;
@@ -164,6 +216,7 @@ export const CapStateStore = create<CapStoreState>()(
           installedCaps.forEach((installedCap: any) => {
             const { id, ...capData } = installedCap;
             installedCapsMap[id] = {
+              cid: capData.cid,
               capData: capData.capData,
               isFavorite: capData.isFavorite,
               lastUsedAt: capData.lastUsedAt,

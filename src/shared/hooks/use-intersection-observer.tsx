@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 
@@ -12,7 +12,10 @@ type UseIntersectionObserverOptions = {
   rootMargin?: string;
   threshold?: number | number[];
   freezeOnceVisible?: boolean;
-  onChange?: (isIntersecting: boolean, entry: IntersectionObserverEntry) => void;
+  onChange?: (
+    isIntersecting: boolean,
+    entry: IntersectionObserverEntry,
+  ) => void;
   initialIsIntersecting?: boolean;
 };
 
@@ -41,7 +44,8 @@ export function useIntersectionObserver({
     entry: undefined,
   }));
 
-  const callbackRef = useRef<UseIntersectionObserverOptions['onChange']>(undefined);
+  const callbackRef =
+    useRef<UseIntersectionObserverOptions['onChange']>(undefined);
 
   callbackRef.current = onChange;
 
@@ -65,10 +69,12 @@ export function useIntersectionObserver({
           ? observer.thresholds
           : [observer.thresholds];
 
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           const isIntersecting =
             entry.isIntersecting &&
-            thresholds.some(threshold => entry.intersectionRatio >= threshold);
+            thresholds.some(
+              (threshold) => entry.intersectionRatio >= threshold,
+            );
 
           setState({ isIntersecting, entry });
 

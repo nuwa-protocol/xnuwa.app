@@ -30,7 +30,10 @@ const router = createBrowserRouter([
           { path: 'settings', element: <SettingsPage /> },
           { path: 'cap-studio', element: <CapStudioPage /> },
           { path: 'cap-studio/create', element: <CapStudioCreatePage /> },
-          { path: 'cap-studio/batch-create', element: <CapStudioBatchCreatePage /> },
+          {
+            path: 'cap-studio/batch-create',
+            element: <CapStudioBatchCreatePage />,
+          },
           { path: 'cap-studio/edit/:id', element: <CapStudioEditPage /> },
           { path: 'cap-studio/submit/:id', element: <CapStudioSubmitPage /> },
           { path: 'cap-studio/mcp', element: <CapStudioMcpPage /> },

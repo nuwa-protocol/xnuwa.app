@@ -23,10 +23,12 @@ const formatDate = (timestamp: number) => {
 };
 
 const getTotalCost = (transactions: PaymentTransaction[]) => {
-  const total = transactions.reduce((sum, tx) => sum + (tx.details?.payment?.costUsd || 0n), 0n);
+  const total = transactions.reduce(
+    (sum, tx) => sum + (tx.details?.payment?.costUsd || 0n),
+    0n,
+  );
   return formatCost(total);
 };
-
 
 interface ChatHistoryItemProps {
   chatRecord: ChatRecord;
@@ -45,9 +47,12 @@ export function ChatItem({
 
   const chatId = chatRecord.chatId;
   const totalCost = getTotalCost(chatRecord.transactions);
-  const chatTime = chatRecord.transactions.length > 0 
-    ? Math.max(...chatRecord.transactions.map(tx => tx.details?.timestamp || 0))
-    : 0;
+  const chatTime =
+    chatRecord.transactions.length > 0
+      ? Math.max(
+          ...chatRecord.transactions.map((tx) => tx.details?.timestamp || 0),
+        )
+      : 0;
   return (
     <Collapsible open={isOpen} onOpenChange={() => onToggle(chatId)}>
       <CollapsibleTrigger asChild>
