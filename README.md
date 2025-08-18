@@ -4,7 +4,7 @@
 
 A local-first AI chat client implemented for [Nuwa AI](https://nuwa.dev/) that enables users to create, share, and interact with Caps. 
 
-| Caps (i.e. capability) are mini-apps in Nuwa AI, the minimium functional AI unit. Cap is designed to be an abstraction of AI models and agents. Currently it is the composation of Prompt, Model and MCP Servers.
+> **Caps** (i.e. capability) are mini-apps in Nuwa AI, the minimium functional AI unit. Cap is designed to be an abstraction of AI models and agents. Currently it is the composation of Prompt, Model and MCP Servers.
 
 ## ✨ Features
 
@@ -99,7 +99,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## 🆘 Support
 
-- **Documentation**: [docs.nuwa.ai](https://docs.nuwa.dev)
+- **Documentation**: [docs.nuwa.dev](https://docs.nuwa.dev)
 - **Issues**: [GitHub Issues](https://github.com/nuwa-protocol/nuwa-client/issues)
 - **Community**: [Discord](https://discord.gg/nuwaai)
 - **Email**: haichao@nuwa.dev
