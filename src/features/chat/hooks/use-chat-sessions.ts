@@ -1,3 +1,4 @@
+import type { Message } from 'ai';
 import { useCallback } from 'react';
 import { ChatStateStore } from '../stores';
 import type { ChatSession } from '../types';
@@ -6,7 +7,7 @@ export const useChatSessions = () => {
   const store = ChatStateStore();
 
   const getSession = useCallback((id: string) => {
-    return store.readSession(id);
+    return store.getChatSession(id);
   }, []);
 
   const deleteSession = useCallback((id: string) => {
@@ -14,8 +15,8 @@ export const useChatSessions = () => {
   }, []);
 
   const updateSession = useCallback(
-    (id: string, updates: Partial<Omit<ChatSession, 'id'>>) => {
-      store.updateSession(id, updates);
+    async (id: string, updates: Partial<Omit<ChatSession, 'id'>>) => {
+      await store.updateSession(id, updates);
     },
     [],
   );
@@ -30,28 +31,27 @@ export const useChatSessions = () => {
     );
   }, [store.sessions]);
 
-  const deleteMessagesAfterTimestamp = useCallback(
-    (sessionId: string, timestamp: number) => {
-      const currentSession = store.readSession(sessionId);
-      if (!currentSession) return;
+  const deleteMessagesAfterId = async (
+    chatId: string,
+    messageId: string,
+    lastMessage?: Message,
+  ) => {
+    const currentSession = store.getChatSession(chatId);
+    if (!currentSession) return;
 
-      const updatedMessages = currentSession.messages.filter((msg) => {
-        const messageTime = msg.createdAt
-          ? new Date(msg.createdAt).getTime()
-          : 0;
-        return messageTime < timestamp;
-      });
+    const messageIndex = currentSession.messages.findIndex(
+      (msg) => msg.id === messageId,
+    );
+    if (messageIndex === -1) return;
 
-      const updatedSession: ChatSession = {
-        ...currentSession,
-        messages: updatedMessages,
-        updatedAt: Date.now(),
-      };
+    const updatedMessages = lastMessage
+      ? [...currentSession.messages.slice(0, messageIndex), lastMessage]
+      : currentSession.messages.slice(0, messageIndex + 1);
 
-      store.updateSession(sessionId, updatedSession);
-    },
-    [store],
-  );
+    console.log('updatedMessages', updatedMessages);
+
+    await store.updateSession(chatId, { messages: updatedMessages });
+  };
 
   return {
     sessions: getSortedSessions(),
@@ -60,6 +60,6 @@ export const useChatSessions = () => {
     deleteSession,
     updateSession,
     clearAllSessions,
-    deleteMessagesAfterTimestamp,
+    deleteMessagesAfterId,
   };
 };

@@ -1,54 +1,118 @@
-# React + TypeScript + Vite
+![Nuwa AI Readme Background](./src/assets/readme-bg.png)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Nuwa AI Client
 
-Currently, two official plugins are available:
+A local-first AI chat client implemented for [Nuwa AI](https://nuwa.dev/) that enables users to create, share, and interact with Caps. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> **Caps** (i.e. capability) are mini-apps in Nuwa AI, the minimium functional AI unit. Cap is designed to be an abstraction of AI models and agents. Currently it is the composation of Prompt, Model and MCP Servers.
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🔐 Decentralized Identity & Crypto Payment
+- **Decentralized Identity**: You control your data with DID-based authentication, fully anonymous
+- **Crypto Payment**: Use cryptos to pay for your day-to-day AI
+- **Data Portability**: Export and migrate your data anywhere
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 🎨 Modern User Experience
+- **Shadcn UI**: Clean, responsive design with dark/light theme support
+- **No MCP Configuration**: MCPs use DID authentication directly, eliminates the need for user to config
+
+
+## 🚀 Beta Release
+
+We're excited to announce the **Nuwa Client Beta**! This release includes:
+
+- ✅ Core CAP creation and publishing functionality
+- ✅ Web3 wallet integration
+- ✅ Decentralized identity system
+- ✅ MCP server integration
+- ✅ Payment system
+
+
+## 🛠️ Technology Stack
+
+- **Framerwork**: React 19, TypeScript, Vite
+- **Styling**: Tailwind CSS + Shadcn UI
+- **State Management**: Zustand with persistence
+- **Database**: Dexie (IndexedDB) for local storage
+- **Identity**: DID from @nuwa-ai/identity-kit
+- **Payment**: Payment Channel from @nuwa-ai/payment-kit
+- **Cap Integration**: Cap integration from @nuwa-ai/cap-kit
+- **Code Quality**: Biome for linting and formatting
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+ 
+- pnpm (recommended package manager)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/nuwa-protocol/nuwa-client.git
+cd nuwa-client
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Visit `http://localhost:5173` to start using Nuwa Client.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📖 Development
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### Project Structure
+
 ```
+src/
+├── features/           # Feature-based modules
+│   ├── auth/          # Authentication
+│   ├── chat/          # Chat functionality
+│   ├── cap-studio/    # CAP creation interface
+│   ├── cap-store/     # CAP marketplace
+│   ├── settings/      # User preferences
+│   ├── sidebar/       # Navigation
+│   └── wallet/        # Web3 integration
+├── shared/            # Shared utilities and components
+├── pages/             # Route components
+└── layout/            # Layout components
+```
+
+Each feature follows a consistent structure:
+- `components` - React components
+- `hooks` - Custom React hooks  
+- `stores` - Zustand state management
+- `services` - Backend logics
+- `types` - TypeScript definitions
+
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to get started.
+
+## 🆘 Support
+
+- **Documentation**: [docs.nuwa.dev](https://docs.nuwa.dev)
+- **Issues**: [GitHub Issues](https://github.com/nuwa-protocol/nuwa-client/issues)
+- **Community**: [Discord](https://discord.gg/nuwaai)
+- **Email**: haichao@nuwa.dev
+
+## 🎯 Roadmap
+
+- [ ] Cap Inline UI Support 
+- [ ] Cap Artifacts UI Support
+- [ ] Multi-Modal Input Support
+- [ ] Desktop App with Tauri
+
+---
+
+**Built with ❤️ by the Nuwa team**
+
+Ready to experience the future of AI chat? [Try Nuwa Client Beta](https://test-app.nuwa.dev) today!

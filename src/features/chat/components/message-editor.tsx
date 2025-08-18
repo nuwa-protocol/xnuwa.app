@@ -30,7 +30,7 @@ export function MessageEditor({
   const [draftContent, setDraftContent] = useState<string>(message.content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { deleteMessagesAfterTimestamp } = useChatSessions();
+  const { deleteMessagesAfterId } = useChatSessions();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -78,11 +78,7 @@ export function MessageEditor({
           onClick={async () => {
             setIsSubmitting(true);
 
-            // Delete trailing messages using client store
-            if (message.createdAt) {
-              const messageTime = new Date(message.createdAt).getTime();
-              deleteMessagesAfterTimestamp(chatId, messageTime);
-            }
+
 
             // @ts-expect-error todo: support UIMessage in setMessages
             setMessages((messages) => {
@@ -95,10 +91,19 @@ export function MessageEditor({
                   parts: [{ type: 'text', text: draftContent }],
                 };
 
-                return [...messages.slice(0, index), updatedMessage];
-              }
+                const updatedMessages = [...messages.slice(0, index), updatedMessage];
 
+                console.log('updatedMessage UI', updatedMessage);
+                return updatedMessages;
+              }
               return messages;
+            });
+
+            await deleteMessagesAfterId(chatId, message.id, {
+              id: message.id,
+              content: draftContent,
+              role: message.role,
+              parts: [{ type: 'text', text: draftContent }],
             });
 
             setMode('view');

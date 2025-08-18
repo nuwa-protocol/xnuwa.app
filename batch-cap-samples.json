@@ -1,0 +1,2599 @@
+[
+  {
+    "idName": "openai_gpt_5_chat",
+    "metadata": {
+      "displayName": "OpenAI: GPT-5 Chat",
+      "description": "GPT-5 Chat is designed for advanced, natural, multimodal, and context-aware conversations for enterprise applications.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Help me plan an enterprise-level project roadmap",
+          "Create a comprehensive business analysis report",
+          "Draft a technical proposal for stakeholders",
+          "Design a customer onboarding workflow"
+        ]
+      },
+      "modelId": "openai/gpt-5-chat",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "openai_gpt_5_cap",
+    "metadata": {
+      "displayName": "OpenAI: GPT-5",
+      "description": "GPT-5 is OpenAI's most advanced model offering major improvements in reasoning, code quality, and user experience. Optimized for complex tasks requiring step-by-step reasoning, instruction following, and accuracy in high-stakes use cases. Features test-time routing and advanced prompt understanding with reduced hallucination and sycophancy.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Content Writing"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Debug this complex Python algorithm step by step",
+          "Write a technical blog post about AI advancements",
+          "Solve this multi-step reasoning problem",
+          "Create a full-stack web application architecture"
+        ]
+      },
+      "modelId": "openai/gpt-5",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "openai_gpt5_mini",
+    "metadata": {
+      "displayName": "OpenAI: GPT-5 Mini",
+      "description": "GPT-5 Mini is a compact version of GPT-5, designed to handle lighter-weight reasoning tasks. It provides the same instruction-following and safety-tuning benefits as GPT-5, but with reduced latency and cost. GPT-5 Mini is the successor to OpenAI's o4-mini model.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Explain this concept in simple terms",
+          "Help me organize my daily tasks",
+          "Answer quick questions about general topics",
+          "Provide a brief summary of this document"
+        ]
+      },
+      "modelId": "openai/gpt-5-mini",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "openai_gpt5_nano",
+    "metadata": {
+      "displayName": "OpenAI: GPT-5 Nano",
+      "description": "GPT-5-Nano is the smallest and fastest variant in the GPT-5 system, optimized for developer tools, rapid interactions, and ultra-low latency environments. While limited in reasoning depth compared to its larger counterparts, it retains key instruction-following and safety features. It is the successor to GPT-4.1-nano and offers a lightweight option for cost-sensitive or real-time applications.",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Quick code completion for this function",
+          "Classify this text into categories",
+          "Generate autocomplete suggestions",
+          "Provide instant responses to user queries"
+        ]
+      },
+      "modelId": "openai/gpt-5-nano",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "openai_oss_120b",
+    "metadata": {
+      "displayName": "OpenAI: gpt-oss-120b",
+      "description": "gpt-oss-120b is an open-weight, 117B-parameter Mixture-of-Experts (MoE) language model from OpenAI designed for high-reasoning, agentic, and general-purpose production use cases. It activates 5.1B parameters per forward pass and is optimized to run on a single H100 GPU with native MXFP4 quantization. The model supports configurable reasoning depth, full chain-of-thought access, and native tool use, including function calling, browsing, and structured output generation.",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Use tools to research and analyze market trends",
+          "Create a function to process large datasets",
+          "Browse the web for the latest tech news",
+          "Generate structured JSON output for API responses"
+        ]
+      },
+      "modelId": "openai/gpt-oss-120b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "openai_oss_20b",
+    "metadata": {
+      "displayName": "OpenAI: gpt-oss-20b",
+      "description": "gpt-oss-20b is an open-weight 21B parameter model released by OpenAI under the Apache 2.0 license. It uses a Mixture-of-Experts (MoE) architecture with 3.6B active parameters per forward pass, optimized for lower-latency inference and deployability on consumer or single-GPU hardware. The model is trained in OpenAI’s Harmony response format and supports reasoning level configuration, fine-tuning, and agentic capabilities including function calling, tool use, and structured outputs.",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Use function calling to integrate with APIs",
+          "Generate code with tool-assisted development",
+          "Create structured outputs with JSON schema",
+          "Build an automated workflow with tools"
+        ]
+      },
+      "modelId": "openai/gpt-oss-20b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_opus_4_1",
+    "metadata": {
+      "displayName": "Anthropic: Claude Opus 4.1",
+      "description": "Claude Opus 4.1 is an updated version of Anthropic’s flagship model, offering improved performance in coding, reasoning, and agentic tasks. It achieves 74.5% on SWE-bench Verified and shows notable gains in multi-file code refactoring, debugging precision, and detail-oriented reasoning. The model supports extended thinking up to 64K tokens and is optimized for tasks involving research, data analysis, and tool-assisted reasoning.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Research",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Refactor this codebase to improve performance",
+          "Research the latest developments in AI",
+          "Debug this complex multi-file project",
+          "Analyze data patterns in this dataset"
+        ]
+      },
+      "modelId": "anthropic/claude-opus-4.1",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen3_30b_instruct",
+    "metadata": {
+      "displayName": "Qwen: Qwen3 30B A3B Instruct 2507",
+      "description": "Qwen3-30B-A3B-Instruct-2507 is a 30.5B-parameter MoE model with 3.3B active parameters per inference. Operates in non-thinking mode for high-quality instruction following, multilingual understanding, and agentic tool use. Demonstrates competitive performance in reasoning, coding, and alignment benchmarks.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Write a technical blog post in multiple languages",
+          "Create a React component with TypeScript",
+          "Generate structured documentation",
+          "Build a function that handles API requests"
+        ]
+      },
+      "modelId": "qwen/qwen3-30b-a3b-instruct-2507",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "glm_4_5",
+    "metadata": {
+      "displayName": "Z.AI: GLM 4.5",
+      "description": "GLM-4.5 is a flagship foundation model purpose-built for agent-based applications with MoE architecture and 128k context support. Features hybrid inference with thinking mode for complex reasoning/tool use and non-thinking mode for instant responses. Enhanced capabilities in reasoning, code generation, and agent alignment.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.62.0/files/light/zai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Design an AI agent for complex reasoning",
+          "Create a Python script for data analysis",
+          "Use tools to automate repetitive tasks",
+          "Build a multi-step workflow application"
+        ]
+      },
+      "modelId": "z-ai/glm-4.5",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "glm_4_5_air",
+    "metadata": {
+      "displayName": "Z.AI: GLM 4.5 Air",
+      "description": "GLM-4.5-Air is the lightweight variant of the flagship model family, purpose-built for agent-centric applications. Uses MoE architecture with compact parameter size. Features hybrid inference modes with thinking mode for advanced reasoning and non-thinking mode for real-time interaction.",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.62.0/files/light/zai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create a lightweight chatbot with tools",
+          "Generate quick responses with function calls",
+          "Build a simple automation script",
+          "Process real-time data streams"
+        ]
+      },
+      "modelId": "z-ai/glm-4.5-air",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen3_235b_thinking",
+    "metadata": {
+      "displayName": "Qwen: Qwen3 235B A22B Thinking 2507",
+      "description": "Qwen3-235B-A22B-Thinking-2507 is a high-performance MoE model optimized for complex reasoning tasks. Activates 22B of 235B parameters per pass with 262K context support. This thinking-only variant excels at structured logical reasoning, mathematics, science, and long-form generation with state-of-the-art benchmark performance.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve this complex mathematical theorem",
+          "Analyze scientific research papers",
+          "Create structured logical arguments",
+          "Generate code for algorithmic problems"
+        ]
+      },
+      "modelId": "qwen/qwen3-235b-a22b-thinking-2507",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "glm_4_32b",
+    "metadata": {
+      "displayName": "Z.AI: GLM 4 32B ",
+      "description": "GLM 4 32B is a cost-effective foundation language model.\n\nIt can efficiently perform complex tasks and has significantly enhanced capabilities in tool use, online search, and code-related intelligent tasks.\n\nIt is made by the same lab behind the thudm models.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.62.0/files/light/zai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build a web scraping tool with Python",
+          "Search online for market research data",
+          "Create a REST API with authentication",
+          "Optimize this database query performance"
+        ]
+      },
+      "modelId": "z-ai/glm-4-32b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen3_coder",
+    "metadata": {
+      "displayName": "Qwen: Qwen3 Coder ",
+      "description": "Qwen3-Coder-480B-A35B-Instruct is a Mixture-of-Experts (MoE) code generation model developed by the Qwen team. It is optimized for agentic coding tasks such as function calling, tool use, and long-context reasoning over repositories. The model features 480 billion total parameters, with 35 billion active per forward pass (8 out of 160 experts).\n\nPricing for the Alibaba endpoints varies by context length. Once a request is greater than 128k input tokens, the higher pricing is used.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Refactor this entire codebase architecture",
+          "Create an advanced machine learning pipeline",
+          "Build a distributed system with microservices",
+          "Use tools to analyze repository patterns"
+        ]
+      },
+      "modelId": "qwen/qwen3-coder",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemini_2_5_lite",
+    "metadata": {
+      "displayName": "Google: Gemini 2.5 Flash Lite",
+      "description": "Gemini 2.5 Flash-Lite is a lightweight reasoning model optimized for ultra-low latency and cost efficiency. Offers improved throughput and faster token generation. By default, thinking (multi-pass reasoning) is disabled for speed, but can be enabled via Reasoning API parameter.",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create a fast API endpoint with caching",
+          "Build a real-time chat application",
+          "Generate automated test cases",
+          "Optimize this code for performance"
+        ]
+      },
+      "modelId": "google/gemini-2.5-flash-lite",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen3_235b_instruct",
+    "metadata": {
+      "displayName": "Qwen: Qwen3 235B A22B Instruct 2507",
+      "description": "Qwen3-235B-A22B-Instruct-2507 is a multilingual, instruction-tuned MoE model with 22B active parameters per forward pass. Optimized for general-purpose text generation, instruction following, logical reasoning, math, code, and tool usage with 262K context length and significant gains in multilingual understanding.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Write a comprehensive technical report",
+          "Create a multilingual content strategy",
+          "Build a complex data processing pipeline",
+          "Generate structured documentation with tools"
+        ]
+      },
+      "modelId": "qwen/qwen3-235b-a22b-2507",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "kimi_k2",
+    "metadata": {
+      "displayName": "MoonshotAI: Kimi K2",
+      "description": "Kimi K2 Instruct is a large-scale MoE model with 1 trillion total parameters and 32 billion active per forward pass. Optimized for agentic capabilities including advanced tool use, reasoning, and code synthesis. Excels in coding (LiveCodeBench, SWE-bench), reasoning (ZebraLogic, GPQA), and tool-use tasks with 128K context support.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/moonshot.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Code a complex algorithm with optimization",
+          "Build an advanced AI agent system",
+          "Create automated testing frameworks",
+          "Design scalable software architecture"
+        ]
+      },
+      "modelId": "moonshotai/kimi-k2",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "grok_4",
+    "metadata": {
+      "displayName": "xAI: Grok 4",
+      "description": "Grok 4 is xAI's latest reasoning model with a 256k context window. It supports parallel tool calling, structured outputs, and both image and text inputs. Note that reasoning is not exposed, reasoning cannot be disabled, and the reasoning effort cannot be specified. Pricing increases once the total tokens in a given request is greater than 128k tokens. See more details on the [xAI docs](https://docs.x.ai/docs/models/grok-4-0709)",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/grok.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Analyze complex data with parallel processing",
+          "Create structured outputs for API integration",
+          "Build a tool that processes images and text",
+          "Generate comprehensive technical reports"
+        ]
+      },
+      "modelId": "x-ai/grok-4",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemini_2_5_lite_06",
+    "metadata": {
+      "displayName": "Google: Gemini 2.5 Flash Lite Preview 06-17",
+      "description": "Gemini 2.5 Flash-Lite is a lightweight reasoning model optimized for ultra-low latency and cost efficiency. Offers improved throughput and faster token generation. By default, thinking (multi-pass reasoning) is disabled for speed, but can be enabled via Reasoning API parameter.",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create a high-speed data processing tool",
+          "Build a real-time analytics dashboard",
+          "Generate quick automated responses",
+          "Optimize this function for low latency"
+        ]
+      },
+      "modelId": "google/gemini-2.5-flash-lite-preview-06-17",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemini_2_5_flash",
+    "metadata": {
+      "displayName": "Google: Gemini 2.5 Flash",
+      "description": "Gemini 2.5 Flash is Google's state-of-the-art workhorse model, specifically designed for advanced reasoning, coding, mathematics, and scientific tasks. It includes built-in \"thinking\" capabilities, enabling it to provide responses with greater accuracy and nuanced context handling. \n\nAdditionally, Gemini 2.5 Flash is configurable through the \"max tokens for reasoning\" parameter, as described in the documentation (https://openrouter.ai/docs/use-cases/reasoning-tokens#max-tokens-for-reasoning).",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Research"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve advanced mathematical problems",
+          "Research cutting-edge scientific topics",
+          "Debug complex software architecture",
+          "Create detailed technical documentation"
+        ]
+      },
+      "modelId": "google/gemini-2.5-flash",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemini_2_5_pro",
+    "metadata": {
+      "displayName": "Google: Gemini 2.5 Pro",
+      "description": "Gemini 2.5 Pro is Google’s state-of-the-art AI model designed for advanced reasoning, coding, mathematics, and scientific tasks. It employs “thinking” capabilities, enabling it to reason through responses with enhanced accuracy and nuanced context handling. Gemini 2.5 Pro achieves top-tier performance on multiple benchmarks, including first-place positioning on the LMArena leaderboard, reflecting superior human-preference alignment and complex problem-solving abilities.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Research"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Conduct comprehensive literature review",
+          "Analyze complex scientific datasets",
+          "Write detailed research methodology",
+          "Create advanced coding solutions"
+        ]
+      },
+      "modelId": "google/gemini-2.5-pro",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "grok_3_mini",
+    "metadata": {
+      "displayName": "xAI: Grok 3 Mini",
+      "description": "A lightweight model that thinks before responding. Fast, smart, and great for logic-based tasks that do not require deep domain knowledge. The raw thinking traces are accessible.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/grok.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve this logic puzzle step-by-step",
+          "Explain complex concepts clearly",
+          "Analyze basic reasoning problems",
+          "Help with quick decision-making"
+        ]
+      },
+      "modelId": "x-ai/grok-3-mini",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "grok_3",
+    "metadata": {
+      "displayName": "xAI: Grok 3",
+      "description": "Grok 3 is the latest model from xAI. It's their flagship model that excels at enterprise use cases like data extraction, coding, and text summarization. Possesses deep domain knowledge in finance, healthcare, law, and science.\n\n",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/grok.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Extract structured data from documents",
+          "Create advanced coding solutions",
+          "Summarize complex financial reports",
+          "Analyze healthcare or legal documents"
+        ]
+      },
+      "modelId": "x-ai/grok-3",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "deepseek_r1_qwen8b",
+    "metadata": {
+      "displayName": "DeepSeek: Deepseek R1 0528 Qwen3 8B",
+      "description": "DeepSeek-R1-0528 is a lightly upgraded release that tops math, programming, and logic leaderboards with step-change depth-of-thought. The distilled variant, DeepSeek-R1-0528-Qwen3-8B, transfers this chain-of-thought into 8B parameters, beating standard Qwen3 8B by +10 pp.",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve advanced programming challenges",
+          "Debug mathematical algorithms",
+          "Optimize code for better performance",
+          "Create efficient data structures"
+        ]
+      },
+      "modelId": "deepseek/deepseek-r1-0528-qwen3-8b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "deepseek_r1_0528",
+    "metadata": {
+      "displayName": "DeepSeek: R1 0528",
+      "description": "May 28th update to the [original DeepSeek R1](/deepseek/deepseek-r1) Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active in an inference pass.\n\nFully open-source model.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Think through complex reasoning problems",
+          "Analyze philosophical questions deeply",
+          "Solve challenging mathematical theorems",
+          "Provide detailed explanations of concepts"
+        ]
+      },
+      "modelId": "deepseek/deepseek-r1-0528",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_opus_4",
+    "metadata": {
+      "displayName": "Anthropic: Claude Opus 4",
+      "description": "Claude Opus 4 is benchmarked as the world’s best coding model, at time of release, bringing sustained performance on complex, long-running tasks and agent workflows. It sets new benchmarks in software engineering, achieving leading results on SWE-bench (72.5%) and Terminal-bench (43.2%). Opus 4 supports extended, agentic workflows, handling thousands of task steps continuously for hours without degradation. \n\nRead more at the [blog post here](https://www.anthropic.com/news/claude-4)",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build enterprise-level software solutions",
+          "Create complex agentic workflows",
+          "Debug multi-file codebases efficiently",
+          "Design scalable system architectures"
+        ]
+      },
+      "modelId": "anthropic/claude-opus-4",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_sonnet_4",
+    "metadata": {
+      "displayName": "Anthropic: Claude Sonnet 4",
+      "description": "Claude Sonnet 4 significantly enhances coding and reasoning capabilities with improved precision and controllability. Achieving 72.7% on SWE-bench, it balances capability and efficiency for diverse applications from routine coding to complex software development with enhanced autonomous navigation and reduced error rates.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Develop production-ready applications",
+          "Create automated testing suites",
+          "Build efficient coding tools",
+          "Design robust software systems"
+        ]
+      },
+      "modelId": "anthropic/claude-sonnet-4",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "llama_guard_4_12b",
+    "metadata": {
+      "displayName": "Meta: Llama Guard 4 12B",
+      "description": "Llama Guard 4 is a multimodal content safety classifier fine-tuned from Llama 4 Scout. Classifies both input prompts and LLM responses as safe/unsafe, providing violation categories. Supports text and image moderation across multiple languages, handles mixed multimodal inputs, and aligns with MLCommons hazards taxonomy.",
+      "tags": [
+        "AI Model",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Classify content for safety compliance",
+          "Moderate user-generated content",
+          "Create content filtering systems",
+          "Analyze text and image safety"
+        ]
+      },
+      "modelId": "meta-llama/llama-guard-4-12b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen3_30b_a3b",
+    "metadata": {
+      "displayName": "Qwen: Qwen3 30B A3B",
+      "description": "Qwen3-30B-A3B features dense and MoE architectures with seamless switching between thinking mode for complex reasoning and non-thinking mode for efficient dialogue. Significantly outperforms prior models in mathematics, coding, commonsense reasoning, creative writing, and interactive dialogue with 30.5B parameters (3.3B activated).",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Write creative technical documentation",
+          "Build intelligent coding assistants",
+          "Create versatile programming tools",
+          "Generate multi-purpose content"
+        ]
+      },
+      "modelId": "qwen/qwen3-30b-a3b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen3_8b",
+    "metadata": {
+      "displayName": "Qwen: Qwen3 8B",
+      "description": "Qwen3-8B is a dense 8.2B parameter model designed for reasoning-heavy tasks and efficient dialogue. Supports seamless switching between thinking mode for math, coding, and logical inference, and non-thinking mode for general conversation. Supports 32K context, extendable to 131K tokens with YaRN.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create interactive dialogue systems",
+          "Build math problem-solving tools",
+          "Write creative content with logical flow",
+          "Generate code for reasoning tasks"
+        ]
+      },
+      "modelId": "qwen/qwen3-8b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen3_14b",
+    "metadata": {
+      "displayName": "Qwen: Qwen3 14B",
+      "description": "Qwen3-14B is a dense 14.8B parameter model designed for complex reasoning and efficient dialogue. Supports seamless switching between thinking mode for math, programming, and logical inference, and non-thinking mode for general conversation. Natively handles 32K token contexts, extendable to 131K tokens.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve complex programming challenges",
+          "Create detailed technical content",
+          "Build advanced reasoning systems",
+          "Generate long-form analytical reports"
+        ]
+      },
+      "modelId": "qwen/qwen3-14b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen3_32b",
+    "metadata": {
+      "displayName": "Qwen: Qwen3 32B",
+      "description": "Qwen3-32B is a dense 32.8B parameter model optimized for complex reasoning and efficient dialogue. Supports seamless switching between thinking mode for math, coding, and logical inference, and non-thinking mode for faster conversation. Natively handles 32K token contexts, extendable to 131K tokens.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Develop sophisticated applications",
+          "Write comprehensive content strategies",
+          "Build complex reasoning algorithms",
+          "Create intelligent automation tools"
+        ]
+      },
+      "modelId": "qwen/qwen3-32b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen3_235b_a22b",
+    "metadata": {
+      "displayName": "Qwen: Qwen3 235B A22B",
+      "description": "Qwen3-235B-A22B is a 235B parameter MoE model activating 22B parameters per forward pass. Supports seamless switching between thinking mode for complex reasoning and non-thinking mode for conversational efficiency. Strong reasoning ability, multilingual support, and agent tool-calling capabilities with 32K context.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build enterprise-scale applications",
+          "Create advanced coding solutions",
+          "Develop intelligent agent systems",
+          "Generate complex technical documentation"
+        ]
+      },
+      "modelId": "qwen/qwen3-235b-a22b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "o4_mini_high",
+    "metadata": {
+      "displayName": "OpenAI: o4 Mini High",
+      "description": "OpenAI o4-mini-high is the same model as o4-mini with reasoning_effort set to high. A compact reasoning model optimized for fast, cost-efficient performance while retaining strong multimodal and agentic capabilities. Demonstrates competitive performance on AIME (99.5% with Python) and SWE-bench benchmarks.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve advanced mathematical problems",
+          "Create optimized coding solutions",
+          "Build intelligent reasoning systems",
+          "Generate automated test frameworks"
+        ]
+      },
+      "modelId": "openai/o4-mini-high",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "o4_mini",
+    "metadata": {
+      "displayName": "OpenAI: o4 Mini",
+      "description": "OpenAI o4-mini is a compact reasoning model optimized for fast, cost-efficient performance while retaining strong multimodal and agentic capabilities. Demonstrates competitive reasoning and coding performance on AIME (99.5% with Python) and SWE-bench, outperforming o3-mini with high accuracy in STEM tasks and visual problem solving.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve STEM problems with high accuracy",
+          "Create efficient coding solutions",
+          "Build multimodal applications",
+          "Generate automated testing tools"
+        ]
+      },
+      "modelId": "openai/o4-mini",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gpt_4_1",
+    "metadata": {
+      "displayName": "OpenAI: GPT-4.1",
+      "description": "GPT-4.1 is a flagship large language model optimized for advanced instruction following, real-world software engineering, and long-context reasoning. Supports 1 million token context window and outperforms GPT-4o across coding (54.6% SWE-bench), instruction compliance, and multimodal understanding.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build enterprise software solutions",
+          "Create advanced coding frameworks",
+          "Generate intelligent automation tools",
+          "Develop large-scale applications"
+        ]
+      },
+      "modelId": "openai/gpt-4.1",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gpt_4_1_mini",
+    "metadata": {
+      "displayName": "OpenAI: GPT-4.1 Mini",
+      "description": "GPT-4.1 Mini is a mid-sized model delivering performance competitive with GPT-4o at substantially lower latency and cost. It retains a 1 million token context window and scores 45.1% on hard instruction evals, 35.8% on MultiChallenge, and 84.1% on IFEval. Mini also shows strong coding ability (e.g., 31.6% on Aider’s polyglot diff benchmark) and vision understanding, making it suitable for interactive applications with tight performance constraints.",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create interactive coding assistants",
+          "Build responsive web applications",
+          "Generate optimized algorithms",
+          "Develop efficient automation scripts"
+        ]
+      },
+      "modelId": "openai/gpt-4.1-mini",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gpt_4_1_nano",
+    "metadata": {
+      "displayName": "OpenAI: GPT-4.1 Nano",
+      "description": "For tasks that demand low latency, GPT‑4.1 nano is the fastest and cheapest model in the GPT-4.1 series. It delivers exceptional performance at a small size with its 1 million token context window, and scores 80.1% on MMLU, 50.3% on GPQA, and 9.8% on Aider polyglot coding – even higher than GPT‑4o mini. It’s ideal for tasks like classification or autocompletion.",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create rapid code completions",
+          "Build fast classification systems",
+          "Generate quick automated responses",
+          "Develop real-time processing tools"
+        ]
+      },
+      "modelId": "openai/gpt-4.1-nano",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "llama_4_maverick",
+    "metadata": {
+      "displayName": "Meta: Llama 4 Maverick",
+      "description": "Llama 4 Maverick 17B is a high-capacity multimodal MoE model with 128 experts and 17B active parameters. Supports multilingual text and image input with 1M token context. Features early fusion for native multimodality, instruction-tuned for assistant behavior, image reasoning, and general-purpose multimodal interaction.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Research"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create multimodal research applications",
+          "Build advanced coding solutions",
+          "Generate comprehensive analyses",
+          "Develop high-capacity AI systems"
+        ]
+      },
+      "modelId": "meta-llama/llama-4-maverick",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "llama_4_scout",
+    "metadata": {
+      "displayName": "Meta: Llama 4 Scout",
+      "description": "Llama 4 Scout 17B is a MoE model activating 17B parameters out of 109B total. Supports native multimodal input (text and image) with 10M token context length. Designed for assistant-style interaction and visual reasoning, incorporating early fusion for seamless modality integration across 12 supported languages.",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build visual reasoning applications",
+          "Create multimodal coding assistants",
+          "Develop image analysis tools",
+          "Generate assistant-style interactions"
+        ]
+      },
+      "modelId": "meta-llama/llama-4-scout",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen2_5_vl_32b",
+    "metadata": {
+      "displayName": "Qwen: Qwen2.5 VL 32B Instruct",
+      "description": "Qwen2.5-VL-32B is a multimodal vision-language model fine-tuned through reinforcement learning for enhanced mathematical reasoning, structured outputs, and visual problem-solving. Excels at visual analysis, object recognition, textual interpretation within images, and precise event localization in extended videos.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Research"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Analyze visual data and images",
+          "Research scientific image content",
+          "Create coding solutions for vision tasks",
+          "Generate insights from visual media"
+        ]
+      },
+      "modelId": "qwen/qwen2.5-vl-32b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "deepseek_v3_0324",
+    "metadata": {
+      "displayName": "DeepSeek: DeepSeek V3 0324",
+      "description": "DeepSeek V3, a 685B-parameter, mixture-of-experts model, is the latest iteration of the flagship chat model family from the DeepSeek team.\n\nIt succeeds the [DeepSeek V3](/deepseek/deepseek-chat-v3) model and performs really well on a variety of tasks.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Engage in general conversation",
+          "Explain complex topics simply",
+          "Help with creative writing tasks",
+          "Provide thoughtful analysis"
+        ]
+      },
+      "modelId": "deepseek/deepseek-chat-v3-0324",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemma_3_4b_it",
+    "metadata": {
+      "displayName": "Google: Gemma 3 4B",
+      "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling.",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create multimodal applications with vision",
+          "Build function calling systems",
+          "Generate structured outputs",
+          "Develop multilingual tools"
+        ]
+      },
+      "modelId": "google/gemma-3-4b-it",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemma_3_12b_it",
+    "metadata": {
+      "displayName": "Google: Gemma 3 12B",
+      "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling. Gemma 3 12B is the second largest in the family of Gemma 3 models after [Gemma 3 27B](google/gemma-3-27b-it)",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create advanced multimodal tools",
+          "Build function calling applications",
+          "Generate structured multilingual content",
+          "Develop complex reasoning systems"
+        ]
+      },
+      "modelId": "google/gemma-3-12b-it",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemma_3_27b_it",
+    "metadata": {
+      "displayName": "Google: Gemma 3 27B",
+      "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities, including structured outputs and function calling. Gemma 3 27B is Google's latest open source model, successor to [Gemma 2](google/gemma-2-27b-it)",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build sophisticated multimodal applications",
+          "Create advanced function calling systems",
+          "Generate comprehensive multilingual content",
+          "Develop enterprise-grade AI tools"
+        ]
+      },
+      "modelId": "google/gemma-3-27b-it",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "sonar_pro",
+    "metadata": {
+      "displayName": "Perplexity: Sonar Pro",
+      "description": "Note: Sonar Pro pricing includes Perplexity search pricing. See [details here](https://docs.perplexity.ai/guides/pricing#detailed-pricing-breakdown-for-sonar-reasoning-pro-and-sonar-pro)\n\nFor enterprises seeking more advanced capabilities, the Sonar Pro API can handle in-depth, multi-step queries with added extensibility, like double the number of citations per search as Sonar on average. Plus, with a larger context window, it can handle longer and more nuanced searches and follow-up questions. ",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/perplexity-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Research complex topics with web search",
+          "Create intelligent automation tools",
+          "Generate comprehensive reports",
+          "Build advanced query systems"
+        ]
+      },
+      "modelId": "perplexity/sonar-pro",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "sonar_deep_research",
+    "metadata": {
+      "displayName": "Perplexity: Sonar Deep Research",
+      "description": "Sonar Deep Research autonomously conducts multi-step research across complex topics, searching and evaluating sources to generate comprehensive reports. Excels in finance, technology, health, and current events analysis with advanced retrieval, synthesis, and reasoning capabilities.",
+      "tags": [
+        "AI Model",
+        "Research"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/perplexity-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Conduct comprehensive market research",
+          "Analyze financial technology trends",
+          "Research health and medical topics",
+          "Generate detailed industry reports"
+        ]
+      },
+      "modelId": "perplexity/sonar-deep-research",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwq_32b",
+    "metadata": {
+      "displayName": "Qwen: QwQ 32B",
+      "description": "QwQ is the reasoning model of the Qwen series. Compared with conventional instruction-tuned models, QwQ, which is capable of thinking and reasoning, can achieve significantly enhanced performance in downstream tasks, especially hard problems. QwQ-32B is the medium-sized reasoning model, which is capable of achieving competitive performance against state-of-the-art reasoning models, e.g., DeepSeek-R1, o1-mini.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve challenging reasoning puzzles",
+          "Think through complex problems step-by-step",
+          "Analyze logical inconsistencies",
+          "Generate structured arguments"
+        ]
+      },
+      "modelId": "qwen/qwq-32b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemini_2_0_lite",
+    "metadata": {
+      "displayName": "Google: Gemini 2.0 Flash Lite",
+      "description": "Gemini 2.0 Flash Lite offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5), all at extremely economical token prices.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create fast, efficient applications",
+          "Build lightweight AI tools",
+          "Generate quick responses",
+          "Develop economical solutions"
+        ]
+      },
+      "modelId": "google/gemini-2.0-flash-lite-001",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_3_7_sonnet",
+    "metadata": {
+      "displayName": "Anthropic: Claude 3.7 Sonnet",
+      "description": "Claude 3.7 Sonnet introduces hybrid reasoning with rapid responses and extended step-by-step processing for complex tasks. Notable improvements in coding, front-end development, and agentic workflows with autonomous multi-step navigation. Maintains performance parity in standard mode while offering enhanced accuracy in extended reasoning.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build advanced coding applications",
+          "Create intelligent automation tools",
+          "Develop complex reasoning systems",
+          "Generate comprehensive solutions"
+        ]
+      },
+      "modelId": "anthropic/claude-3.7-sonnet",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_3_7_thinking",
+    "metadata": {
+      "displayName": "Anthropic: Claude 3.7 Sonnet (thinking)",
+      "description": "Claude 3.7 Sonnet introduces hybrid reasoning with rapid responses and extended step-by-step processing for complex tasks. Notable improvements in coding, front-end development, and agentic workflows with autonomous multi-step navigation. Maintains performance parity in standard mode while offering enhanced accuracy in extended reasoning.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Think through complex coding problems",
+          "Build sophisticated automation tools",
+          "Create detailed technical solutions",
+          "Develop step-by-step workflows"
+        ]
+      },
+      "modelId": "anthropic/claude-3.7-sonnet:thinking",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_3_7_beta",
+    "metadata": {
+      "displayName": "Anthropic: Claude 3.7 Sonnet (self-moderated)",
+      "description": "Claude 3.7 Sonnet introduces hybrid reasoning with rapid responses and extended step-by-step processing for complex tasks. Notable improvements in coding, front-end development, and agentic workflows with autonomous multi-step navigation. Maintains performance parity in standard mode while offering enhanced accuracy in extended reasoning.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create self-moderated content systems",
+          "Build advanced coding solutions",
+          "Develop intelligent automation tools",
+          "Generate comprehensive analyses"
+        ]
+      },
+      "modelId": "anthropic/claude-3.7-sonnet:beta",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemini_2_0_flash",
+    "metadata": {
+      "displayName": "Google: Gemini 2.0 Flash",
+      "description": "Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5). It introduces notable enhancements in multimodal understanding, coding capabilities, complex instruction following, and function calling. These advancements come together to deliver more seamless and robust agentic experiences.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build multimodal coding applications",
+          "Create intelligent automation systems",
+          "Generate complex function calling tools",
+          "Develop advanced AI agents"
+        ]
+      },
+      "modelId": "google/gemini-2.0-flash-001",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen2_5_vl_72b",
+    "metadata": {
+      "displayName": "Qwen: Qwen2.5 VL 72B Instruct",
+      "description": "Qwen2.5-VL is proficient in recognizing common objects such as flowers, birds, fish, and insects. It is also highly capable of analyzing texts, charts, icons, graphics, and layouts within images.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Analyze visual content and objects",
+          "Create image-based applications",
+          "Generate insights from charts and graphics",
+          "Build visual reasoning tools"
+        ]
+      },
+      "modelId": "qwen/qwen2.5-vl-72b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "o3_mini",
+    "metadata": {
+      "displayName": "OpenAI: o3 Mini",
+      "description": "OpenAI o3-mini is a cost-efficient reasoning model optimized for STEM tasks, excelling in science, mathematics, and coding. Features adjustable reasoning effort levels (high/medium/low) and supports function calling, structured outputs, and streaming. Demonstrates 39% fewer errors than predecessors while matching o1 performance on AIME and GPQA at lower cost.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve complex STEM problems efficiently",
+          "Create advanced coding tools",
+          "Build structured output systems",
+          "Generate mathematical solutions"
+        ]
+      },
+      "modelId": "openai/o3-mini",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "deepseek_r1_qwen32b",
+    "metadata": {
+      "displayName": "DeepSeek: R1 Distill Qwen 32B",
+      "description": "DeepSeek R1 Distill Qwen 32B is a distilled large language model based on Qwen 2.5 32B, using outputs from DeepSeek R1. Outperforms OpenAI's o1-mini across various benchmarks with AIME 2024 pass@1: 72.6, MATH-500 pass@1: 94.3, and CodeForces Rating: 1691.",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve advanced mathematical challenges",
+          "Create high-performance coding solutions",
+          "Build complex reasoning algorithms",
+          "Generate optimized system architectures"
+        ]
+      },
+      "modelId": "deepseek/deepseek-r1-distill-qwen-32b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "perplexity_sonar",
+    "metadata": {
+      "displayName": "Perplexity: Sonar",
+      "description": "Sonar is lightweight, affordable, fast, and simple to use — now featuring citations and the ability to customize sources. It is designed for companies seeking to integrate lightweight question-and-answer features optimized for speed.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/perplexity-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Answer quick questions with sources",
+          "Search for current information",
+          "Create simple research summaries",
+          "Generate fast, cited responses"
+        ]
+      },
+      "modelId": "perplexity/sonar",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "lfm_7b",
+    "metadata": {
+      "displayName": "Liquid: LFM 7B",
+      "description": "LFM-7B, a new best-in-class language model. LFM-7B is designed for exceptional chat capabilities, including languages like Arabic and Japanese. Powered by the Liquid Foundation Model (LFM) architecture, it exhibits unique features like low memory footprint and fast inference speed. \n\nLFM-7B is the world’s best-in-class multilingual language model in English, Arabic, and Japanese.\n\nSee the [launch announcement](https://www.liquid.ai/lfm-7b) for benchmarks and more info.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/liquid.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create multilingual conversations",
+          "Build efficient dialogue systems",
+          "Generate culturally-aware content",
+          "Develop fast response applications"
+        ]
+      },
+      "modelId": "liquid/lfm-7b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "lfm_3b",
+    "metadata": {
+      "displayName": "Liquid: LFM 3B",
+      "description": "Liquid's LFM 3B delivers incredible performance for its size. It positions itself as first place among 3B parameter transformers, hybrids, and RNN models It is also on par with Phi-3.5-mini on multiple benchmarks, while being 18.4% smaller.\n\nLFM-3B is the ideal choice for mobile and other edge text-based applications.\n\nSee the [launch announcement](https://www.liquid.ai/liquid-foundation-models) for benchmarks and more info.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/liquid.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build lightweight mobile applications",
+          "Create efficient edge computing tools",
+          "Generate fast text processing systems",
+          "Develop compact AI solutions"
+        ]
+      },
+      "modelId": "liquid/lfm-3b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "deepseek_r1_llama70b",
+    "metadata": {
+      "displayName": "DeepSeek: R1 Distill Llama 70B",
+      "description": "DeepSeek R1 Distill Llama 70B is a distilled large language model based on Llama-3.3-70B-Instruct, using outputs from DeepSeek R1. Achieves high performance with AIME 2024 pass@1: 70.0, MATH-500 pass@1: 94.5, and CodeForces Rating: 1633 through advanced distillation techniques.",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve advanced mathematical problems",
+          "Create high-performance coding solutions",
+          "Build complex algorithmic systems",
+          "Generate optimized data structures"
+        ]
+      },
+      "modelId": "deepseek/deepseek-r1-distill-llama-70b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "deepseek_r1",
+    "metadata": {
+      "displayName": "DeepSeek: R1",
+      "description": "DeepSeek R1 is here: Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active in an inference pass.\n\nFully open-source model & [technical report](https://api-docs.deepseek.com/news/news250120).\n\nMIT licensed: Distill & commercialize freely!",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Reason through complex problems openly",
+          "Create advanced AI tools with transparency",
+          "Build open-source reasoning systems",
+          "Generate detailed problem-solving steps"
+        ]
+      },
+      "modelId": "deepseek/deepseek-r1",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "minimax_01",
+    "metadata": {
+      "displayName": "MiniMax: MiniMax-01",
+      "description": "MiniMax-01 combines MiniMax-Text-01 for text generation and MiniMax-VL-01 for image understanding. Has 456 billion parameters with 45.9 billion activated per inference and 4 million token context. Uses hybrid architecture combining Lightning Attention, Softmax Attention, and MoE.",
+      "tags": [
+        "AI Model",
+        "Content Writing"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/minimax-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create innovative content with unique voice",
+          "Write compelling marketing campaigns",
+          "Generate creative multimedia content",
+          "Build engaging storytelling tools"
+        ]
+      },
+      "modelId": "minimax/minimax-01",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "ms_phi_4",
+    "metadata": {
+      "displayName": "Microsoft: Phi 4",
+      "description": "Microsoft Research Phi-4 is designed for complex reasoning tasks and efficient operation in limited memory situations. At 14 billion parameters, it was trained on high-quality synthetic datasets and academic materials with careful instruction tuning and strong safety standards. Works best with English inputs.",
+      "tags": [
+        "AI Model",
+        "Research"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/microsoft-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Solve complex reasoning problems",
+          "Research academic topics thoroughly",
+          "Create detailed analytical reports",
+          "Build efficient memory-based systems"
+        ]
+      },
+      "modelId": "microsoft/phi-4",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "deepseek_chat",
+    "metadata": {
+      "displayName": "DeepSeek: DeepSeek V3",
+      "description": "DeepSeek-V3 is the latest model from DeepSeek, building upon instruction following and coding abilities of previous versions. Pre-trained on nearly 15 trillion tokens, it outperforms other open-source models and rivals leading closed-source models in reported evaluations.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build advanced coding applications",
+          "Create intelligent automation tools",
+          "Develop comprehensive AI systems",
+          "Generate structured technical solutions"
+        ]
+      },
+      "modelId": "deepseek/deepseek-chat",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "llama_3_3_70b_inst",
+    "metadata": {
+      "displayName": "Meta: Llama 3.3 70B Instruct",
+      "description": "Meta Llama 3.3 70B is a pretrained and instruction-tuned multilingual LLM optimized for dialogue use cases. Outperforms many available open source and closed chat models on industry benchmarks. Supports English, German, French, Italian, Portuguese, Hindi, Spanish, and Thai.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Engage in multilingual conversations",
+          "Create diverse dialogue interactions",
+          "Generate helpful responses",
+          "Build conversational applications"
+        ]
+      },
+      "modelId": "meta-llama/llama-3.3-70b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gpt_4o_2024_11_20",
+    "metadata": {
+      "displayName": "OpenAI: GPT-4o (2024-11-20)",
+      "description": "The 2024-11-20 version of GPT-4o offers leveled-up creative writing with more natural, engaging, and tailored writing for improved relevance and readability. Better at working with uploaded files, providing deeper insights and more thorough responses while maintaining GPT-4 Turbo intelligence at improved speed and cost.",
+      "tags": [
+        "AI Model",
+        "Content Writing"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Write engaging creative content",
+          "Create detailed narratives",
+          "Generate compelling storytelling",
+          "Build content creation tools"
+        ]
+      },
+      "modelId": "openai/gpt-4o-2024-11-20",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen_2_5_coder_32b",
+    "metadata": {
+      "displayName": "Qwen2.5 Coder 32B Instruct",
+      "description": "Qwen2.5-Coder is the latest Code-Specific Qwen model with significant improvements in code generation, code reasoning, and code fixing. Enhanced foundation for real-world applications like Code Agents while maintaining strengths in mathematics and general competencies for comprehensive coding support.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build comprehensive coding tools",
+          "Create intelligent code agents",
+          "Generate automated testing frameworks",
+          "Fix complex programming bugs"
+        ]
+      },
+      "modelId": "qwen/qwen-2.5-coder-32b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_3_5_haiku",
+    "metadata": {
+      "displayName": "Anthropic: Claude 3.5 Haiku",
+      "description": "Claude 3.5 Haiku offers enhanced capabilities in speed, coding accuracy, and tool use. Engineered for real-time applications with quick response times essential for dynamic tasks like chat interactions and immediate coding suggestions. Highly suitable for software development and customer service bots.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build fast coding applications",
+          "Create real-time AI assistants",
+          "Generate quick automated responses",
+          "Develop efficient development tools"
+        ]
+      },
+      "modelId": "anthropic/claude-3.5-haiku",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_3_5_haiku_10",
+    "metadata": {
+      "displayName": "Anthropic: Claude 3.5 Haiku (2024-10-22)",
+      "description": "Claude 3.5 Haiku features enhancements across coding, tool use, and reasoning. As the fastest model in Anthropic's lineup, it offers rapid response times for high interactivity and low latency applications like chatbots and code completions. Excels in data extraction and real-time content moderation. No image input support.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create rapid coding solutions",
+          "Build real-time chatbots",
+          "Generate quick content moderation tools",
+          "Write efficient technical content"
+        ]
+      },
+      "modelId": "anthropic/claude-3.5-haiku-20241022",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_3_5_sonnet",
+    "metadata": {
+      "displayName": "Anthropic: Claude 3.5 Sonnet",
+      "description": "Claude 3.5 Sonnet delivers better-than-Opus capabilities at faster-than-Sonnet speeds. Particularly strong in coding (49% on SWE-Bench Verified), data science with unstructured data navigation, visual processing for charts and graphs, and agentic tasks requiring complex multi-step problem solving with tool use.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build advanced coding solutions",
+          "Create intelligent automation tools",
+          "Generate complex data analysis systems",
+          "Develop sophisticated AI agents"
+        ]
+      },
+      "modelId": "anthropic/claude-3.5-sonnet",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen_2_5_7b_inst",
+    "metadata": {
+      "displayName": "Qwen2.5 7B Instruct",
+      "description": "Qwen2.5 7B offers enhanced coding, mathematics, and instruction following capabilities with 128K context support. Features improved long text generation (8K+ tokens), structured data understanding, JSON output generation, and multilingual support for 29+ languages including Chinese, English, and European languages.",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create multilingual coding applications",
+          "Build structured data processing tools",
+          "Generate JSON output systems",
+          "Develop comprehensive AI assistants"
+        ]
+      },
+      "modelId": "qwen/qwen-2.5-7b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemini_1_5_8b",
+    "metadata": {
+      "displayName": "Google: Gemini 1.5 Flash 8B",
+      "description": "Gemini Flash 1.5 8B is optimized for speed and efficiency, offering enhanced performance in small prompt tasks like chat, transcription, and translation. With reduced latency, it is highly effective for real-time and large-scale operations while maintaining high-quality results.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create fast, efficient applications",
+          "Build real-time chat systems",
+          "Generate quick translations",
+          "Develop lightweight AI tools"
+        ]
+      },
+      "modelId": "google/gemini-flash-1.5-8b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "llama_3_2_3b_inst",
+    "metadata": {
+      "displayName": "Meta: Llama 3.2 3B Instruct",
+      "description": "Llama 3.2 3B is a multilingual large language model optimized for dialogue generation, reasoning, and summarization. Supports eight languages including English, Spanish, and Hindi. Trained on 9 trillion tokens, it excels in instruction-following, complex reasoning, and tool use with balanced accuracy and efficiency.",
+      "tags": [
+        "AI Model",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create multilingual content",
+          "Generate comprehensive summaries",
+          "Build intelligent dialogue systems",
+          "Use tools for enhanced interactions"
+        ]
+      },
+      "modelId": "meta-llama/llama-3.2-3b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "qwen_2_5_72b_inst",
+    "metadata": {
+      "displayName": "Qwen2.5 72B Instruct",
+      "description": "Qwen2.5 72B offers enhanced coding, mathematics, and instruction following capabilities with 128K context support. Features improved long text generation (8K+ tokens), structured data understanding, JSON output generation, and multilingual support for 29+ languages including Chinese, English, and European languages.",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build large-scale coding applications",
+          "Create multilingual content systems",
+          "Generate structured data outputs",
+          "Develop comprehensive AI solutions"
+        ]
+      },
+      "modelId": "qwen/qwen-2.5-72b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "hermes_3_llama_70b",
+    "metadata": {
+      "displayName": "Nous: Hermes 3 70B Instruct",
+      "description": "Hermes 3 70B is a competitive finetune of Llama-3.1 70B with advanced agentic capabilities, improved roleplaying, reasoning, multi-turn conversation, and long context coherence. Features powerful steering capabilities, reliable function calling, structured output capabilities, and improved code generation skills.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Research",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/nousresearch.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build advanced coding applications",
+          "Research complex technical topics",
+          "Create intelligent automation tools",
+          "Generate structured function calls"
+        ]
+      },
+      "modelId": "nousresearch/hermes-3-llama-3.1-70b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "hermes_3_llama_405b",
+    "metadata": {
+      "displayName": "Nous: Hermes 3 405B Instruct",
+      "description": "Hermes 3 405B is a frontier-level, full-parameter finetune of Llama-3.1 405B focused on aligning LLMs to users with powerful steering capabilities. Features advanced agentic capabilities, improved roleplaying, reasoning, multi-turn conversation, and enhanced function calling and structured output capabilities.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/nousresearch.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build enterprise-level AI systems",
+          "Create advanced coding solutions",
+          "Generate complex automation tools",
+          "Develop sophisticated AI agents"
+        ]
+      },
+      "modelId": "nousresearch/hermes-3-llama-3.1-405b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "chatgpt_4o_latest",
+    "metadata": {
+      "displayName": "OpenAI: ChatGPT-4o",
+      "description": "OpenAI ChatGPT 4o is continually updated by OpenAI to point to the current version of GPT-4o used by ChatGPT. It therefore differs slightly from the API version of [GPT-4o](/models/openai/gpt-4o) in that it has additional RLHF. It is intended for research and evaluation.\n\nOpenAI notes that this model is not suited for production use-cases as it may be removed or redirected to another model in the future.",
+      "tags": [
+        "AI Model",
+        "Research",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Research cutting-edge topics",
+          "Create comprehensive analysis tools",
+          "Generate detailed technical reports",
+          "Build advanced reasoning systems"
+        ]
+      },
+      "modelId": "openai/chatgpt-4o-latest",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "l3_lunaris_8b",
+    "metadata": {
+      "displayName": "Sao10K: Llama 3 8B Lunaris",
+      "description": "Lunaris 8B is a versatile generalist and roleplaying model based on Llama 3. It's a strategic merge of multiple models, designed to balance creativity with improved logic and general knowledge.\n\nCreated by [Sao10k](https://huggingface.co/Sao10k), this model aims to offer an improved experience over Stheno v3.2, with enhanced creativity and logical reasoning.\n\nFor best results, use with Llama 3 Instruct context template, temperature 1.4, and min_p 0.1.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/sao10k-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create versatile applications",
+          "Generate balanced creative content",
+          "Build logical reasoning systems",
+          "Develop general-purpose AI tools"
+        ]
+      },
+      "modelId": "sao10k/l3-lunaris-8b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gpt_4o_2024_08_06",
+    "metadata": {
+      "displayName": "OpenAI: GPT-4o (2024-08-06)",
+      "description": "The 2024-08-06 version of GPT-4o offers improved structured outputs with JSON schema support in response_format. Maintains GPT-4 Turbo intelligence while being twice as fast and 50% more cost-effective. Enhanced performance in non-English languages and improved visual capabilities for multimodal tasks.",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Generate structured JSON outputs",
+          "Create intelligent automation tools",
+          "Build enhanced API integrations",
+          "Develop multimodal applications"
+        ]
+      },
+      "modelId": "openai/gpt-4o-2024-08-06",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "llama_3_1_8b_inst",
+    "metadata": {
+      "displayName": "Meta: Llama 3.1 8B Instruct",
+      "description": "Meta's latest class of model (Llama 3.1) launched with a variety of sizes & flavors. This 8B instruct-tuned version is fast and efficient.\n\nIt has demonstrated strong performance compared to leading closed-source models in human evaluations.\n\nTo read more about the model release, [click here](https://ai.meta.com/blog/meta-llama-3-1/). Usage of this model is subject to [Meta's Acceptable Use Policy](https://llama.meta.com/llama3/use-policy/).",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create efficient dialogue systems",
+          "Generate helpful responses",
+          "Build general-purpose applications",
+          "Develop conversational AI tools"
+        ]
+      },
+      "modelId": "meta-llama/llama-3.1-8b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "llama_3_1_405b_inst",
+    "metadata": {
+      "displayName": "Meta: Llama 3.1 405B Instruct",
+      "description": "Llama 3.1 405B is Meta's highly anticipated 400B class model with 128k context and impressive eval scores. This instruct-tuned version is optimized for high quality dialogue use cases, demonstrating strong performance compared to leading closed-source models including GPT-4o and Claude 3.5 Sonnet.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build large-scale AI applications",
+          "Create advanced reasoning systems",
+          "Generate comprehensive solutions",
+          "Develop enterprise-grade tools"
+        ]
+      },
+      "modelId": "meta-llama/llama-3.1-405b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "llama_3_1_70b_inst",
+    "metadata": {
+      "displayName": "Meta: Llama 3.1 70B Instruct",
+      "description": "Meta's latest class of model (Llama 3.1) launched with a variety of sizes & flavors. This 70B instruct-tuned version is optimized for high quality dialogue usecases.\n\nIt has demonstrated strong performance compared to leading closed-source models in human evaluations.\n\nTo read more about the model release, [click here](https://ai.meta.com/blog/meta-llama-3-1/). Usage of this model is subject to [Meta's Acceptable Use Policy](https://llama.meta.com/llama3/use-policy/).",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create high-quality dialogue systems",
+          "Build comprehensive AI applications",
+          "Generate detailed responses",
+          "Develop advanced conversation tools"
+        ]
+      },
+      "modelId": "meta-llama/llama-3.1-70b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gpt_4o_mini",
+    "metadata": {
+      "displayName": "OpenAI: GPT-4o-mini",
+      "description": "GPT-4o mini is OpenAI's newest small model after GPT-4 Omni, supporting text and image inputs with text outputs. More affordable than frontier models and 60% cheaper than GPT-3.5 Turbo while maintaining SOTA intelligence. Achieves 82% on MMLU and ranks higher than GPT-4 on chat preferences.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create affordable AI applications",
+          "Generate quick intelligent responses",
+          "Build cost-effective solutions",
+          "Develop efficient chat systems"
+        ]
+      },
+      "modelId": "openai/gpt-4o-mini",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gpt_4o_mini_240718",
+    "metadata": {
+      "displayName": "OpenAI: GPT-4o-mini (2024-07-18)",
+      "description": "GPT-4o mini is OpenAI's newest small model after GPT-4 Omni, supporting text and image inputs with text outputs. More affordable than frontier models and 60% cheaper than GPT-3.5 Turbo while maintaining SOTA intelligence. Achieves 82% on MMLU and ranks higher than GPT-4 on chat preferences.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create efficient AI applications",
+          "Generate cost-effective solutions",
+          "Build reliable chat systems",
+          "Develop multimodal tools"
+        ]
+      },
+      "modelId": "openai/gpt-4o-mini-2024-07-18",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "hermes_2_pro_llama3",
+    "metadata": {
+      "displayName": "NousResearch: Hermes 2 Pro - Llama-3 8B",
+      "description": "Hermes 2 Pro is an upgraded, retrained version of Nous Hermes 2, consisting of an updated and cleaned version of the OpenHermes 2.5 Dataset, as well as a newly introduced Function Calling and JSON Mode dataset developed in-house.",
+      "tags": [
+        "AI Model",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/nousresearch.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create function calling systems",
+          "Build JSON mode applications",
+          "Generate structured outputs",
+          "Develop intelligent automation tools"
+        ]
+      },
+      "modelId": "nousresearch/hermes-2-pro-llama-3-8b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemini_1_5_flash",
+    "metadata": {
+      "displayName": "Google: Gemini 1.5 Flash ",
+      "description": "Gemini 1.5 Flash performs well at multimodal tasks including visual understanding, classification, summarization, and content creation from image, audio and video. Designed for high-volume, high-frequency tasks where cost and latency matter, achieving comparable quality to other Gemini Pro models at reduced cost.",
+      "tags": [
+        "AI Model",
+        "Content Writing"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create engaging content with visuals",
+          "Write compelling narratives",
+          "Generate creative marketing materials",
+          "Build multimodal content systems"
+        ]
+      },
+      "modelId": "google/gemini-flash-1.5",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gpt_4o",
+    "metadata": {
+      "displayName": "OpenAI: GPT-4o",
+      "description": "GPT-4o (omni) is OpenAI's latest AI model, supporting both text and image inputs with text outputs. Maintains GPT-4 Turbo intelligence while being twice as fast and 50% more cost-effective. Offers improved performance in processing non-English languages and enhanced visual capabilities.",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create intelligent applications",
+          "Generate helpful responses",
+          "Build conversational systems",
+          "Develop multimodal solutions"
+        ]
+      },
+      "modelId": "openai/gpt-4o",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "llama_3_8b_inst",
+    "metadata": {
+      "displayName": "Meta: Llama 3 8B Instruct",
+      "description": "Meta's latest class of model (Llama 3) launched with a variety of sizes & flavors. This 8B instruct-tuned version was optimized for high quality dialogue usecases.\n\nIt has demonstrated strong performance compared to leading closed-source models in human evaluations.\n\nTo read more about the model release, [click here](https://ai.meta.com/blog/meta-llama-3/). Usage of this model is subject to [Meta's Acceptable Use Policy](https://llama.meta.com/llama3/use-policy/).",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create dialogue systems",
+          "Generate helpful responses",
+          "Build conversational applications",
+          "Develop interactive AI tools"
+        ]
+      },
+      "modelId": "meta-llama/llama-3-8b-instruct",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "wizardlm_2_8x22b",
+    "metadata": {
+      "displayName": "WizardLM-2 8x22B",
+      "description": "WizardLM-2 8x22B is Microsoft AI's most advanced Wizard model. It demonstrates highly competitive performance compared to leading proprietary models, and it consistently outperforms all existing state-of-the-art opensource models.\n\nIt is an instruct finetune of [Mixtral 8x22B](/models/mistralai/mixtral-8x22b).\n\nTo read more about the model release, [click here](https://wizardlm.github.io/WizardLM2/).\n\n#moe",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/microsoft-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create comprehensive AI solutions",
+          "Generate competitive analyses",
+          "Build advanced reasoning systems",
+          "Develop enterprise applications"
+        ]
+      },
+      "modelId": "microsoft/wizardlm-2-8x22b",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gemini_pro_1_5",
+    "metadata": {
+      "displayName": "Google: Gemini 1.5 Pro",
+      "description": "Google's latest multimodal model, supports image and video[0] in text or chat prompts.\n\nOptimized for language tasks including:\n\n- Code generation\n- Text generation\n- Text editing\n- Problem solving\n- Recommendations\n- Information extraction\n- Data extraction or generation\n- AI agents\n\nUsage of Gemini is subject to Google's [Gemini Terms of Use](https://ai.google.dev/terms).\n\n* [0]: Video input is not available through OpenRouter at this time.",
+      "tags": [
+        "AI Model",
+        "Coding",
+        "Content Writing",
+        "Tools"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Build comprehensive coding solutions",
+          "Create content generation tools",
+          "Generate data extraction systems",
+          "Develop intelligent AI agents"
+        ]
+      },
+      "modelId": "google/gemini-pro-1.5",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "claude_3_haiku",
+    "metadata": {
+      "displayName": "Anthropic: Claude 3 Haiku",
+      "description": "Claude 3 Haiku is Anthropic's fastest and most compact model for\nnear-instant responsiveness. Quick and accurate targeted performance.\n\nSee the launch announcement and benchmark results [here](https://www.anthropic.com/news/claude-3-haiku)\n\n#multimodal",
+      "tags": [
+        "AI Model",
+        "Others"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create fast responsive applications",
+          "Generate quick helpful responses",
+          "Build efficient chat systems",
+          "Develop compact AI solutions"
+        ]
+      },
+      "modelId": "anthropic/claude-3-haiku",
+      "mcpServers": {}
+    }
+  },
+  {
+    "idName": "gpt_3_5_turbo",
+    "metadata": {
+      "displayName": "OpenAI: GPT-3.5 Turbo",
+      "description": "GPT-3.5 Turbo is OpenAI's fastest model. It can understand and generate natural language or code, and is optimized for chat and traditional completion tasks.\n\nTraining data up to Sep 2021.",
+      "tags": [
+        "AI Model",
+        "Coding"
+      ],
+      "thumbnail": {
+        "type": "url",
+        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
+      }
+    },
+    "core": {
+      "prompt": {
+        "value": "",
+        "suggestions": [
+          "Create fast coding solutions",
+          "Generate natural language responses",
+          "Build efficient chat completions",
+          "Develop cost-effective AI tools"
+        ]
+      },
+      "modelId": "openai/gpt-3.5-turbo",
+      "mcpServers": {}
+    }
+  }
+]

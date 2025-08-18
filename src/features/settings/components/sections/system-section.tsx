@@ -10,6 +10,7 @@ export function SystemSection() {
   const [isClearing, setIsClearing] = useState(false);
   const { clearAllStorage } = useStorage();
   const { settings, setSetting } = useSettings();
+  const isDevMode = settings.devMode;
 
   // Clear all storage logic
   const handleClearStorage = async () => {
@@ -48,21 +49,23 @@ export function SystemSection() {
         disabled={false}
       />
 
-      <DangerActionCard
-        title={t('settings.system.clearAllStorage.title')}
-        description={t('settings.system.clearAllStorage.description')}
-        buttonLabel={t('settings.system.clearAllStorage.button')}
-        onClick={handleClearStorage}
-        disabled={isClearing}
-        confirmationTitle={t('settings.system.clearAllStorage.confirmTitle')}
-        confirmationDescription={t(
-          'settings.system.clearAllStorage.confirmDescription',
-        )}
-        confirmationButtonLabel={t(
-          'settings.system.clearAllStorage.confirmButton',
-        )}
-        cancelButtonLabel={t('settings.system.clearAllStorage.cancel')}
-      />
+      {isDevMode && (
+        <DangerActionCard
+          title={t('settings.system.clearAllStorage.title')}
+          description={t('settings.system.clearAllStorage.description')}
+          buttonLabel={t('settings.system.clearAllStorage.button')}
+          onClick={handleClearStorage}
+          disabled={isClearing}
+          confirmationTitle={t('settings.system.clearAllStorage.confirmTitle')}
+          confirmationDescription={t(
+            'settings.system.clearAllStorage.confirmDescription',
+          )}
+          confirmationButtonLabel={t(
+            'settings.system.clearAllStorage.confirmButton',
+          )}
+          cancelButtonLabel={t('settings.system.clearAllStorage.cancel')}
+        />
+      )}
     </div>
   );
 }
