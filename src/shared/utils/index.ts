@@ -6,10 +6,6 @@ function generateUUID(): string {
   });
 }
 
-function sanitizeText(text: string) {
-  return text.replace('<has_function_call>', '');
-}
-
 function formatRelativeTime(timestamp: number): string {
   const now = Date.now();
   const diff = now - timestamp;
@@ -37,4 +33,4 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export { cn, formatRelativeTime, generateUUID, sanitizeText };
+export { cn, formatRelativeTime, generateUUID };

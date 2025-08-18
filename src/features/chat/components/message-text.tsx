@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
-import { cn, sanitizeText } from '@/shared/utils';
+import { cn } from '@/shared/utils';
 import { useChatSessions } from '../hooks';
 import { Markdown } from './markdown';
 import { MessageEditor } from './message-editor';
@@ -57,9 +57,6 @@ export const MessageText = ({
   };
 
   const handleResend = async () => {
-    // TODO: Implement resend functionality
-    console.log('Resend message:', message);
-
     // Delete trailing messages using client store
     await deleteMessagesAfterId(chatId, message.id);
 
@@ -81,15 +78,17 @@ export const MessageText = ({
         : part.text;
 
     return (
-      <div key={key} className="flex flex-col gap-2">
+      <div key={key} className="flex flex-col gap-2 items-end">
         <div
           data-testid="message-content"
-          className={cn('flex flex-col w-full', {
+          className={cn('flex flex-col', {
             'bg-purple-200 dark:bg-purple-700 px-3 py-2 rounded-xl':
               message.role === 'user',
+          }, {
+            'w-full': message.role === 'assistant'
           })}
         >
-          <Markdown>{sanitizeText(displayText)}</Markdown>
+          <Markdown>{displayText}</Markdown>
 
           {isUserMessageLong && (
             <Button
