@@ -1,41 +1,37 @@
-# Nuwa Client
+![Nuwa AI Readme Background](./src/assets/readme-bg.png)
 
-A local-first AI chat client that enables users to create, share, and interact with Caps. 
+# Nuwa AI Client
+
+A local-first AI chat client implemented for [Nuwa AI](https://nuwa.dev/) that enables users to create, share, and interact with Caps. 
+
+| Caps (i.e. capability) are mini-apps in Nuwa AI, the minimium functional AI unit. Cap is designed to be an abstraction of AI models and agents. Currently it is the composation of Prompt, Model and MCP Servers.
 
 ## ✨ Features
 
-### 🔐 Decentralized Identity & Payment
-- **Self-Sovereign Identity**: Your data belongs to you with DID-based authentication
-- **Crypto Payment**: Use cryptos to pay for your day-to-day ai
+### 🔐 Decentralized Identity & Crypto Payment
+- **Decentralized Identity**: You control your data with DID-based authentication, fully anonymous
+- **Crypto Payment**: Use cryptos to pay for your day-to-day AI
 - **Data Portability**: Export and migrate your data anywhere
 
 ### 🎨 Modern User Experience
-- **Beautiful UI**: Clean, responsive design with dark/light theme support
-- **Accessibility**: Built on Radix UI primitives for full accessibility
-- **Performance**: Optimized with React 19 and Vite for fast loading
+- **Shadcn UI**: Clean, responsive design with dark/light theme support
+- **No MCP Configuration**: MCPs use DID authentication directly, eliminates the need for user to config
+
 
 ## 🚀 Beta Release
 
 We're excited to announce the **Nuwa Client Beta**! This release includes:
 
-- ✅ Core CAP creation and sharing functionality
-- ✅ Multi-model AI chat with streaming
+- ✅ Core CAP creation and publishing functionality
 - ✅ Web3 wallet integration
 - ✅ Decentralized identity system
 - ✅ MCP server integration
-- ✅ Payment system for premium features
+- ✅ Payment system
 
-### What's Coming Next
-- Enhanced CAP marketplace with ratings and reviews
-- Advanced MCP tool ecosystem
-- Mobile applications (iOS/Android)
-- Advanced collaboration features
-- Enterprise integrations
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React 19, TypeScript, Vite
-- **Routing**: React Router v7
+- **Framerwork**: React 19, TypeScript, Vite
 - **Styling**: Tailwind CSS + Shadcn UI
 - **State Management**: Zustand with persistence
 - **Database**: Dexie (IndexedDB) for local storage
@@ -110,7 +106,9 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## 🎯 Roadmap
 
-- [ ] Cap UI Support with inline card and side artifacts
+- [ ] Cap Inline UI Support 
+- [ ] Cap Artifacts UI Support
+- [ ] Multi-Modal Input Support
 - [ ] Desktop App with Tauri
 
 ---
