@@ -1,14 +1,23 @@
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
-import { ChevronDownIcon, ChevronUpIcon, PencilIcon } from 'lucide-react';
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CopyIcon,
+  PencilIcon,
+  RotateCcwIcon,
+} from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
+import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { cn, sanitizeText } from '@/shared/utils';
+import { useChatSessions } from '../hooks';
 import { Markdown } from './markdown';
 import { MessageEditor } from './message-editor';
 
@@ -37,12 +46,29 @@ export const MessageText = ({
 }: MessageTextProps) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [copyToClipboard, isCopied] = useCopyToClipboard();
+  const { deleteMessagesAfterId } = useChatSessions();
 
   const key = `message-${message.id}-part-${index}`;
 
   const handleModeChange = (newMode: 'view' | 'edit') => {
     setMode(newMode);
     onModeChange(newMode);
+  };
+
+  const handleResend = async () => {
+    // TODO: Implement resend functionality
+    console.log('Resend message:', message);
+
+    // Delete trailing messages using client store
+    await deleteMessagesAfterId(chatId, message.id);
+
+    reload();
+  };
+
+  const handleCopy = () => {
+    copyToClipboard(part.text);
+    toast.success('Copied to clipboard');
   };
 
   if (mode === 'view') {
@@ -55,25 +81,7 @@ export const MessageText = ({
         : part.text;
 
     return (
-      <div key={key} className="flex flex-row gap-2 items-start">
-        {message.role === 'user' && !isReadonly && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                data-testid="message-edit-button"
-                variant="ghost"
-                className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
-                onClick={() => {
-                  handleModeChange('edit');
-                }}
-              >
-                <PencilIcon />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Edit message</TooltipContent>
-          </Tooltip>
-        )}
-
+      <div key={key} className="flex flex-col gap-2">
         <div
           data-testid="message-content"
           className={cn('flex flex-col w-full', {
@@ -102,6 +110,56 @@ export const MessageText = ({
             </Button>
           )}
         </div>
+
+        {message.role === 'user' && !isReadonly && (
+          <div className="flex justify-end gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  data-testid="message-copy-button"
+                  variant="ghost"
+                  className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
+                  onClick={handleCopy}
+                >
+                  <CopyIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isCopied ? 'Copied!' : 'Copy message'}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  data-testid="message-resend-button"
+                  variant="ghost"
+                  className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
+                  onClick={handleResend}
+                >
+                  <RotateCcwIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Resend message</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  data-testid="message-edit-button"
+                  variant="ghost"
+                  className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
+                  onClick={() => {
+                    handleModeChange('edit');
+                  }}
+                >
+                  <PencilIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Edit message</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
       </div>
     );
   }

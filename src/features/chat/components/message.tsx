@@ -59,11 +59,6 @@ const PurePreviewMessage = ({
             {message.parts?.map((part, index) => {
               if (part.type !== 'reasoning') return null;
               return (
-                // <MessageReasoning
-                //   key={`reasoning-${message.id}-${index}`}
-                //   isStreaming={isStreamingReasoning}
-                //   reasoning={part.reasoning}
-                // />
                 <MessageReasoning
                   key={`reasoning-${message.id}-${index}`}
                   isStreaming={isStreamingReasoning}
