@@ -20,7 +20,7 @@ export function TestnetFaucetDialog({
 }: TestnetFaucetDialogProps) {
   const handleDiscordClick = () => {
     // Open Discord link
-    window.open('https://discord.gg/nuwa', '_blank');
+    window.open('https://discord.gg/nuwaai', '_blank');
   };
 
   return (
