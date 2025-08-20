@@ -58,6 +58,8 @@ export const useCapStore = () => {
       if (!capCid) {
         throw new Error('Cap CID is required for downloading cap');
       }
+
+      //TODO: downloadCap with id
       const capData = await downloadCap(capCid);
       addInstalledCap({
         cid: capCid,

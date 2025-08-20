@@ -56,10 +56,13 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
         },
       };
 
-      console.log(capWithSubmitFormData);
-
       // make the submission
       const result = await submitCap(capWithSubmitFormData);
+
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
 
       // update cap status to submitted
       updateCap(cap.id, {
