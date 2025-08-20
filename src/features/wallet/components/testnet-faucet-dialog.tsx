@@ -27,7 +27,6 @@ export function TestnetFaucetDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-
           <DialogDescription className=" text-sm text-muted-foreground">
             Need more testnet balance?
           </DialogDescription>
@@ -35,7 +34,6 @@ export function TestnetFaucetDialog({
             Join Nuwa AI Discord to get free testnet balance
           </DialogTitle>
         </DialogHeader>
-
 
         <div className="flex flex-col items-center mb-6 w-full">
           <div className="flex flex-col gap-4 p-6 bg-gradient-to-b from-muted/30 to-muted/50 rounded-xl border border-border/50 w-full">
