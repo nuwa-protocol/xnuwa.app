@@ -5,6 +5,7 @@ import { generateUUID } from '@/shared/utils';
 import { ChatSDKError } from '../errors/chatsdk-errors';
 import { ErrorHandlers } from '../errors/error-handler';
 import { createClientAIFetch } from '../services';
+import { useChatSessions } from './use-chat-sessions';
 import { useUpdateChatTitle } from './use-update-chat-title';
 
 export const useChatDefault = (
@@ -13,7 +14,7 @@ export const useChatDefault = (
 ) => {
   const navigate = useNavigate();
   const { updateTitle } = useUpdateChatTitle(chatId);
-
+  const { addCurrentCapsToChat } = useChatSessions();
   const handleUseChatError = (error: Error) => {
     let errorMessage: UIMessage;
     if (error instanceof ChatSDKError) {
@@ -33,6 +34,7 @@ export const useChatDefault = (
 
   const handleOnResponse = () => {
     updateTitle();
+    addCurrentCapsToChat(chatId);
     navigate(`/chat?cid=${chatId}`);
   };
 

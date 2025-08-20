@@ -11,15 +11,11 @@ export default function ChatPage() {
 
   return (
     <div className="h-full relative">
-      {/* Subtle page-specific background enhancement */}
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-theme-subtle/20 to-theme-muted/10 pointer-events-none" />
-      <div className="relative z-10 h-full">
-        <Chat
-          id={chatSession.id}
-          initialMessages={initialMessages}
-          isReadonly={false}
-        />
-      </div>
+      <Chat
+        id={chatSession.id}
+        initialMessages={initialMessages}
+        isReadonly={false}
+      />
     </div>
   );
 }

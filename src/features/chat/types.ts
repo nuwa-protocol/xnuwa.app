@@ -1,4 +1,5 @@
 import type { Message } from 'ai';
+import type { Cap } from '@/shared/types/cap';
 
 export type ChatPaymentType = 'generate-title' | 'chat-message';
 
@@ -17,6 +18,7 @@ export interface ChatSession {
   updatedAt: number;
   messages: Message[];
   payments: ChatPayment[];
+  caps: Cap[];
   pinned?: boolean;
   did?: string; // Added for IndexedDB storage
 }
