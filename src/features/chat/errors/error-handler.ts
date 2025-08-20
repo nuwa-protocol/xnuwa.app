@@ -50,7 +50,7 @@ function formatErrorForUser(errorText: string, level: ErrorLevel): string {
   const emoji = getErrorEmoji(level);
   const prefix = getErrorPrefix(level);
 
-  return `${emoji} **${prefix}**: ${errorText}\n\n*${locale.error.persist}*`;
+  return `${prefix}: ${errorText}`;
 }
 
 // get error emoji

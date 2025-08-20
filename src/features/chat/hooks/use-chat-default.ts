@@ -1,6 +1,7 @@
 import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { generateUUID } from '@/shared/utils';
 import { ChatSDKError } from '../errors/chatsdk-errors';
 import { ErrorHandlers } from '../errors/error-handler';
@@ -15,6 +16,7 @@ export const useChatDefault = (
   const navigate = useNavigate();
   const { updateTitle } = useUpdateChatTitle(chatId);
   const { addCurrentCapsToChat } = useChatSessions();
+
   const handleUseChatError = (error: Error) => {
     let errorMessage: UIMessage;
     if (error instanceof ChatSDKError) {
@@ -28,8 +30,13 @@ export const useChatDefault = (
     } else {
       errorMessage = ErrorHandlers.generic(error.message);
     }
-    // Add error message to chat
-    setChatMessages((messages) => [...messages, errorMessage]);
+    toast.error(errorMessage.content, {
+      duration: 10000, // Stay for 10 seconds
+      action: {
+        label: 'Retry',
+        onClick: () => reload(),
+      },
+    });
   };
 
   const handleOnResponse = () => {
