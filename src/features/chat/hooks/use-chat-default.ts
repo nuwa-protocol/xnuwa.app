@@ -1,10 +1,12 @@
 import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { generateUUID } from '@/shared/utils';
 import { ChatSDKError } from '../errors/chatsdk-errors';
 import { ErrorHandlers } from '../errors/error-handler';
 import { createClientAIFetch } from '../services';
+import { useChatSessions } from './use-chat-sessions';
 import { useUpdateChatTitle } from './use-update-chat-title';
 
 export const useChatDefault = (
@@ -13,6 +15,7 @@ export const useChatDefault = (
 ) => {
   const navigate = useNavigate();
   const { updateTitle } = useUpdateChatTitle(chatId);
+  const { addCurrentCapsToChat } = useChatSessions();
 
   const handleUseChatError = (error: Error) => {
     let errorMessage: UIMessage;
@@ -27,12 +30,18 @@ export const useChatDefault = (
     } else {
       errorMessage = ErrorHandlers.generic(error.message);
     }
-    // Add error message to chat
-    setChatMessages((messages) => [...messages, errorMessage]);
+    toast.error(errorMessage.content, {
+      duration: 10000, // Stay for 10 seconds
+      action: {
+        label: 'Retry',
+        onClick: () => reload(),
+      },
+    });
   };
 
   const handleOnResponse = () => {
     updateTitle();
+    addCurrentCapsToChat(chatId);
     navigate(`/chat?cid=${chatId}`);
   };
 

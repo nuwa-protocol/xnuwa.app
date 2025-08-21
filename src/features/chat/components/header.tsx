@@ -1,6 +1,5 @@
 import { EditIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useChatSessions } from '../hooks/use-chat-sessions';
 import { RenameDialog } from './rename-dialog';
@@ -41,18 +40,11 @@ export default function Header({ chatId }: HeaderProps) {
         >
           <span>{title}</span>
           {isHovered && title && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRenameClick();
-              }}
-              aria-label={t('actions.rename')}
+            <div
+              className="h-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <EditIcon className="h-3 w-3" />
-            </Button>
+            </div>
           )}
         </button>
       </header>

@@ -33,9 +33,6 @@ export const CurrentCapStore = create<CurrentCapState>()((set) => ({
     if (hasMCPServers) {
       mcpManager
         .initializeForCap(cap)
-        .then(() => {
-          console.log('Cap MCP Initialized Successfully');
-        })
         .catch((error) => {
           const errorMessage =
             error instanceof Error
@@ -57,14 +54,9 @@ export const CurrentCapStore = create<CurrentCapState>()((set) => ({
         });
     } else {
       set({ isCurrentCapMCPInitialized: true });
-      mcpManager
-        .cleanup()
-        .then(() => {
-          console.log('Previous MCP servers cleaned up successfully');
-        })
-        .catch((error) => {
-          console.warn('Failed to cleanup previous MCP servers:', error);
-        });
+      mcpManager.cleanup().catch((error) => {
+        console.warn('Failed to cleanup previous MCP servers:', error);
+      });
     }
   },
 }));

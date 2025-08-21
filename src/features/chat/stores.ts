@@ -15,6 +15,7 @@ export const createInitialChatSession = (): ChatSession => ({
   title: 'New Chat',
   createdAt: Date.now(),
   updatedAt: Date.now(),
+  caps: [],
   messages: [],
   payments: [],
 });
@@ -106,6 +107,7 @@ export const ChatStateStore = create<ChatStoreState>()(
               updatedAt: Date.now(),
               messages: [],
               payments: [],
+              caps: [],
             };
           }
 
@@ -141,6 +143,7 @@ export const ChatStateStore = create<ChatStoreState>()(
               updatedAt: Date.now(),
               messages: [],
               payments: [payment],
+              caps: [],
             };
 
             return {
@@ -208,6 +211,7 @@ export const ChatStateStore = create<ChatStoreState>()(
               updatedAt: Date.now(),
               messages: [],
               payments: [],
+              caps: [],
             };
           }
 

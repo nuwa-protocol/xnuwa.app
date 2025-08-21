@@ -1433,35 +1433,6 @@
     }
   },
   {
-    "idName": "claude_3_7_beta",
-    "metadata": {
-      "displayName": "Anthropic: Claude 3.7 Sonnet (self-moderated)",
-      "description": "Claude 3.7 Sonnet introduces hybrid reasoning with rapid responses and extended step-by-step processing for complex tasks. Notable improvements in coding, front-end development, and agentic workflows with autonomous multi-step navigation. Maintains performance parity in standard mode while offering enhanced accuracy in extended reasoning.",
-      "tags": [
-        "AI Model",
-        "Coding",
-        "Tools"
-      ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
-    },
-    "core": {
-      "prompt": {
-        "value": "",
-        "suggestions": [
-          "Create self-moderated content systems",
-          "Build advanced coding solutions",
-          "Develop intelligent automation tools",
-          "Generate comprehensive analyses"
-        ]
-      },
-      "modelId": "anthropic/claude-3.7-sonnet:beta",
-      "mcpServers": {}
-    }
-  },
-  {
     "idName": "gemini_2_0_flash",
     "metadata": {
       "displayName": "Google: Gemini 2.0 Flash",

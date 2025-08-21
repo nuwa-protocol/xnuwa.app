@@ -1,4 +1,4 @@
-import { Clock, Loader2, MoreHorizontal, Star } from 'lucide-react';
+import { Clock, Loader2, MoreHorizontal, Share, Star } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import {
   Card,
@@ -7,6 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui';
+import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
+import { APP_URL } from '@/shared/config/app';
 import type { Cap } from '@/shared/types/cap';
 import { useCapStore } from '../hooks/use-cap-store';
 import { useRemoteCap } from '../hooks/use-remote-cap';
@@ -28,6 +30,7 @@ export function CapCard({ cap }: CapCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [descriptionClamp, setDescriptionClamp] = useState<number>(2);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   const { downloadCap } = useRemoteCap();
   const { activeSection, setSelectedCap } = useCapStoreModal();
@@ -100,6 +103,12 @@ export function CapCard({ cap }: CapCardProps) {
       });
     }
 
+    actions.push({
+      icon: <Share className="size-4" />,
+      label: 'Share',
+      onClick: () => setShareDialogOpen(true),
+    });
+
     return actions;
   };
 
@@ -142,31 +151,46 @@ export function CapCard({ cap }: CapCardProps) {
         {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
         ) : (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="p-1.5 hover:bg-muted rounded-sm transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-                <span className="sr-only">More Actions</span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {actions?.map((action) => (
-                <DropdownMenuItem
-                  key={action.label}
-                  onMouseDown={(e) => e.preventDefault()}
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="p-1.5 hover:bg-muted rounded-sm transition-colors"
                   onClick={(e) => e.stopPropagation()}
-                  onSelect={() => action.onClick()}
                 >
-                  {action.icon}
-                  {action.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <span className="sr-only">More Actions</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {actions?.map((action) => (
+                  <DropdownMenuItem
+                    key={action.label}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={(e) => e.stopPropagation()}
+                    onSelect={() => action.onClick()}
+                  >
+                    {action.icon}
+                    {action.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ShareDialog
+              open={shareDialogOpen}
+              onOpenChange={setShareDialogOpen}
+              title={`Share ${capMetadata.displayName}`}
+              description="Share this cap with others"
+              links={[
+                {
+                  id: 'cap-link',
+                  label: 'Cap Link',
+                  url: `${APP_URL}/chat?capid=${cap.id}`,
+                },
+              ]}
+            />
+          </>
         )}
       </div>
     </Card>

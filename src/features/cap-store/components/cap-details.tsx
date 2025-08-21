@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Copy, Home, Play, Star, Tag } from 'lucide-react';
+import { Copy, Home, Play, Share, Star, Tag } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -11,6 +11,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui';
+import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
+import { APP_URL } from '@/shared/config/app';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { useCapStore } from '../hooks/use-cap-store';
 import { CapAvatar } from './cap-avatar';
@@ -22,6 +24,7 @@ export function CapDetails() {
   const { closeModal, selectedCap: cap } = useCapStoreModal();
   const [isLoading, setIsLoading] = useState(false);
   const [copyToClipboard, isCopied] = useCopyToClipboard();
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   if (!cap) {
     return (
@@ -132,7 +135,9 @@ export function CapDetails() {
                       >
                         <Star className="h-4 w-4 fill-current text-yellow-500" />
                         <span className="group-hover:hidden">Favorited</span>
-                        <span className="hidden group-hover:inline">Remove</span>
+                        <span className="hidden group-hover:inline">
+                          Remove
+                        </span>
                       </Button>
                     ) : (
                       <Button
@@ -144,6 +149,24 @@ export function CapDetails() {
                         Add to Favorites
                       </Button>
                     )}
+                    <ShareDialog
+                      open={shareDialogOpen}
+                      onOpenChange={setShareDialogOpen}
+                      title={`Share ${cap.capData.metadata.displayName}`}
+                      description="Share this cap with others"
+                      links={[
+                        {
+                          id: 'cap-link',
+                          label: 'Cap Link',
+                          url: `${APP_URL}/chat?capid=${cap.capData.id}`,
+                        },
+                      ]}
+                    >
+                      <Button variant="outline" className="gap-2">
+                        <Share className="h-4 w-4" />
+                        Share
+                      </Button>
+                    </ShareDialog>
                   </div>
                 </div>
               </div>
@@ -206,7 +229,13 @@ export function CapDetails() {
                                 Input Price:
                               </span>
                               <span className="font-medium text-right break-words">
-                                ${Number(cap.capData.core.model.pricing.input_per_million_tokens.toPrecision(3))}{' / 1M Tokens'}
+                                $
+                                {Number(
+                                  cap.capData.core.model.pricing.input_per_million_tokens.toPrecision(
+                                    3,
+                                  ),
+                                )}
+                                {' / 1M Tokens'}
                               </span>
                             </div>
                             <div className="flex justify-between items-start gap-2">
@@ -214,7 +243,13 @@ export function CapDetails() {
                                 Output Price:
                               </span>
                               <span className="font-medium text-right break-words">
-                                ${Number(cap.capData.core.model.pricing.output_per_million_tokens.toPrecision(3))}{' / 1M Tokens'}
+                                $
+                                {Number(
+                                  cap.capData.core.model.pricing.output_per_million_tokens.toPrecision(
+                                    3,
+                                  ),
+                                )}
+                                {' / 1M Tokens'}
                               </span>
                             </div>
                             <div className="flex justify-between items-start gap-2">
@@ -239,10 +274,13 @@ export function CapDetails() {
                         Object.keys(cap.capData.core.mcpServers).length > 0 ? (
                         <div className="space-y-3">
                           {Object.entries(cap.capData.core.mcpServers).map(
-                            ([name, server]: [string, {
-                              url: string;
-                              transport: string;
-                            }]) => (
+                            ([name, server]: [
+                              string,
+                              {
+                                url: string;
+                                transport: string;
+                              },
+                            ]) => (
                               <div
                                 key={name}
                                 className="flex justify-between items-center p-3 bg-muted rounded-lg gap-2 min-w-0"
@@ -280,12 +318,13 @@ export function CapDetails() {
               <Card className="p-4">
                 <h3 className="font-semibold">Information</h3>
                 <div className="space-y-3 text-sm">
-
                   {/* Tags */}
                   {cap.capData.metadata.tags &&
                     cap.capData.metadata.tags.length > 0 && (
                       <div>
-                        <span className="text-muted-foreground block mb-2">Tags:</span>
+                        <span className="text-muted-foreground block mb-2">
+                          Tags:
+                        </span>
                         <div className="flex flex-wrap gap-2">
                           {cap.capData.metadata.tags.map((tag) => (
                             <Badge
@@ -304,7 +343,9 @@ export function CapDetails() {
                   {/* Author Badge */}
                   {cap.capData.authorDID && (
                     <div>
-                      <span className="text-muted-foreground block mb-2">Author:</span>
+                      <span className="text-muted-foreground block mb-2">
+                        Author:
+                      </span>
                       <Badge
                         variant={isCopied ? 'default' : 'outline'}
                         className="gap-2 cursor-pointer hover:bg-accent w-full justify-start"
@@ -322,7 +363,9 @@ export function CapDetails() {
 
                   {cap.capData.metadata.submittedAt && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground block mb-2">Created At:</span>
+                      <span className="text-muted-foreground block mb-2">
+                        Created At:
+                      </span>
                       <span>
                         {formatDate(cap.capData.metadata.submittedAt)}
                       </span>

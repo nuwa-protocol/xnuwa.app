@@ -157,7 +157,7 @@ export function useRemoteCap() {
       }
 
       // download cap if not installed
-      const downloadedCap = await capKit.downloadCap(remoteCap.cid);
+      const downloadedCap = await capKit.downloadCapWithCID(remoteCap.cid);
       await addInstalledCap({
         cid: remoteCap.cid,
         capData: downloadedCap,

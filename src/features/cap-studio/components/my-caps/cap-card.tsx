@@ -8,6 +8,7 @@ import {
   Edit,
   MoreVertical,
   Server,
+  Share,
   Trash2,
   Upload,
 } from 'lucide-react';
@@ -34,6 +35,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui';
+import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
+import { APP_URL } from '@/shared/config/app';
 import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
 import type { LocalCap } from '../../types';
 
@@ -63,6 +66,7 @@ export function CapCard({
   const { deleteCap } = useLocalCapsHandler();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   const handleDelete = () => {
     deleteCap(cap.id);
@@ -74,7 +78,7 @@ export function CapCard({
       await navigator.clipboard.writeText(cap.cid);
       toast.success(`Published CID copied: ${cap.cid}`);
     }
-  };
+  }
 
   const handleSelectClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -227,19 +231,46 @@ export function CapCard({
                     variant="ghost"
                     size="sm"
                     onClick={(e) => e.stopPropagation()}
+                    onSelect={(e) => e.preventDefault()}
                   >
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
+                  {cap.id && (
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShareDialogOpen(true);
+                      }}
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <Share className="h-4 w-4 mr-2" />
+                      Share
+                    </DropdownMenuItem>
+
+
+                  )}
+
                   {cap.status === 'submitted' && cap.cid && (
-                    <DropdownMenuItem onClick={handleCopyCid}>
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopyCid();
+                    }}>
                       <Copy className="h-4 w-4 mr-2" />
                       Copy Published CID
                     </DropdownMenuItem>
+
                   )}
 
-                  <DropdownMenuItem onClick={onTest}>
+                  {cap.status === 'submitted' && (
+                    <DropdownMenuSeparator />
+                  )}
+
+                  <DropdownMenuItem onClick={(e) => {
+                    e.stopPropagation();
+                    onTest?.();
+                  }}>
                     <Bug className="h-4 w-4 mr-2" />
                     Test Cap
                   </DropdownMenuItem>
@@ -247,7 +278,10 @@ export function CapCard({
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem
-                    onClick={() => setShowDeleteDialog(true)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowDeleteDialog(true);
+                    }}
                     className="text-destructive"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
@@ -280,6 +314,19 @@ export function CapCard({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <ShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        title={`Share ${cap.capData.metadata.displayName}`}
+        description="Share this published cap with others using this link."
+        links={[
+          {
+            id: 'share',
+            label: 'Share Link',
+            url: `${APP_URL}/chat?capid=${cap.id}`,
+          },
+        ]}
+      />
     </Card>
   );
 }
