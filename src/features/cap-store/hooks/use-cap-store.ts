@@ -58,6 +58,7 @@ export const useCapStore = () => {
   const runCap = useCallback(
     async (capId: string) => {
       const installedCap = installedCaps[capId];
+      console.log(installedCap);
 
       if (!installedCap) {
         if (!capKit) {
@@ -87,7 +88,7 @@ export const useCapStore = () => {
         return installedCap.capData;
       }
     },
-    [capKit, isLoading],
+    [capKit, isLoading, installedCaps],
   );
 
   const getRecentCaps = () => {
