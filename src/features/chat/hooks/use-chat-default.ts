@@ -1,10 +1,9 @@
 import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Sentry } from '@/shared/services/sentry';
 import { generateUUID } from '@/shared/utils';
-import { ChatSDKError } from '../errors/chatsdk-errors';
-import { ErrorHandlers } from '../errors/error-handler';
 import { createClientAIFetch } from '../services';
 import { useChatSessions } from './use-chat-sessions';
 import { useUpdateChatTitle } from './use-update-chat-title';
@@ -16,57 +15,47 @@ export const useChatDefault = (
   const navigate = useNavigate();
   const { updateTitle } = useUpdateChatTitle(chatId);
   const { addCurrentCapsToChat, getSession } = useChatSessions();
-  const [searchParams] = useSearchParams();
-  const chatIdFromParams = searchParams.get('cid');
 
   const handleUseChatError = (error: Error) => {
-    let errorMessage: UIMessage;
-    if (error instanceof ChatSDKError) {
-      errorMessage = ErrorHandlers.api(error.message);
-    } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      errorMessage = ErrorHandlers.network(
-        'Failed to connect to the AI service',
-      );
-    } else if (error.message.includes('timeout')) {
-      errorMessage = ErrorHandlers.timeout('AI response');
-    } else {
-      errorMessage = ErrorHandlers.generic(error.message);
-    }
-    toast.error(errorMessage.content, {
-      duration: 10000, // Stay for 10 seconds
+    toast.error('Chat Error', {
+      description:
+        error.message ||
+        error.toString() ||
+        'Unknown error, please try again later',
       action: {
         label: 'Retry',
         onClick: () => reload(),
       },
     });
+    Sentry.captureException(error);
   };
 
   const handleOnResponse = () => {
     updateTitle();
     addCurrentCapsToChat(chatId);
-    if (chatIdFromParams !== chatId) {
+    const currentChatIdFromParams = new URLSearchParams(
+      window.location.search,
+    ).get('cid');
+    if (currentChatIdFromParams !== chatId) {
       navigate(`/chat?cid=${chatId}`);
     }
   };
 
   const handleOnFinish = () => {
     const chatSession = getSession(chatId);
-    if (chatIdFromParams === chatId) return;
-    if (chatSession) {
-      toast.success(`Your chat "${chatSession.title}" is completed`, {
+    const currentChatIdFromParams = new URLSearchParams(
+      window.location.search,
+    ).get('cid');
+    if (currentChatIdFromParams === chatId) return;
+    toast.success(
+      `Your chat ${chatSession ? `"${chatSession.title} is"` : 'is'} completed`,
+      {
         action: {
           label: 'View Chat',
           onClick: () => navigate(`/chat?cid=${chatId}`),
         },
-      });
-    } else {
-      toast.success(`Your chat is completed`, {
-        action: {
-          label: 'View Chat',
-          onClick: () => navigate(`/chat?cid=${chatId}`),
-        },
-      });
-    }
+      },
+    );
   };
 
   const {

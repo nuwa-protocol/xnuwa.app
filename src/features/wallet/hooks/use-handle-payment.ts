@@ -28,8 +28,6 @@ export const useHandlePayment = () => {
     const hash = result.result as `0x${string}`;
 
     if (hash) {
-      console.log(`Payment successful: ${hash}`);
-
       setBalance(balance + amount * nuwaToUsdRate);
 
       addTransaction({

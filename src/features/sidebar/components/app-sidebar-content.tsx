@@ -44,7 +44,6 @@ export function AppSidebarContent() {
         !event.shiftKey &&
         !event.altKey
       ) {
-        console.log('Manual keyboard shortcut triggered: Cmd+K/Ctrl+K');
         event.preventDefault();
         handleNewChat();
         return;

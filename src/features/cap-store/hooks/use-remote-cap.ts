@@ -152,7 +152,6 @@ export function useRemoteCap() {
       // check if cap is already installed
       const installedCap = installedCaps[remoteCap.id];
       if (installedCap) {
-        console.log('cap is already installed', installedCap);
         return installedCap;
       }
 

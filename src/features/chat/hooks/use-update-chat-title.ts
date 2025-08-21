@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { useCallback } from 'react';
 import { generateTitleFromUserMessage } from '../services';
 import { ChatStateStore } from '../stores';
@@ -13,13 +14,17 @@ export const useUpdateChatTitle = (chatId: string) => {
 
     if (!firstMessage) return;
     if (session.title !== 'New Chat') return;
+    try {
+      const title = await generateTitleFromUserMessage({
+        chatId: chatId,
+        message: firstMessage,
+      });
 
-    const title = await generateTitleFromUserMessage({
-      chatId: chatId,
-      message: firstMessage,
-    });
-
-    await store.updateSession(chatId, { title: title });
+      await store.updateSession(chatId, { title: title });
+    } catch (error) {
+      console.error('catch update title error:', error);
+      Sentry.captureException(error);
+    }
   }, [chatId]);
 
   return {

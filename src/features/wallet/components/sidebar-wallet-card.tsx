@@ -2,8 +2,8 @@ import { WalletIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useCopyToClipboard } from 'usehooks-ts';
-import { useAuth } from '@/features/auth/hooks/use-auth';
 import { Card, CardContent } from '@/shared/components/ui/card';
+import { useAuth } from '@/shared/hooks/use-auth';
 import { usePaymentHubRgas } from '@/shared/hooks/use-payment-hub';
 import { cn } from '@/shared/utils';
 

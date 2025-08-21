@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { useAuth } from '@/features/auth/hooks';
+import { useAuth } from '@/shared/hooks';
 import type { CapMcpServerConfig, CapThumbnail } from '@/shared/types/cap';
 import type { LocalCap } from '../types';
 import { useLocalCapsHandler } from './use-local-caps-handler';

@@ -1,8 +1,8 @@
 import { createContext, type ReactNode, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/features/auth/hooks/use-auth';
 import { ChatStateStore } from '@/features/chat/stores';
 import { SettingsStateStore } from '@/features/settings/stores';
+import { useAuth } from '@/shared/hooks/use-auth';
 
 type AuthGuardValue = ReturnType<typeof useAuth>;
 

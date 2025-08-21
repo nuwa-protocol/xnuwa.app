@@ -9,23 +9,6 @@ import { generateUUID } from '@/shared/utils';
 import { ChatStateStore } from '../stores';
 import { CapResolve } from './cap-resolve';
 
-// Error handling function
-function errorHandler(error: unknown) {
-  if (error == null) {
-    return 'unknown error';
-  }
-
-  if (typeof error === 'string') {
-    return error;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return JSON.stringify(error);
-}
-
 function appendSourcesToFinalMessages(
   finalMessages: Message[],
   messageId: string,
@@ -49,7 +32,7 @@ function appendSourcesToFinalMessages(
 }
 
 // Handle AI request, entrance of the AI workflow
-const handleAIRequest = async ({
+export const handleAIRequest = async ({
   chatId,
   messages,
   signal,
@@ -113,12 +96,15 @@ const handleAIRequest = async ({
 
   // stream the response
   const dataStreamResponse = result.toDataStreamResponse({
-    getErrorMessage: errorHandler,
+    getErrorMessage(error) {
+      if (error instanceof Error) {
+        return error.message;
+      }
+      return error?.toString() || 'Unknown error occurred';
+    },
     sendReasoning: true,
     sendSources: true,
   });
 
   return dataStreamResponse;
 };
-
-export { handleAIRequest };
