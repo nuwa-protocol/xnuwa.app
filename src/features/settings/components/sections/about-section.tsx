@@ -33,24 +33,11 @@ export function AboutSection() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">
-          {t('settings.sections.profile.title')?.replace('Profile', 'About') ||
-            'About'}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {t('settings.sections.profile.subtitle') ||
-            'Your profile information.'}
-        </p>
-      </div>
-
-
       {/* Version Info & Feedback */}
       <div className="rounded-lg border p-6">
         <div className="space-y-4">
           <div className="space-y-0.5">
-            <h3 className="text-base font-medium">Version Information</h3>
-            <p className="text-sm text-muted-foreground">Current Version: v{version}</p>
+            <h3 className="text-base font-medium">Nuwa Client v{version}</h3>
             <div className="pt-2">
               <Button
                 variant="link"
