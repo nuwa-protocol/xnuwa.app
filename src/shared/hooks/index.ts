@@ -1,3 +1,4 @@
+export * from './use-auth';
 export * from './use-capkit';
 export * from './use-current-cap';
 export * from './use-debounce-callback';

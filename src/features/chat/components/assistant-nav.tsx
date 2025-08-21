@@ -1,7 +1,6 @@
 import { LogOut, Monitor, Moon, Settings, Sun } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthHandler } from '@/features/auth/hooks';
-import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useSettings } from '@/features/settings/hooks/use-settings';
 import { useTheme } from '@/shared/components/theme-provider';
 import {
@@ -20,6 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui';
+import { useAuth } from '@/shared/hooks/use-auth';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { useStorage } from '@/shared/hooks/use-storage';
 import type { Locale } from '@/shared/locales';

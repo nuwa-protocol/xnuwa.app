@@ -1,7 +1,7 @@
 import { KeyRound, Loader2 } from 'lucide-react';
-import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useAuthHandler } from '@/features/auth/hooks/use-auth-handler';
 import { Button } from '@/shared/components/ui/button';
+import { useAuth } from '@/shared/hooks/use-auth';
 
 export function ConnectButton() {
   const { isConnected, isConnecting } = useAuth();

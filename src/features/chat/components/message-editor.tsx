@@ -93,7 +93,6 @@ export function MessageEditor({
 
                 const updatedMessages = [...messages.slice(0, index), updatedMessage];
 
-                console.log('updatedMessage UI', updatedMessage);
                 return updatedMessages;
               }
               return messages;

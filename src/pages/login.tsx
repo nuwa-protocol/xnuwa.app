@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConnectButton } from '@/features/auth/components/connect-button';
-import { useAuth } from '@/features/auth/hooks';
 import { Logo } from '@/shared/components/logo';
 import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
+import { useAuth } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 
 export default function LoginPage() {

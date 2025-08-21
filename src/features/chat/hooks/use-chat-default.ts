@@ -2,9 +2,8 @@ import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Sentry } from '@/shared/services/sentry';
 import { generateUUID } from '@/shared/utils';
-import { ChatSDKError } from '../errors/chatsdk-errors';
-import { ErrorHandlers } from '../errors/error-handler';
 import { createClientAIFetch } from '../services';
 import { useChatSessions } from './use-chat-sessions';
 import { useUpdateChatTitle } from './use-update-chat-title';
@@ -20,25 +19,17 @@ export const useChatDefault = (
   const chatIdFromParams = searchParams.get('cid');
 
   const handleUseChatError = (error: Error) => {
-    let errorMessage: UIMessage;
-    if (error instanceof ChatSDKError) {
-      errorMessage = ErrorHandlers.api(error.message);
-    } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      errorMessage = ErrorHandlers.network(
-        'Failed to connect to the AI service',
-      );
-    } else if (error.message.includes('timeout')) {
-      errorMessage = ErrorHandlers.timeout('AI response');
-    } else {
-      errorMessage = ErrorHandlers.generic(error.message);
-    }
-    toast.error(errorMessage.content, {
-      duration: 10000, // Stay for 10 seconds
+    toast.error('Chat Error', {
+      description:
+        error.message ||
+        error.toString() ||
+        'Unknown error, please try again later',
       action: {
         label: 'Retry',
         onClick: () => reload(),
       },
     });
+    Sentry.captureException(error);
   };
 
   const handleOnResponse = () => {

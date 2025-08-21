@@ -10,7 +10,6 @@ import {
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useAuth } from '@/features/auth/hooks';
 import {
   Alert,
   AlertDescription,
@@ -21,6 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui';
+import { useAuth } from '@/shared/hooks';
 import { CapSchema } from '@/shared/types/cap';
 import { useAvailableModels } from '../hooks';
 import { useLocalCapsHandler } from '../hooks/use-local-caps-handler';
