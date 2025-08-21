@@ -202,6 +202,11 @@
 
 
 
+/* Toast width customization */
+[data-sonner-toaster] {
+  --width: 420px;
+}
+
 @layer base {
   * {
     @apply border-border;
