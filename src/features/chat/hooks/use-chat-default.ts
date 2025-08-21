@@ -1,6 +1,6 @@
 import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Sentry } from '@/shared/services/sentry';
 import { generateUUID } from '@/shared/utils';
@@ -15,8 +15,6 @@ export const useChatDefault = (
   const navigate = useNavigate();
   const { updateTitle } = useUpdateChatTitle(chatId);
   const { addCurrentCapsToChat, getSession } = useChatSessions();
-  const [searchParams] = useSearchParams();
-  const chatIdFromParams = searchParams.get('cid');
 
   const handleUseChatError = (error: Error) => {
     toast.error('Chat Error', {
@@ -35,29 +33,29 @@ export const useChatDefault = (
   const handleOnResponse = () => {
     updateTitle();
     addCurrentCapsToChat(chatId);
-    if (chatIdFromParams !== chatId) {
+    const currentChatIdFromParams = new URLSearchParams(
+      window.location.search,
+    ).get('cid');
+    if (currentChatIdFromParams !== chatId) {
       navigate(`/chat?cid=${chatId}`);
     }
   };
 
   const handleOnFinish = () => {
     const chatSession = getSession(chatId);
-    if (chatIdFromParams === chatId) return;
-    if (chatSession) {
-      toast.success(`Your chat "${chatSession.title}" is completed`, {
+    const currentChatIdFromParams = new URLSearchParams(
+      window.location.search,
+    ).get('cid');
+    if (currentChatIdFromParams === chatId) return;
+    toast.success(
+      `Your chat ${chatSession ? `"${chatSession.title} is"` : 'is'} completed`,
+      {
         action: {
           label: 'View Chat',
           onClick: () => navigate(`/chat?cid=${chatId}`),
         },
-      });
-    } else {
-      toast.success(`Your chat is completed`, {
-        action: {
-          label: 'View Chat',
-          onClick: () => navigate(`/chat?cid=${chatId}`),
-        },
-      });
-    }
+      },
+    );
   };
 
   const {
