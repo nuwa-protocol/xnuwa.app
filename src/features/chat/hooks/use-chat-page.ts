@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useCapStore } from '@/features/cap-store/hooks/use-cap-store';
 import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { createInitialChatSession } from '../stores';
@@ -16,7 +17,7 @@ export const useChatPage = () => {
   const [chatSession, setChatSession] = useState<ChatSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { setCurrentCap } = useCurrentCap();
-  const { runCap } = useCapStore();
+  const { runCap, isLoading: isCapLoading } = useCapStore();
 
   useEffect(() => {
     const session = chatId ? sessionsMap[chatId] : null;
@@ -31,14 +32,20 @@ export const useChatPage = () => {
   }, [chatId, sessionsMap]);
 
   useEffect(() => {
-    if (capId) {
-      runCap(capId);
+    if (capId && !isCapLoading) {
+      toast.promise(runCap(capId), {
+        loading: 'Downloading cap...',
+        success: (capData) => {
+          return `Cap:${capData?.metadata.displayName} successfully downloaded`;
+        },
+        error: 'Failed to download cap',
+      });
     }
-  }, [capId]);
+  }, [capId, isCapLoading]);
 
   return {
     chatSession,
-    isLoading,
+    isLoading: isLoading || isCapLoading,
     chatId,
     initialMessages: chatSession
       ? chatSession.messages.map(convertToUIMessage)

@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useCapKit } from '@/shared/hooks';
 import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { CapStateStore } from '../stores';
@@ -8,18 +9,21 @@ import { CapStateStore } from '../stores';
 export const useCapStore = () => {
   const { installedCaps, addInstalledCap, updateInstalledCap } =
     CapStateStore();
-  const { capKit } = useCapKit();
+  const { capKit, isLoading, error } = useCapKit();
   const { setCurrentCap } = useCurrentCap();
 
-  const downloadCap = async (capCid: string) => {
-    if (!capKit) {
-      throw new Error('CapKit not initialized');
-    }
+  const downloadCapWithCID = useCallback(
+    async (capCid: string) => {
+      if (!capKit) {
+        throw new Error('CapKit not initialized');
+      }
 
-    const capData = await capKit.downloadCap(capCid, 'utf8');
+      const capData = await capKit.downloadCapWithCID(capCid, 'utf8');
 
-    return capData;
-  };
+      return capData;
+    },
+    [capKit],
+  );
 
   const addCapToFavorite = async (capId: string, capCid?: string) => {
     const installedCap = installedCaps[capId];
@@ -27,7 +31,7 @@ export const useCapStore = () => {
       if (!capCid) {
         throw new Error('Cap CID is required for downloading cap');
       }
-      const capData = await downloadCap(capCid);
+      const capData = await downloadCapWithCID(capCid);
       addInstalledCap({
         cid: capCid,
         capData,
@@ -51,31 +55,40 @@ export const useCapStore = () => {
     });
   };
 
-  const runCap = async (capId: string, capCid?: string) => {
-    const installedCap = installedCaps[capId];
+  const runCap = useCallback(
+    async (capId: string) => {
+      const installedCap = installedCaps[capId];
 
-    if (!installedCap) {
-      if (!capCid) {
-        throw new Error('Cap CID is required for downloading cap');
+      if (!installedCap) {
+        if (!capKit) {
+          return null;
+        }
+        try {
+          const query = await capKit.queryCapWithID(capId);
+          const capData = await capKit.downloadCapWithID(capId, 'utf8');
+
+          addInstalledCap({
+            cid: query.data?.cid ?? '',
+            capData,
+            isFavorite: false,
+            lastUsedAt: Date.now(),
+          });
+          setCurrentCap(capData);
+          return capData;
+        } catch (error) {
+          throw new Error(`Failed to download cap: ${error}`);
+        }
+      } else {
+        updateInstalledCap(capId, {
+          lastUsedAt: Date.now(),
+        });
+
+        setCurrentCap(installedCap.capData);
+        return installedCap.capData;
       }
-
-      //TODO: downloadCap with id
-      const capData = await downloadCap(capCid);
-      addInstalledCap({
-        cid: capCid,
-        capData,
-        isFavorite: false,
-        lastUsedAt: Date.now(),
-      });
-      setCurrentCap(capData);
-    } else {
-      updateInstalledCap(capId, {
-        lastUsedAt: Date.now(),
-      });
-
-      setCurrentCap(installedCap.capData);
-    }
-  };
+    },
+    [capKit, isLoading],
+  );
 
   const getRecentCaps = () => {
     return Object.values(installedCaps)
@@ -126,5 +139,7 @@ export const useCapStore = () => {
     getRecentCaps,
     removeCapFromRecents,
     isCapFavorite,
+    isLoading,
+    error,
   };
 };
