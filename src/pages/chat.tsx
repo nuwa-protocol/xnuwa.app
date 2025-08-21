@@ -12,6 +12,7 @@ export default function ChatPage() {
   return (
     <div className="h-full relative">
       <Chat
+        key={chatSession.id} // Force re-mount when chat changes
         id={chatSession.id}
         initialMessages={initialMessages}
         isReadonly={false}

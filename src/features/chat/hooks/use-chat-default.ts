@@ -1,6 +1,6 @@
 import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { generateUUID } from '@/shared/utils';
 import { ChatSDKError } from '../errors/chatsdk-errors';
@@ -15,7 +15,9 @@ export const useChatDefault = (
 ) => {
   const navigate = useNavigate();
   const { updateTitle } = useUpdateChatTitle(chatId);
-  const { addCurrentCapsToChat } = useChatSessions();
+  const { addCurrentCapsToChat, getSession } = useChatSessions();
+  const [searchParams] = useSearchParams();
+  const chatIdFromParams = searchParams.get('cid');
 
   const handleUseChatError = (error: Error) => {
     let errorMessage: UIMessage;
@@ -42,7 +44,29 @@ export const useChatDefault = (
   const handleOnResponse = () => {
     updateTitle();
     addCurrentCapsToChat(chatId);
-    navigate(`/chat?cid=${chatId}`);
+    if (chatIdFromParams !== chatId) {
+      navigate(`/chat?cid=${chatId}`);
+    }
+  };
+
+  const handleOnFinish = () => {
+    const chatSession = getSession(chatId);
+    if (chatIdFromParams === chatId) return;
+    if (chatSession) {
+      toast.success(`Your chat "${chatSession.title}" is completed`, {
+        action: {
+          label: 'View Chat',
+          onClick: () => navigate(`/chat?cid=${chatId}`),
+        },
+      });
+    } else {
+      toast.success(`Your chat is completed`, {
+        action: {
+          label: 'View Chat',
+          onClick: () => navigate(`/chat?cid=${chatId}`),
+        },
+      });
+    }
   };
 
   const {
@@ -57,6 +81,7 @@ export const useChatDefault = (
     reload,
   } = useChat({
     id: chatId,
+    key: `chat-${chatId}`, // Force re-creation when chatId changes
     initialMessages,
     experimental_throttle: 100,
     sendExtraMessageFields: true,
@@ -68,6 +93,7 @@ export const useChatDefault = (
     }),
     onError: handleUseChatError,
     onResponse: handleOnResponse,
+    onFinish: handleOnFinish,
   });
 
   return {
