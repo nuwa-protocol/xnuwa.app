@@ -48,7 +48,7 @@ export function TransactionItem({
             {formatTransactionLabel(transaction)}
           </p>
           <p className="text-xs text-muted-foreground">
-            {formatDate(transaction.details?.timestamp || 0)}
+            {formatDate(transaction.info.timestamp || 0)}
           </p>
         </div>
       </div>
