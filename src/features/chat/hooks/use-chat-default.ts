@@ -2,7 +2,6 @@ import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Sentry } from '@/shared/services/sentry';
 import { generateUUID } from '@/shared/utils';
 import { createClientAIFetch } from '../services';
 import { useChatSessions } from './use-chat-sessions';
@@ -17,17 +16,17 @@ export const useChatDefault = (
   const { addCurrentCapsToChat, getSession } = useChatSessions();
 
   const handleUseChatError = (error: Error) => {
-    toast.error('Chat Error', {
-      description:
-        error.message ||
-        error.toString() ||
-        'Unknown error, please try again later',
-      action: {
-        label: 'Retry',
-        onClick: () => reload(),
-      },
-    });
-    Sentry.captureException(error);
+    const errorMessage = error.message;
+    if (errorMessage !== 'IGNORED_ERROR') {
+      toast.error('An error occurred', {
+        description:
+          errorMessage || 'Please check your network connection and try again.',
+        action: {
+          label: 'Retry',
+          onClick: () => reload(),
+        },
+      });
+    }
   };
 
   const handleOnResponse = () => {

@@ -52,63 +52,64 @@ export function TransactionHistory() {
   };
 
   const filteredAndSortedChatRecords = useMemo(() => {
-    let filtered = chatRecords;
+    // Always sort transactions within each chat by time (earliest first)
+    const chatsWithSortedTransactions = chatRecords.map((chatRecord) => ({
+      ...chatRecord,
+      transactions: [...chatRecord.transactions].sort((a, b) => 
+        a.info.timestamp - b.info.timestamp
+      ),
+    }));
 
-    // Filter by date if a date is selected
+    let filtered = chatsWithSortedTransactions;
+
+    // Filter by date if a date is selected - filter entire chats
     if (filterDate) {
       const filterDateStart = new Date(filterDate);
       filterDateStart.setHours(0, 0, 0, 0);
       const filterDateEnd = new Date(filterDate);
       filterDateEnd.setHours(23, 59, 59, 999);
 
-      filtered = chatRecords
-        .map((chatRecord) => ({
-          ...chatRecord,
-          transactions: chatRecord.transactions.filter((transaction) => {
-            const transactionDate = new Date(transaction.info.timestamp);
-            return (
-              transactionDate >= filterDateStart &&
-              transactionDate <= filterDateEnd
-            );
-          }),
-        }))
-        .filter((chatRecord) => chatRecord.transactions.length > 0);
+      filtered = chatsWithSortedTransactions.filter((chatRecord) => {
+        // Check if any transaction in the chat falls within the selected date
+        return chatRecord.transactions.some((transaction) => {
+          const transactionDate = new Date(transaction.info.timestamp);
+          return (
+            transactionDate >= filterDateStart &&
+            transactionDate <= filterDateEnd
+          );
+        });
+      });
     }
 
-    // Sort transactions within each chat and sort chats
-    const sorted = filtered.map((chatRecord) => {
-      const sortedTransactions = [...chatRecord.transactions].sort((a, b) => {
-        switch (sortBy) {
-          case 'time-asc':
-            return a.info.timestamp - b.info.timestamp;
-          case 'time-desc':
-            return b.info.timestamp - a.info.timestamp;
-          case 'amount-asc': {
-            const amountA = Number(a.details?.payment?.costUsd || 0);
-            const amountB = Number(b.details?.payment?.costUsd || 0);
-            return amountA - amountB;
-          }
-          case 'amount-desc': {
-            const amountA = Number(a.details?.payment?.costUsd || 0);
-            const amountB = Number(b.details?.payment?.costUsd || 0);
-            return amountB - amountA;
-          }
-          default:
-            return b.info.timestamp - a.info.timestamp;
+    // Sort chats based on selected criteria
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'time-asc': {
+          const oldestA = a.transactions[0]?.info.timestamp || 0;
+          const oldestB = b.transactions[0]?.info.timestamp || 0;
+          return oldestA - oldestB;
         }
-      });
-
-      return {
-        ...chatRecord,
-        transactions: sortedTransactions,
-      };
-    });
-
-    // Sort chats by the most recent transaction timestamp
-    return sorted.sort((a, b) => {
-      const mostRecentA = a.transactions[0]?.info.timestamp || 0;
-      const mostRecentB = b.transactions[0]?.info.timestamp || 0;
-      return mostRecentB - mostRecentA;
+        case 'time-desc': {
+          const mostRecentA = a.transactions[a.transactions.length - 1]?.info.timestamp || 0;
+          const mostRecentB = b.transactions[b.transactions.length - 1]?.info.timestamp || 0;
+          return mostRecentB - mostRecentA;
+        }
+        case 'amount-asc': {
+          const totalA = a.transactions.reduce((sum, t) => sum + Number(t.details?.payment?.costUsd || 0), 0);
+          const totalB = b.transactions.reduce((sum, t) => sum + Number(t.details?.payment?.costUsd || 0), 0);
+          return totalA - totalB;
+        }
+        case 'amount-desc': {
+          const totalA = a.transactions.reduce((sum, t) => sum + Number(t.details?.payment?.costUsd || 0), 0);
+          const totalB = b.transactions.reduce((sum, t) => sum + Number(t.details?.payment?.costUsd || 0), 0);
+          return totalB - totalA;
+        }
+        default: {
+          const mostRecentA = a.transactions[a.transactions.length - 1]?.info.timestamp || 0;
+          const mostRecentB = b.transactions[b.transactions.length - 1]?.info.timestamp || 0;
+          return mostRecentB - mostRecentA;
+        }
+      }
     });
   }, [chatRecords, sortBy, filterDate]);
 

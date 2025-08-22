@@ -18,10 +18,9 @@ export function initSentry() {
     replaysOnErrorSampleRate: 1.0,
     beforeSend: async (event) => {
       // Don't send in development mode unless explicitly enabled
-      if (
-        import.meta.env.MODE === 'development' &&
-        !import.meta.env.VITE_SENTRY_DEBUG
-      ) {
+
+      const isSentryDebugEnabled = import.meta.env.VITE_SENTRY_DEBUG === 'true';
+      if (import.meta.env.MODE === 'development' && !isSentryDebugEnabled) {
         return null;
       }
 
