@@ -22,7 +22,7 @@ export const useUpdateChatTitle = (chatId: string) => {
 
       await store.updateSession(chatId, { title: title });
     } catch (error) {
-      console.error('catch update title error:', error);
+      console.error('Update Chat Title:', error);
       Sentry.captureException(error);
     }
   }, [chatId]);
