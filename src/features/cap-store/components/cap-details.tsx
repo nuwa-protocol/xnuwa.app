@@ -193,7 +193,7 @@ export function CapDetails() {
                     </TabsList>
 
                     <TabsContent value="prompt" className="mt-4">
-                      <div className="space-y-3 bg-muted rounded-lg p-4">
+                      <div className="space-y-3 bg-muted rounded-lg p-4 max-h-96 overflow-y-auto">
                         <p className="text-muted-foreground break-words whitespace-pre-wrap font-mono text-sm">
                           {typeof cap.capData.core.prompt === 'string'
                             ? cap.capData.core.prompt
@@ -204,108 +204,112 @@ export function CapDetails() {
                     </TabsContent>
 
                     <TabsContent value="model" className="mt-4">
-                      {cap.capData.core.model ? (
-                        <div className="space-y-4">
-                          {/* Model Name and Provider */}
-                          <div className="p-4 bg-muted rounded-lg">
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-muted-foreground flex-shrink-0">
-                                Model Name:
-                              </span>
-                              <span className="font-medium text-right break-words">
-                                {cap.capData.core.model.name}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-muted-foreground flex-shrink-0">
-                                Provider Name:
-                              </span>
-                              <span className="font-medium text-right break-words">
-                                {cap.capData.core.model.providerName}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-muted-foreground flex-shrink-0">
-                                Input Price:
-                              </span>
-                              <span className="font-medium text-right break-words">
-                                $
-                                {Number(
-                                  cap.capData.core.model.pricing.input_per_million_tokens.toPrecision(
-                                    3,
-                                  ),
-                                )}
-                                {' / 1M Tokens'}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-muted-foreground flex-shrink-0">
-                                Output Price:
-                              </span>
-                              <span className="font-medium text-right break-words">
-                                $
-                                {Number(
-                                  cap.capData.core.model.pricing.output_per_million_tokens.toPrecision(
-                                    3,
-                                  ),
-                                )}
-                                {' / 1M Tokens'}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-muted-foreground flex-shrink-0">
-                                Context Length:
-                              </span>
-                              <span className="font-medium text-right break-words">
-                                {cap.capData.core.model.contextLength}
-                              </span>
+                      <div className="max-h-96 overflow-y-auto">
+                        {cap.capData.core.model ? (
+                          <div className="space-y-4">
+                            {/* Model Name and Provider */}
+                            <div className="p-4 bg-muted rounded-lg">
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="text-muted-foreground flex-shrink-0">
+                                  Model Name:
+                                </span>
+                                <span className="font-medium text-right break-words">
+                                  {cap.capData.core.model.name}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="text-muted-foreground flex-shrink-0">
+                                  Provider Name:
+                                </span>
+                                <span className="font-medium text-right break-words">
+                                  {cap.capData.core.model.providerName}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="text-muted-foreground flex-shrink-0">
+                                  Input Price:
+                                </span>
+                                <span className="font-medium text-right break-words">
+                                  $
+                                  {Number(
+                                    cap.capData.core.model.pricing.input_per_million_tokens.toPrecision(
+                                      3,
+                                    ),
+                                  )}
+                                  {' / 1M Tokens'}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="text-muted-foreground flex-shrink-0">
+                                  Output Price:
+                                </span>
+                                <span className="font-medium text-right break-words">
+                                  $
+                                  {Number(
+                                    cap.capData.core.model.pricing.output_per_million_tokens.toPrecision(
+                                      3,
+                                    ),
+                                  )}
+                                  {' / 1M Tokens'}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="text-muted-foreground flex-shrink-0">
+                                  Context Length:
+                                </span>
+                                <span className="font-medium text-right break-words">
+                                  {cap.capData.core.model.contextLength}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">
-                          No model configuration available.
-                        </p>
-                      )}
+                        ) : (
+                          <p className="text-muted-foreground">
+                            No model configuration available.
+                          </p>
+                        )}
+                      </div>
                     </TabsContent>
 
                     <TabsContent value="mcp" className="mt-4">
-                      {cap.capData.core.mcpServers &&
-                        Object.keys(cap.capData.core.mcpServers).length > 0 ? (
-                        <div className="space-y-3">
-                          {Object.entries(cap.capData.core.mcpServers).map(
-                            ([name, server]: [
-                              string,
-                              {
-                                url: string;
-                                transport: string;
-                              },
-                            ]) => (
-                              <div
-                                key={name}
-                                className="flex justify-between items-center p-3 bg-muted rounded-lg gap-2 min-w-0"
-                              >
-                                <span className="font-medium truncate">
-                                  {name}
-                                </span>
-                                <span className="font-mono truncate">
-                                  {server.url}
-                                </span>
-                                <Badge
-                                  variant="outline"
-                                  className="flex-shrink-0"
+                      <div className="max-h-96 overflow-y-auto">
+                        {cap.capData.core.mcpServers &&
+                          Object.keys(cap.capData.core.mcpServers).length > 0 ? (
+                          <div className="space-y-3">
+                            {Object.entries(cap.capData.core.mcpServers).map(
+                              ([name, server]: [
+                                string,
+                                {
+                                  url: string;
+                                  transport: string;
+                                },
+                              ]) => (
+                                <div
+                                  key={name}
+                                  className="flex justify-between items-center p-3 bg-muted rounded-lg gap-2 min-w-0"
                                 >
-                                  {server.transport || 'Unknown'}
-                                </Badge>
-                              </div>
-                            ),
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">
-                          No MCP servers configured.
-                        </p>
-                      )}
+                                  <span className="font-medium truncate">
+                                    {name}
+                                  </span>
+                                  <span className="font-mono truncate">
+                                    {server.url}
+                                  </span>
+                                  <Badge
+                                    variant="outline"
+                                    className="flex-shrink-0"
+                                  >
+                                    {server.transport || 'Unknown'}
+                                  </Badge>
+                                </div>
+                              ),
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-muted-foreground">
+                            No MCP servers configured.
+                          </p>
+                        )}
+                      </div>
                     </TabsContent>
                   </Tabs>
                 </Card>
