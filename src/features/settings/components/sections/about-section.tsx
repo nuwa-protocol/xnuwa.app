@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthHandler } from '@/features/auth/hooks/use-auth-handler';
 import { Button } from '@/shared/components/ui/button';
+import { useAuth } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { LogoutCard } from '../cards';
 
@@ -13,6 +14,7 @@ export function AboutSection() {
   const { logout } = useAuthHandler();
   const navigate = useNavigate();
   const version = __APP_VERSION__;
+  const { did } = useAuth();
 
   // Logout logic
   const handleLogout = async () => {
@@ -31,6 +33,23 @@ export function AboutSection() {
     }
   };
 
+  const createGitHubIssueURL = () => {
+    const owner = 'nuwa-protocol';
+    const repo = 'nuwa-client';
+    const title = '[Nuwa Client Feedback] PLEASE ENTER TITLE HERE';
+    const body = `## Info\n- My DID: ${did}\n- Client Version: ${version}\n\n## Description\n PLEASE DESCRIBE THE ISSUE HERE...`;
+    const labels = ['uncategorized'];
+
+    const baseURL = `https://github.com/${owner}/${repo}/issues/new`;
+    const params = new URLSearchParams();
+
+    params.append('title', title);
+    params.append('body', body);
+    params.append('labels', labels.join(','));
+
+    return `${baseURL}?${params.toString()}`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Version Info & Feedback */}
@@ -43,12 +62,7 @@ export function AboutSection() {
                 variant="link"
                 size="sm"
                 className="h-auto p-0 text-xs"
-                onClick={() =>
-                  window.open(
-                    'https://github.com/nuwa-ai/nuwa-client/releases',
-                    '_blank',
-                  )
-                }
+                onClick={() => window.open('https://github.com/nuwa-ai/nuwa-client/releases', '_blank')}
               >
                 View Release Notes
                 <ExternalLink className="h-3 w-3 ml-1" />
@@ -63,7 +77,11 @@ export function AboutSection() {
                   Have any issues or suggestions? Please let us know!
                 </p>
               </div>
-              <Link to="https://github.com/nuwa-protocol/nuwa-client/issues/new" target="_blank" rel="noopener noreferrer">
+              <Link
+                to={createGitHubIssueURL()}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Button variant="outline" size="sm">
                   <Bug className="h-4 w-4 mr-2" />
                   Submit Feedback
@@ -73,7 +91,6 @@ export function AboutSection() {
           </div>
         </div>
       </div>
-
 
       <LogoutCard
         title={t('settings.profile.logout.title') || 'Logout'}
