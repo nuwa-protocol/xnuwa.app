@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { generateUUID } from '@/shared/utils';
 import { createClientAIFetch } from '../services';
+import { processErrorMessage } from '../utils';
 import { useChatSessions } from './use-chat-sessions';
 import { useUpdateChatTitle } from './use-update-chat-title';
 
@@ -16,11 +17,10 @@ export const useChatDefault = (
   const { addCurrentCapsToChat, getSession } = useChatSessions();
 
   const handleUseChatError = (error: Error) => {
-    const errorMessage = error.message;
+    const errorMessage = processErrorMessage(error);
     if (errorMessage !== 'IGNORED_ERROR') {
       toast.error('An error occurred', {
-        description:
-          errorMessage || 'Please check your network connection and try again.',
+        description: 'Please check your network connection and try again.',
         action: {
           label: 'Retry',
           onClick: () => reload(),
