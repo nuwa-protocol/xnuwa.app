@@ -7,6 +7,7 @@ import {
 } from 'ai';
 import { generateUUID } from '@/shared/utils';
 import { ChatStateStore } from '../stores';
+import { getErrorMessage } from '../utils';
 import { CapResolve } from './cap-resolve';
 
 function appendSourcesToFinalMessages(
@@ -97,21 +98,7 @@ export const handleAIRequest = async ({
 
   // stream the response
   const dataStreamResponse = result.toDataStreamResponse({
-    getErrorMessage: (error) => {
-      if (error == null) {
-        return 'unknown error';
-      }
-
-      if (typeof error === 'string') {
-        return error;
-      }
-
-      if (error instanceof Error) {
-        return error.message;
-      }
-
-      return JSON.stringify(error);
-    },
+    getErrorMessage,
     sendReasoning: true,
     sendSources: true,
   });
