@@ -1,11 +1,11 @@
 import { IdentityKitWeb } from '@nuwa-ai/identity-kit-web';
+import type { PaymentChannelHttpClient } from '@nuwa-ai/payment-kit';
 import {
   createHttpClient,
-  RoochPaymentChannelContract,
-  PaymentHubClient,
   DebugLogger,
+  PaymentHubClient,
+  RoochPaymentChannelContract,
 } from '@nuwa-ai/payment-kit';
-import type { PaymentChannelHttpClient } from '@nuwa-ai/payment-kit';
 import { LLM_GATEWAY } from '@/shared/config/llm-gateway';
 
 DebugLogger.setGlobalLevel('debug');
@@ -65,9 +65,15 @@ export async function cleanupPaymentClientsOnLogout(): Promise<void> {
     if (httpClientPromise) {
       const client = await httpClientPromise;
       try {
-        await client.logoutCleanup({ clearMapping: true, reason: 'user-logout' });
+        await client.logoutCleanup({
+          clearMapping: true,
+          reason: 'user-logout',
+        });
       } catch (e) {
-        DebugLogger.get('PaymentChannelHttpClient').debug('logoutCleanup failed', e);
+        DebugLogger.get('PaymentChannelHttpClient').debug(
+          'logoutCleanup failed',
+          e,
+        );
       }
     }
   } finally {

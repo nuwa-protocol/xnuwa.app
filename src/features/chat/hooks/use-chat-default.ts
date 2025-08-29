@@ -33,7 +33,7 @@ export const useChatDefault = (
       });
     } else {
       toast.error('An error occurred', {
-        description: 'Please check your network connection and try again.',
+        description: 'Please check your network connection and try again',
         action: {
           label: 'Retry',
           onClick: () => reload(),

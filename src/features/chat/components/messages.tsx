@@ -1,28 +1,16 @@
-import type { UseChatHelpers } from '@ai-sdk/react';
-import type { UIMessage } from 'ai';
-import equal from 'fast-deep-equal';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { useMessagesUI } from '@/features/chat/hooks/use-messages-ui';
-import { PreviewMessage, ThinkingMessage } from './message';
+import { useChatContext } from '../contexts/chat-context';
+import { Loader } from './loader';
+import { PreviewMessage } from './message';
 
 interface MessagesProps {
-  chatId: string;
-  status: UseChatHelpers['status'];
-  messages: Array<UIMessage>;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
   isReadonly: boolean;
 }
 
-function PureMessages({
-  chatId,
-  status,
-  messages,
-  setMessages,
-  reload,
-  isReadonly,
-}: MessagesProps) {
+function PureMessages({ isReadonly }: MessagesProps) {
+  const { chatId, status, messages, setMessages, reload } = useChatContext();
   const {
     containerRef: messagesContainerRef,
     endRef: messagesEndRef,
@@ -37,7 +25,7 @@ function PureMessages({
   return (
     <div
       ref={messagesContainerRef}
-      className="flex flex-col min-w-0 gap-6 h-full overflow-y-scroll pt-4 relative"
+      className="flex flex-col min-w-0 gap-6 h-full overflow-y-scroll pt-4 relative mx-auto w-full max-w-4xl px-4"
     >
       {messages.map((message, index) => {
         const isStreaming =
@@ -66,7 +54,7 @@ function PureMessages({
 
       {status === 'submitted' &&
         messages.length > 0 &&
-        messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
+        messages[messages.length - 1].role === 'user' && <Loader />}
 
       <motion.div
         ref={messagesEndRef}
@@ -79,10 +67,6 @@ function PureMessages({
 }
 
 export const Messages = memo(PureMessages, (prevProps, nextProps) => {
-  if (prevProps.status !== nextProps.status) return false;
-  if (prevProps.status && nextProps.status) return false;
-  if (prevProps.messages.length !== nextProps.messages.length) return false;
-  if (!equal(prevProps.messages, nextProps.messages)) return false;
-
+  if (prevProps.isReadonly !== nextProps.isReadonly) return false;
   return true;
 });
