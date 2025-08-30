@@ -38,6 +38,9 @@ importers:
       '@nuwa-ai/cap-kit':
         specifier: ^0.5.3
         version: 0.5.3(react@19.1.0)(typescript@5.8.3)
+      '@nuwa-ai/capui-kit':
+        specifier: link:../nuwa/nuwa-kit/typescript/packages/capui-kit
+        version: link:../nuwa/nuwa-kit/typescript/packages/capui-kit
       '@nuwa-ai/identity-kit':
         specifier: ^0.5.1
         version: 0.5.1(typescript@5.8.3)

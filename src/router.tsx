@@ -8,6 +8,7 @@ import CapStudioCreatePage from './pages/cap-studio-create';
 import CapStudioEditPage from './pages/cap-studio-edit';
 import CapStudioMcpPage from './pages/cap-studio-mcp';
 import CapStudioSubmitPage from './pages/cap-studio-submit';
+import MCPParentDemoPage from './pages/capui-debug';
 import ChatPage from './pages/chat';
 import ErrorPage from './pages/error';
 import LoginPage from './pages/login';
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
           { path: 'cap-studio/submit/:id', element: <CapStudioSubmitPage /> },
           { path: 'cap-studio/mcp', element: <CapStudioMcpPage /> },
           { path: 'cap-studio/mcp/:id', element: <CapStudioMcpPage /> },
+          { path: 'capui-debug', element: <MCPParentDemoPage /> },
         ],
       },
       { path: 'login', element: <LoginPage /> },
