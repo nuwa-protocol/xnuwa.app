@@ -6,7 +6,7 @@ export const Loader = () => {
     return (
         <motion.div
             data-testid="message-assistant-loading"
-            className="w-full mx-auto max-w-4xl px-4 group/message min-h-96"
+            className="w-full mx-auto max-w-4xl px-4 group/message min-h-[calc(100vh-280px)]"
             initial={{ y: 5, opacity: 0 }}
             animate={{ y: 0, opacity: 1, transition: { delay: 1 } }}
         >

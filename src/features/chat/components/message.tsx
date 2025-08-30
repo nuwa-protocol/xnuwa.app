@@ -52,7 +52,7 @@ const PurePreviewMessage = ({
         >
           <div
             className={cn('flex flex-col gap-4 w-full', {
-              'min-h-96': message.role === 'assistant' && requiresScrollPadding,
+              'min-h-[calc(100vh-280px)]': message.role === 'assistant' && requiresScrollPadding,
             })}
           >
             {/* render reasoning */}

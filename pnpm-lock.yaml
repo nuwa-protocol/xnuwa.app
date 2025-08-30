@@ -45,7 +45,7 @@ importers:
         specifier: ^0.5.2
         version: 0.5.2(react@19.1.0)(typescript@5.8.3)
       '@nuwa-ai/payment-kit':
-        specifier: ^0.5.12
+        specifier: ^0.5.9
         version: 0.5.12(express@5.1.0)(typescript@5.8.3)
       '@radix-ui/react-accordion':
         specifier: ^1.2.11

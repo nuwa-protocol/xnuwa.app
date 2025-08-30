@@ -2,13 +2,7 @@ import type { UseChatHelpers } from '@ai-sdk/react';
 import type { Attachment } from 'ai';
 import cx from 'classnames';
 import equal from 'fast-deep-equal';
-import { AnimatePresence, motion } from 'framer-motion';
-import {
-  ArrowDown,
-  ArrowUpIcon,
-  PaperclipIcon,
-  StopCircleIcon,
-} from 'lucide-react';
+import { ArrowUpIcon, PaperclipIcon, StopCircleIcon } from 'lucide-react';
 import type React from 'react';
 import {
   type Dispatch,
@@ -128,30 +122,6 @@ function PureMultimodalInput({
 
   return (
     <div className="relative w-full flex flex-col gap-4">
-      <AnimatePresence>
-        {messages.length > 0 && !isAtBottom && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="absolute left-1/2 bottom-28 -translate-x-1/2 z-50"
-          >
-            <Button
-              data-testid="scroll-to-bottom-button"
-              className="rounded-full"
-              size="icon"
-              variant="outline"
-              onClick={(event) => {
-                event.preventDefault();
-                scrollToBottom();
-              }}
-            >
-              <ArrowDown />
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {messages.length === 0 && <SuggestedActions append={append} />}
 
