@@ -1,8 +1,5 @@
 // to fix: need to unify the MCP client
 
-
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { PostMessageMCPTransport } from '@nuwa-ai/ui-kit';
 import {
   ArrowLeft,
   BrushCleaning,
@@ -63,7 +60,7 @@ export function Mcp({ cap, serverName }: McpProps) {
   const [mcpType, setMcpType] = useState<MCPType>('MCP Server');
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  const [client, setClient] = useState<NuwaMCPClient | Client | null>(null);
+  const [client, setClient] = useState<NuwaMCPClient | null>(null);
   const [tools, setTools] = useState<Record<string, any>>({});
   const [toolParams, setToolParams] = useState<
     Record<string, Record<string, string>>
@@ -96,89 +93,7 @@ export function Mcp({ cap, serverName }: McpProps) {
     }
   }, [cap, serverName, pushLog]);
 
-  const handleConnectMCPUI = useCallback(async () => {
-    try {
-      setConnecting(true);
-      pushLog({
-        type: 'info',
-        message: `Connecting to ${url} with PostMessage transport`,
-      });
-      if (!iframeRef.current?.contentWindow) {
-        throw new Error('Iframe not ready');
-      }
-
-      // Wait a bit for iframe to fully load
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Create transport
-      const transport = new PostMessageMCPTransport({
-        targetWindow: iframeRef.current.contentWindow,
-        targetOrigin: '*',
-        allowedOrigins: ['*'],
-        debug: true,
-        timeout: 10000,
-      });
-
-      // Create MCP client
-      const client = new Client(
-        {
-          name: 'capui-demo-parent',
-          version: '1.0.0',
-        },
-        {
-          capabilities: {
-            tools: {},
-          },
-        },
-      );
-
-      // Connect transport
-      await client.connect(transport);
-      setClient(client);
-
-      // Fetch tools
-      // List available tools
-      const toolsResult = await client.listTools();
-      setTools(toolsResult.tools || []);
-      pushLog({
-        type: 'info',
-        message: `🛠️ Found ${toolsResult.tools?.length || 0} tools`,
-      });
-
-      console.log('toolsResult', toolsResult);
-
-      // Initialize tool parameters
-      const initialParams: Record<string, Record<string, string>> = {};
-      toolsResult.tools?.forEach(tool => {
-        initialParams[tool.name] = {};
-        // Initialize parameters based on input schema if available
-        if (tool.inputSchema?.properties) {
-          Object.keys(tool.inputSchema.properties).forEach(param => {
-            initialParams[tool.name][param] = "";
-          });
-        }
-      });
-      setToolParams(initialParams);
-
-      pushLog({
-        type: 'success',
-        message: '✅ MCP transport connected',
-      });
-
-
-      setConnected(true);
-    } catch (error) {
-      pushLog({
-        type: 'error',
-        message: `❌ Connection failed: ${error}`,
-      });
-      console.error('MCP connection error:', error);
-    } finally {
-      setConnecting(false);
-    }
-  }, [connecting, pushLog]);
-
-  const handleConnectMCPServer = useCallback(async () => {
+  const handleConnect = useCallback(async () => {
     if (connecting) return;
 
     setConnecting(true);
@@ -188,7 +103,17 @@ export function Mcp({ cap, serverName }: McpProps) {
         message: `Connecting to ${url} with Streamable HTTP transport`,
       });
 
-      const newClient = await createNuwaMCPClient(url);
+      let newClient: NuwaMCPClient;
+      if (mcpType === 'MCP Server') {
+        newClient = await createNuwaMCPClient(url);
+      } else {
+        if (!iframeRef.current?.contentWindow) {
+          throw new Error('Iframe not ready');
+        }
+        newClient = await createNuwaMCPClient(url, 'postMessage', {
+          targetWindow: iframeRef.current?.contentWindow,
+        });
+      }
 
       setClient(newClient);
 
@@ -371,7 +296,7 @@ export function Mcp({ cap, serverName }: McpProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/cap-studio")}
             className="flex items-center space-x-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -489,11 +414,7 @@ export function Mcp({ cap, serverName }: McpProps) {
                   </Button>
                 ) : (
                   <Button
-                    onClick={
-                      mcpType === 'MCP Server'
-                        ? handleConnectMCPServer
-                        : handleConnectMCPUI
-                    }
+                    onClick={handleConnect}
                     disabled={connecting || !url.trim()}
                     size="default"
                     className="min-w-32"

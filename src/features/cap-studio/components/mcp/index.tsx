@@ -3,7 +3,7 @@ import { useLocalCaps } from '../../hooks';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
 import { Mcp } from './mcp';
 
-export function MCPServerDebug() {
+export function MCPDebug() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const localCaps = useLocalCaps();

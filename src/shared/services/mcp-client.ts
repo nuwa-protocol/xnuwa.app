@@ -12,10 +12,7 @@ import {
   type ResourceTemplateDefinition,
   ResourceTemplateSchema,
 } from '../types/mcp-client';
-import {
-  createDidAuthSigner,
-  SignedStreamableHTTPClientTransport,
-} from './mcp-transport';
+import { createDidAuthSigner, createTransport } from './mcp-transport';
 
 /**
  * Cached MCP client instances keyed by server URL.
@@ -30,9 +27,20 @@ const CACHE = new Map<string, Promise<NuwaMCPClient>>();
  *
  * @param url The MCP server URL
  * @param transportType Optional transport type, auto-detected if not specified
+ * @param postMessageOptions Required when using postMessage transport
  * @returns A Promise resolving to a NuwaMCPClient instance
  */
-export async function createNuwaMCPClient(url: string): Promise<NuwaMCPClient> {
+export async function createNuwaMCPClient(
+  url: string,
+  transportType: 'httpStream' | 'postMessage' = 'httpStream',
+  postMessageOptions?: {
+    targetWindow: Window;
+    targetOrigin?: string;
+    allowedOrigins?: string[];
+    debug?: boolean;
+    timeout?: number;
+  },
+): Promise<NuwaMCPClient> {
   // Check cache first - only use URL as key, ignoring transportType
   // This ensures we reuse the same connection regardless of how transportType is specified
   if (CACHE.has(url)) {
@@ -45,15 +53,14 @@ export async function createNuwaMCPClient(url: string): Promise<NuwaMCPClient> {
     const signer = await createDidAuthSigner(url);
     const initialHeader = await signer({});
 
-    const buildTransport = async (): Promise<any> => {
-      return new SignedStreamableHTTPClientTransport(
-        new URL(url),
-        signer,
-        initialHeader,
-      );
-    };
-
-    const finalTransport = await buildTransport();
+    // 2. Create transport based on type
+    const finalTransport = await createTransport(
+      transportType,
+      url,
+      signer,
+      initialHeader,
+      postMessageOptions,
+    );
 
     // 3. Create the base client instance
     const rawClient = await createMCPClient({ transport: finalTransport });
