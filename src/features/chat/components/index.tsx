@@ -1,6 +1,7 @@
 import type { Attachment, UIMessage } from 'ai';
 import { useState } from 'react';
 import { ChatProvider, useChatContext } from '../contexts/chat-context';
+import { CapUIRenderer } from './cap-ui-renderer';
 import { CenteredWelcome } from './centered-welcome';
 import Header from './header';
 import { Messages } from './messages';
@@ -25,7 +26,7 @@ function ChatContent({ isReadonly }: { isReadonly: boolean }) {
   );
 
   return (
-    <div className="flex flex-col relative min-w-0 h-dvh bg-background">
+    <div className="flex flex-col relative min-w-0 h-screen bg-background">
       {/* Chat */}
       <div className={'flex flex-col w-full h-dvh bg-background'}>
         <Header chatId={chatId} />
@@ -65,9 +66,26 @@ export function Chat({
   initialMessages: Array<UIMessage>;
   isReadonly: boolean;
 }) {
+  const showArtifact = false;
+  const artifactUrl = 'http://localhost:3000/test';
   return (
     <ChatProvider chatId={id} initialMessages={initialMessages}>
-      <ChatContent isReadonly={isReadonly} />
+      <div className="flex flex-row h-dvh">
+        <div className={showArtifact ? "w-1/3" : "flex-1"}>
+          <ChatContent isReadonly={isReadonly} />
+        </div>
+        {showArtifact && (
+          <div className="flex h-full w-2/3 p-4">
+            <div className="w-full h-full max-h-screen bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden">
+              <CapUIRenderer
+                srcUrl={artifactUrl}
+                title="Artifact"
+                artifact={true}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </ChatProvider>
   );
 }

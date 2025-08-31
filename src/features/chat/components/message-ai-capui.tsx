@@ -1,6 +1,6 @@
 import type { ComponentProps, HTMLAttributes } from 'react';
 import { memo, useMemo } from 'react';
-import { CapUIRenderer } from '@/features/chat/components/capui-renderer-embed';
+import { CapUIRenderer } from '@/features/chat/components/cap-ui-renderer';
 import { Response } from './message-ai';
 
 function parseCapUIAttributes(
