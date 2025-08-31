@@ -3,7 +3,7 @@ import { useLocalCaps } from '../../hooks';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
 import { Mcp } from './mcp';
 
-export function McpTools() {
+export function MCPServerDebug() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const localCaps = useLocalCaps();
@@ -26,7 +26,7 @@ export function McpTools() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout className="max-w-full">
       <Mcp cap={cap} serverName={serverName} />
     </DashboardLayout>
   );

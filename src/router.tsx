@@ -6,9 +6,9 @@ import CapStudioPage from './pages/cap-studio';
 import CapStudioBatchCreatePage from './pages/cap-studio-batch-create';
 import CapStudioCreatePage from './pages/cap-studio-create';
 import CapStudioEditPage from './pages/cap-studio-edit';
-import CapStudioMcpPage from './pages/cap-studio-mcp';
+import CapStudioMcpServerPage from './pages/cap-studio-mcp-server';
+import CapStudioMcpUiPage from './pages/cap-studio-mcp-ui';
 import CapStudioSubmitPage from './pages/cap-studio-submit';
-import MCPParentDemoPage from './pages/capui-debug';
 import ChatPage from './pages/chat';
 import ErrorPage from './pages/error';
 import LoginPage from './pages/login';
@@ -37,9 +37,9 @@ const router = createBrowserRouter([
           },
           { path: 'cap-studio/edit/:id', element: <CapStudioEditPage /> },
           { path: 'cap-studio/submit/:id', element: <CapStudioSubmitPage /> },
-          { path: 'cap-studio/mcp', element: <CapStudioMcpPage /> },
-          { path: 'cap-studio/mcp/:id', element: <CapStudioMcpPage /> },
-          { path: 'capui-debug', element: <MCPParentDemoPage /> },
+          { path: 'cap-studio/mcp-server', element: <CapStudioMcpServerPage /> },
+          { path: 'cap-studio/mcp-server/:id', element: <CapStudioMcpServerPage /> },
+          { path: 'cap-studio/mcp-ui', element: <CapStudioMcpUiPage /> },
         ],
       },
       { path: 'login', element: <LoginPage /> },

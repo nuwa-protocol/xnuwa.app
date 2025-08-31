@@ -115,7 +115,7 @@
     "wagmi": "^2.16.1",
     "zod": "^3.25.67",
     "zustand": "^5.0.7",
-    "@nuwa-ai/capui-kit": "link:../nuwa/nuwa-kit/typescript/packages/capui-kit"
+    "@nuwa-ai/ui-kit": "link:../nuwa/nuwa-kit/typescript/packages/ui-kit"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.5",

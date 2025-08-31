@@ -29,8 +29,12 @@ export function CapStudio() {
     navigate('/cap-studio/create');
   };
 
-  const handleGoToMcpDebug = () => {
-    navigate('/cap-studio/mcp');
+  const handleGoToMcpServer = () => {
+    navigate('/cap-studio/mcp-server');
+  };
+
+  const handleGoToMcpUI = () => {
+    navigate('/cap-studio/mcp-ui');
   };
 
   return (
@@ -39,9 +43,14 @@ export function CapStudio() {
         title="Cap Studio"
         description="Create, test, and publish powerful AI capabilities with integrated MCP tools"
         actions={
-          <Button onClick={handleGoToMcpDebug} variant="outline" size="sm">
-            <Bug className="mr-1" /> MCP Tools
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button onClick={handleGoToMcpServer} variant="outline" size="sm">
+              <Bug className="mr-1" /> MCP Server Debug
+            </Button>
+            <Button onClick={handleGoToMcpUI} variant="outline" size="sm">
+              <Bug className="mr-1" /> MCP UI Debug
+            </Button>
+          </div>
         }
       />
 
