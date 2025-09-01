@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import { CapStateStore, type UseRemoteCapParams } from '../stores';
 import type { InstalledCap, RemoteCap } from '../types';
+import { ResultCap } from '@nuwa-ai/cap-kit';
 
 /**
  * Hook for accessing the remote caps with advanced filtering, sorting, and pagination
@@ -38,6 +39,8 @@ export function useRemoteCap() {
         page: pageNum = 0,
         size: sizeNum = 45,
         tags: tagsArray = [],
+        sortBy: sortByParam = 'downloads',
+        sortOrder: sortOrderParam = 'desc',
       } = params;
 
       if (append) {
@@ -51,24 +54,28 @@ export function useRemoteCap() {
       setLastSearchParams(params);
 
       try {
-        const response = await capKit.queryWithName(
+        const response = await capKit.queryByName(
           queryString,
-          tagsArray,
-          pageNum,
-          sizeNum,
+          {
+            tags: tagsArray,
+            page: pageNum,
+            size: sizeNum,
+            sortBy: sortByParam,
+            sortOrder: sortOrderParam,
+          }
         );
 
         const newRemoteCaps: RemoteCap[] =
           response.data?.items
             ?.filter((item) => {
               return item.displayName !== 'nuwa_test';
-            })
-            .map((item) => {
+            }).map((item) => {
               return {
                 cid: item.cid,
                 version: item.version,
                 id: item.id,
                 idName: item.name,
+                stats: item.stats,
                 authorDID: item.id.split(':')[0],
                 metadata: {
                   displayName: item.displayName,
@@ -79,7 +86,7 @@ export function useRemoteCap() {
                   submittedAt: item.submittedAt,
                   thumbnail: item.thumbnail,
                 },
-              };
+              }
             }) || [];
 
         // Check if we have more data
@@ -156,16 +163,18 @@ export function useRemoteCap() {
       }
 
       // download cap if not installed
-      const downloadedCap = await capKit.downloadCapWithCID(remoteCap.cid);
+      const downloadedCap = await capKit.downloadByCID(remoteCap.cid);
       await addInstalledCap({
         cid: remoteCap.cid,
         capData: downloadedCap,
+        stats: remoteCap.stats,
         isFavorite: false,
         lastUsedAt: null,
       });
       return {
         cid: remoteCap.cid,
         capData: downloadedCap,
+        stats: remoteCap.stats,
         isFavorite: false,
         lastUsedAt: null,
       };

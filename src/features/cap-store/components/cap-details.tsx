@@ -41,7 +41,7 @@ export function CapDetails() {
   const handleRunCap = async () => {
     setIsLoading(true);
     try {
-      await runCap(cap.capData.id);
+      await runCap(cap.capData.id, cap.cid, cap.stats);
       closeModal();
     } finally {
       setIsLoading(false);
@@ -55,7 +55,7 @@ export function CapDetails() {
         `Removed ${cap.capData.metadata.displayName} from favorites`,
       );
     } else {
-      addCapToFavorite(cap.capData.id);
+      addCapToFavorite(cap.capData.id, cap.cid, cap.stats);
       toast.success(`Added ${cap.capData.metadata.displayName} to favorites`);
     }
   };

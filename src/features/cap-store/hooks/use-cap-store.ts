@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useCapKit } from '@/shared/hooks';
 import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { CapStateStore } from '../stores';
+import { CapStats } from '@nuwa-ai/cap-kit';
 
 /**
  * Hook for managing the installed caps
@@ -12,29 +13,44 @@ export const useCapStore = () => {
   const { capKit, isLoading, error } = useCapKit();
   const { setCurrentCap } = useCurrentCap();
 
-  const downloadCapWithCID = useCallback(
-    async (capCid: string) => {
-      if (!capKit) {
-        throw new Error('CapKit not initialized');
-      }
+  const downloadCapByCID = async (capCid: string) => {
+    if (!capKit) {
+      throw new Error('CapKit not initialized');
+    }
 
-      const capData = await capKit.downloadCapWithCID(capCid, 'utf8');
+    const capData = await capKit.downloadByCID(capCid, 'utf8');
 
       return capData;
-    },
-    [capKit],
-  );
+  }
 
-  const addCapToFavorite = async (capId: string, capCid?: string) => {
+  const downloadCapByID = async (capId: string) => {
+    if (!capKit) {
+      throw new Error('CapKit not initialized');
+    }
+
+    const capData = await capKit.downloadByID(capId, 'utf8');
+
+    return capData;
+  };
+
+  const addCapToFavorite = async (capId: string, capCid: string, stats: CapStats) => {
+
+    const result = await capKit?.favorite(capId, 'add');
+
+    if (result?.code !== 200) {
+      throw new Error('Failed to add cap to favorite');
+    }
+
     const installedCap = installedCaps[capId];
     if (!installedCap) {
       if (!capCid) {
         throw new Error('Cap CID is required for downloading cap');
       }
-      const capData = await downloadCapWithCID(capCid);
+      const capData = await downloadCapByCID(capCid);
       addInstalledCap({
         cid: capCid,
         capData,
+        stats,
         isFavorite: true,
         lastUsedAt: null,
       });
@@ -45,7 +61,16 @@ export const useCapStore = () => {
     }
   };
 
-  const removeCapFromFavorite = (capId: string) => {
+  const removeCapFromFavorite = async (capId: string) => {
+    if (!capId) {
+      throw new Error('Cap CID is required for downloading cap');
+    }
+    const result = await capKit?.favorite(capId, 'remove');
+
+    if (result?.code !== 200) {
+      throw new Error('Failed to remove cap from favorite');
+    }
+
     const installedCap = installedCaps[capId];
     if (!installedCap) {
       throw new Error('Cap is not installed');
@@ -64,12 +89,19 @@ export const useCapStore = () => {
           return null;
         }
         try {
-          const query = await capKit.queryCapWithID(capId);
-          const capData = await capKit.downloadCapWithID(capId, 'utf8');
+          const query = await capKit.queryByID({id: capId});
+          const capData = await capKit.downloadByID(capId, 'utf8');
 
           addInstalledCap({
             cid: query.data?.cid ?? '',
             capData,
+            stats: query.data?.stats ?? {
+              capId: capId,
+              downloads: 0,
+              ratingCount: 0,
+              averageRating: 0,
+              favorites: 0,
+            },
             isFavorite: false,
             lastUsedAt: Date.now(),
           });
@@ -99,10 +131,10 @@ export const useCapStore = () => {
         }
         return 0;
       })
-      .map((cap) => cap.capData);
   };
 
   const getFavoriteCaps = () => {
+    capKit?.queryMyFavorite()
     return Object.values(installedCaps)
       .filter((cap) => cap.isFavorite)
       .sort((a, b) => {
@@ -111,7 +143,6 @@ export const useCapStore = () => {
         }
         return 0;
       })
-      .map((cap) => cap.capData);
   };
 
   const removeCapFromRecents = (capId: string) => {
