@@ -20,7 +20,7 @@ const PurePreviewMessage = ({
   setMessages,
   reload,
   isReadonly,
-  requiresScrollPadding,
+  minHeight,
 }: {
   chatId: string;
   message: UIMessage;
@@ -29,9 +29,10 @@ const PurePreviewMessage = ({
   setMessages: UseChatHelpers['setMessages'];
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
-  requiresScrollPadding: boolean;
+  minHeight?: string;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
+
   return (
     <AnimatePresence>
       <motion.div
@@ -43,7 +44,7 @@ const PurePreviewMessage = ({
       >
         <div
           className={cn(
-            'flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl',
+            'flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:pt-1 group-data-[role=user]/message:max-w-2xl',
             {
               'w-full': mode === 'edit',
               'group-data-[role=user]/message:w-fit': mode !== 'edit',
@@ -51,9 +52,10 @@ const PurePreviewMessage = ({
           )}
         >
           <div
-            className={cn('flex flex-col gap-4 w-full', {
-              'min-h-[calc(100vh-280px)]': message.role === 'assistant' && requiresScrollPadding,
-            })}
+            className={cn('flex flex-col gap-4 w-full')}
+            style={{
+              minHeight: minHeight,
+            }}
           >
             {/* render reasoning */}
             {message.parts?.map((part, index) => {
@@ -162,8 +164,7 @@ export const PreviewMessage = memo(
   (prevProps, nextProps) => {
     if (prevProps.isStreaming !== nextProps.isStreaming) return false;
     if (prevProps.message.id !== nextProps.message.id) return false;
-    if (prevProps.requiresScrollPadding !== nextProps.requiresScrollPadding)
-      return false;
+    if (prevProps.minHeight !== nextProps.minHeight) return false;
     if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
 
     return true;

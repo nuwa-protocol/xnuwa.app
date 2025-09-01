@@ -71,7 +71,7 @@ export function Chat({
   return (
     <ChatProvider chatId={id} initialMessages={initialMessages}>
       <div className="flex flex-row h-dvh">
-        <div className={showArtifact ? "w-1/3" : "flex-1"}>
+        <div className={showArtifact ? 'w-1/3' : 'flex-1'}>
           <ChatContent isReadonly={isReadonly} />
         </div>
         {showArtifact && (

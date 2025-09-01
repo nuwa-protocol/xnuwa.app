@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion';
+import { memo } from 'react';
 import { generateUUID } from '@/shared/utils';
 
-export const Loader = () => {
+export const Loader = memo(({ minHeight }: { minHeight: string }) => {
 
     return (
         <motion.div
             data-testid="message-assistant-loading"
-            className="w-full mx-auto max-w-4xl px-4 group/message min-h-[calc(100vh-280px)]"
+            className="w-full mx-auto max-w-4xl px-4 group/message"
+            style={{ minHeight: minHeight }}
             initial={{ y: 5, opacity: 0 }}
             animate={{ y: 0, opacity: 1, transition: { delay: 1 } }}
         >
@@ -35,4 +37,4 @@ export const Loader = () => {
             </div>
         </motion.div>
     );
-};
+});
