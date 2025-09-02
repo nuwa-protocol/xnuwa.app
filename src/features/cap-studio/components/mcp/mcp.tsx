@@ -10,9 +10,10 @@ import {
   Terminal,
   Unplug,
 } from 'lucide-react';
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { CapUIRenderer } from '@/features/chat/components/cap-ui-renderer';
 import {
   Button,
   Card,
@@ -69,8 +70,7 @@ export function Mcp({ cap, serverName }: McpProps) {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isCallingTool, setIsCallingTool] = useState(false);
   const [showUIPreview, setShowUIPreview] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [iframeUrl, setIframeUrl] = useState<string>('');
+  const [penpalConnected, setPenpalConnected] = useState(false);
 
   const pushLog = useCallback((entry: Omit<LogEntry, 'id' | 'timestamp'>) => {
     setLogs((prev) =>
@@ -103,18 +103,14 @@ export function Mcp({ cap, serverName }: McpProps) {
         message: `Connecting to ${url} with Streamable HTTP transport`,
       });
 
-      let newClient: NuwaMCPClient;
-      if (mcpType === 'MCP Server') {
-        newClient = await createNuwaMCPClient(url);
-      } else {
-        if (!iframeRef.current?.contentWindow) {
-          throw new Error('Iframe not ready');
-        }
-        newClient = await createNuwaMCPClient(url, 'postMessage', {
-          targetWindow: iframeRef.current?.contentWindow,
-        });
+      // Only handle MCP Server connections in this function
+      if (mcpType !== 'MCP Server') {
+        throw new Error(
+          'handleConnect should only be used for MCP Server connections',
+        );
       }
 
+      const newClient = await createNuwaMCPClient(url);
       setClient(newClient);
 
       pushLog({
@@ -122,30 +118,7 @@ export function Mcp({ cap, serverName }: McpProps) {
         message: 'Successfully connected to MCP server',
       });
 
-      // Fetch server capabilities
-      const toolsList = await newClient.tools();
-      setTools(toolsList);
-      pushLog({
-        type: 'info',
-        message: `Discovered ${Object.keys(toolsList).length} tools`,
-        data: { tools: Object.keys(toolsList) },
-      });
-
-      // Initialize tool parameters
-      const initialParams: Record<string, Record<string, string>> = {};
-      Object.entries(toolsList).forEach(([toolName, tool]) => {
-        initialParams[toolName] = {};
-        // Initialize parameters based on input schema if available
-        if (tool.parameters.jsonSchema) {
-          Object.keys(tool.parameters.jsonSchema.properties).forEach(
-            (param) => {
-              initialParams[toolName][param] = '';
-            },
-          );
-        }
-      });
-
-      setToolParams(initialParams);
+      await handleToolsDiscovery(newClient);
 
       toast.success(`Successfully connected to ${url}`);
       setConnected(true);
@@ -161,23 +134,184 @@ export function Mcp({ cap, serverName }: McpProps) {
     } finally {
       setConnecting(false);
     }
-  }, [connecting, url, pushLog]);
+  }, [connecting, url, pushLog, mcpType]);
+
+  const handleToolsDiscovery = useCallback(
+    async (mcpClient: NuwaMCPClient) => {
+      try {
+        // Fetch server capabilities
+        const toolsList = await mcpClient.tools();
+        setTools(toolsList);
+        pushLog({
+          type: 'info',
+          message: `Discovered ${Object.keys(toolsList).length} tools`,
+          data: { tools: Object.keys(toolsList) },
+        });
+
+        // Initialize tool parameters
+        const initialParams: Record<string, Record<string, string>> = {};
+        Object.entries(toolsList).forEach(([toolName, tool]) => {
+          initialParams[toolName] = {};
+          // Initialize parameters based on input schema if available
+          if (tool.parameters.jsonSchema) {
+            Object.keys(tool.parameters.jsonSchema.properties).forEach(
+              (param) => {
+                initialParams[toolName][param] = '';
+              },
+            );
+          }
+        });
+
+        setToolParams(initialParams);
+      } catch (err) {
+        pushLog({
+          type: 'error',
+          message: `Failed to discover tools: ${String(err)}`,
+        });
+        throw err;
+      }
+    },
+    [pushLog],
+  );
+
+  const handlePenpalConnected = useCallback(() => {
+    setPenpalConnected(true);
+    pushLog({
+      type: 'success',
+      message: '🔗 Penpal connection established',
+    });
+  }, [pushLog]);
+
+  const handleMCPConnected = useCallback(
+    async (mcpClient: NuwaMCPClient) => {
+      try {
+        setClient(mcpClient);
+        pushLog({
+          type: 'success',
+          message: '🔌 MCP connection established via UI',
+        });
+
+        await handleToolsDiscovery(mcpClient);
+        toast.success(`Successfully connected to ${url}`);
+        setConnected(true);
+      } catch (err) {
+        pushLog({
+          type: 'error',
+          message: `MCP connection failed: ${String(err)}`,
+        });
+        toast.error(String(err));
+      }
+    },
+    [pushLog, url, handleToolsDiscovery],
+  );
+
+  const handleMCPConnectionError = useCallback(
+    (error: Error) => {
+      pushLog({
+        type: 'error',
+        message: `🔌 MCP connection failed: ${error.message}`,
+      });
+      toast.error(`MCP connection failed: ${error.message}`);
+      setConnected(false);
+      setClient(null);
+      setShowUIPreview(false);
+    },
+    [pushLog],
+  );
+
+  const handlePenpalConnectionError = useCallback(
+    (error: Error) => {
+      pushLog({
+        type: 'error',
+        message: `🔗 Penpal connection failed: ${error.message}`,
+      });
+      toast.error(`Penpal connection failed: ${error.message}`);
+      setPenpalConnected(false);
+    },
+    [pushLog],
+  );
+
+  // Unified callback handlers via logging
+  const handleSendPrompt = useCallback(
+    (prompt: string) => {
+      pushLog({
+        type: 'info',
+        message: `📝 Prompt sent: ${prompt.substring(0, 100)}${prompt.length > 100 ? '...' : ''}`,
+        data: { prompt },
+        copyable: true,
+      });
+    },
+    [pushLog],
+  );
+
+  const handleAddSelection = useCallback(
+    (label: string, message: string) => {
+      pushLog({
+        type: 'info',
+        message: `📌 Selection added: ${label} - ${message.substring(0, 50)}${message.length > 50 ? '...' : ''}`,
+        data: { label, message },
+        copyable: true,
+      });
+    },
+    [pushLog],
+  );
+
+  const handleSaveState = useCallback(
+    (state: any) => {
+      pushLog({
+        type: 'info',
+        message: `💾 State saved`,
+        data: { state },
+        copyable: true,
+      });
+    },
+    [pushLog],
+  );
+
+  const handleGetState = useCallback(() => {
+    pushLog({
+      type: 'info',
+      message: `🔄 State requested`,
+    });
+    return null; // Return whatever state is needed
+  }, [pushLog]);
 
   const handleDisconnect = async () => {
-    if (!client) return;
-
     try {
-      await client.close();
-      setClient(null);
-      setConnected(false);
-      setTools({});
+      // Close MCP client if it exists
+      if (client) {
+        await client.close();
+        setClient(null);
+        setConnected(false);
+        setTools({});
+      }
+
+      // Always reset UI state for MCP UI mode
+      setPenpalConnected(false);
+      setShowUIPreview(false);
+
+      // Clear logs
+      setLogs([]);
 
       pushLog({
         type: 'info',
-        message: 'Disconnected from MCP server',
+        message: client
+          ? 'Disconnected from MCP server'
+          : 'Closed UI preview',
       });
 
-      toast.success('Successfully disconnected from MCP server');
+      toast.success(client
+        ? 'Successfully disconnected from MCP server'
+        : 'UI preview closed'
+      );
+
+      // Wait for renderer to fully unmount
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      pushLog({
+        type: 'info',
+        message: '🧹 Renderer cleanup completed',
+      });
     } catch (err) {
       pushLog({
         type: 'error',
@@ -296,7 +430,7 @@ export function Mcp({ cap, serverName }: McpProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate("/cap-studio")}
+            onClick={() => navigate('/cap-studio')}
             className="flex items-center space-x-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -352,25 +486,34 @@ export function Mcp({ cap, serverName }: McpProps) {
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="http://example.com/mcp"
-                  disabled={connecting || connected}
+                  disabled={connecting || connected || (mcpType === 'MCP UI' && showUIPreview)}
                   className="h-10"
                 />
               </div>
             </div>
 
             {/* Connection Status */}
-            {(connected || connecting) && (
+            {(connected || connecting || penpalConnected) && (
               <div className="space-y-3">
                 {connected && (
                   <div className="flex items-center space-x-3 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 px-4 py-3 rounded-lg">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                     <div className="flex-1">
-                      <span className="font-medium">Connected to {url}</span>
+                      <span className="font-medium">Connected to {url} via MCP</span>
                       <div className="text-xs text-green-600 dark:text-green-500 mt-1">
                         {Object.keys(tools).length} tools available
                       </div>
                     </div>
                     <Plug className="h-4 w-4" />
+                  </div>
+                )}
+
+                {penpalConnected && mcpType === 'MCP UI' && (
+                  <div className="flex items-center space-x-3 text-sm text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 px-4 py-3 rounded-lg">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                    <span className="font-medium">
+                      🔗 Penpal connection established
+                    </span>
                   </div>
                 )}
 
@@ -387,11 +530,10 @@ export function Mcp({ cap, serverName }: McpProps) {
             <div className="flex items-center justify-between pt-2">
               <div className="flex items-center space-x-2">
                 {/* Launch UI Button - only show for MCP UI type and when not connected */}
-                {mcpType === 'MCP UI' && !connected && !connecting && (
+                {mcpType === 'MCP UI' && !showUIPreview && (
                   <Button
                     onClick={() => {
                       setShowUIPreview(true);
-                      setIframeUrl(url);
                     }}
                     variant="outline"
                     size="default"
@@ -402,7 +544,41 @@ export function Mcp({ cap, serverName }: McpProps) {
                   </Button>
                 )}
 
-                {connected ? (
+                {/* Connect/Disconnect buttons - only show for MCP Server type */}
+                {mcpType === 'MCP Server' &&
+                  (connected ? (
+                    <Button
+                      onClick={handleDisconnect}
+                      variant="destructive"
+                      size="default"
+                      className="min-w-32"
+                    >
+                      <Unplug className="h-4 w-4 mr-2" />
+                      Disconnect
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleConnect}
+                      disabled={connecting || !url.trim()}
+                      size="default"
+                      className="min-w-32"
+                    >
+                      {connecting ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          Connecting...
+                        </>
+                      ) : (
+                        <>
+                          <Plug className="h-4 w-4 mr-2" />
+                          Connect
+                        </>
+                      )}
+                    </Button>
+                  ))}
+
+                {/* Disconnect button for MCP UI when connected */}
+                {mcpType === 'MCP UI' && (connected || showUIPreview) && (
                   <Button
                     onClick={handleDisconnect}
                     variant="destructive"
@@ -411,25 +587,6 @@ export function Mcp({ cap, serverName }: McpProps) {
                   >
                     <Unplug className="h-4 w-4 mr-2" />
                     Disconnect
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleConnect}
-                    disabled={connecting || !url.trim()}
-                    size="default"
-                    className="min-w-32"
-                  >
-                    {connecting ? (
-                      <>
-                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        Connecting...
-                      </>
-                    ) : (
-                      <>
-                        <Plug className="h-4 w-4 mr-2" />
-                        Connect
-                      </>
-                    )}
                   </Button>
                 )}
               </div>
@@ -674,24 +831,25 @@ export function Mcp({ cap, serverName }: McpProps) {
 
       {/* UI Preview - Right Side Panel */}
       {mcpType === 'MCP UI' && (
-        <div className="w-2/3 space-y-4">
+        <div className="w-2/3">
           <Card className="h-full border-none shadow-none">
             <CardHeader>
-              <CardTitle>UI Preview</CardTitle>
+              <CardTitle className='sr-only'>UI Preview</CardTitle>
             </CardHeader>
-            <CardContent className="h-[800px] pb-6">
-              {iframeUrl && showUIPreview ? (
-                <iframe
-                  ref={iframeRef}
-                  src={iframeUrl}
-                  className="w-full h-full border border-muted rounded-md shadow-md"
+            <CardContent className="w-full h-full max-h-screen bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden">
+              {url && showUIPreview ? (
+                <CapUIRenderer
+                  srcUrl={url}
                   title="MCP UI Preview"
-                  onLoad={() =>
-                    pushLog({
-                      type: 'info',
-                      message: '📱 UI Preview loaded successfully',
-                    })
-                  }
+                  artifact={true}
+                  onPenpalConnected={handlePenpalConnected}
+                  onMCPConnected={handleMCPConnected}
+                  onMCPConnectionError={handleMCPConnectionError}
+                  onPenpalConnectionError={handlePenpalConnectionError}
+                  onSendPrompt={handleSendPrompt}
+                  onAddSelection={handleAddSelection}
+                  onSaveState={handleSaveState}
+                  onGetState={handleGetState}
                 />
               ) : (
                 <div className="text-muted-foreground text-center py-8 space-y-2">
@@ -701,7 +859,7 @@ export function Mcp({ cap, serverName }: McpProps) {
                     <>
                       <p>Click "Launch UI" to preview the interface</p>
                       <p className="text-xs">
-                        or connect to load automatically
+                        The UI will automatically connect when loaded
                       </p>
                     </>
                   )}

@@ -1,6 +1,7 @@
 import type { ComponentProps, HTMLAttributes } from 'react';
 import { memo, useMemo } from 'react';
 import { CapUIRenderer } from '@/features/chat/components/cap-ui-renderer';
+import { useCapUIRender } from '../hooks/use-cap-ui-render';
 import { Response } from './message-ai';
 
 function parseCapUIAttributes(
@@ -40,6 +41,8 @@ export const ResponseWithCapUI = memo(
     className,
     ...props
   }: CapUIMarkdownProps) => {
+    const { handleSendPrompt, handleAddSelection, handleGetState, handleSaveState } = useCapUIRender();
+
     const processedContent = useMemo(() => {
       if (typeof children !== 'string') {
         return [{ type: 'markdown', content: children }];
@@ -83,6 +86,8 @@ export const ResponseWithCapUI = memo(
       return parts;
     }, [children]);
 
+
+
     return (
       <div className={className} {...props}>
         {processedContent.map((part) => {
@@ -93,6 +98,10 @@ export const ResponseWithCapUI = memo(
                 key={data.url}
                 srcUrl={data.url}
                 title={data.title}
+                onSendPrompt={handleSendPrompt}
+                onAddSelection={handleAddSelection}
+                onSaveState={handleSaveState}
+                onGetState={handleGetState}
               />
             );
           } else {

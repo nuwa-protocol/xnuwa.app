@@ -67,24 +67,22 @@ export function Chat({
   isReadonly: boolean;
 }) {
   const showArtifact = false;
-  const artifactUrl = 'http://localhost:3000/test';
+  const artifactUrl = 'http://localhost:3000/note';
   return (
     <ChatProvider chatId={id} initialMessages={initialMessages}>
       <div className="flex flex-row h-dvh">
         <div className={showArtifact ? 'w-1/3' : 'flex-1'}>
           <ChatContent isReadonly={isReadonly} />
         </div>
-        {showArtifact && (
-          <div className="flex h-full w-2/3 p-4">
-            <div className="w-full h-full max-h-screen bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden">
-              <CapUIRenderer
-                srcUrl={artifactUrl}
-                title="Artifact"
-                artifact={true}
-              />
-            </div>
+        <div className={showArtifact ? "flex h-full w-2/3 p-4" : "w-0 h-0 border-none absolute"}>
+          <div className="w-full h-full max-h-screen bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden">
+            <CapUIRenderer
+              srcUrl={artifactUrl}
+              title="Artifact"
+              artifact={true}
+            />
           </div>
-        )}
+        </div>
       </div>
     </ChatProvider>
   );

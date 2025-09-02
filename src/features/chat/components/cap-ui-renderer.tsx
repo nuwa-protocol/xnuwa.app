@@ -1,8 +1,13 @@
+import { NUWA_CLIENT_TIMEOUT } from '@nuwa-ai/ui-kit';
 import { AlertCircle } from 'lucide-react';
 import { connect, WindowMessenger } from 'penpal';
 import { useCallback, useRef, useState } from 'react';
 import { TextShimmer } from '@/shared/components/ui/text-shimmer';
-import { useChatContext } from '../contexts/chat-context';
+import {
+  closeNuwaMCPClient,
+  createNuwaMCPClient,
+} from '@/shared/services/mcp-client';
+import type { NuwaMCPClient } from '@/shared/types';
 
 const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
   if (artifact) {
@@ -14,9 +19,12 @@ const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
             <AlertCircle className="relative size-16 text-destructive/80" />
           </div>
           <div className="text-center space-y-2">
-            <h3 className="text-lg font-medium text-foreground">Failed to load UI</h3>
+            <h3 className="text-lg font-medium text-foreground">
+              Failed to load UI
+            </h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              The artifact interface could not be loaded. Please try refreshing or check your connection.
+              The artifact interface could not be loaded. Please try refreshing
+              or check your connection.
             </p>
           </div>
         </div>
@@ -72,37 +80,55 @@ const LoadingScreen = ({ artifact }: { artifact?: boolean }) => {
   );
 };
 
-
 export type CapUIRendererProps = {
   srcUrl: string;
   title?: string;
   artifact?: boolean;
+  onSendPrompt?: (prompt: string) => void;
+  onAddSelection?: (label: string, message: string) => void;
+  onSaveState?: (state: any) => void;
+  onGetState?: () => any;
+  onMCPConnected?: (mcpClient: NuwaMCPClient) => void;
+  onMCPConnectionError?: (error: Error) => void;
+  onPenpalConnected?: () => void;
+  onPenpalConnectionError?: (error: Error) => void;
 };
 
-
-export const CapUIRenderer = ({ srcUrl, title, artifact = false }: CapUIRendererProps) => {
-  const CONNECTION_TIMEOUT = 3000;
-
-  const { append } = useChatContext();
+export const CapUIRenderer = ({
+  srcUrl,
+  title,
+  artifact = false,
+  onSendPrompt,
+  onAddSelection,
+  onSaveState,
+  onGetState,
+  onMCPConnected,
+  onMCPConnectionError,
+  onPenpalConnected,
+  onPenpalConnectionError,
+}: CapUIRendererProps) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [height, setHeight] = useState<number>(100); // Default height
   const [isLoading, setIsLoading] = useState(true);
 
-  const sendLog = (message: string) => {
-    console.log(`Log Message from "${title}": ${message}`);
+  const sendPrompt = (prompt: string) => {
+    onSendPrompt?.(prompt);
   };
 
-  const sendPrompt = (prompt: string) => {
-    append({
-      role: 'user',
-      content: prompt,
-    });
+  const addSelection = (label: string, message: string) => {
+    onAddSelection?.(label, message);
+  };
+
+  const saveState = (state: any) => {
+    onSaveState?.(state);
+  };
+
+  const getState = () => {
+    onGetState?.();
   };
 
   const connectToPenpal = useCallback(async () => {
-    setIsLoading(false);
-
     try {
       if (!iframeRef.current?.contentWindow) {
         throw new Error('Iframe content not accessible');
@@ -116,23 +142,43 @@ export const CapUIRenderer = ({ srcUrl, title, artifact = false }: CapUIRenderer
       await connect({
         messenger,
         methods: {
-          sendLog,
           sendPrompt,
           setHeight,
+          addSelection,
+          saveState,
+          getState,
         },
-        timeout: CONNECTION_TIMEOUT,
+        timeout: NUWA_CLIENT_TIMEOUT,
       }).promise;
 
-      console.log('Successfully connected to Cap UI', title ?? srcUrl);
+      onPenpalConnected?.();
     } catch (error) {
       const err =
         error instanceof Error
           ? error
-          : new Error('Failed to establish connection with Cap UI');
-      console.log('Unable to connect to Cap UI over Penpal:', {
-        error: err.message,
-        url: srcUrl,
+          : new Error(`Failed to connect to ${title ?? srcUrl} over Penpal`);
+      onPenpalConnectionError?.(err);
+    }
+  }, [title, srcUrl]);
+
+  const connectToMCP = useCallback(async () => {
+    try {
+      if (!iframeRef.current?.contentWindow) {
+        throw new Error('Iframe not ready');
+      }
+
+      const mcpClient = await createNuwaMCPClient(srcUrl, 'postMessage', {
+        targetWindow: iframeRef.current?.contentWindow,
       });
+
+      onMCPConnected?.(mcpClient);
+    } catch (error) {
+      const err =
+        error instanceof Error
+          ? error
+          : new Error(`Failed to connect to ${title ?? srcUrl} over MCP`);
+      onMCPConnectionError?.(err);
+      await closeNuwaMCPClient(srcUrl);
     }
   }, [title, srcUrl]);
 
@@ -179,9 +225,7 @@ export const CapUIRenderer = ({ srcUrl, title, artifact = false }: CapUIRenderer
 
   return (
     <div className="relative" style={{ height: artifact ? '100%' : height }}>
-      {isLoading && (
-        <LoadingScreen artifact={artifact} />
-      )}
+      {isLoading && <LoadingScreen artifact={artifact} />}
       <iframe
         src={srcUrl}
         allow={allowPermissions}
@@ -201,7 +245,12 @@ export const CapUIRenderer = ({ srcUrl, title, artifact = false }: CapUIRenderer
         sandbox={sandbox}
         title={title ?? 'Nuwa Cap UI'}
         ref={iframeRef}
-        onLoad={connectToPenpal}
+        onLoad={() => {
+          setIsLoading(false);
+          connectToPenpal();
+          connectToMCP();
+        }}
+        onErrorCapture={console.log}
       />
     </div>
   );

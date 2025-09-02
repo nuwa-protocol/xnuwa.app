@@ -16,6 +16,10 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   Textarea,
 } from '@/shared/components/ui';
 import type { CapThumbnail } from '@/shared/types/cap';
@@ -93,221 +97,241 @@ export function CapEditForm({ editingCap }: CapEditFormProps) {
           )}
           className="space-y-6"
         >
-          <DashboardGrid cols={1}>
-            {/* Basic Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Basic Information</CardTitle>
-                <CardDescription>
-                  Essential details about your cap
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="idName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Unique identifier for your cap.
-                      </p>
-                      <FormControl>
-                        <Input placeholder="my-awesome_cap" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          <Tabs defaultValue="general" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="model">Model</TabsTrigger>
+              <TabsTrigger value="prompt">Prompt</TabsTrigger>
+              <TabsTrigger value="mcp">MCP</TabsTrigger>
+            </TabsList>
 
-                <FormField
-                  control={form.control}
-                  name="displayName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Display Name</FormLabel>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Human-readable name shown in the store.
-                      </p>
-                      <FormControl>
-                        <Input placeholder="My Awesome Cap" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Describe what your cap does..."
-                          rows={3}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="tags"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tags</FormLabel>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Select one or more tags that describe your cap.
-                      </p>
-                      <FormControl>
-                        <CapTags
-                          value={field.value || []}
-                          onChange={field.onChange}
-                          placeholder="Search tags..."
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Model Configuration (use Model Selector) */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-base">
-                      Model Configuration
-                    </CardTitle>
+            {/* General Tab */}
+            <TabsContent value="general" className="space-y-6">
+              <DashboardGrid cols={1}>
+                {/* Basic Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Basic Information</CardTitle>
                     <CardDescription>
-                      Choose the AI model for your cap
+                      Essential details about your cap
                     </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="idName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Name</FormLabel>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Unique identifier for your cap.
+                          </p>
+                          <FormControl>
+                            <Input placeholder="my-awesome_cap" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="displayName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Display Name</FormLabel>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Human-readable name shown in the store.
+                          </p>
+                          <FormControl>
+                            <Input placeholder="My Awesome Cap" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Describe what your cap does..."
+                              rows={3}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="tags"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tags</FormLabel>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Select one or more tags that describe your cap.
+                          </p>
+                          <FormControl>
+                            <CapTags
+                              value={field.value || []}
+                              onChange={field.onChange}
+                              placeholder="Search tags..."
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Author Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Author Information</CardTitle>
+                    <CardDescription>
+                      Information about the cap author and licensing
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="homepage"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Homepage (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://example.com" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            Link to your cap's homepage or documentation
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="repository"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Repository (Optional)</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="https://github.com/user/repo"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Link to the source code repository
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Thumbnail */}
+                <ThumbnailUpload
+                  thumbnail={thumbnail}
+                  onThumbnailChange={setThumbnail}
+                />
+              </DashboardGrid>
+            </TabsContent>
+
+            {/* Model Tab */}
+            <TabsContent value="model" className="space-y-6">
+              <DashboardGrid cols={1}>
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-base">
+                          Model Configuration
+                        </CardTitle>
+                        <CardDescription>
+                          Choose the AI model for your cap
+                        </CardDescription>
+                      </div>
+                      <ModelSelectorDialog />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {!selectedModel ? (
+                      <div className="text-muted-foreground text-sm">
+                        No model selected
+                      </div>
+                    ) : (
+                      <ModelDetails model={selectedModel} />
+                    )}
+                  </CardContent>
+                </Card>
+              </DashboardGrid>
+            </TabsContent>
+
+            {/* Prompt Tab */}
+            <TabsContent value="prompt" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-base">
+                        Prompt Configuration
+                      </CardTitle>
+                      <CardDescription>
+                        This prompt will guide the AI model's behavior when using
+                        your cap
+                      </CardDescription>
+                    </div>
                   </div>
-                  <ModelSelectorDialog />
-                </div>
-              </CardHeader>
-              <CardContent>
-                {!selectedModel ? (
-                  <div className="text-muted-foreground text-sm">
-                    No model selected
-                  </div>
-                ) : (
-                  <ModelDetails model={selectedModel} />
-                )}
-              </CardContent>
-            </Card>
-          </DashboardGrid>
+                </CardHeader>
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="prompt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <PromptEditor
+                            value={field.value.value}
+                            onChange={(value) =>
+                              field.onChange({ ...field.value, value })
+                            }
+                            suggestions={field.value.suggestions || []}
+                            onSuggestionsChange={(suggestions) =>
+                              field.onChange({ ...field.value, suggestions })
+                            }
+                            placeholder="Enter your prompt instructions here..."
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          {/* Prompt Configuration */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">
-                    Prompt Configuration
-                  </CardTitle>
-                  <CardDescription>
-                    This prompt will guide the AI model's behavior when using
-                    your cap
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="prompt"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <PromptEditor
-                        value={field.value.value}
-                        onChange={(value) =>
-                          field.onChange({ ...field.value, value })
-                        }
-                        suggestions={field.value.suggestions || []}
-                        onSuggestionsChange={(suggestions) =>
-                          field.onChange({ ...field.value, suggestions })
-                        }
-                        placeholder="Enter your prompt instructions here..."
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            {/* MCP Tab */}
+            <TabsContent value="mcp" className="space-y-6">
+              <McpServersConfig
+                mcpServers={mcpServers}
+                onUpdateMcpServers={handleUpdateMcpServers}
+                capId={editingCap?.id}
               />
-            </CardContent>
-          </Card>
+            </TabsContent>
+          </Tabs>
 
-          {/* MCP Servers */}
-          <McpServersConfig
-            mcpServers={mcpServers}
-            onUpdateMcpServers={handleUpdateMcpServers}
-            capId={editingCap?.id}
-          />
-
-          {/* Author Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Author Information</CardTitle>
-              <CardDescription>
-                Information about the cap author and licensing
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="homepage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Homepage (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Link to your cap's homepage or documentation
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="repository"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Repository (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="https://github.com/user/repo"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Link to the source code repository
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Thumbnail */}
-          <ThumbnailUpload
-            thumbnail={thumbnail}
-            onThumbnailChange={setThumbnail}
-          />
-
-          {/* Submit */}
+          {/* Submit - Always visible at bottom */}
           <div className="flex items-center justify-between pt-6 border-t">
             <div className="flex items-center space-x-2 text-sm">
               {Object.keys(form.formState.errors).length === 0 ? (
