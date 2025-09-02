@@ -8,39 +8,41 @@ import { CapStoreSidebar } from './cap-store-sidebar';
 export function CapStoreModal() {
   const { t } = useLanguage();
 
-  const { toggleModal, isOpen } = useCapStoreModal();
+  return null;
 
-  return (
-    <Dialog.Dialog open={isOpen} onOpenChange={toggleModal}>
-      <Dialog.DialogContent
-        className="fixed left-1/2 top-1/2 z-50 flex flex-col -translate-x-1/2 -translate-y-1/2 gap-0 border bg-background p-0 shadow-lg sm:rounded-lg overflow-hidden [&>button:last-child]:hidden"
-        style={{
-          width: '90vw',
-          maxWidth: 1200,
-          height: '85vh',
-          maxHeight: 800,
-          minHeight: 0,
-        }}
-        aria-describedby={undefined}
-      >
-        <Dialog.DialogTitle className="sr-only">
-          {t('capStore.title')}
-        </Dialog.DialogTitle>
+  // const { toggleModal, isOpen } = useCapStoreModal();
 
-        {/* Main Content with Sidebar */}
-        <div className="flex-1 min-h-0 flex">
-          <CapStoreSidebar />
+  // return (
+  //   <Dialog.Dialog open={isOpen} onOpenChange={toggleModal}>
+  //     <Dialog.DialogContent
+  //       className="fixed left-1/2 top-1/2 z-50 flex flex-col -translate-x-1/2 -translate-y-1/2 gap-0 border bg-background p-0 shadow-lg sm:rounded-lg overflow-hidden [&>button:last-child]:hidden"
+  //       style={{
+  //         width: '90vw',
+  //         maxWidth: 1200,
+  //         height: '85vh',
+  //         maxHeight: 800,
+  //         minHeight: 0,
+  //       }}
+  //       aria-describedby={undefined}
+  //     >
+  //       <Dialog.DialogTitle className="sr-only">
+  //         {t('capStore.title')}
+  //       </Dialog.DialogTitle>
 
-          {/* Content Area */}
-          <div className="flex-1 min-h-0 flex flex-col">
-            <CapStoreHeader />
+  //       {/* Main Content with Sidebar */}
+  //       <div className="flex-1 min-h-0 flex">
+  //         <CapStoreSidebar />
 
-            <div className="flex-1 min-h-0">
-              <CapStoreContent />
-            </div>
-          </div>
-        </div>
-      </Dialog.DialogContent>
-    </Dialog.Dialog>
-  );
+  //         {/* Content Area */}
+  //         <div className="flex-1 min-h-0 flex flex-col">
+  //           <CapStoreHeader />
+
+  //           <div className="flex-1 min-h-0">
+  //             <CapStoreContent />
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </Dialog.DialogContent>
+  //   </Dialog.Dialog>
+  // );
 }

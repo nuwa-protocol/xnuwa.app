@@ -98,6 +98,7 @@ export const CapStateStore = create<CapStoreState>()(
             averageRating: 0,
             favorites: 0,
           },
+          version: '0',
           isFavorite: false,
           lastUsedAt: null,
         },
@@ -126,6 +127,7 @@ export const CapStateStore = create<CapStoreState>()(
             [cap.capData.id]: {
               cid: cap.cid,
               capData: cap.capData,
+              version: cap.version,
               stats: cap.stats,
               isFavorite: cap.isFavorite,
               lastUsedAt: cap.lastUsedAt,
@@ -228,6 +230,7 @@ export const CapStateStore = create<CapStoreState>()(
             installedCapsMap[id] = {
               cid: capData.cid,
               capData: capData.capData,
+              version: capData.version,
               stats: capData.stats,
               isFavorite: capData.isFavorite,
               lastUsedAt: capData.lastUsedAt,

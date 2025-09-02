@@ -94,7 +94,7 @@ export function useRemoteCap() {
         setHasMoreData(totalItems === sizeNum);
 
         if (append) {
-          setRemoteCaps([...remoteCaps, ...newRemoteCaps]);
+          setRemoteCaps((prevCaps) => [...prevCaps, ...newRemoteCaps]);
           setCurrentPage(pageNum);
         } else {
           setRemoteCaps(newRemoteCaps);
@@ -115,7 +115,6 @@ export function useRemoteCap() {
     },
     [
       capKit,
-      remoteCaps,
       setRemoteCaps,
       setIsFetching,
       setIsLoadingMore,
@@ -168,6 +167,7 @@ export function useRemoteCap() {
         cid: remoteCap.cid,
         capData: downloadedCap,
         stats: remoteCap.stats,
+        version: remoteCap.version,
         isFavorite: false,
         lastUsedAt: null,
       });
@@ -175,6 +175,7 @@ export function useRemoteCap() {
         cid: remoteCap.cid,
         capData: downloadedCap,
         stats: remoteCap.stats,
+        version: remoteCap.version,
         isFavorite: false,
         lastUsedAt: null,
       };

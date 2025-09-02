@@ -1,6 +1,7 @@
-import { Layers, Settings2, Wrench } from 'lucide-react';
+import { Settings2, Wrench } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SidebarCapStoreCard } from '@/features/cap-store/components/sidebar-cap-store-card';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
 import { SidebarWalletCard } from '@/features/wallet/components/sidebar-wallet-card';
 import { Logo } from '@/shared/components';
@@ -108,12 +109,7 @@ export function AppSidebarContent() {
 
             <SidebarWalletCard className="mb-2" />
 
-            <SidebarButton
-              icon={Layers}
-              text={'Caps'}
-              href="/wallet"
-              variant="secondary"
-            />
+            <SidebarCapStoreCard />
 
             {isDevMode && (
               <SidebarButton

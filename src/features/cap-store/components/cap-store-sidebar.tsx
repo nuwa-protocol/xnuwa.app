@@ -138,8 +138,12 @@ export function CapStoreSidebar() {
     }
   };
 
+  // useEffect(() => {
+  //   handleActiveSectionChange(sidebarSections[3]);
+  // }, []);
+
   return (
-    <div className="w-56 border-r bg-muted/30 overflow-y-auto shrink-0 flex flex-col">
+    <div className="w-56 border-r bg-background overflow-y-auto shrink-0 flex flex-col">
       {/* Search Section */}
       <div className="p-4 border-b shrink-0">
         <div className="space-y-3">

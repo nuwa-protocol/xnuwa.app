@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useCapKit } from '@/shared/hooks';
 import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { CapStateStore } from '../stores';
-import { CapStats } from '@nuwa-ai/cap-kit';
+import { type CapStats } from '@nuwa-ai/cap-kit';
 
 /**
  * Hook for managing the installed caps
@@ -12,6 +12,49 @@ export const useCapStore = () => {
     CapStateStore();
   const { capKit, isLoading, error } = useCapKit();
   const { setCurrentCap } = useCurrentCap();
+
+  const rateCap = async (capId: string, rating: number) => {
+    if (!capKit) {
+      throw new Error('CapKit not initialized');
+    }
+
+    const result = await capKit.rateCap(capId, rating);
+
+    if (result?.code !== 200) {
+      throw new Error(result.error || 'Failed to rate cap');
+    }
+
+    // After rating, we should probably refetch the cap stats to show the update
+    const statsResult = await capKit.queryCapStats(capId);
+    if (statsResult.data) {
+      // Also update the installed cap if it exists
+      if (installedCaps[capId]) {
+        updateInstalledCap(capId, { stats: statsResult.data });
+      }
+    }
+
+    return result.data;
+  };
+
+  const fetchFavoriteStatus = async (capId: string) => {
+    if (!capKit) {
+      throw new Error('CapKit not initialized');
+    }
+
+    const result = await capKit.favorite(capId, 'isFavorite');
+
+    if (result?.code !== 200) {
+      throw new Error(result.error || 'Failed to rate cap');
+    }
+
+    console.log(result.data);
+
+    if (installedCaps[capId]) {
+      updateInstalledCap(capId, { isFavorite: result.data });
+    }
+
+    return result.data;
+  };
 
   const downloadCapByCID = async (capCid: string) => {
     if (!capKit) {
@@ -33,7 +76,7 @@ export const useCapStore = () => {
     return capData;
   };
 
-  const addCapToFavorite = async (capId: string, capCid: string, stats: CapStats) => {
+  const addCapToFavorite = async (capId: string, version: string, capCid: string, stats: CapStats) => {
 
     const result = await capKit?.favorite(capId, 'add');
 
@@ -50,6 +93,7 @@ export const useCapStore = () => {
       addInstalledCap({
         cid: capCid,
         capData,
+        version,
         stats,
         isFavorite: true,
         lastUsedAt: null,
@@ -57,6 +101,10 @@ export const useCapStore = () => {
     } else {
       updateInstalledCap(capId, {
         isFavorite: true,
+        stats: {
+          ...installedCap.stats,
+          favorites: installedCap.stats.favorites + 1,
+        }
       });
     }
   };
@@ -77,50 +125,38 @@ export const useCapStore = () => {
     }
     updateInstalledCap(capId, {
       isFavorite: false,
+      stats: {
+        ...installedCap.stats,
+        favorites: installedCap.stats.favorites - 1,
+      }
     });
   };
 
-  const runCap = useCallback(
-    async (capId: string) => {
-      const installedCap = installedCaps[capId];
+  const runCap = useCallback(async (capId: string, version: string, capCid: string, stats: CapStats) => {
+    const installedCap = installedCaps[capId];
 
-      if (!installedCap) {
-        if (!capKit) {
-          return null;
-        }
-        try {
-          const query = await capKit.queryByID({id: capId});
-          const capData = await capKit.downloadByID(capId, 'utf8');
-
-          addInstalledCap({
-            cid: query.data?.cid ?? '',
-            capData,
-            stats: query.data?.stats ?? {
-              capId: capId,
-              downloads: 0,
-              ratingCount: 0,
-              averageRating: 0,
-              favorites: 0,
-            },
-            isFavorite: false,
-            lastUsedAt: Date.now(),
-          });
-          setCurrentCap(capData);
-          return capData;
-        } catch (error) {
-          throw new Error(`Failed to download cap: ${error}`);
-        }
-      } else {
-        updateInstalledCap(capId, {
-          lastUsedAt: Date.now(),
-        });
-
-        setCurrentCap(installedCap.capData);
-        return installedCap.capData;
-      }
-    },
-    [capKit, isLoading, installedCaps],
-  );
+    if (!installedCap) {
+      const capData = await downloadCapByID(capId);
+      addInstalledCap({
+        cid: capCid,
+        capData,
+        version,
+        stats: {
+          ...stats,
+          downloads: stats.downloads + 1,
+        },
+        isFavorite: false,
+        lastUsedAt: Date.now(),
+      });
+      setCurrentCap(capData);
+    } else {
+      updateInstalledCap(capId, {
+        lastUsedAt: Date.now(),
+      });
+      setCurrentCap(installedCap.capData);
+      return installedCap.capData;
+    }
+  }, [capKit, isLoading, installedCaps]);
 
   const getRecentCaps = () => {
     return Object.values(installedCaps)
@@ -172,5 +208,7 @@ export const useCapStore = () => {
     isCapFavorite,
     isLoading,
     error,
+    rateCap,
+    fetchFavoriteStatus,
   };
 };

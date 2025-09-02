@@ -10,6 +10,7 @@ export type RemoteCap = CapID & {
 export type InstalledCap = {
   cid: string;
   capData: Cap;
+  version: string;
   isFavorite: boolean;
   stats: CapStats;
   lastUsedAt: number | null;
