@@ -1,13 +1,10 @@
 import { useChatContext } from '../contexts/chat-context';
 
 export const useCapUIRender = () => {
-  const { append } = useChatContext();
+  const { sendMessage } = useChatContext();
 
   const handleSendPrompt = (prompt: string) => {
-    append({
-      role: 'user',
-      content: prompt,
-    });
+    sendMessage({ text: prompt });
   };
 
   // TODO: Implement add selection

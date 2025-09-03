@@ -1,4 +1,4 @@
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import type { Cap } from '@/shared/types';
 
 export type ChatPaymentType = 'generate-title' | 'chat-message';
@@ -16,7 +16,7 @@ export interface ChatSession {
   title: string;
   createdAt: number;
   updatedAt: number;
-  messages: Message[];
+  messages: UIMessage[];
   payments: ChatPayment[];
   caps: Cap[];
   pinned?: boolean;

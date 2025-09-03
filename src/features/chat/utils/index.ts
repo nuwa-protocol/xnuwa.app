@@ -1,3 +1,2 @@
-export * from './error-process';
-export * from './get-error-message';
+export * from './handl-error';
 export * from './ui-message';

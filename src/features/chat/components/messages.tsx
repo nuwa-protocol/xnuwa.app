@@ -9,15 +9,8 @@ interface MessagesProps {
 }
 
 function PureMessages({ isReadonly }: MessagesProps) {
-  const { chatId, status, messages, setMessages, reload } = useChatContext();
-  const [hasSentMessage, setHasSentMessage] = useState(false);
+  const { chatId, status, messages, setMessages, regenerate } = useChatContext();
   const [userMessagesHeight, setUserMessagesHeight] = useState(0);
-
-  useEffect(() => {
-    if (status === 'submitted') {
-      setHasSentMessage(true);
-    }
-  }, [status]);
 
   // when messages update, recalculate the height of the last user message
   useEffect(() => {
@@ -70,7 +63,7 @@ function PureMessages({ isReadonly }: MessagesProps) {
             message.parts?.some((part) => part.type === 'reasoning') &&
             !message.parts?.some((part) => part.type === 'text');
 
-          const shouldPushToTop = hasSentMessage && index === messages.length - 1;
+          const shouldPushToTop = status === 'submitted' && index === messages.length - 1;
           const minHeight = getMessageMinHeight(shouldPushToTop, message.role);
 
           return (
@@ -81,16 +74,34 @@ function PureMessages({ isReadonly }: MessagesProps) {
               isStreaming={isStreaming}
               isStreamingReasoning={isStreamingReasoning}
               setMessages={setMessages}
-              reload={reload}
+              regenerate={regenerate}
               isReadonly={isReadonly}
               minHeight={minHeight}
             />
           );
         })}
 
-        {status === 'submitted' &&
-          messages.length > 0 &&
-          messages[messages.length - 1].role === 'user' && <Loader minHeight={getLoaderMinHeight()} />}
+        {/* Show loader from user message submission until AI outputs meaningful content */}
+        {(() => {
+          // Show loader during submission
+          if (status === 'submitted' && messages.length > 0 && messages[messages.length - 1].role === 'user') {
+            return true;
+          }
+
+          // Show loader during streaming if AI hasn't started outputting text/reasoning yet
+          if (status === 'streaming' && messages.length >= 2) {
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessage.role === 'assistant') {
+              // Hide loader once AI starts outputting meaningful content
+              const hasTextOrReasoning = lastMessage.parts?.some(part =>
+                (part.type === 'text' && part.text?.trim()) || part.type === 'reasoning'
+              );
+              return !hasTextOrReasoning;
+            }
+          }
+
+          return false;
+        })() && <Loader minHeight={getLoaderMinHeight()} />}
         <ConversationScrollButton />
       </ConversationContent>
     </Conversation>

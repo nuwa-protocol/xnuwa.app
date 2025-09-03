@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion';
-import { memo } from 'react';
 import { generateUUID } from '@/shared/utils';
 
-export const Loader = memo(({ minHeight }: { minHeight: string }) => {
+export const Loader = ({ minHeight }: { minHeight: string }) => {
 
     return (
         <motion.div
@@ -37,4 +36,4 @@ export const Loader = memo(({ minHeight }: { minHeight: string }) => {
             </div>
         </motion.div>
     );
-});
+};

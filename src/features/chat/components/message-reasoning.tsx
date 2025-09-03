@@ -190,7 +190,7 @@ export const MessageReasoning = ({
   content,
 }: MessageReasoningProps) => {
   return (
-    <AIReasoning className="w-full" isStreaming={isStreaming}>
+    <AIReasoning className="w-full mb-0" isStreaming={isStreaming}>
       <AIReasoningTrigger />
       <AIReasoningContent>{content}</AIReasoningContent>
     </AIReasoning>

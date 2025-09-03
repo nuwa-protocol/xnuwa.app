@@ -250,7 +250,9 @@ export const CapUIRenderer = ({
           connectToPenpal();
           connectToMCP();
         }}
-        onErrorCapture={console.log}
+        onErrorCapture={(error) => {
+          console.error('UI Renderer Error', error);
+        }}
       />
     </div>
   );

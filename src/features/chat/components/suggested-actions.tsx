@@ -1,14 +1,14 @@
-import type { UseChatHelpers } from '@ai-sdk/react';
+import type { useChat } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { Button } from '@/shared/components/ui';
 import { useSuggestedActions } from '../hooks/use-suggested-actions';
 
 interface SuggestedActionsProps {
-  append: UseChatHelpers['append'];
+  sendMessage: ReturnType<typeof useChat>['sendMessage'];
 }
 
-function PureSuggestedActions({ append }: SuggestedActionsProps) {
+function PureSuggestedActions({ sendMessage }: SuggestedActionsProps) {
   const suggestedActions = useSuggestedActions();
 
   return (
@@ -27,10 +27,7 @@ function PureSuggestedActions({ append }: SuggestedActionsProps) {
           <Button
             variant="ghost"
             onClick={async () => {
-              append({
-                role: 'user',
-                content: suggestedAction.action,
-              });
+              sendMessage({ text: suggestedAction.action });
             }}
             className="text-xs whitespace-nowrap border rounded-xl px-3 py-2 flex-shrink-0"
           >

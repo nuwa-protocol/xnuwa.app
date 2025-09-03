@@ -41,13 +41,13 @@ class GlobalMCPManager {
     const mcpServers = cap.core.mcpServers || {};
 
     // Initialize all MCP clients
-    for (const [serverName, serverConfig] of Object.entries(mcpServers)) {
+    for (const [serverName, server] of Object.entries(mcpServers)) {
       try {
-        const client = await createNuwaMCPClient(serverConfig.url);
+        const client = await createNuwaMCPClient(server);
         clients.set(serverName, client);
       } catch (error) {
         throw new Error(
-          `Failed to connect to MCP server ${serverName} at ${serverConfig.url}: ${error}`,
+          `Failed to connect to MCP server ${serverName} at ${server}: ${error}`,
         );
       }
     }

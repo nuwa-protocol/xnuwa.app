@@ -1,4 +1,4 @@
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import { CopyIcon } from 'lucide-react';
 import { memo } from 'react';
 import { toast } from 'sonner';
@@ -15,7 +15,7 @@ export function PureMessageActions({
   message,
   isStreaming,
 }: {
-  message: Message;
+  message: UIMessage;
   isStreaming: boolean;
 }) {
   const [_, copyToClipboard] = useCopyToClipboard();

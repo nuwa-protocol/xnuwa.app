@@ -1,5 +1,5 @@
 import type { UseChatHelpers } from '@ai-sdk/react';
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import {
   type Dispatch,
   type SetStateAction,
@@ -13,10 +13,10 @@ import { useChatSessions } from '../hooks/use-chat-sessions';
 
 export type MessageEditorProps = {
   chatId: string;
-  message: Message;
+  message: UIMessage;
   setMode: Dispatch<SetStateAction<'view' | 'edit'>>;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  regenerate: UseChatHelpers<UIMessage>['regenerate'];
 };
 
 export function MessageEditor({
@@ -24,10 +24,10 @@ export function MessageEditor({
   message,
   setMode,
   setMessages,
-  reload,
+  regenerate,
 }: MessageEditorProps) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [draftContent, setDraftContent] = useState<string>(message.content);
+  const [draftContent, setDraftContent] = useState<string>(message.parts.find((part) => part.type === 'text')?.text ?? '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { deleteMessagesAfterId } = useChatSessions();
@@ -101,13 +101,17 @@ export function MessageEditor({
 
             await deleteMessagesAfterId(chatId, message.id, {
               id: message.id,
-              content: draftContent,
               role: message.role,
-              parts: [{ type: 'text', text: draftContent }],
+              parts: message.parts.map((part) => {
+                if (part.type === 'text') {
+                  return { ...part, text: draftContent };
+                }
+                return part;
+              }),
             });
 
             setMode('view');
-            reload();
+            regenerate();
           }}
         >
           {isSubmitting ? 'Sending...' : 'Send'}

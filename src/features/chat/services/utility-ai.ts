@@ -1,4 +1,4 @@
-import { generateText, type Message } from 'ai';
+import { generateText, type UIMessage } from 'ai';
 import { generateUUID } from '@/shared/utils';
 import { ChatStateStore } from '../stores';
 import { llmProvider } from './providers';
@@ -10,7 +10,7 @@ export async function generateTitleFromUserMessage({
   message,
 }: {
   chatId: string;
-  message: Message;
+  message: UIMessage;
 }) {
   const { addPaymentCtxIdToChatSession } = ChatStateStore.getState();
 

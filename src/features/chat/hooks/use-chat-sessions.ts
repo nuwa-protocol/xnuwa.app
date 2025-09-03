@@ -1,4 +1,4 @@
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import { useCallback } from 'react';
 import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { ChatStateStore } from '../stores';
@@ -36,7 +36,7 @@ export const useChatSessions = () => {
   const deleteMessagesAfterId = async (
     chatId: string,
     messageId: string,
-    lastMessage?: Message,
+    lastMessage?: UIMessage,
   ) => {
     const currentSession = store.getChatSession(chatId);
     if (!currentSession) return;

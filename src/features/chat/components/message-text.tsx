@@ -29,8 +29,8 @@ interface MessageTextProps {
   part: { type: 'text'; text: string };
   index: number;
   isReadonly: boolean;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  regenerate: UseChatHelpers<UIMessage>['regenerate'];
   onModeChange: (mode: 'view' | 'edit') => void;
 }
 
@@ -41,7 +41,7 @@ export const MessageText = ({
   index,
   isReadonly,
   setMessages,
-  reload,
+  regenerate,
   onModeChange,
 }: MessageTextProps) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
@@ -60,7 +60,7 @@ export const MessageText = ({
     // Delete trailing messages using client store
     await deleteMessagesAfterId(chatId, message.id);
 
-    reload();
+    regenerate();
   };
 
   const handleCopy = () => {
@@ -185,7 +185,7 @@ export const MessageText = ({
             }
           }}
           setMessages={setMessages}
-          reload={reload}
+          regenerate={regenerate}
         />
       </div>
     );

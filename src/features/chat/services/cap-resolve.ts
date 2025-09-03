@@ -1,13 +1,15 @@
-import type { LanguageModelV1 } from '@ai-sdk/provider';
+import { createOpenAI } from '@ai-sdk/openai';
+import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import { GlobalMCPManager } from '@/shared/services/global-mcp-manager';
+import { createPaymentFetch } from '@/shared/services/payment-fetch';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
-import { llmProvider } from './providers';
 
 export class CapResolve {
   private cap: Cap;
   private isCurrentCapMCPError: boolean;
   private hasMCPServers: boolean;
+  private openai: ReturnType<typeof createOpenAI>;
 
   constructor() {
     const { currentCap, isCurrentCapMCPError } = CurrentCapStore.getState();
@@ -17,6 +19,12 @@ export class CapResolve {
     this.cap = currentCap;
     this.isCurrentCapMCPError = isCurrentCapMCPError;
     this.hasMCPServers = Object.keys(this.cap.core.mcpServers).length > 0;
+
+    this.openai = createOpenAI({
+      apiKey: 'NOT-USED',
+      baseURL: LLM_GATEWAY_BASE_URL,
+      fetch: createPaymentFetch(LLM_GATEWAY_BASE_URL),
+    });
   }
 
   private async getUserLocation(): Promise<string> {
@@ -64,10 +72,6 @@ export class CapResolve {
     return await this.resolveVariables(this.cap.core.prompt.value);
   }
 
-  getResolvedModel(): LanguageModelV1 {
-    return llmProvider.chat(this.cap.core.model.modelId);
-  }
-
   async getResolvedTools(): Promise<Record<string, any>> {
     if (this.hasMCPServers && !this.isCurrentCapMCPError) {
       // Make sure MCP is initialized through global manager
@@ -84,7 +88,7 @@ export class CapResolve {
   async getResolvedConfig() {
     return {
       prompt: await this.getResolvedPrompt(),
-      model: this.getResolvedModel(),
+      modelId: this.cap.core.model.modelId,
       tools: await this.getResolvedTools(),
     };
   }

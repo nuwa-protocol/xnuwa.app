@@ -10,6 +10,7 @@ import { cn } from '@/shared/utils';
 import { CodeBlock, CodeBlockCopyButton } from './code-block';
 import 'katex/dist/katex.min.css';
 import hardenReactMarkdown from 'harden-react-markdown';
+import { toast } from 'sonner';
 
 /**
  * Parses markdown text and removes incomplete tokens to prevent partial rendering
@@ -371,8 +372,8 @@ const components: Options['components'] = {
         language={language}
       >
         <CodeBlockCopyButton
-          onCopy={() => console.log('Copied code to clipboard')}
-          onError={() => console.error('Failed to copy code to clipboard')}
+          onCopy={() => toast.success('Copied code to clipboard')}
+          onError={() => toast.error('Failed to copy code to clipboard')}
         />
       </CodeBlock>
     );

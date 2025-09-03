@@ -1,15 +1,22 @@
 import type { UseChatHelpers } from '@ai-sdk/react';
-import type { UIMessage } from 'ai';
+import type { ToolUIPart, UIMessage } from 'ai';
 
 import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
+import {
+  Tool,
+  ToolContent,
+  ToolHeader,
+  ToolInput,
+  ToolOutput,
+} from '@/shared/components/ui/shadcn-io/tool';
 import { cn } from '@/shared/utils';
 import { MessageActions } from './message-actions';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { MessageText } from './message-text';
-import { ToolCall } from './tool-call';
+import { PreviewAttachment } from './preview-attachment';
 import { ToolResult } from './tool-result';
 
 const PurePreviewMessage = ({
@@ -18,7 +25,7 @@ const PurePreviewMessage = ({
   isStreaming,
   isStreamingReasoning,
   setMessages,
-  reload,
+  regenerate,
   isReadonly,
   minHeight,
 }: {
@@ -26,12 +33,16 @@ const PurePreviewMessage = ({
   message: UIMessage;
   isStreaming: boolean;
   isStreamingReasoning: boolean;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  regenerate: UseChatHelpers<UIMessage>['regenerate'];
   isReadonly: boolean;
   minHeight?: string;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
+
+  const attachmentsFromMessage = (message.parts || []).filter(
+    (part) => part.type === 'file',
+  );
 
   return (
     <AnimatePresence>
@@ -57,25 +68,41 @@ const PurePreviewMessage = ({
               minHeight: minHeight,
             }}
           >
-            {/* render reasoning */}
-            {message.parts?.map((part, index) => {
-              if (part.type !== 'reasoning') return null;
-              return (
-                <MessageReasoning
-                  key={`reasoning-${message.id}-${index}`}
-                  isStreaming={isStreamingReasoning}
-                  content={part.reasoning}
-                />
-              );
-            })}
+            {attachmentsFromMessage.length > 0 && (
+              <div
+                data-testid={`message-attachments`}
+                className="flex flex-row gap-2 justify-end"
+              >
+                {attachmentsFromMessage.map((attachment) => (
+                  <PreviewAttachment
+                    key={attachment.url}
+                    attachment={{
+                      name: attachment.filename ?? 'file',
+                      contentType: attachment.mediaType,
+                      url: attachment.url,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
 
-            {/* render text/tool-invocation */}
+            {/* render message parts */}
             {message.parts?.map((part, index) => {
-              const processedTypes = new Set(['reasoning', 'source']);
-              if (processedTypes.has(part.type)) return null;
+              // const processedTypes = new Set(['reasoning', 'source']);
+              // if (processedTypes.has(part.type)) return null;
 
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
+
+              if (type === 'reasoning' && part.text?.trim().length > 0) {
+                return (
+                  <MessageReasoning
+                    key={`reasoning-${message.id}-${index}`}
+                    isStreaming={isStreamingReasoning}
+                    content={part.text}
+                  />
+                );
+              }
 
               if (type === 'text') {
                 return (
@@ -87,43 +114,33 @@ const PurePreviewMessage = ({
                     index={index}
                     isReadonly={isReadonly}
                     setMessages={setMessages}
-                    reload={reload}
+                    regenerate={regenerate}
                     onModeChange={setMode}
                   />
                 );
               }
 
-              if (type === 'tool-invocation') {
-                const { toolInvocation } = part;
-                const { toolName, toolCallId, state } = toolInvocation;
-
-                if (state === 'call') {
-                  const { args } = toolInvocation;
-
-                  return (
-                    <ToolCall
-                      key={toolCallId}
-                      toolName={toolName}
-                      toolCallId={toolCallId}
-                      args={args}
-                    />
-                  );
-                }
-
-                if (state === 'result') {
-                  const { result, args } = toolInvocation;
-
-                  // if it is not, render the plain tool result
-                  return (
-                    <ToolResult
-                      key={toolCallId}
-                      toolName={toolName}
-                      toolCallId={toolCallId}
-                      result={result}
-                      args={args}
-                    />
-                  );
-                }
+              if (type.startsWith('tool-')) {
+                const toolName = type.split('-')[1];
+                const { toolCallId, state, input, output } = part as ToolUIPart;
+                <Tool key={toolCallId} defaultOpen={true}>
+                  <ToolHeader type={`tool-${toolName}`} state={state} />
+                  <ToolContent>
+                    {state === 'input-available' && <ToolInput input={input} />}
+                    {state === 'output-available' && (
+                      <ToolOutput
+                        output={
+                          <ToolResult
+                            toolName={toolName}
+                            result={output}
+                            toolCallId={toolCallId}
+                          />
+                        }
+                        errorText={undefined}
+                      />
+                    )}
+                  </ToolContent>
+                </Tool>;
               }
             })}
 
@@ -131,8 +148,8 @@ const PurePreviewMessage = ({
             {(() => {
               const sources: any[] = [];
               message.parts?.forEach((part) => {
-                if (part.type === 'source') {
-                  sources.push(part.source);
+                if (part.type === 'source-url') {
+                  sources.push(part.url);
                 }
               });
               if (sources.length === 0) return null;
@@ -162,7 +179,12 @@ const PurePreviewMessage = ({
 export const PreviewMessage = memo(
   PurePreviewMessage,
   (prevProps, nextProps) => {
-    if (prevProps.isStreaming !== nextProps.isStreaming) return false;
+    // Always re-render during streaming to show real-time updates
+    if (prevProps.isStreaming || nextProps.isStreaming) {
+      return false;
+    }
+    
+    // For non-streaming messages, use normal memo optimization
     if (prevProps.message.id !== nextProps.message.id) return false;
     if (prevProps.minHeight !== nextProps.minHeight) return false;
     if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;

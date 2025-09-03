@@ -1,4 +1,4 @@
-import { handleAIRequest } from './handler';
+import { StreamAIResponse } from './stream-ai';
 
 export const createClientAIFetch = (): ((
   input: RequestInfo | URL,
@@ -12,7 +12,7 @@ export const createClientAIFetch = (): ((
     const requestBody = JSON.parse(init.body as string);
     const { id: chatId, messages } = requestBody;
 
-    const response = await handleAIRequest({
+    const response = await StreamAIResponse({
       chatId,
       messages,
       signal: init?.signal ?? undefined,

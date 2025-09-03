@@ -39,7 +39,7 @@ export function InlineUISetup({ onInsertPrompt }: InlineUISetupProps) {
       url: '',
       title: '',
       description: '',
-      parameters: [],
+      inputSchema: [],
     },
   ]);
 
@@ -61,7 +61,7 @@ export function InlineUISetup({ onInsertPrompt }: InlineUISetupProps) {
       url: '',
       title: '',
       description: '',
-      parameters: [],
+      inputSchema: [],
     };
     setUrlConfigs([...urlConfigs, newConfig]);
   };
@@ -148,7 +148,7 @@ export function InlineUISetup({ onInsertPrompt }: InlineUISetupProps) {
       title: 'Weather Card',
       description:
         'Displays current weather information for a specific location',
-      parameters: [
+      inputSchema: [
         {
           id: `${Date.now()}-1`,
           key: 'latitude',

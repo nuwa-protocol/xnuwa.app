@@ -1,17 +1,16 @@
 // chat-store.ts
 // Store for managing chat sessions and message history with unified storage
 
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
-import { generateUUID } from '@/shared/utils';
 import type { ChatPayment, ChatSession } from './types';
 
 // ================= Constants ================= //
-export const createInitialChatSession = (): ChatSession => ({
-  id: generateUUID(),
+export const createInitialChatSession = (chatId: string): ChatSession => ({
+  id: chatId,
   title: 'New Chat',
   createdAt: Date.now(),
   updatedAt: Date.now(),
@@ -48,7 +47,7 @@ interface ChatStoreState {
   deleteSession: (id: string) => void;
 
   // update messages for a session and create a new session if not founds
-  updateMessages: (chatId: string, messages: Message[]) => Promise<void>;
+  updateMessages: (chatId: string, messages: UIMessage[]) => Promise<void>;
 
   // utility methods
   clearAllSessions: () => void;
@@ -196,7 +195,7 @@ export const ChatStateStore = create<ChatStoreState>()(
         deleteFromDB();
       },
 
-      updateMessages: async (chatId: string, messages: Message[]) => {
+      updateMessages: async (chatId: string, messages: UIMessage[]) => {
         set((state) => {
           let session = state.sessions[chatId];
           let isNewSession = false;

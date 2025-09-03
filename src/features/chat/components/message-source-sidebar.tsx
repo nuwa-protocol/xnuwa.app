@@ -11,11 +11,7 @@ import type { UrlMetadata } from '../types';
 import { SourceCard } from './source-card';
 
 interface MessageSourceSidebarProps {
-  sources: Array<{
-    id?: string;
-    title?: string;
-    url?: string;
-  }>;
+  sources: string[];
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -37,11 +33,7 @@ export const MessageSourceSidebar = ({
     const fetchMetadata = async () => {
       setLoading(true);
       try {
-        const urls = sources
-          .map((source) => source.url)
-          .filter((url): url is string =>
-            Boolean(url && url.startsWith('http')),
-          );
+        const urls = sources;
 
         if (urls.length === 0) {
           setLoading(false);
@@ -98,12 +90,12 @@ export const MessageSourceSidebar = ({
 
         <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-8rem)]">
           {sources.map((source, index) => {
-            const url = source.url || '';
+            const url = source || '';
             const metadata = url ? metadataMap[url] : null;
 
             return (
               <SourceCard
-                key={`source-${index}-${source.id || 'unknown'}`}
+                key={`source-${index}-${source}`}
                 source={source}
                 metadata={metadata}
                 loading={loading}

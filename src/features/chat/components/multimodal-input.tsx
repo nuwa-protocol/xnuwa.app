@@ -1,18 +1,9 @@
 import type { UseChatHelpers } from '@ai-sdk/react';
-import type { Attachment } from 'ai';
+import type { UIMessage } from 'ai';
 import cx from 'classnames';
-import equal from 'fast-deep-equal';
 import { ArrowUpIcon, PaperclipIcon, StopCircleIcon } from 'lucide-react';
 import type React from 'react';
-import {
-  type Dispatch,
-  memo,
-  type SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
@@ -25,31 +16,21 @@ import { useChatContext } from '../contexts/chat-context';
 import { useUpdateMessages } from '../hooks/use-update-messages';
 import { SuggestedActions } from './suggested-actions';
 
-function PureMultimodalInput({
-  attachments,
-  setAttachments,
-  className,
-}: {
-  attachments: Array<Attachment>;
-  setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
-  className?: string;
-}) {
+function PureMultimodalInput({ className }: { className?: string }) {
   const {
     chatId,
-    input,
-    setInput,
     status,
     stop,
     messages,
     setMessages,
-    append,
-    handleSubmit,
+    sendMessage,
   } = useChatContext();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
   const isDevMode = useDevMode();
   const { currentCap, isCurrentCapMCPInitialized, isCurrentCapMCPError } =
     useCurrentCap();
+  const [input, setInput] = useState('');
 
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
     'input',
@@ -77,6 +58,14 @@ function PureMultimodalInput({
       textareaRef.current.focus();
     }
   }, [chatId, width]);
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (input.trim()) {
+      sendMessage({ text: input });
+      setInput('');
+    }
+  };
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
@@ -122,8 +111,7 @@ function PureMultimodalInput({
 
   return (
     <div className="relative w-full flex flex-col gap-4">
-
-      {messages.length === 0 && <SuggestedActions append={append} />}
+      {messages.length === 0 && <SuggestedActions sendMessage={sendMessage} />}
 
       <div
         className={cx(
@@ -197,20 +185,14 @@ function PureMultimodalInput({
   );
 }
 
-export const MultimodalInput = memo(
-  PureMultimodalInput,
-  (prevProps, nextProps) => {
-    if (!equal(prevProps.attachments, nextProps.attachments)) return false;
-    return true;
-  },
-);
+export const MultimodalInput = PureMultimodalInput;
 
 function PureAttachmentsButton({
   fileInputRef,
   status,
 }: {
   fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
-  status: UseChatHelpers['status'];
+  status: UseChatHelpers<UIMessage>['status'];
 }) {
   return (
     <Button
@@ -236,7 +218,7 @@ function PureStopButton({
   chatId,
 }: {
   stop: () => void;
-  setMessages: UseChatHelpers['setMessages'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
   chatId: string;
 }) {
   const updateMessages = useUpdateMessages();
