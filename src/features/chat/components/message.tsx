@@ -1,4 +1,4 @@
-import type { UseChatHelpers } from '@ai-sdk/react';
+import { useChat } from '@ai-sdk/react';
 import type { ToolUIPart, UIMessage } from 'ai';
 
 import equal from 'fast-deep-equal';
@@ -12,6 +12,7 @@ import {
   ToolOutput,
 } from '@/shared/components/ui/shadcn-io/tool';
 import { cn } from '@/shared/utils';
+import { useChatContext } from '../contexts/chat-context';
 import { MessageActions } from './message-actions';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
@@ -20,29 +21,52 @@ import { PreviewAttachment } from './preview-attachment';
 import { ToolResult } from './tool-result';
 
 const PurePreviewMessage = ({
-  chatId,
+  index,
   message,
-  isStreaming,
-  isStreamingReasoning,
-  setMessages,
-  regenerate,
   isReadonly,
-  minHeight,
+  userMessagesHeight,
 }: {
-  chatId: string;
+  index: number;
   message: UIMessage;
-  isStreaming: boolean;
-  isStreamingReasoning: boolean;
-  setMessages: UseChatHelpers<UIMessage>['setMessages'];
-  regenerate: UseChatHelpers<UIMessage>['regenerate'];
   isReadonly: boolean;
-  minHeight?: string;
+  userMessagesHeight: number;
 }) => {
+  const { chat } = useChatContext();
+  const { messages, status, setMessages, regenerate } = useChat({ chat });
+
   const [mode, setMode] = useState<'view' | 'edit'>('view');
+
 
   const attachmentsFromMessage = (message.parts || []).filter(
     (part) => part.type === 'file',
   );
+
+
+
+  // calculate the minimum height of the message
+  const getMessageMinHeight = (shouldPushToTop: boolean, role: string) => {
+    if (shouldPushToTop && role === 'assistant') {
+      const headerHeight = 196;
+      const calculatedMinHeight = Math.max(
+        0,
+        window.innerHeight - headerHeight - userMessagesHeight,
+      );
+      return calculatedMinHeight > 0 ? `${calculatedMinHeight}px` : undefined;
+    }
+    return undefined;
+  };
+
+  const isStreaming =
+    status === 'streaming' && messages.length - 1 === index;
+  const isStreamingReasoning =
+    isStreaming &&
+    message.role === 'assistant' &&
+    message.parts?.some((part) => part.type === 'reasoning') &&
+    !message.parts?.some((part) => part.type === 'text');
+
+  const shouldPushToTop = status === 'submitted' && index === messages.length - 1;
+  const minHeight = getMessageMinHeight(shouldPushToTop, message.role);
+
 
   return (
     <AnimatePresence>
@@ -86,6 +110,24 @@ const PurePreviewMessage = ({
               </div>
             )}
 
+            {/* render source */}
+            {(() => {
+              const sources: any[] = [];
+              message.parts?.forEach((part) => {
+                if (part.type === 'source-url') {
+                  sources.push(part.url);
+                }
+              });
+              if (sources.length === 0) return null;
+              return (
+                <MessageSource
+                  key={`sources-${message.id}`}
+                  sources={sources}
+                  className="mb-2"
+                />
+              );
+            })()}
+
             {/* render message parts */}
             {message.parts?.map((part, index) => {
               // const processedTypes = new Set(['reasoning', 'source']);
@@ -108,7 +150,7 @@ const PurePreviewMessage = ({
                 return (
                   <MessageText
                     key={key}
-                    chatId={chatId}
+                    chatId={chat.id}
                     message={message}
                     part={part}
                     index={index}
@@ -144,23 +186,7 @@ const PurePreviewMessage = ({
               }
             })}
 
-            {/* render source */}
-            {(() => {
-              const sources: any[] = [];
-              message.parts?.forEach((part) => {
-                if (part.type === 'source-url') {
-                  sources.push(part.url);
-                }
-              });
-              if (sources.length === 0) return null;
-              return (
-                <MessageSource
-                  key={`sources-${message.id}`}
-                  sources={sources}
-                  className="mb-2"
-                />
-              );
-            })()}
+
 
             {!isReadonly && (
               <MessageActions
@@ -179,14 +205,8 @@ const PurePreviewMessage = ({
 export const PreviewMessage = memo(
   PurePreviewMessage,
   (prevProps, nextProps) => {
-    // Always re-render during streaming to show real-time updates
-    if (prevProps.isStreaming || nextProps.isStreaming) {
-      return false;
-    }
-    
     // For non-streaming messages, use normal memo optimization
     if (prevProps.message.id !== nextProps.message.id) return false;
-    if (prevProps.minHeight !== nextProps.minHeight) return false;
     if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
 
     return true;

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod/v3';
+import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import { useAuth } from '@/shared/hooks';
 import {
   CapCoreSchema,
@@ -50,7 +51,8 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
           suggestions: editingCap?.capData.core.prompt.suggestions || [],
         },
         model: {
-          gatewayUrl: editingCap?.capData.core.model.gatewayUrl || '',
+          gatewayUrl:
+            editingCap?.capData.core.model.gatewayUrl || LLM_GATEWAY_BASE_URL,
           modelId: editingCap?.capData.core.model.modelId || '',
           parameters: editingCap?.capData.core.model.parameters || {},
           supportedInputs: editingCap?.capData.core.model.supportedInputs || [

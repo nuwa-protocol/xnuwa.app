@@ -1,3 +1,4 @@
+import { useChat } from '@ai-sdk/react';
 import { memo, useEffect, useState } from 'react';
 import { useChatContext } from '../contexts/chat-context';
 import { Conversation, ConversationContent, ConversationScrollButton } from './conversation';
@@ -9,7 +10,8 @@ interface MessagesProps {
 }
 
 function PureMessages({ isReadonly }: MessagesProps) {
-  const { chatId, status, messages, setMessages, regenerate } = useChatContext();
+  const { chat } = useChatContext();
+  const { messages, status, setMessages, regenerate } = useChat({ chat });
   const [userMessagesHeight, setUserMessagesHeight] = useState(0);
 
   // when messages update, recalculate the height of the last user message
@@ -32,19 +34,6 @@ function PureMessages({ isReadonly }: MessagesProps) {
     return () => clearTimeout(timer);
   }, [messages]);
 
-  // calculate the minimum height of the message
-  const getMessageMinHeight = (shouldPushToTop: boolean, role: string) => {
-    if (shouldPushToTop && role === 'assistant') {
-      const headerHeight = 196;
-      const calculatedMinHeight = Math.max(
-        0,
-        window.innerHeight - headerHeight - userMessagesHeight,
-      );
-      return calculatedMinHeight > 0 ? `${calculatedMinHeight}px` : undefined;
-    }
-    return undefined;
-  };
-
   const getLoaderMinHeight = () => {
     const headerHeight = 196;
     const calculatedMinHeight = Math.max(0, window.innerHeight - headerHeight - userMessagesHeight);
@@ -55,28 +44,14 @@ function PureMessages({ isReadonly }: MessagesProps) {
     <Conversation>
       <ConversationContent>
         {messages.map((message, index) => {
-          const isStreaming =
-            status === 'streaming' && messages.length - 1 === index;
-          const isStreamingReasoning =
-            isStreaming &&
-            message.role === 'assistant' &&
-            message.parts?.some((part) => part.type === 'reasoning') &&
-            !message.parts?.some((part) => part.type === 'text');
-
-          const shouldPushToTop = status === 'submitted' && index === messages.length - 1;
-          const minHeight = getMessageMinHeight(shouldPushToTop, message.role);
 
           return (
             <PreviewMessage
               key={message.id}
-              chatId={chatId}
+              index={index}
               message={message}
-              isStreaming={isStreaming}
-              isStreamingReasoning={isStreamingReasoning}
-              setMessages={setMessages}
-              regenerate={regenerate}
               isReadonly={isReadonly}
-              minHeight={minHeight}
+              userMessagesHeight={userMessagesHeight}
             />
           );
         })}

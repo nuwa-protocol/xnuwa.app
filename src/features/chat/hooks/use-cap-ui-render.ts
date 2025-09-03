@@ -1,7 +1,9 @@
+import { useChat } from '@ai-sdk/react';
 import { useChatContext } from '../contexts/chat-context';
 
 export const useCapUIRender = () => {
-  const { sendMessage } = useChatContext();
+  const { chat } = useChatContext();
+  const { sendMessage } = useChat({ chat });
 
   const handleSendPrompt = (prompt: string) => {
     sendMessage({ text: prompt });

@@ -1,9 +1,11 @@
 import type { UseChatHelpers } from '@ai-sdk/react';
+import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import cx from 'classnames';
 import { ArrowUpIcon, PaperclipIcon, StopCircleIcon } from 'lucide-react';
 import type React from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
@@ -17,21 +19,17 @@ import { useUpdateMessages } from '../hooks/use-update-messages';
 import { SuggestedActions } from './suggested-actions';
 
 function PureMultimodalInput({ className }: { className?: string }) {
-  const {
-    chatId,
-    status,
-    stop,
-    messages,
-    setMessages,
-    sendMessage,
-  } = useChatContext();
+  const { chat } = useChatContext();
+  const { messages, status, stop, setMessages, sendMessage } = useChat({
+    chat,
+  });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
   const isDevMode = useDevMode();
   const { currentCap, isCurrentCapMCPInitialized, isCurrentCapMCPError } =
     useCurrentCap();
   const [input, setInput] = useState('');
-
+  const navigate = useNavigate();
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
     'input',
     '',
@@ -57,13 +55,15 @@ function PureMultimodalInput({ className }: { className?: string }) {
     if (textareaRef.current && width && width > 768) {
       textareaRef.current.focus();
     }
-  }, [chatId, width]);
+  }, [chat.id, width]);
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (input.trim()) {
       sendMessage({ text: input });
       setInput('');
+      console.log('send message and navigate')
+      navigate(`/chat?cid=${chat.id}`, { replace: true });
     }
   };
 
@@ -166,7 +166,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
               <StopButton
                 stop={stop}
                 setMessages={setMessages}
-                chatId={chatId}
+                chatId={chat.id}
               />
             ) : (
               <SendButton
