@@ -1,4 +1,4 @@
-import { Clock, Loader2, MoreHorizontal, Share, Star } from 'lucide-react';
+import { Clock, Download, Heart, Loader2, MoreHorizontal, Share, Star } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import {
   Card,
@@ -9,15 +9,15 @@ import {
 } from '@/shared/components/ui';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import { APP_URL } from '@/shared/config/app';
-import type { Cap } from '@/shared/types/cap';
 import { useCapStore } from '../hooks/use-cap-store';
 import { useRemoteCap } from '../hooks/use-remote-cap';
-import type { RemoteCap } from '../types';
+import type { InstalledCap, RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
 import { useCapStoreModal } from './cap-store-modal-context';
+import { StarRating } from './star-rating';
 
 export interface CapCardProps {
-  cap: Cap | RemoteCap;
+  cap: InstalledCap | RemoteCap;
 }
 
 export function CapCard({ cap }: CapCardProps) {
@@ -58,15 +58,16 @@ export function CapCard({ cap }: CapCardProps) {
     return () => window.removeEventListener('resize', recomputeClamp);
   }, [cap]);
 
-  const handleCapClick = async (cap: Cap | RemoteCap) => {
-    const installedCap = installedCaps[cap.id];
+  const handleCapClick = async (cap: InstalledCap | RemoteCap) => {
+    const id = 'metadata' in cap ? cap.id : cap.capData.id;
+    const installedCap = installedCaps[id];
     if (installedCap) {
       setSelectedCap(installedCap);
     } else {
-      if ('cid' in cap) {
+      if ('id' in cap) {
         setIsLoading(true);
         try {
-          const downloadedCap = await downloadCap(cap);
+          const downloadedCap = await downloadCap(cap as RemoteCap);
           setSelectedCap(downloadedCap);
         } finally {
           setIsLoading(false);
@@ -75,23 +76,23 @@ export function CapCard({ cap }: CapCardProps) {
     }
   };
 
-  const getCapActions = (cap: Cap | RemoteCap) => {
+  const getCapActions = (cap: InstalledCap | RemoteCap) => {
     const actions = [];
 
-    const isRemoteCap = 'cid' in cap;
+    const isRemoteCap = 'id' in cap;
+    const id = isRemoteCap ? cap.id : cap.capData.id;
 
-    if (isCapFavorite(cap.id)) {
+    if (isCapFavorite(id)) {
       actions.push({
         icon: <Star className="size-4" />,
         label: 'Remove from Favorites',
-        onClick: () => removeCapFromFavorite(cap.id),
+        onClick: () => removeCapFromFavorite(id),
       });
     } else {
       actions.push({
         icon: <Star className="size-4" />,
         label: 'Add to Favorites',
-        onClick: () =>
-          addCapToFavorite(cap.id, isRemoteCap ? cap.cid : undefined),
+        onClick: () => addCapToFavorite(id, cap.version, cap.cid, cap.stats)
       });
     }
 
@@ -99,7 +100,7 @@ export function CapCard({ cap }: CapCardProps) {
       actions.push({
         icon: <Clock className="size-4" />,
         label: 'Remove from Recents',
-        onClick: () => removeCapFromRecents(cap.id),
+        onClick: () => removeCapFromRecents(id),
       });
     }
 
@@ -112,7 +113,8 @@ export function CapCard({ cap }: CapCardProps) {
     return actions;
   };
 
-  const capMetadata = cap.metadata;
+  const capMetadata = 'metadata' in cap ? cap.metadata : cap.capData.metadata;
+  const capStats = 'stats' in cap ? cap.stats : null;
 
   const actions = getCapActions(cap);
 
@@ -146,6 +148,24 @@ export function CapCard({ cap }: CapCardProps) {
             >
               {capMetadata.description}
             </p>
+          ) : null}
+          {capStats ? (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2">
+              <div className="flex items-center gap-1">
+                <Download className="size-3" />
+                <span>{capStats.downloads}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Heart className="size-3" />
+                <span>{capStats.favorites}</span>
+              </div>
+              <StarRating
+                averageRating={capStats.averageRating}
+                userRating={capStats.userRating}
+                ratingCount={capStats.ratingCount}
+                size={14}
+              />
+            </div>
           ) : null}
         </div>
         {isLoading ? (
@@ -186,7 +206,7 @@ export function CapCard({ cap }: CapCardProps) {
                 {
                   id: 'cap-link',
                   label: 'Cap Link',
-                  url: `${APP_URL}/chat?capid=${cap.id}`,
+                  url: `${APP_URL}/chat?capid=${'id' in cap ? cap.id : cap.capData.id}`,
                 },
               ]}
             />

@@ -13,6 +13,8 @@ export interface UseRemoteCapParams {
   tags?: string[];
   page?: number;
   size?: number;
+  sortBy?: 'average_rating' | 'downloads' | 'favorites' | 'rating_count' | 'updated_at',
+  sortOrder?: 'asc' | 'desc'
 }
 
 // ================= Interfaces ================= //
@@ -89,6 +91,14 @@ export const CapStateStore = create<CapStoreState>()(
         [defaultCap.id]: {
           cid: defaultCap.id,
           capData: defaultCap,
+          stats: {
+            capId: defaultCap.id,
+            downloads: 0,
+            ratingCount: 0,
+            averageRating: 0,
+            favorites: 0,
+          },
+          version: '0',
           isFavorite: false,
           lastUsedAt: null,
         },
@@ -117,6 +127,8 @@ export const CapStateStore = create<CapStoreState>()(
             [cap.capData.id]: {
               cid: cap.cid,
               capData: cap.capData,
+              version: cap.version,
+              stats: cap.stats,
               isFavorite: cap.isFavorite,
               lastUsedAt: cap.lastUsedAt,
             },
@@ -218,6 +230,8 @@ export const CapStateStore = create<CapStoreState>()(
             installedCapsMap[id] = {
               cid: capData.cid,
               capData: capData.capData,
+              version: capData.version,
+              stats: capData.stats,
               isFavorite: capData.isFavorite,
               lastUsedAt: capData.lastUsedAt,
             };

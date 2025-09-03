@@ -8,6 +8,8 @@ export type {
   CapModel,
   CapPrompt,
   CapThumbnail,
+  ResultCap,
+  CapStats
 } from '@nuwa-ai/cap-kit';
 
 // re-export schemas from @nuwa-ai/cap-kit
@@ -21,3 +23,4 @@ export {
   CapSchema,
   CapThumbnailSchema,
 } from '@nuwa-ai/cap-kit';
+

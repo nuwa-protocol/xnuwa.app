@@ -24,6 +24,10 @@ export function CapAvatar({
 
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
+  console.log(capName)
+  if (capName === undefined) {
+    console.log('hahahh')
+  }
 
   return (
     <Avatar
