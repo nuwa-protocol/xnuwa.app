@@ -28,7 +28,7 @@ export const CapModelSchema = z.object({
     .refine((id) => id.length > 0, 'Model ID is required'),
   parameters: z.record(z.string(), z.any()).optional(),
   supportedInputs: z
-    .array(z.enum(['text', 'image', 'pdf', 'audio']))
+    .array(z.enum(['text', 'image', 'file', 'audio']))
     .min(1)
     .refine((inputs) => inputs.includes('text'), 'text input is required'),
   modelType: z.enum([

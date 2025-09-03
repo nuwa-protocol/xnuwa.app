@@ -1,7 +1,7 @@
 import type { LanguageModelV1 } from '@ai-sdk/provider';
 import { GlobalMCPManager } from '@/shared/services/global-mcp-manager';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import type { Cap } from '@/shared/types/cap';
+import type { Cap } from '@/shared/types';
 import { llmProvider } from './providers';
 
 export class CapResolve {
@@ -65,7 +65,7 @@ export class CapResolve {
   }
 
   getResolvedModel(): LanguageModelV1 {
-    return llmProvider.chat(this.cap.core.model.id);
+    return llmProvider.chat(this.cap.core.model.modelId);
   }
 
   async getResolvedTools(): Promise<Record<string, any>> {

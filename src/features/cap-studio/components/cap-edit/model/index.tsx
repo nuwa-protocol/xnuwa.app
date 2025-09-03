@@ -1,4 +1,3 @@
-import { CheckCircle2 } from 'lucide-react';
 import React, { useId, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import type { ModelDetails } from '@/features/cap-studio/components/cap-edit/model/model-selector/type';
@@ -27,7 +26,7 @@ import {
   Separator,
   Textarea,
 } from '@/shared/components/ui';
-import { LLM_GATEWAY } from '@/shared/config/llm-gateway';
+import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import { ModelSelectorDialog } from './model-selector';
 
 interface ModelTabProps {
@@ -39,7 +38,7 @@ export function ModelTab({ form }: ModelTabProps) {
   const customGatewayId = useId();
   const parametersConfigId = useId();
   const customParametersId = useId();
-  
+
   const gatewayUrl = form.watch('core.model.gatewayUrl');
   const modelId = form.watch('core.model.modelId');
   const parameters = form.watch('core.model.parameters') || {};
@@ -47,11 +46,11 @@ export function ModelTab({ form }: ModelTabProps) {
   const modelType = form.watch('core.model.modelType');
 
   // Initialize states based on form data
-  const initialGatewayType = gatewayUrl === LLM_GATEWAY ? 'nuwa' : 'custom';
+  const initialGatewayType = gatewayUrl === LLM_GATEWAY_BASE_URL ? 'nuwa' : 'custom';
   // For custom gateway, confirm if we have any model configuration (not just modelId)
   const hasModelConfig = modelId || modelType || (supportedInputs && supportedInputs.length > 0);
-  const initialIsConfirmed = gatewayUrl ? (gatewayUrl === LLM_GATEWAY ? true : !!hasModelConfig) : false;
-  
+  const initialIsConfirmed = gatewayUrl ? (gatewayUrl === LLM_GATEWAY_BASE_URL ? true : !!hasModelConfig) : false;
+
   const [isGatewayConfirmed, setIsGatewayConfirmed] = useState(initialIsConfirmed);
   const [isValidatingGateway, setIsValidatingGateway] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ModelDetails | null>(null);
@@ -59,17 +58,9 @@ export function ModelTab({ form }: ModelTabProps) {
   const [jsonError, setJsonError] = useState<string>('');
   const [gatewayType, setGatewayType] = useState<'nuwa' | 'custom'>(initialGatewayType);
 
-  console.log('gatewayUrl', gatewayUrl);
-  console.log('modelId', modelId);
-  console.log('parameters', parameters);
-  console.log('supportedInputs', supportedInputs);
-  console.log('modelType', modelType);
-  console.log('gatewayType', gatewayType);
-  console.log('isGatewayConfirmed', isGatewayConfirmed);
-
   const handleGatewayTypeChange = (field: any, type: 'nuwa' | 'custom') => {
     if (type === 'nuwa') {
-      field.onChange(LLM_GATEWAY);
+      field.onChange(LLM_GATEWAY_BASE_URL);
       setGatewayType('nuwa');
     } else {
       // Set a default URL for custom gateway to avoid immediate validation errors
@@ -85,7 +76,7 @@ export function ModelTab({ form }: ModelTabProps) {
     setIsGatewayConfirmed(false);
   };
 
-  const handleConfirmGateway = async () => {
+  const handleTestGateway = async () => {
     if (gatewayType === 'custom') {
       setIsValidatingGateway(true);
       try {
@@ -176,7 +167,7 @@ export function ModelTab({ form }: ModelTabProps) {
   // Initialize states based on existing data
   React.useEffect(() => {
     if (gatewayUrl) {
-      if (gatewayUrl === LLM_GATEWAY) {
+      if (gatewayUrl === LLM_GATEWAY_BASE_URL) {
         if (gatewayType !== 'nuwa') {
           setGatewayType('nuwa');
         }
@@ -281,7 +272,7 @@ export function ModelTab({ form }: ModelTabProps) {
                           <p className="text-sm text-muted-foreground">
                             Using:{' '}
                             <code className="text-xs bg-background px-2 py-1 rounded">
-                              {LLM_GATEWAY}
+                              {LLM_GATEWAY_BASE_URL}
                             </code>
                           </p>
                         </div>
@@ -304,25 +295,13 @@ export function ModelTab({ form }: ModelTabProps) {
           </div>
 
           <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center space-x-2">
-              {isGatewayConfirmed ? (
-                <div className="flex items-center space-x-2 text-green-600">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span className="text-sm">Gateway confirmed</span>
-                </div>
-              ) : (
-                <span className="text-sm text-muted-foreground">
-                  Confirm gateway to proceed with model selection
-                </span>
-              )}
-            </div>
             <Button
               type="button"
               size="sm"
-              onClick={handleConfirmGateway}
+              onClick={handleTestGateway}
               disabled={!gatewayUrl?.trim() || isValidatingGateway}
             >
-              {isValidatingGateway ? 'Validating...' : 'Confirm Gateway'}
+              {isValidatingGateway ? 'Testing...' : 'Test Gateway'}
             </Button>
           </div>
         </CardContent>
@@ -351,7 +330,7 @@ export function ModelTab({ form }: ModelTabProps) {
         <CardContent className="space-y-4">
           {!isGatewayConfirmed ? (
             <div className="text-muted-foreground text-sm">
-              Please confirm your gateway first
+              Please test your gateway first
             </div>
           ) : gatewayType === 'nuwa' ? (
             // Nuwa Gateway Mode - Show selected model info

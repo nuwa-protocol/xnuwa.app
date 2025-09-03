@@ -1,5 +1,5 @@
 import type { Message } from 'ai';
-import type { Cap } from '@/shared/types/cap';
+import type { Cap } from '@/shared/types';
 
 export type ChatPaymentType = 'generate-title' | 'chat-message';
 

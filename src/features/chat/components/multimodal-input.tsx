@@ -20,7 +20,7 @@ import { useScrollToBottom } from '@/features/chat/hooks/use-scroll-to-bottom';
 import { Button } from '@/shared/components/ui/button';
 import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { useDevMode } from '@/shared/hooks/use-dev-mode';
-import type { Cap } from '@/shared/types/cap';
+import type { Cap } from '@/shared/types';
 import { useChatContext } from '../contexts/chat-context';
 import { useUpdateMessages } from '../hooks/use-update-messages';
 import { SuggestedActions } from './suggested-actions';
