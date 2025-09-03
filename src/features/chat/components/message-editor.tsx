@@ -50,6 +50,41 @@ export function MessageEditor({
     adjustHeight();
   };
 
+  const handleSend = async () => {
+    setIsSubmitting(true);
+
+    const updatedMessage = {
+      ...message,
+      content: draftContent,
+      parts: message.parts.map((part) => {
+        if (part.type === 'text') {
+          return { ...part, text: draftContent };
+        }
+        return part;
+      }),
+    };
+    console.log(updatedMessage)
+
+    // Update UI state - keep messages up to and including the edited message
+    setMessages((messages) => {
+      const index = messages.findIndex((m) => m.id === message.id);
+
+      if (index !== -1) {
+        return [
+          ...messages.slice(0, index),
+          updatedMessage,
+        ];
+      }
+      return messages;
+    });
+
+    // Update database - delete all messages after this one and update this message
+    await deleteMessagesAfterId(chatId, message.id, updatedMessage);
+
+    setMode('view');
+    regenerate();
+  }
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <Textarea
@@ -75,44 +110,7 @@ export function MessageEditor({
           variant="default"
           className="h-fit py-2 px-3"
           disabled={isSubmitting}
-          onClick={async () => {
-            setIsSubmitting(true);
-
-            // @ts-expect-error todo: support UIMessage in setMessages
-            setMessages((messages) => {
-              const index = messages.findIndex((m) => m.id === message.id);
-
-              if (index !== -1) {
-                const updatedMessage = {
-                  ...message,
-                  content: draftContent,
-                  parts: [{ type: 'text', text: draftContent }],
-                };
-
-                const updatedMessages = [
-                  ...messages.slice(0, index),
-                  updatedMessage,
-                ];
-
-                return updatedMessages;
-              }
-              return messages;
-            });
-
-            await deleteMessagesAfterId(chatId, message.id, {
-              id: message.id,
-              role: message.role,
-              parts: message.parts.map((part) => {
-                if (part.type === 'text') {
-                  return { ...part, text: draftContent };
-                }
-                return part;
-              }),
-            });
-
-            setMode('view');
-            regenerate();
-          }}
+          onClick={handleSend}
         >
           {isSubmitting ? 'Sending...' : 'Send'}
         </Button>

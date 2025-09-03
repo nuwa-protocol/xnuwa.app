@@ -3,6 +3,7 @@ import {
   createUIMessageStream,
   createUIMessageStreamResponse,
   smoothStream,
+  stepCountIs,
   streamText,
   type UIMessage,
 } from 'ai';
@@ -61,6 +62,7 @@ export const StreamAIResponse = async ({
         tools,
         abortSignal: signal,
         maxRetries: 3,
+        stopWhen: stepCountIs(10),
         headers,
         onChunk: (chunk) => {
           if (hasSendOnResponseDataMark) return;

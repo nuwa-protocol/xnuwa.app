@@ -47,7 +47,7 @@ export const MessageText = ({
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [isExpanded, setIsExpanded] = useState(false);
   const [copyToClipboard, isCopied] = useCopyToClipboard();
-  const { deleteMessagesAfterId } = useChatSessions();
+  const { deleteMessagesAfterId, updateSession } = useChatSessions();
 
   const key = `message-${message.id}-part-${index}`;
 
@@ -57,7 +57,16 @@ export const MessageText = ({
   };
 
   const handleResend = async () => {
-    // Delete trailing messages using client store
+    // Keep this message and delete all messages after it
+    setMessages((messages) => {
+      const index = messages.findIndex((m) => m.id === message.id);
+      if (index !== -1) {
+        return messages.slice(0, index + 1);
+      }
+      return messages;
+    });
+
+    // Update database to keep messages up to and including this message
     await deleteMessagesAfterId(chatId, message.id);
 
     regenerate();

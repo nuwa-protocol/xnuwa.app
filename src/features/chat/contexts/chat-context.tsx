@@ -139,7 +139,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
         const currentUrlChatId = new URLSearchParams(
           window.location.search,
         ).get('cid');
-        if (currentUrlChatId !== currentChatId) {
+        if (currentUrlChatId !== currentChatId && !chat.error) {
           const session = getSession(currentChatId);
           toast.success(
             `Your chat ${session ? `"${session.title}"` : ''} is completed`,
