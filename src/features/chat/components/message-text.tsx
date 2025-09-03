@@ -18,7 +18,7 @@ import {
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { cn } from '@/shared/utils';
 import { useChatSessions } from '../hooks';
-import { ResponseWithCapUI } from './message-ai-capui';
+import { ResponseWithUI } from './message-ai-ui';
 import { MessageEditor } from './message-editor';
 
 const MAX_MESSAGE_LENGTH = 150;
@@ -92,9 +92,9 @@ export const MessageText = ({
             },
           )}
         >
-          <ResponseWithCapUI parseIncompleteMarkdown={true}>
+          <ResponseWithUI parseIncompleteMarkdown={true}>
             {displayText}
-          </ResponseWithCapUI>
+          </ResponseWithUI>
 
           {isUserMessageLong && (
             <Button

@@ -1,6 +1,7 @@
 import { Maximize2, Save, Variable, X } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { Markdown } from '@/features/chat/components/markdown';
+import { Markdown } from '@/features/cap-studio/components/cap-edit/prompt/markdown';
+import { Response } from '@/features/chat/components/message-ai';
 import {
   Badge,
   Button,
@@ -21,6 +22,7 @@ import {
 } from '@/shared/components/ui';
 import { promptVariables } from '@/shared/constants/cap';
 import { cn } from '@/shared/utils';
+import { InlineUISetup } from './inline-ui-setup';
 import { PromptSuggestions } from './prompt-suggestions';
 
 interface PromptEditorProps {
@@ -176,6 +178,8 @@ export function PromptEditor({
             onOpenChange={setIsVariablesDialogOpen}
             onVariableSelect={insertVariable}
           />
+          {/* Inline UI Setup */}
+          <InlineUISetup onInsertPrompt={insertText} />
         </div>
 
         <div className="flex items-center space-x-2">
@@ -197,15 +201,15 @@ export function PromptEditor({
               value={value}
               onChange={(e) => handleChange(e.target.value)}
               placeholder={placeholder}
-              className="min-h-[200px] font-mono text-sm resize-none"
+              className="min-h-[800px] font-mono text-sm resize-none"
             />
           </TabsContent>
           <TabsContent
             value="preview"
-            className="min-h-[200px] p-3 border rounded-md bg-muted/20"
+            className="min-h-[800px] p-3 border rounded-md bg-muted/20"
           >
             <div className="prose prose-sm max-w-none">
-              <Markdown>{value || 'No content to preview'}</Markdown>
+              <Response>{value || 'No content to preview'}</Response>
             </div>
           </TabsContent>
         </Tabs>
@@ -269,6 +273,25 @@ export function PromptEditor({
                         textarea.focus();
                         textarea.selectionStart = textarea.selectionEnd =
                           start + variable.length;
+                      }, 0);
+                    }}
+                  />
+                  {/* Inline UI Setup */}
+                  <InlineUISetup
+                    onInsertPrompt={(text: string) => {
+                      const textarea = drawerTextareaRef.current;
+                      if (!textarea) return;
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const newValue =
+                        drawerValue.substring(0, start) +
+                        text +
+                        drawerValue.substring(end);
+                      setDrawerValue(newValue);
+                      setTimeout(() => {
+                        textarea.focus();
+                        textarea.selectionStart = textarea.selectionEnd =
+                          start + text.length;
                       }, 0);
                     }}
                   />

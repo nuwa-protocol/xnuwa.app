@@ -28,8 +28,6 @@ export function UiTab({ form }: UiTabProps) {
   const [tempUrl, setTempUrl] = useState(currentUiUrl || '');
   const [urlError, setUrlError] = useState<string>('');
 
-  console.log('currentUiUrl', currentUiUrl);
-
   const validateUrl = (url: string): string => {
     if (!url.trim()) {
       return 'UI URL is required';

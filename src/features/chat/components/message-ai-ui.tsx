@@ -19,7 +19,7 @@ function parseCapUIAttributes(
   return { url, title };
 }
 
-interface CapUIMarkdownProps extends HTMLAttributes<HTMLDivElement> {
+interface ResponseWithUIProps extends HTMLAttributes<HTMLDivElement> {
   children: string;
   allowedImagePrefixes?: ComponentProps<
     typeof Response
@@ -31,7 +31,7 @@ interface CapUIMarkdownProps extends HTMLAttributes<HTMLDivElement> {
   >['parseIncompleteMarkdown'];
 }
 
-export const ResponseWithCapUI = memo(
+export const ResponseWithUI = memo(
   ({
     children,
     allowedImagePrefixes,
@@ -40,7 +40,7 @@ export const ResponseWithCapUI = memo(
     parseIncompleteMarkdown,
     className,
     ...props
-  }: CapUIMarkdownProps) => {
+  }: ResponseWithUIProps) => {
     const { handleSendPrompt, handleAddSelection, handleGetState, handleSaveState } = useCapUIRender();
 
     const processedContent = useMemo(() => {
@@ -124,4 +124,4 @@ export const ResponseWithCapUI = memo(
   (prevProps, nextProps) => prevProps.children === nextProps.children,
 );
 
-ResponseWithCapUI.displayName = 'ResponseWithCapUI';
+ResponseWithUI.displayName = 'ResponseWithUI';

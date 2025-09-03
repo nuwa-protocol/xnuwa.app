@@ -1,15 +1,11 @@
 import MarkdownPreview from '@uiw/react-markdown-preview';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { useTheme } from '@/shared/components/theme-provider';
 import './markdown.css';
-import { CheckIcon, CopyIcon } from 'lucide-react';
 import type React from 'react';
 import type { ReactNode } from 'react';
 import { getCodeString } from 'rehype-rewrite';
 import rehypeSanitize from 'rehype-sanitize';
-import { toast } from 'sonner';
-import { useCopyToClipboard } from 'usehooks-ts';
-import { Button } from '@/shared/components/ui/button';
 import { ImageZoom } from '@/shared/components/ui/shadcn-io/image-zoom';
 import { MermaidCode } from './markdown-mermaid';
 
@@ -71,9 +67,6 @@ const Code: React.FC<CodeProps> = ({
   className,
   ...props
 }) => {
-  const [isCopied, setIsCopied] = useState(false);
-  const [_, copyToClipboard] = useCopyToClipboard();
-
   const isMermaid =
     className && /^language-mermaid/.test(className.toLocaleLowerCase());
   // original code component
@@ -87,34 +80,9 @@ const Code: React.FC<CodeProps> = ({
     return <MermaidCode code={code} className={className} />;
   }
 
-  // For inline code, return simple code element
-  if (inline) {
-    return <code>{children}</code>;
-  }
-
-  // For code blocks, add copy button
-  const handleCopy = async () => {
-    await copyToClipboard(code);
-    setIsCopied(true);
-    toast.success('Code copied to clipboard!');
-    setTimeout(() => setIsCopied(false), 2000);
-  };
-
   return (
     <div className="relative group">
       <code {...props}>{children}</code>
-      <Button
-        size="sm"
-        variant="outline"
-        className="absolute top-2 right-2 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm"
-        onClick={handleCopy}
-      >
-        {isCopied ? (
-          <CheckIcon className="h-4 w-4" />
-        ) : (
-          <CopyIcon className="h-4 w-4" />
-        )}
-      </Button>
     </div>
   );
 };
