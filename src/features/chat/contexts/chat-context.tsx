@@ -57,10 +57,6 @@ export function ChatProvider({ children }: ChatProviderProps) {
       if (cid) {
         // If we have a cid and it matches our generated new chat ID, we're navigating
         if (globalNewChatId === cid) {
-          console.log(
-            'detected navigation from new chat to existing chat with id: ',
-            cid,
-          );
           isNavigatingRef.current = true;
           // DON'T clear globalNewChatId here - keep it for reference
         }
@@ -69,7 +65,6 @@ export function ChatProvider({ children }: ChatProviderProps) {
         // Use existing generated ID or create new one for new chat
         if (!globalNewChatId) {
           globalNewChatId = generateUUID();
-          console.log('generated new chat id: ', globalNewChatId);
         }
         currentChatId = globalNewChatId;
       }
@@ -77,7 +72,6 @@ export function ChatProvider({ children }: ChatProviderProps) {
       // ALWAYS check cache first, even before any other logic
       const existingInstance = globalChatInstances.get(currentChatId);
       if (existingInstance) {
-        console.log('reusing existing chat instance with id: ', currentChatId);
         chatIdRef.current = currentChatId;
         // Reset navigation flag after reusing
         if (isNavigatingRef.current) {
@@ -87,7 +81,6 @@ export function ChatProvider({ children }: ChatProviderProps) {
       }
 
       // Only create new instance if one doesn't exist
-      console.log('creating new chat instance with id: ', currentChatId);
 
       // Store the current chat ID for navigation logic
       chatIdRef.current = currentChatId;
@@ -190,7 +183,6 @@ export function ChatProvider({ children }: ChatProviderProps) {
       // Only navigate when we actually start chatting (have messages)
       const existingSession = sessionsMap[chat.id];
       if (existingSession && existingSession.messages.length > 0) {
-        console.log('navigating from new chat to chat page with id: ', chat.id);
         // Set navigation flag before navigating
         isNavigatingRef.current = true;
         navigate(`/chat?cid=${chat.id}`, { replace: true });
@@ -199,10 +191,6 @@ export function ChatProvider({ children }: ChatProviderProps) {
 
     // Clear globalNewChatId when we're on a specific chat page and navigation is complete
     if (cid && globalNewChatId === cid && !isNavigatingRef.current) {
-      console.log(
-        'clearing globalNewChatId after successful navigation to: ',
-        cid,
-      );
       globalNewChatId = null;
     }
   }, [cid, chat.id, navigate, sessionsMap]);

@@ -1,5 +1,5 @@
 import { useChat } from '@ai-sdk/react';
-import type { ToolUIPart, UIMessage } from 'ai';
+import type { UIMessage } from 'ai';
 
 import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -162,27 +162,32 @@ const PurePreviewMessage = ({
                 );
               }
 
-              if (type.startsWith('tool-')) {
-                const toolName = type.split('-')[1];
-                const { toolCallId, state, input, output } = part as ToolUIPart;
-                <Tool key={toolCallId} defaultOpen={true}>
-                  <ToolHeader type={`tool-${toolName}`} state={state} />
-                  <ToolContent>
-                    {state === 'input-available' && <ToolInput input={input} />}
-                    {state === 'output-available' && (
-                      <ToolOutput
-                        output={
-                          <ToolResult
-                            toolName={toolName}
-                            result={output}
-                            toolCallId={toolCallId}
+              if (type === 'dynamic-tool') {
+                const { toolCallId, state, input, output, toolName } = part;
+                return (
+                  <Tool key={toolCallId} defaultOpen={false}>
+                    <ToolHeader type={`tool-${toolName}`} state={state} />
+                    <ToolContent>
+                      {state === 'input-available' && <ToolInput input={input} />}
+                      {state === 'output-available' && (
+                        <div>
+                          <ToolInput input={input} />
+                          <ToolOutput
+                            output={
+                              <ToolResult
+                                toolName={toolName}
+                                result={output}
+                                toolCallId={toolCallId}
+                              />
+                            }
+                            errorText={undefined}
                           />
-                        }
-                        errorText={undefined}
-                      />
-                    )}
-                  </ToolContent>
-                </Tool>;
+                        </div>
+
+                      )}
+                    </ToolContent>
+                  </Tool>
+                );
               }
             })}
 

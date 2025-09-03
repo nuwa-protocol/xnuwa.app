@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { ArrowUpIcon, PaperclipIcon, StopCircleIcon } from 'lucide-react';
 import type React from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
@@ -34,6 +34,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
     'input',
     '',
   );
+  const { pathname } = useLocation();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -62,8 +63,9 @@ function PureMultimodalInput({ className }: { className?: string }) {
     if (input.trim()) {
       sendMessage({ text: input });
       setInput('');
-      console.log('send message and navigate')
-      navigate(`/chat?cid=${chat.id}`, { replace: true });
+      if (pathname !== `/chat?cid=${chat.id}`) {
+        navigate(`/chat?cid=${chat.id}`, { replace: true });
+      }
     }
   };
 

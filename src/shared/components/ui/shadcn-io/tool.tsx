@@ -10,7 +10,7 @@ import {
   CheckCircleIcon,
   ChevronDownIcon,
   CircleIcon,
-  ClockIcon,
+  Loader2,
   WrenchIcon,
   XCircleIcon,
 } from 'lucide-react';
@@ -21,7 +21,7 @@ export type ToolProps = ComponentProps<typeof Collapsible>;
 
 export const Tool = ({ className, ...props }: ToolProps) => (
   <Collapsible
-    className={cn('not-prose mb-4 w-full rounded-md border', className)}
+    className={cn('not-prose mb-2 w-full', className)}
     {...props}
   />
 );
@@ -42,13 +42,13 @@ const getStatusBadge = (status: ToolUIPart['state']) => {
 
   const icons = {
     'input-streaming': <CircleIcon className="size-4" />,
-    'input-available': <ClockIcon className="size-4 animate-pulse" />,
+    'input-available': <Loader2 className="size-4 animate-spin" />,
     'output-available': <CheckCircleIcon className="size-4 text-green-600" />,
     'output-error': <XCircleIcon className="size-4 text-red-600" />,
   } as const;
 
   return (
-    <Badge className="gap-1.5 rounded-full text-xs" variant="secondary">
+    <Badge className="gap-1.5 rounded-full text-xs border-0 bg-muted/50 text-muted-foreground/80" variant="secondary">
       {icons[status]}
       {labels[status]}
     </Badge>
@@ -63,17 +63,17 @@ export const ToolHeader = ({
 }: ToolHeaderProps) => (
   <CollapsibleTrigger
     className={cn(
-      'flex w-full items-center justify-between gap-4 p-3',
+      'flex w-full items-center justify-between gap-4 px-1 py-2 hover:bg-muted/30 rounded-sm transition-colors',
       className
     )}
     {...props}
   >
     <div className="flex items-center gap-2">
-      <WrenchIcon className="size-4 text-muted-foreground" />
-      <span className="font-medium text-sm">{type}</span>
+      <WrenchIcon className="size-3.5 text-muted-foreground/70" />
+      <span className="font-normal text-sm text-muted-foreground">{type}</span>
       {getStatusBadge(state)}
     </div>
-    <ChevronDownIcon className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+    <ChevronDownIcon className="size-3.5 text-muted-foreground/50 transition-transform group-data-[state=open]:rotate-180" />
   </CollapsibleTrigger>
 );
 
