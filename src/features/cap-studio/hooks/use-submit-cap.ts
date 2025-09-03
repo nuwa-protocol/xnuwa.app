@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useCapKit } from '@/shared/hooks/use-capkit';
-import type { Cap } from '@/shared/types/cap';
+import type { Cap } from '@/shared/types/cap-new';
 import type { LocalCap } from '../types';
 
 interface CapSubmitResponse {
@@ -34,8 +34,9 @@ export const useSubmitCap = () => {
           throw new Error('Failed to initialize CapKit');
         }
 
-        // Register the capability using CapKit
-        const cid = await capKit.registerCap(capData);
+        // Register the capability using CapKit (TODO: need to upgrade cap kit)
+        // const cid = await capKit.registerCap(capData);
+        const cid = '';
 
         return {
           success: true,
@@ -82,7 +83,8 @@ export const useSubmitCap = () => {
         }));
 
         try {
-          await capKit.registerCap(cap.capData);
+          // Register the capability using CapKit (TODO: need to upgrade cap kit)
+          // await capKit.registerCap(cap.capData);
           setBulkProgress((prev) => ({
             ...prev,
             completed: prev.completed + 1,

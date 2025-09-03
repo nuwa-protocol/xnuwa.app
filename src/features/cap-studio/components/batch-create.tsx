@@ -20,8 +20,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui';
+import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import { useAuth } from '@/shared/hooks';
-import { CapSchema } from '@/shared/types/cap';
+import { CapSchema } from '@/shared/types';
 import { useAvailableModels } from '../hooks';
 import { useLocalCapsHandler } from '../hooks/use-local-caps-handler';
 import type { LocalCap } from '../types';
@@ -63,7 +64,7 @@ interface SimplifiedCapInput {
 export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
   const navigate = useNavigate();
   const { did } = useAuth();
-  const { models } = useAvailableModels();
+  const { models } = useAvailableModels(LLM_GATEWAY_BASE_URL);
   const { createCap } = useLocalCapsHandler();
   const [uploading, setUploading] = useState(false);
   const [showJsonFormat, setShowJsonFormat] = useState(false);

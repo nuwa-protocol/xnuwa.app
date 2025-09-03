@@ -1,6 +1,7 @@
 import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { Badge, Button, Input, Label } from '@/shared/components/ui';
+import { CapPromptSuggestionSchema } from '@/shared/types/cap-new';
 import { cn } from '@/shared/utils';
 
 interface PromptSuggestionsProps {
@@ -15,12 +16,38 @@ export function PromptSuggestions({
   className,
 }: PromptSuggestionsProps) {
   const [newSuggestion, setNewSuggestion] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const validateInput = (value: string) => {
+    const result = CapPromptSuggestionSchema.safeParse(value);
+    if (!result.success) {
+      setValidationError(result.error.errors[0]?.message || 'Invalid input');
+    } else {
+      setValidationError(null);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewSuggestion(value);
+    validateInput(value);
+  };
 
   const addSuggestion = () => {
     const trimmed = newSuggestion.trim();
+    const validation = CapPromptSuggestionSchema.safeParse(trimmed);
+
+    if (!validation.success) {
+      setValidationError(
+        validation.error.errors[0]?.message || 'Invalid input',
+      );
+      return;
+    }
+
     if (trimmed && !suggestions.includes(trimmed)) {
       onSuggestionsChange([...suggestions, trimmed]);
       setNewSuggestion('');
+      setValidationError(null);
     }
   };
 
@@ -47,26 +74,36 @@ export function PromptSuggestions({
       </div>
 
       {/* Add new suggestion */}
-      <div className="flex gap-2">
-        <Input
-          id={`suggestions-input-${Math.random()}`}
-          value={newSuggestion}
-          onChange={(e) => setNewSuggestion(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Enter a suggestion..."
-          className="flex-1"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={addSuggestion}
-          disabled={
-            !newSuggestion.trim() || suggestions.includes(newSuggestion.trim())
-          }
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
+      <div className="space-y-1">
+        <div className="flex gap-2">
+          <Input
+            id={`suggestions-input-${Math.random()}`}
+            value={newSuggestion}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            placeholder="Enter a suggestion..."
+            className={cn(
+              'flex-1',
+              validationError && 'border-red-500 focus:border-red-500',
+            )}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addSuggestion}
+            disabled={
+              !newSuggestion.trim() ||
+              suggestions.includes(newSuggestion.trim()) ||
+              !!validationError
+            }
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+        {validationError && (
+          <p className="text-xs text-red-500">{validationError}</p>
+        )}
       </div>
 
       {/* Display existing suggestions */}

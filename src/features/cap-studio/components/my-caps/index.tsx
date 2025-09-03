@@ -1,4 +1,4 @@
-import { CheckSquare, Plus, Search, Send, Trash2, Upload } from 'lucide-react';
+import { CheckSquare, ChevronDown, Plus, Search, Send, Trash2, Upload } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -7,6 +7,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Input,
   Progress,
 } from '@/shared/components/ui';
@@ -188,21 +192,27 @@ export function MyCaps({
 
       {/* Header with controls */}
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center">
           {!isMultiSelectMode ? (
             <>
-              <Button onClick={onCreateNew} size="sm">
+              <Button onClick={onCreateNew} className='rounded-r-none w-32'>
                 <Plus className="h-4 w-4 mr-2" />
                 New Cap
               </Button>
-              <Button
-                onClick={() => navigate('/cap-studio/batch-create')}
-                variant="outline"
-                size="sm"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Batch Create
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild className='focus:ring-0 focus:ring-transparent focus:ring-offset-0'>
+                  <Button className='rounded-l-none border-l-0 px-2 w-10'>
+                    <ChevronDown />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='w-40'>
+                  <DropdownMenuItem onClick={() => navigate('/cap-studio/batch-create')}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Batch Create
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
             </>
           ) : (
             <>

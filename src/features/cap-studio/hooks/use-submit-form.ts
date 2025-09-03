@@ -1,22 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { z } from 'zod';
-import type { CapThumbnail } from '@/shared/types/cap';
+import type { CapThumbnail } from '@/shared/types/cap-new';
 import { useLocalCapsHandler } from '../hooks/use-local-caps-handler';
 import { useSubmitCap } from '../hooks/use-submit-cap';
 import type { LocalCap } from '../types';
-
-const submitSchema = z.object({
-  homepage: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  repository: z
-    .string()
-    .url('Must be a valid URL')
-    .optional()
-    .or(z.literal('')),
-});
-
-export type SubmitFormData = z.infer<typeof submitSchema>;
 
 interface UseSubmitFormProps {
   cap: LocalCap;
@@ -45,19 +33,8 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
     };
 
     try {
-      const capWithSubmitFormData = {
-        ...cap.capData,
-        metadata: {
-          ...cap.capData.metadata,
-          homepage: submitFormData.homepage || undefined,
-          repository: submitFormData.repository || undefined,
-          submittedAt: Date.now(),
-          thumbnail: thumbnail || null,
-        },
-      };
-
       // make the submission
-      const result = await submitCap(capWithSubmitFormData);
+      const result = await submitCap(cap.capData);
 
       if (!result.success) {
         toast.error(result.message);
@@ -66,9 +43,9 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
 
       // update cap status to submitted
       updateCap(cap.id, {
+        ...cap,
         status: 'submitted',
         cid: result.capId,
-        capData: capWithSubmitFormData,
       });
 
       toast.success(result.message);

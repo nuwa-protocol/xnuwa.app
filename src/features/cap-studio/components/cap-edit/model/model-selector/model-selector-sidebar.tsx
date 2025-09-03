@@ -11,8 +11,8 @@ import {
   SidebarMenuItem,
 } from '@/shared/components/ui/sidebar';
 import { useLocale } from '@/shared/locales/use-locale';
-import type { Provider } from '../../utils';
-import { ProviderAvatar } from './provider-avatar';
+import { ProviderAvatar } from '../../../../../../shared/components/provider-avatar';
+import type { Provider } from './utils';
 
 interface ModelSelectorSidebarProps {
   selectedTab: string;

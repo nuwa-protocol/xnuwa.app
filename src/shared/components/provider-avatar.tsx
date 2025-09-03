@@ -66,7 +66,6 @@ const AutoIcon = (
   </svg>
 );
 
-// Provider名称到图标组件的映射
 const PROVIDER_ICON_MAP: Record<
   string,
   React.ComponentType<{ size?: number }> & {
@@ -121,17 +120,15 @@ export const ProviderAvatar: React.FC<ProviderAvatarProps> = ({
   size = 'md',
   className = '',
 }) => {
-  // 标准化provider名称
   const normalizedProvider = provider.toLowerCase().replace(/\s+/g, '-');
 
   const iconSize = iconSizeMap[size];
 
-  // 如果 provider 是 auto，渲染 AutoIcon 并加上主色
   if (normalizedProvider === 'auto') {
     return (
       <div
         className={`${sizeMap[size]} ${className} flex items-center justify-center`}
-        style={{ color: 'var(--primary)' }} // 你可以根据主题调整
+        style={{ color: 'var(--primary)' }}
       >
         {React.cloneElement(AutoIcon, {
           width: iconSize,
@@ -141,14 +138,10 @@ export const ProviderAvatar: React.FC<ProviderAvatarProps> = ({
       </div>
     );
   }
-
-  // 查找对应的图标组件
   const IconComponent = PROVIDER_ICON_MAP[normalizedProvider];
 
-  // 如果有对应的图标组件，使用它
   if (IconComponent) {
     try {
-      // 优先使用彩色图标，如果不存在则使用默认图标
       const ColorIcon = (IconComponent as any).Color;
       const FinalIcon = ColorIcon || IconComponent;
 
@@ -160,11 +153,9 @@ export const ProviderAvatar: React.FC<ProviderAvatarProps> = ({
         </div>
       );
     } catch (error) {
-      // 如果图标组件渲染失败，回退到默认图标
       console.warn(`Failed to render icon for provider: ${provider}`, error);
     }
   }
 
-  // 回退到BotIcon
   return <BotIcon className={`${sizeMap[size]} ${className}`} />;
 };

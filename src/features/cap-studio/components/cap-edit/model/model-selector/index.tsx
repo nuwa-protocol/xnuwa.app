@@ -25,16 +25,23 @@ import {
 import { SidebarInset, SidebarProvider } from '@/shared/components/ui/sidebar';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { useLocale } from '@/shared/locales/use-locale';
-import type { CapModel } from '@/shared/types/cap';
-import { useAvailableModels, useSelectedModel } from '../../hooks';
-import { generateProviders } from '../../utils';
+import { useAvailableModels } from '../../../../hooks';
 import { ModelCard } from './model-card';
 import { ModelSelectorSidebar } from './model-selector-sidebar';
+import type { ModelDetails } from './type';
+import { generateProviders } from './utils';
 
-export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
+export const LLMModelSelector = ({
+  onClose,
+  gatewayUrl,
+  onModelSelect,
+}: {
+  onClose: () => void;
+  gatewayUrl: string;
+  onModelSelect: (model: ModelDetails) => void;
+}) => {
   const { t } = useLocale();
-  const { models, loading, error } = useAvailableModels();
-  const { selectedModel, setSelectedModel } = useSelectedModel();
+  const { models, loading, error } = useAvailableModels(gatewayUrl);
 
   const [selectedTab, setSelectedTab] = useState<string>('all');
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
@@ -111,9 +118,9 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
     return filtered;
   };
 
-  const handleModelSelect = (model: CapModel) => {
-    setSelectedModel(model);
+  const handleModelSelect = (model: ModelDetails) => {
     onClose();
+    onModelSelect(model);
   };
 
   const handleTabChange = (tab: string) => {
@@ -130,15 +137,10 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
     return renderModelGrid(filteredModels);
   };
 
-  const renderModelGrid = (modelList: CapModel[]) => (
+  const renderModelGrid = (modelList: ModelDetails[]) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {modelList.map((model) => (
-        <ModelCard
-          key={model.id}
-          model={model}
-          isSelected={selectedModel?.id === model.id}
-          onClick={handleModelSelect}
-        />
+        <ModelCard key={model.id} model={model} onClick={handleModelSelect} />
       ))}
     </div>
   );
@@ -271,7 +273,10 @@ export const LLMModelSelector = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-export const ModelSelectorDialog: React.FC = () => {
+export const ModelSelectorDialog: React.FC<{
+  gatewayUrl: string;
+  onModelSelect: (model: ModelDetails) => void;
+}> = ({ gatewayUrl, onModelSelect }) => {
   const { t } = useLocale();
   const [open, setOpen] = useState(false);
 
@@ -286,7 +291,11 @@ export const ModelSelectorDialog: React.FC = () => {
       <DialogContent className="max-w-6xl h-[80vh] p-0 overflow-hidden">
         <DialogTitle className="sr-only">LLM Model Selector</DialogTitle>
         <Description className="sr-only">Select an LLM model.</Description>
-        <LLMModelSelector onClose={() => setOpen(false)} />
+        <LLMModelSelector
+          onClose={() => setOpen(false)}
+          gatewayUrl={gatewayUrl}
+          onModelSelect={onModelSelect}
+        />
       </DialogContent>
     </Dialog>
   );

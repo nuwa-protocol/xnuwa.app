@@ -1,13 +1,15 @@
 import { createAuthorizedFetch } from '@/shared/services/authorized-fetch';
-import type { CapModel } from '@/shared/types/cap';
 import type {
+  ModelDetails,
   OpenRouterAPIResponse,
   OpenRouterModel,
-} from './types/openrouter-model';
+} from './components/cap-edit/model/model-selector/type';
 
-async function modelFetch(): Promise<OpenRouterAPIResponse> {
+async function modelFetch(gatewayUrl: string): Promise<OpenRouterAPIResponse> {
   const authorizedFetch = createAuthorizedFetch();
-  const endpoint = 'https://openrouter.ai/api/v1/models';
+  // TODO: need to make sure NUWA LLM Gateway supports models endpoint
+  // const endpoint = `${gatewayUrl}/models`;
+  const endpoint = `https://openrouter.ai/api/v1/models`;
 
   try {
     const response = await authorizedFetch(endpoint, {
@@ -50,8 +52,8 @@ function parseModelInfo(model: OpenRouterModel) {
   };
 }
 
-export async function fetchModels(): Promise<CapModel[]> {
-  const openRouterModels = await modelFetch();
+export async function fetchModels(gatewayUrl: string): Promise<ModelDetails[]> {
+  const openRouterModels = await modelFetch(gatewayUrl);
 
   return openRouterModels.data
     .filter((model: OpenRouterModel) => !model.id.includes('openrouter')) // exclude openrouter models

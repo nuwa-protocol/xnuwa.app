@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
-import type { Cap } from '@/shared/types/cap';
+import type { Cap } from '@/shared/types';
 import { generateUUID } from '@/shared/utils';
 import type { LocalCap } from '../types';
 

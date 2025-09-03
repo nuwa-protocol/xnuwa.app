@@ -1,5 +1,5 @@
 import { createNuwaMCPClient } from '@/shared/services/mcp-client';
-import type { Cap } from '@/shared/types/cap';
+import type { Cap } from '@/shared/types';
 
 interface MCPInstance {
   clients: Map<string, any>;

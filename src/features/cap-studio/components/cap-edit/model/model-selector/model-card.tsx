@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import type React from 'react';
+import type { ModelDetails } from '@/features/cap-studio/components/cap-edit/model/model-selector/type';
 import {
   Card,
   CardFooter,
@@ -7,22 +8,16 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { useLocale } from '@/shared/locales/use-locale';
-import type { CapModel } from '@/shared/types/cap';
 import { cn } from '@/shared/utils';
-import { getModelName, getProviderName } from '../../utils';
-import { ProviderAvatar } from './provider-avatar';
+import { ProviderAvatar } from '../../../../../../shared/components/provider-avatar';
+import { getModelName, getProviderName } from './utils';
 
 interface ModelCardProps {
-  model: CapModel;
-  isSelected: boolean;
-  onClick: (model: CapModel) => void;
+  model: ModelDetails;
+  onClick: (model: ModelDetails) => void;
 }
 
-export const ModelCard: React.FC<ModelCardProps> = ({
-  model,
-  isSelected,
-  onClick,
-}) => {
+export const ModelCard: React.FC<ModelCardProps> = ({ model, onClick }) => {
   const { t } = useLocale();
 
   return (
@@ -30,7 +25,6 @@ export const ModelCard: React.FC<ModelCardProps> = ({
       <Card
         className={cn(
           'hover:bg-accent transition-colors cursor-pointer h-full',
-          isSelected && 'bg-accent border-primary',
         )}
         onClick={() => onClick(model)}
       >

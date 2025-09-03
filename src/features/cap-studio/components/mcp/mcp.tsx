@@ -35,7 +35,6 @@ import {
   createNuwaMCPClient,
 } from '@/shared/services/mcp-client';
 import type { NuwaMCPClient } from '@/shared/types';
-import type { LocalCap } from '../../types';
 
 interface LogEntry {
   id: string;
@@ -47,13 +46,13 @@ interface LogEntry {
 }
 
 interface McpProps {
-  cap?: LocalCap | null;
-  serverName?: string | null;
+  mcpServerUrl: string | null;
+  mcpUIUrl: string | null;
 }
 
 type MCPType = 'MCP Server' | 'MCP UI';
 
-export function Mcp({ cap, serverName }: McpProps) {
+export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   const navigate = useNavigate();
   const serverUrlId = useId();
   const mcpTypeId = useId();
@@ -87,11 +86,15 @@ export function Mcp({ cap, serverName }: McpProps) {
 
   // Auto-populate connection details when server is specified via URL parameter
   useEffect(() => {
-    if (cap && serverName && cap.capData.core.mcpServers[serverName]) {
-      const serverConfig = cap.capData.core.mcpServers[serverName];
-      setUrl(serverConfig.url);
+    if (mcpServerUrl) {
+      setMcpType('MCP Server');
+      setUrl(mcpServerUrl);
     }
-  }, [cap, serverName, pushLog]);
+    if (mcpUIUrl) {
+      setMcpType('MCP UI');
+      setUrl(mcpUIUrl);
+    }
+  }, [mcpServerUrl, mcpUIUrl]);
 
   const handleConnect = useCallback(async () => {
     if (connecting) return;

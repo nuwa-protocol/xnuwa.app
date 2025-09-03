@@ -37,7 +37,6 @@ const router = createBrowserRouter([
           { path: 'cap-studio/edit/:id', element: <CapStudioEditPage /> },
           { path: 'cap-studio/submit/:id', element: <CapStudioSubmitPage /> },
           { path: 'cap-studio/mcp', element: <CapStudioMcpPage /> },
-          { path: 'cap-studio/mcp/:id', element: <CapStudioMcpPage /> },
         ],
       },
       { path: 'login', element: <LoginPage /> },

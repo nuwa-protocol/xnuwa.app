@@ -142,9 +142,7 @@ export function CapCard({
               <Avatar className="rounded-lg">
                 <AvatarImage
                   src={
-                    cap.capData.metadata.thumbnail?.type === 'file'
-                      ? cap.capData.metadata.thumbnail.file
-                      : cap.capData.metadata.thumbnail?.url
+                    cap.capData.metadata.thumbnail
                   }
                 />
                 <AvatarFallback>
@@ -167,7 +165,7 @@ export function CapCard({
               <div className="flex items-center space-x-4 text-xs text-muted-foreground flex-wrap">
                 <div className="flex items-center">
                   <Bot className="h-3 w-3 mr-1" />
-                  {cap.capData.core.model.name}
+                  {cap.capData.core.model.modelId}
                 </div>
                 <div className="flex items-center">
                   <Server className="h-3 w-3 mr-1" />

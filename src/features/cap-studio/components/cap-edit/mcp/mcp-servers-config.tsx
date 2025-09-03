@@ -12,28 +12,26 @@ import {
   Label,
 } from '@/shared/components/ui';
 
-import type { CapMcpServerConfig } from '@/shared/types/cap';
+import type { CapMcpServer } from '@/shared/types/cap-new';
 
 interface McpServersConfigProps {
-  mcpServers: Record<string, CapMcpServerConfig>;
-  onUpdateMcpServers: (servers: Record<string, CapMcpServerConfig>) => void;
-  capId?: string;
+  mcpServers: Record<string, CapMcpServer>;
+  onUpdateMcpServers: (servers: Record<string, CapMcpServer>) => void;
 }
 
 export function McpServersConfig({
   mcpServers,
   onUpdateMcpServers,
-  capId,
 }: McpServersConfigProps) {
   const navigate = useNavigate();
   const [isAdding, setIsAdding] = useState(false);
   const [editingServer, setEditingServer] = useState<string | null>(null);
-  const [newServer, setNewServer] = useState<
-    CapMcpServerConfig & { name: string }
-  >({
+  const [newServer, setNewServer] = useState<{
+    name: string;
+    url: string;
+  }>({
     name: '',
     url: '',
-    transport: 'httpStream',
   });
   const [errors, setErrors] = useState<{
     name?: string;
@@ -74,19 +72,17 @@ export function McpServersConfig({
     setNewServer({
       name: '',
       url: '',
-      transport: 'httpStream',
     });
     setErrors({});
   };
 
   const handleEditServer = (serverName: string) => {
-    const serverConfig = mcpServers[serverName];
+    const serverUrl = mcpServers[serverName];
     setEditingServer(serverName);
     setIsAdding(false);
     setNewServer({
       name: serverName,
-      url: serverConfig.url,
-      transport: serverConfig.transport,
+      url: serverUrl,
     });
     setErrors({});
   };
@@ -113,10 +109,7 @@ export function McpServersConfig({
     }
 
     // Add/update the server with the new/current name
-    updatedServers[newServer.name] = {
-      url: newServer.url,
-      transport: newServer.transport,
-    };
+    updatedServers[newServer.name] = newServer.url;
 
     onUpdateMcpServers(updatedServers);
     setIsAdding(false);
@@ -124,7 +117,6 @@ export function McpServersConfig({
     setNewServer({
       name: '',
       url: '',
-      transport: 'httpStream',
     });
     setErrors({});
   };
@@ -135,7 +127,6 @@ export function McpServersConfig({
     setNewServer({
       name: '',
       url: '',
-      transport: 'httpStream',
     });
     setErrors({});
   };
@@ -145,12 +136,10 @@ export function McpServersConfig({
     onUpdateMcpServers(rest);
   };
 
-  const handleTestServer = (serverName: string) => {
-    if (capId) {
-      navigate(
-        `/cap-studio/mcp/${capId}?server=${encodeURIComponent(serverName)}`,
-      );
-    }
+  const handleTestServer = (serverUrl: string) => {
+    navigate(
+      `/cap-studio/mcp?mcpserver=${encodeURIComponent(serverUrl)}`,
+    );
   };
 
   return (
@@ -178,7 +167,7 @@ export function McpServersConfig({
       <CardContent>
         <div className="space-y-4">
           {/* Existing MCP servers */}
-          {Object.entries(mcpServers).map(([serverName, config]) => (
+          {Object.entries(mcpServers).map(([serverName, url]) => (
             <div
               key={serverName}
               className="flex items-center justify-between p-3 border rounded-lg bg-muted/50"
@@ -186,7 +175,7 @@ export function McpServersConfig({
               <div className="min-w-0 flex-1">
                 <div className="font-medium text-sm truncate">{serverName}</div>
                 <div className="text-xs text-muted-foreground truncate">
-                  Streamable HTTP • {config.url}
+                  {url}
                 </div>
               </div>
               <div className="flex items-center gap-2 ml-2 flex-shrink-0">
@@ -201,18 +190,16 @@ export function McpServersConfig({
                   <Edit className="h-4 w-4" />
                   Edit
                 </Button>
-                {capId && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleTestServer(serverName)}
-                    disabled={isAdding || editingServer !== null}
-                  >
-                    <Code className="h-4 w-4" />
-                    Debug
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleTestServer(url)}
+                  disabled={isAdding || editingServer !== null}
+                >
+                  <Code className="h-4 w-4" />
+                  Debug
+                </Button>
                 <Button
                   type="button"
                   variant="ghost"
@@ -276,18 +263,6 @@ export function McpServersConfig({
                     {errors.url && (
                       <p className="text-xs text-red-500">{errors.url}</p>
                     )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="transport">Transport</Label>
-                    <Input
-                      value="Streamable HTTP"
-                      disabled
-                      className="bg-muted"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Only Streamable HTTP transport is supported.
-                    </p>
                   </div>
 
                   <div className="flex items-center justify-end space-x-2 pt-4">

@@ -14,7 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui';
-import type { CapThumbnail } from '@/shared/types/cap';
+import type { CapThumbnail } from '@/shared/types/cap-new';
 
 interface ThumbnailUploadProps {
   thumbnail: CapThumbnail;
@@ -26,9 +26,9 @@ export function ThumbnailUpload({
   onThumbnailChange,
 }: ThumbnailUploadProps) {
   const thumbnailUploadId = useId();
-  const [inputUrl, setInputUrl] = useState(thumbnail?.url || '');
+  const [inputUrl, setInputUrl] = useState(thumbnail || '');
   const [activeTab, setActiveTab] = useState<'upload' | 'url'>(
-    thumbnail?.type === 'url' ? 'url' : 'upload',
+    thumbnail ? 'url' : 'upload',
   );
 
   const handleThumbnailUpload = async (
@@ -51,10 +51,8 @@ export function ThumbnailUpload({
           reader.readAsDataURL(file);
         });
 
-        onThumbnailChange({
-          type: 'file',
-          file: base64,
-        });
+        onThumbnailChange(base64);
+
       } catch (error) {
         toast.error('Failed to process image file');
         console.error('File conversion error:', error);
@@ -76,31 +74,16 @@ export function ThumbnailUpload({
       return;
     }
 
-    onThumbnailChange({
-      type: 'url',
-      url: inputUrl.trim(),
-    });
+    onThumbnailChange(inputUrl.trim());
     toast.success('Image URL has been set');
   };
 
   const handleRemoveThumbnail = () => {
-    onThumbnailChange(null);
+    onThumbnailChange(undefined);
     setInputUrl('');
   };
 
-  const getThumbnailSrc = () => {
-    if (thumbnail?.type === 'file' && thumbnail.file) {
-      // For base64, the URL is the base64 string itself
-      return thumbnail.file;
-    }
-    if (thumbnail?.type === 'url' && thumbnail.url) {
-      return thumbnail.url;
-    }
-    return null;
-  };
 
-  const hasThumbnail = thumbnail !== null;
-  const thumbnailSrc = getThumbnailSrc();
 
   return (
     <Card>
@@ -116,17 +99,17 @@ export function ThumbnailUpload({
         {/* Thumbnail Preview */}
         <div className="flex items-start gap-6">
           <div className="relative group">
-            {hasThumbnail ? (
+            {thumbnail ? (
               <div className="w-32 h-32 rounded-xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm bg-white dark:bg-slate-800">
                 <img
-                  src={thumbnailSrc!}
+                  src={thumbnail}
                   alt="Thumbnail Preview"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   onError={() => {
                     toast.error(
                       'Failed to load image, please check if the URL is valid',
                     );
-                    onThumbnailChange(null);
+                    onThumbnailChange(undefined);
                     setInputUrl('');
                   }}
                 />
