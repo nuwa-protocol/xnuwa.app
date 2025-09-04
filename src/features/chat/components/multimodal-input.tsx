@@ -146,6 +146,11 @@ function PureMultimodalInput({ className }: { className?: string }) {
   }, [attachments.length]);
 
   const handleSend = async () => {
+    if (chat.status === 'streaming' || chat.status === 'submitted') {
+      toast.warning('Waiting for the model to finish processing the previous message...');
+      return;
+    }
+
     // Check if Cap has MCP servers and if they are initialized
     const hasMCPServers =
       currentCap?.core?.mcpServers &&

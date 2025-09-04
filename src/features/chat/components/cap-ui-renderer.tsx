@@ -20,7 +20,7 @@ const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
           </div>
           <div className="text-center space-y-2">
             <h3 className="text-lg font-medium text-foreground">
-              Failed to load UI
+              Failed to load Artifact
             </h3>
             <p className="text-sm text-muted-foreground max-w-sm">
               The artifact interface could not be loaded. Please try refreshing
@@ -108,7 +108,7 @@ export const CapUIRenderer = ({
   onPenpalConnectionError,
 }: CapUIRendererProps) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const [error, setError] = useState<Error | null>(null);
+
   const [height, setHeight] = useState<number>(100); // Default height
   const [isLoading, setIsLoading] = useState(true);
 
@@ -216,10 +216,6 @@ export const CapUIRenderer = ({
 
   if (!srcUrl) {
     console.error('No URL provided for HTML resource');
-    return <ErrorScreen artifact={artifact} />;
-  }
-
-  if (error) {
     return <ErrorScreen artifact={artifact} />;
   }
 

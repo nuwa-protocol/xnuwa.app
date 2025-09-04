@@ -35,7 +35,7 @@ function PureMessages({ isReadonly }: MessagesProps) {
   }, [messages]);
 
   const getLoaderMinHeight = () => {
-    const headerHeight = 196;
+    const headerHeight = 195;
     const calculatedMinHeight = Math.max(0, window.innerHeight - headerHeight - userMessagesHeight);
     return `${calculatedMinHeight}px`;
   };

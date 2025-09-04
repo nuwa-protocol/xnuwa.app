@@ -46,7 +46,7 @@ const PurePreviewMessage = ({
   // calculate the minimum height of the message
   const getMessageMinHeight = (shouldPushToTop: boolean, role: string) => {
     if (shouldPushToTop && role === 'assistant') {
-      const headerHeight = 196;
+      const headerHeight = 195;
       const calculatedMinHeight = Math.max(
         0,
         window.innerHeight - headerHeight - userMessagesHeight,
@@ -189,6 +189,8 @@ const PurePreviewMessage = ({
                   </Tool>
                 );
               }
+
+              return null;
             })}
 
 
