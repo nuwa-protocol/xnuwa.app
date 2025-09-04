@@ -6,7 +6,7 @@ import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';
 
 function ChatContent({ isReadonly }: { isReadonly: boolean }) {
-  const { chat, chatId } = useChatContext();
+  const { chat } = useChatContext();
   const { messages } = useChat({ chat });
 
   const renderEmptyState = () => (
@@ -23,7 +23,7 @@ function ChatContent({ isReadonly }: { isReadonly: boolean }) {
     <div className="flex flex-col relative min-w-0 h-screen bg-background">
       {/* Chat */}
       <div className={'flex flex-col w-full h-dvh bg-background'}>
-        <Header chatId={chatId} />
+        <Header chatId={chat.id} />
 
         {messages.length === 0 ? (
           renderEmptyState()

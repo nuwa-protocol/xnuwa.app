@@ -1,14 +1,13 @@
-import type { useChat } from '@ai-sdk/react';
+import { useChat } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { Button } from '@/shared/components/ui';
+import { useChatContext } from '../contexts';
 import { useSuggestedActions } from '../hooks/use-suggested-actions';
 
-interface SuggestedActionsProps {
-  sendMessage: ReturnType<typeof useChat>['sendMessage'];
-}
-
-function PureSuggestedActions({ sendMessage }: SuggestedActionsProps) {
+function PureSuggestedActions() {
+  const { chat } = useChatContext()
+  const { sendMessage } = useChat({ chat });
   const suggestedActions = useSuggestedActions();
 
   return (

@@ -4,52 +4,73 @@ import type { UIMessage } from 'ai';
 import cx from 'classnames';
 import { ArrowUpIcon, PaperclipIcon, StopCircleIcon } from 'lucide-react';
 import type React from 'react';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useId, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
-import { useScrollToBottom } from '@/features/chat/hooks/use-scroll-to-bottom';
 import { Button } from '@/shared/components/ui/button';
 import { useCurrentCap } from '@/shared/hooks/use-current-cap';
-import { useDevMode } from '@/shared/hooks/use-dev-mode';
 import type { Cap } from '@/shared/types';
 import { useChatContext } from '../contexts/chat-context';
+import { usePersistentInput } from '../hooks/use-persistent-input';
 import { useUpdateMessages } from '../hooks/use-update-messages';
+import { PreviewAttachment } from './preview-attachment';
 import { SuggestedActions } from './suggested-actions';
 
 function PureMultimodalInput({ className }: { className?: string }) {
   const { chat } = useChatContext();
+  const fileInputId = useId();
   const { messages, status, stop, setMessages, sendMessage } = useChat({
     chat,
   });
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { input, setInput, textareaRef, clearInput } = usePersistentInput();
   const { width } = useWindowSize();
-  const isDevMode = useDevMode();
   const { currentCap, isCurrentCapMCPInitialized, isCurrentCapMCPError } =
     useCurrentCap();
-  const [input, setInput] = useState('');
   const navigate = useNavigate();
-  const [localStorageInput, setLocalStorageInput] = useLocalStorage(
-    'input',
-    '',
-  );
   const { pathname } = useLocation();
+  const [showAttachments, setShowAttachments] = useState(false);
+  // File attachment state with base64 encoding support
+  const [attachments, setAttachments] = useState<
+    {
+      type: 'file';
+      mediaType: string;
+      filename?: string;
+      url: string;
+    }[]
+  >([]);
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      const domValue = textareaRef.current.value;
-      // Prefer DOM value over localStorage to handle hydration
-      const finalValue = domValue || localStorageInput || '';
-      setInput(finalValue);
-    }
-    // Only run once after hydration
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // File constraints
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const ACCEPTED_FILE_TYPES = [
+    // Images
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml',
 
-  useEffect(() => {
-    setLocalStorageInput(input);
-  }, [input, setLocalStorageInput]);
+    // Documents
+    'application/pdf',
+
+    // Text files
+    'text/plain',
+    'text/csv',
+    'text/markdown',
+    'application/json',
+    'text/html',
+    'text/css',
+    'text/javascript',
+    'application/javascript',
+
+    // Code files
+    'text/typescript',
+    'text/x-python',
+    'text/x-java',
+    'text/x-c',
+    'text/x-cpp',
+  ];
 
   // Auto focus when chat ID changes (page navigation)
   useEffect(() => {
@@ -58,25 +79,73 @@ function PureMultimodalInput({ className }: { className?: string }) {
     }
   }, [chat.id, width]);
 
-  const handleSubmit = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (input.trim()) {
-      sendMessage({ text: input });
-      setInput('');
-      if (pathname !== `/chat?cid=${chat.id}`) {
-        navigate(`/chat?cid=${chat.id}`, { replace: true });
+  // Convert file to base64 data URL
+  const convertFileToDataURL = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  // Handle file selection
+  const handleFileSelect = useCallback(async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const validFiles: File[] = [];
+    const errors: string[] = [];
+
+    // Validate files
+    Array.from(files).forEach((file) => {
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        errors.push(`${file.name} exceeds maximum size of ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
+        return;
       }
+
+      // Check file type
+      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+        errors.push(`${file.name} has unsupported file type: ${file.type}`);
+        return;
+      }
+
+      validFiles.push(file);
+    });
+
+    // Show validation errors
+    if (errors.length > 0) {
+      toast.error(errors.join(', '));
     }
-  };
 
-  const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(event.target.value);
-  };
+    // Convert valid files to attachments
+    try {
+      const newAttachments = await Promise.all(
+        validFiles.map(async (file) => ({
+          type: 'file' as const,
+          filename: file.name,
+          mediaType: file.type,
+          url: await convertFileToDataURL(file)
+        }))
+      );
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
+      setAttachments(prev => [...prev, ...newAttachments]);
+      setShowAttachments(true);
+    } catch (error) {
+      console.error('Error converting files:', error);
+      toast.error('Failed to process files');
+    }
+  }, [MAX_FILE_SIZE, ACCEPTED_FILE_TYPES, convertFileToDataURL]);
 
-  const submitForm = useCallback(() => {
+  // Remove attachment
+  const removeAttachment = useCallback((index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+    if (attachments.length === 1) {
+      setShowAttachments(false);
+    }
+  }, [attachments.length]);
+
+  const handleSend = async () => {
     // Check if Cap has MCP servers and if they are initialized
     const hasMCPServers =
       currentCap?.core?.mcpServers &&
@@ -87,33 +156,45 @@ function PureMultimodalInput({ className }: { className?: string }) {
       return;
     }
 
-    handleSubmit(undefined);
+    if (input.trim() || attachments.length > 0) {
+      sendMessage({
+        text: input,
+        files: attachments.length > 0 ? attachments : undefined,
+      });
 
-    setLocalStorageInput('');
+      clearInput();
+      setAttachments([]);
+      setShowAttachments(false);
+
+      if (pathname !== `/chat?cid=${chat.id}`) {
+        navigate(`/chat?cid=${chat.id}`, { replace: true });
+      }
+    }
 
     if (width && width > 768) {
       textareaRef.current?.focus();
     }
-  }, [
-    handleSubmit,
-    setLocalStorageInput,
-    width,
-    currentCap,
-    isCurrentCapMCPInitialized,
-    isCurrentCapMCPError,
-  ]);
-
-  const { isAtBottom, scrollToBottom } = useScrollToBottom();
-
-  useEffect(() => {
-    if (status === 'submitted') {
-      scrollToBottom();
-    }
-  }, [status, scrollToBottom]);
+  }
 
   return (
     <div className="relative w-full flex flex-col gap-4">
-      {messages.length === 0 && <SuggestedActions sendMessage={sendMessage} />}
+      {messages.length === 0 && <SuggestedActions />}
+
+      {showAttachments && attachments.length > 0 && (
+        <div className="flex flex-wrap gap-2 p-2">
+          {attachments.map((attachment, index) => (
+            <PreviewAttachment
+              key={`${attachment.filename || 'file'}-${index}`}
+              attachment={{
+                name: attachment.filename || 'Unknown file',
+                url: attachment.url,
+                contentType: attachment.mediaType
+              }}
+              onRemove={() => removeAttachment(index)}
+            />
+          ))}
+        </div>
+      )}
 
       <div
         className={cx(
@@ -126,7 +207,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
           ref={textareaRef}
           placeholder="Send a message..."
           value={input}
-          onChange={handleInput}
+          onChange={(event) => setInput(event.target.value)}
           className="flex-1 min-h-[50px] max-h-[calc(25dvh-48px)] overflow-auto hide-scrollbar resize-none text-base bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none pt-3 px-3 pb-0"
           rows={2}
           autoFocus
@@ -150,7 +231,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
                 );
               }
 
-              submitForm();
+              handleSend();
             }
           }}
         />
@@ -160,10 +241,32 @@ function PureMultimodalInput({ className }: { className?: string }) {
             <CapSelector />
           </div>
 
-          <div className="flex items-center">
-            {/* {isDevMode && (
-              <AttachmentsButton fileInputRef={fileInputRef} status={status} />
-            )} */}
+          <div className="flex items-center gap-2">
+            {/* File Input */}
+            <input
+              type="file"
+              id={fileInputId}
+              multiple
+              accept={ACCEPTED_FILE_TYPES.join(',')}
+              onChange={(e) => handleFileSelect(e.target.files)}
+              className="hidden"
+              data-testid="file-input"
+            />
+            {/* Attachment Toggle Button */}
+            <Button
+              type="button"
+              onClick={() => {
+                const fileInput = document.getElementById(fileInputId) as HTMLInputElement;
+                fileInput?.click();
+              }}
+              variant="ghost"
+              size="sm"
+              className={`p-1.5 h-fit rounded-md hover:bg-accent ${attachments.length > 0 ? 'bg-accent text-primary' : ''}`}
+              data-testid="attachment-toggle"
+            >
+              <PaperclipIcon size={14} />
+            </Button>
+
             {status === 'submitted' || status === 'streaming' ? (
               <StopButton
                 stop={stop}
@@ -173,8 +276,8 @@ function PureMultimodalInput({ className }: { className?: string }) {
             ) : (
               <SendButton
                 input={input}
-                submitForm={submitForm}
-                uploadQueue={uploadQueue}
+                attachments={attachments}
+                submitForm={handleSend}
                 currentCap={currentCap}
                 isCurrentCapMCPInitialized={isCurrentCapMCPInitialized}
                 isCurrentCapMCPError={isCurrentCapMCPError}
@@ -188,31 +291,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
 }
 
 export const MultimodalInput = PureMultimodalInput;
-
-function PureAttachmentsButton({
-  fileInputRef,
-  status,
-}: {
-  fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
-  status: UseChatHelpers<UIMessage>['status'];
-}) {
-  return (
-    <Button
-      data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
-      onClick={(event) => {
-        event.preventDefault();
-        fileInputRef.current?.click();
-      }}
-      disabled={status !== 'ready'}
-      variant="ghost"
-    >
-      <PaperclipIcon size={14} />
-    </Button>
-  );
-}
-
-const AttachmentsButton = memo(PureAttachmentsButton);
 
 function PureStopButton({
   stop,
@@ -247,14 +325,19 @@ const StopButton = memo(PureStopButton);
 function PureSendButton({
   submitForm,
   input,
-  uploadQueue,
+  attachments,
   currentCap,
   isCurrentCapMCPInitialized,
   isCurrentCapMCPError,
 }: {
   submitForm: () => void;
   input: string;
-  uploadQueue: Array<string>;
+  attachments: {
+    type: 'file';
+    mediaType: string;
+    filename?: string;
+    url: string;
+  }[];
   currentCap: Cap;
   isCurrentCapMCPInitialized: boolean;
   isCurrentCapMCPError: boolean;
@@ -263,6 +346,8 @@ function PureSendButton({
   const hasMCPServers =
     currentCap?.core?.mcpServers &&
     Object.keys(currentCap.core.mcpServers).length > 0;
+
+  const hasContent = input.trim().length > 0 || attachments.length > 0;
 
   return (
     <Button
@@ -273,8 +358,7 @@ function PureSendButton({
         submitForm();
       }}
       disabled={
-        input.length === 0 ||
-        uploadQueue.length > 0 ||
+        !hasContent ||
         (hasMCPServers && (!isCurrentCapMCPInitialized || isCurrentCapMCPError))
       }
     >
@@ -284,8 +368,8 @@ function PureSendButton({
 }
 
 const SendButton = memo(PureSendButton, (prevProps, nextProps) => {
-  if (prevProps.uploadQueue.length !== nextProps.uploadQueue.length)
-    return false;
   if (prevProps.input !== nextProps.input) return false;
+  if (prevProps.attachments.length !== nextProps.attachments.length)
+    return false;
   return true;
 });

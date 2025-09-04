@@ -18,7 +18,6 @@ let globalNewChatId: string | null = null;
 
 interface ChatContextValue {
   chat: Chat<UIMessage>;
-  chatId: string;
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null);
@@ -197,7 +196,6 @@ export function ChatProvider({ children }: ChatProviderProps) {
 
   const value: ChatContextValue = {
     chat,
-    chatId: chat.id,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
