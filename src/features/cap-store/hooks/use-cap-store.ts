@@ -36,6 +36,18 @@ export const useCapStore = () => {
     return result.data;
   };
 
+  const fetchCapById = async (id: {id?: string, cid?: string}) => {
+    if (!capKit) {
+      throw new Error('CapKit not initialized');
+    }
+
+    const result = await capKit.queryByID(
+      id
+    );
+
+    return result.data;
+  }
+
   const fetchFavoriteStatus = async (capId: string) => {
     if (!capKit) {
       throw new Error('CapKit not initialized');
@@ -132,18 +144,32 @@ export const useCapStore = () => {
     });
   };
 
-  const runCap = useCallback(async (capId: string, version: string, capCid: string, stats: CapStats) => {
+  const runCap = useCallback(async (capId: string, 
+    opt?: {version: string, capCid: string, stats: CapStats}) => {
     const installedCap = installedCaps[capId];
+
+    let version = opt?.version;
+    let stats = opt?.stats;
+    let capCid = opt?.capCid;
 
     if (!installedCap) {
       const capData = await downloadCapByID(capId);
+      if (!opt) {
+        const result = await fetchCapById({id: capId})
+        version = result?.version;
+        stats = result?.stats;
+        capCid = result?.cid;
+      } 
       addInstalledCap({
-        cid: capCid,
+        cid: capCid || '',
         capData,
-        version,
-        stats: {
-          ...stats,
-          downloads: stats.downloads + 1,
+        version: version || '',
+        stats: stats || {
+          capId: capId,
+          downloads: 0,
+          ratingCount: 0,
+          averageRating: 0,
+          favorites: 0,
         },
         isFavorite: false,
         lastUsedAt: Date.now(),

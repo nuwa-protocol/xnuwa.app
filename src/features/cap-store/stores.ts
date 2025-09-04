@@ -1,6 +1,6 @@
 // cap-store.ts
 // Store for managing capability (Cap) states
-import { create } from 'zustand';
+import { create, type StateCreator } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { defaultCap } from '@/shared/constants/cap';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
@@ -83,7 +83,7 @@ const persistConfig = createPersistConfig<CapStoreState>({
 
 // ================= Store Definition ================= //
 
-export const CapStateStore = create<CapStoreState>()(
+export const CapStateStore = create<CapStoreState>(
   persist(
     (set, get) => ({
       // Store state
@@ -91,6 +91,8 @@ export const CapStateStore = create<CapStoreState>()(
         [defaultCap.id]: {
           cid: defaultCap.id,
           capData: defaultCap,
+          isFavorite: false,
+          version: '0',
           stats: {
             capId: defaultCap.id,
             downloads: 0,
@@ -98,8 +100,6 @@ export const CapStateStore = create<CapStoreState>()(
             averageRating: 0,
             favorites: 0,
           },
-          version: '0',
-          isFavorite: false,
           lastUsedAt: null,
         },
       },
@@ -127,10 +127,10 @@ export const CapStateStore = create<CapStoreState>()(
             [cap.capData.id]: {
               cid: cap.cid,
               capData: cap.capData,
-              version: cap.version,
-              stats: cap.stats,
               isFavorite: cap.isFavorite,
               lastUsedAt: cap.lastUsedAt,
+              version: cap.version,
+              stats: cap.stats,
             },
           },
         }));
@@ -225,15 +225,14 @@ export const CapStateStore = create<CapStoreState>()(
 
           const installedCapsMap: Record<string, InstalledCap> = {};
 
-          installedCaps.forEach((installedCap: any) => {
-            const { id, ...capData } = installedCap;
-            installedCapsMap[id] = {
-              cid: capData.cid,
-              capData: capData.capData,
-              version: capData.version,
-              stats: capData.stats,
-              isFavorite: capData.isFavorite,
-              lastUsedAt: capData.lastUsedAt,
+          installedCaps.forEach((installedCap: InstalledCap) => {
+            installedCapsMap[installedCap.capData.id] = {
+              cid: installedCap.cid,
+              capData: installedCap.capData,
+              isFavorite: installedCap.isFavorite,
+              lastUsedAt: installedCap.lastUsedAt,
+              version: installedCap.version,
+              stats: installedCap.stats,
             };
           });
 
@@ -265,5 +264,5 @@ export const CapStateStore = create<CapStoreState>()(
       },
     }),
     persistConfig,
-  ),
+  ) as StateCreator<CapStoreState>,
 );

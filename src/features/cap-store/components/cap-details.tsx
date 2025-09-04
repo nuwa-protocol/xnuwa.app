@@ -66,7 +66,10 @@ export function CapDetails() {
   const handleRunCap = async () => {
     setIsLoading(true);
     try {
-      await runCap(cap.capData.id, cap.version, cap.cid, cap.stats);
+      await runCap(cap.capData.id, {
+        version: cap.version, capCid: cap.cid, stats: cap.stats
+      }
+      );
       navigate('/chat');
     } finally {
       setIsLoading(false);
