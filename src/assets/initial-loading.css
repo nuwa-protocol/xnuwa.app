@@ -1,0 +1,101 @@
+/* Priority loading styles */
+#initial-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+#initial-loading .loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+#initial-loading .loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top: 2px solid #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+
+#initial-loading .loading-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.9);
+  margin: 0 0 8px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.4;
+}
+
+#initial-loading .loading-subtext {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.4;
+}
+
+/* Dark theme */
+@media (prefers-color-scheme: dark) {
+  html:not(.light) body {
+    background-color: black;
+  }
+  html:not(.light) #initial-loading {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  html:not(.light) #initial-loading .loading-spinner {
+    border-color: rgba(255, 255, 255, 0.2);
+    border-top-color: white;
+  }
+  html:not(.light) #initial-loading .loading-text {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  html:not(.light) #initial-loading .loading-subtext {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Explicit theme overrides */
+html.dark body { background-color: black !important; }
+html.dark #initial-loading { background: rgba(0, 0, 0, 0.3) !important; }
+html.dark #initial-loading .loading-spinner { 
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  border-top-color: white !important; 
+}
+html.dark #initial-loading .loading-text { color: rgba(255, 255, 255, 0.9) !important; }
+html.dark #initial-loading .loading-subtext { color: rgba(255, 255, 255, 0.6) !important; }
+
+html.light body { background-color: white !important; }
+html.light #initial-loading { background: rgba(255, 255, 255, 0.3) !important; }
+html.light #initial-loading .loading-spinner { 
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  border-top-color: #000 !important; 
+}
+html.light #initial-loading .loading-text { color: rgba(0, 0, 0, 0.9) !important; }
+html.light #initial-loading .loading-subtext { color: rgba(0, 0, 0, 0.6) !important; }
+
+/* States and animations */
+@keyframes spin { to { transform: rotate(360deg); } }
+#initial-loading.hidden { opacity: 0; pointer-events: none; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  #initial-loading .loading-content { padding: 24px 16px; }
+  #initial-loading .loading-text { font-size: 16px; }
+  #initial-loading .loading-subtext { font-size: 13px; }
+}

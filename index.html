@@ -34,8 +34,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    
+    <!-- Priority loading Loading styles -->
+    <link rel="stylesheet" href="/src/assets/initial-loading.css">
+    
+    <!-- Initialize theme class before React loads -->
+    <script>
+      // Get stored theme or system preference
+      const storedTheme = localStorage.getItem('nuwa-ui-theme');
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      let theme = 'light';
+      if (storedTheme === 'dark' || (storedTheme === 'system' && systemDark) || (!storedTheme && systemDark)) {
+        theme = 'dark';
+      }
+      
+      // Add theme class immediately
+      document.documentElement.classList.add(theme);
+    </script>
   </head>
   <body>
+    <!-- Priority loading Loading interface -->
+    <div id="initial-loading">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <h2 class="loading-text">Initializing application</h2>
+        <p class="loading-subtext">Please wait...</p>
+      </div>
+    </div>
+    
+    <!-- React App -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
