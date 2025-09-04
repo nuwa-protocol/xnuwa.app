@@ -33,7 +33,7 @@ export const useChatPage = () => {
 
   useEffect(() => {
     if (capId && !isCapLoading) {
-      toast.promise(runCap(capId), {
+      toast.promise(runCap(capId, ), {
         loading: 'Downloading cap...',
         success: (capData) => {
           return `Cap:${capData?.metadata.displayName} successfully downloaded`;

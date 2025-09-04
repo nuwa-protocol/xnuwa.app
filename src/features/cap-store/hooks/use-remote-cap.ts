@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import { CapStateStore, type UseRemoteCapParams } from '../stores';
 import type { InstalledCap, RemoteCap } from '../types';
-import { ResultCap } from '@nuwa-ai/cap-kit';
 
 /**
  * Hook for accessing the remote caps with advanced filtering, sorting, and pagination
@@ -92,9 +91,8 @@ export function useRemoteCap() {
         // Check if we have more data
         const totalItems = response.data?.items?.length || 0;
         setHasMoreData(totalItems === sizeNum);
-
         if (append) {
-          setRemoteCaps((prevCaps) => [...prevCaps, ...newRemoteCaps]);
+          setRemoteCaps([...remoteCaps, ...newRemoteCaps]);
           setCurrentPage(pageNum);
         } else {
           setRemoteCaps(newRemoteCaps);
