@@ -63,7 +63,6 @@ export function MessageEditor({
         return part;
       }),
     };
-    console.log(updatedMessage)
 
     // Update UI state - keep messages up to and including the edited message
     setMessages((messages) => {
