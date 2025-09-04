@@ -1,5 +1,7 @@
 // to fix: need to unify the MCP client
 
+import Form from '@rjsf/shadcn';
+import validator from '@rjsf/validator-ajv8';
 import {
   ArrowLeft,
   BrushCleaning,
@@ -22,7 +24,6 @@ import {
   CardHeader,
   CardTitle,
   Input,
-  Label,
   ScrollArea,
   Select,
   SelectContent,
@@ -62,9 +63,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   const [connecting, setConnecting] = useState(false);
   const [client, setClient] = useState<NuwaMCPClient | null>(null);
   const [tools, setTools] = useState<Record<string, any>>({});
-  const [toolParams, setToolParams] = useState<
-    Record<string, Record<string, string>>
-  >({});
+  const [toolParams, setToolParams] = useState<Record<string, any>>({});
   const [toolSearch, setToolSearch] = useState<string>('');
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isCallingTool, setIsCallingTool] = useState(false);
@@ -152,17 +151,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         });
 
         // Initialize tool parameters
-        const initialParams: Record<string, Record<string, string>> = {};
+        const initialParams: Record<string, any> = {};
         Object.entries(toolsList).forEach(([toolName, tool]) => {
           initialParams[toolName] = {};
-          // Initialize parameters based on input schema if available
-          if (tool.inputSchema?.jsonSchema?.properties) {
-            Object.keys(tool.inputSchema.jsonSchema.properties).forEach(
-              (param) => {
-                initialParams[toolName][param] = '';
-              },
-            );
-          }
         });
 
         setToolParams(initialParams);
@@ -298,18 +289,17 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
       pushLog({
         type: 'info',
-        message: client
-          ? 'Disconnected from MCP server'
-          : 'Closed UI preview',
+        message: client ? 'Disconnected from MCP server' : 'Closed UI preview',
       });
 
-      toast.success(client
-        ? 'Successfully disconnected from MCP server'
-        : 'UI preview closed'
+      toast.success(
+        client
+          ? 'Successfully disconnected from MCP server'
+          : 'UI preview closed',
       );
 
       // Wait for renderer to fully unmount
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       pushLog({
         type: 'info',
@@ -335,14 +325,35 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         throw new Error('MCP client not connected');
       }
 
-      // Get parameters from state, filter out empty values
+      // Get parameters from RJSF form data and clean them
+      const rawArgs = toolParams[toolName] || {};
+      
+      // Filter out empty/undefined values
       const args = Object.fromEntries(
-        Object.entries(toolParams[toolName] || {}).filter(
-          ([, value]) => value.trim() !== '',
-        ),
+        Object.entries(rawArgs).filter(([_, value]) => 
+          value !== '' && value !== null && value !== undefined
+        )
       );
 
-      const result = await client.raw.callTool({ name: toolName, arguments: args });
+      pushLog({
+        type: 'info',
+        message: `📤 Calling with arguments: ${JSON.stringify(args, null, 2)}`,
+        data: { arguments: args },
+        copyable: true,
+      });
+
+      // Use the same pattern as in mcp-client.ts for calling tools
+      const passThroughSchema = { parse: (v: any) => v } as const;
+      const result = await (client.raw as any).request({
+        request: {
+          method: 'tools/call',
+          params: {
+            name: toolName,
+            arguments: args,
+          },
+        },
+        resultSchema: passThroughSchema,
+      });
 
       pushLog({
         type: 'result',
@@ -356,10 +367,11 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         message: `✅ Tool ${toolName} executed successfully`,
       });
     } catch (error) {
-      const errorMessage = `❌ Tool call failed: ${error}`;
+      const errorMessage = `❌ Tool call failed: ${error instanceof Error ? error.message : String(error)}`;
       pushLog({
         type: 'error',
         message: errorMessage,
+        data: { error: error instanceof Error ? error.stack : error },
         copyable: true,
       });
     } finally {
@@ -367,17 +379,10 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
     }
   };
 
-  const updateToolParam = (
-    toolName: string,
-    paramName: string,
-    value: string,
-  ) => {
+  const updateToolParams = (toolName: string, formData: any) => {
     setToolParams((prev) => ({
       ...prev,
-      [toolName]: {
-        ...prev[toolName],
-        [paramName]: value,
-      },
+      [toolName]: formData,
     }));
   };
 
@@ -489,7 +494,11 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="http://example.com/mcp"
-                  disabled={connecting || connected || (mcpType === 'MCP UI' && showUIPreview)}
+                  disabled={
+                    connecting ||
+                    connected ||
+                    (mcpType === 'MCP UI' && showUIPreview)
+                  }
                   className="h-10"
                 />
               </div>
@@ -502,7 +511,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                   <div className="flex items-center space-x-3 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 px-4 py-3 rounded-lg">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                     <div className="flex-1">
-                      <span className="font-medium">Connected to {url} via MCP</span>
+                      <span className="font-medium">
+                        Connected to {url} via MCP
+                      </span>
                       <div className="text-xs text-green-600 dark:text-green-500 mt-1">
                         {Object.keys(tools).length} tools available
                       </div>
@@ -639,8 +650,6 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                   filteredTools.map(([toolName, tool]) => {
                     const toolSchema =
                       tool.inputSchema?.jsonSchema?.properties || {};
-                    const requiredParams =
-                      tool.inputSchema?.jsonSchema?.required || [];
                     const hasParams = Object.keys(toolSchema).length > 0;
 
                     return (
@@ -670,51 +679,27 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                               <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                                 Parameters
                               </div>
-                              {Object.entries(toolSchema).map(
-                                ([paramName, paramDef]: [string, any]) => {
-                                  const paramId = `${toolName}-${paramName}`;
-                                  return (
-                                    <div
-                                      key={paramName}
-                                      className="grid w-full items-center gap-1.5"
-                                    >
-                                      <Label
-                                        htmlFor={paramId}
-                                        className="text-xs"
-                                      >
-                                        {paramName}
-                                        {paramDef.type && (
-                                          <span className="text-muted-foreground ml-1">
-                                            ({paramDef.type}){' '}
-                                            {requiredParams.includes(paramName)
-                                              ? ' (required)'
-                                              : ''}
-                                          </span>
-                                        )}
-                                      </Label>
-                                      <Input
-                                        id={paramId}
-                                        size={10}
-                                        placeholder={
-                                          paramDef.description ||
-                                          `Enter ${paramName}`
-                                        }
-                                        value={
-                                          toolParams[toolName][paramName] || ''
-                                        }
-                                        onChange={(e) =>
-                                          updateToolParam(
-                                            toolName,
-                                            paramName,
-                                            e.target.value,
-                                          )
-                                        }
-                                        className="text-xs h-8"
-                                      />
-                                    </div>
-                                  );
-                                },
-                              )}
+                              <Form
+                                schema={tool.inputSchema.jsonSchema}
+                                validator={validator}
+                                formData={toolParams[toolName] || {}}
+                                onChange={(e) =>
+                                  updateToolParams(toolName, e.formData)
+                                }
+                                uiSchema={{
+                                  ...Object.keys(toolSchema).reduce((acc, paramName) => {
+                                    const paramDef = toolSchema[paramName];
+                                    acc[paramName] = {
+                                      'ui:title': `${paramName} ${paramDef.type ? `(${paramDef.type})` : ''}`,
+                                      'ui:placeholder': paramDef.description || `Enter ${paramName}`,
+                                    };
+                                    return acc;
+                                  }, {} as Record<string, any>),
+                                  'ui:submitButtonOptions': {
+                                    norender: true,
+                                  },
+                                }}
+                              />
                             </div>
                           </CardContent>
                         )}
@@ -837,7 +822,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         <div className="w-2/3">
           <Card className="h-full border-none shadow-none">
             <CardHeader>
-              <CardTitle className='sr-only'>UI Preview</CardTitle>
+              <CardTitle className="sr-only">UI Preview</CardTitle>
             </CardHeader>
             <CardContent className="w-full h-full max-h-screen bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden">
               {url && showUIPreview ? (
