@@ -156,8 +156,8 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         Object.entries(toolsList).forEach(([toolName, tool]) => {
           initialParams[toolName] = {};
           // Initialize parameters based on input schema if available
-          if (tool.parameters.jsonSchema) {
-            Object.keys(tool.parameters.jsonSchema.properties).forEach(
+          if (tool.inputSchema?.jsonSchema?.properties) {
+            Object.keys(tool.inputSchema.jsonSchema.properties).forEach(
               (param) => {
                 initialParams[toolName][param] = '';
               },
@@ -342,7 +342,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         ),
       );
 
-      const result = await tools[toolName].execute(args);
+      const result = await client.raw.callTool({ name: toolName, arguments: args });
 
       pushLog({
         type: 'result',
@@ -638,9 +638,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                 ) : (
                   filteredTools.map(([toolName, tool]) => {
                     const toolSchema =
-                      tool.parameters.jsonSchema?.properties || {};
+                      tool.inputSchema?.jsonSchema?.properties || {};
                     const requiredParams =
-                      tool.parameters.jsonSchema?.required || [];
+                      tool.inputSchema?.jsonSchema?.required || [];
                     const hasParams = Object.keys(toolSchema).length > 0;
 
                     return (
