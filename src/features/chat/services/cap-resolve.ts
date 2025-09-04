@@ -1,7 +1,4 @@
-import { createOpenAI } from '@ai-sdk/openai';
-import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import { GlobalMCPManager } from '@/shared/services/global-mcp-manager';
-import { createPaymentFetch } from '@/shared/services/payment-fetch';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 
@@ -9,7 +6,6 @@ export class CapResolve {
   private cap: Cap;
   private isCurrentCapMCPError: boolean;
   private hasMCPServers: boolean;
-  private openai: ReturnType<typeof createOpenAI>;
 
   constructor() {
     const { currentCap, isCurrentCapMCPError } = CurrentCapStore.getState();
@@ -19,12 +15,6 @@ export class CapResolve {
     this.cap = currentCap;
     this.isCurrentCapMCPError = isCurrentCapMCPError;
     this.hasMCPServers = Object.keys(this.cap.core.mcpServers).length > 0;
-
-    this.openai = createOpenAI({
-      apiKey: 'NOT-USED',
-      baseURL: LLM_GATEWAY_BASE_URL,
-      fetch: createPaymentFetch(LLM_GATEWAY_BASE_URL),
-    });
   }
 
   private async getUserLocation(): Promise<string> {
@@ -88,7 +78,7 @@ export class CapResolve {
   async getResolvedConfig() {
     return {
       prompt: await this.getResolvedPrompt(),
-      modelId: this.cap.core.model.modelId,
+      model: this.cap.core.model,
       tools: await this.getResolvedTools(),
     };
   }

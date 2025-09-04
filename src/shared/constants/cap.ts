@@ -1,3 +1,4 @@
+import { LLM_GATEWAY_BASE_URL } from '../config/llm-gateway';
 import type { Cap } from '../types/cap-new';
 
 export const predefinedTags = [
@@ -28,11 +29,10 @@ export const defaultCap: Cap = {
       suggestions: [],
     },
     model: {
-      gatewayUrl: 'https://api.openai.com/v1',
+      gatewayUrl: LLM_GATEWAY_BASE_URL,
       modelId: 'gpt-4o',
       parameters: {
         temperature: 0.7,
-        max_tokens: 4000,
       },
       supportedInputs: ['text', 'image'],
       modelType: 'Language Model',

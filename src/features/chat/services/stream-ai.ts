@@ -24,7 +24,7 @@ export const StreamAIResponse = async ({
 }) => {
   // Resolve cap configuration
   const capResolve = new CapResolve();
-  const { prompt, modelId, tools } = await capResolve.getResolvedConfig();
+  const { prompt, model, tools } = await capResolve.getResolvedConfig();
 
   // create a new chat session and update the messages
   const { updateMessages, addPaymentCtxIdToChatSession } =
@@ -55,7 +55,7 @@ export const StreamAIResponse = async ({
     execute: ({ writer }) => {
       let hasSendOnResponseDataMark = false;
       const result = streamText({
-        model: llmProvider.chat(modelId),
+        model: llmProvider.chat(model),
         system: prompt,
         messages: convertToModelMessages(messages),
         experimental_transform: smoothStream({ chunking: 'word' }),
@@ -72,6 +72,7 @@ export const StreamAIResponse = async ({
           });
           hasSendOnResponseDataMark = true;
         },
+        providerOptions: model.parameters,
       });
       writer.merge(
         result.toUIMessageStream({
