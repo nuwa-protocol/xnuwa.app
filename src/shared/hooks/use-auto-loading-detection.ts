@@ -1,6 +1,29 @@
 import { useEffect, useState } from 'react';
 
 /**
+ * Hide the HTML inline loading interface
+ */
+function hideInitialLoading() {
+  const loadingElement = document.getElementById('initial-loading');
+  if (loadingElement && !loadingElement.classList.contains('hidden')) {
+    loadingElement.classList.add('hidden');
+
+    // Remove the element after the animation ends, release memory
+    loadingElement.remove();
+  }
+}
+
+/**
+ * Hook to hide initial loading screen immediately
+ * Use this in error pages or anywhere you need to force hide the loading screen
+ */
+export function useHideInitialLoading() {
+  useEffect(() => {
+    hideInitialLoading();
+  }, []);
+}
+
+/**
  * Check component is ready
  * - Check React App is ready
  * - Check if the critical components are rendered
@@ -53,19 +76,4 @@ export function useAutoLoadingDetection() {
       };
     }
   }, [isAppReady]);
-}
-
-/**
- * Hide the HTML inline loading interface
- */
-function hideInitialLoading() {
-  const loadingElement = document.getElementById('initial-loading');
-  if (loadingElement) {
-    loadingElement.classList.add('hidden');
-
-    // Remove the element after the animation ends, release memory
-    setTimeout(() => {
-      loadingElement.remove();
-    }, 300); // Corresponding CSS transition duration
-  }
 }

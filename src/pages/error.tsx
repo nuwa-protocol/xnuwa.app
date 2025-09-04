@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { useStorage } from '@/shared/hooks/use-storage';
+import { useHideInitialLoading } from '@/shared/hooks/use-auto-loading-detection';
 
 export const DevErrorCard = ({ error }: { error: Error | object }) => {
   const [copied, setCopied] = useState(false);
@@ -187,6 +188,9 @@ export const UserErrorCard = ({
 };
 
 export default function ErrorPage() {
+  // Hide initial loading screen when error page renders
+  useHideInitialLoading();
+  
   const error = useRouteError();
 
   let title = 'Oops, something went wrong!';
