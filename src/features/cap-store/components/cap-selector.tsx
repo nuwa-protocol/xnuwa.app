@@ -114,17 +114,17 @@ function CapSelectorButton() {
         <DropdownMenuContent align="start" className="min-w-[200px]">
           {favoriteCaps.map((cap) => (
             <DropdownMenuItem
-              key={cap.id}
+              key={cap.capData.id}
               className="cursor-pointer"
-              onSelect={() => handleCapSelect(cap)}
+              onSelect={() => handleCapSelect(cap.capData)}
             >
               <div className="flex items-center gap-2">
                 <CapAvatar
-                  capName={cap.metadata.displayName}
-                  capThumbnail={cap.metadata.thumbnail}
+                  capName={cap.capData.metadata.displayName}
+                  capThumbnail={cap.capData.metadata.thumbnail}
                   size="sm"
                 />
-                <span className="text-sm">{cap.metadata.displayName}</span>
+                <span className="text-sm">{cap.capData.metadata.displayName}</span>
               </div>
             </DropdownMenuItem>
           ))}
