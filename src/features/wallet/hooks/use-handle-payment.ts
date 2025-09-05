@@ -1,11 +1,11 @@
 import { type PaymentAsset, type PaymentResult, pay } from '@reown/appkit-pay';
 import { assetMap, networkMap, recipientMap } from '../constants';
+import { WalletStore } from '../stores';
 import type { Asset, Network } from '../types';
 import { useNuwaToUsdRate } from './use-nuwa-to-usd-rate';
-import { useWallet } from './use-wallet';
 
 export const useHandlePayment = () => {
-  const { addTransaction, setBalance, balance } = useWallet();
+  const { addTransaction, setBalance, balance } = WalletStore();
   const nuwaToUsdRate = useNuwaToUsdRate();
 
   const getRecipientAddress = (network: Network): string => {

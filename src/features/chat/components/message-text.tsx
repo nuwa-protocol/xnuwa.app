@@ -17,7 +17,7 @@ import {
 } from '@/shared/components/ui/tooltip';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { cn } from '@/shared/utils';
-import { useChatSessions } from '../hooks';
+import { useDeleteMessagesAfterId } from '../hooks';
 import { ResponseWithUI } from './message-ai-ui';
 import { MessageEditor } from './message-editor';
 
@@ -47,7 +47,7 @@ export const MessageText = ({
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [isExpanded, setIsExpanded] = useState(false);
   const [copyToClipboard, isCopied] = useCopyToClipboard();
-  const { deleteMessagesAfterId, updateSession } = useChatSessions();
+  const { deleteMessagesAfterId } = useDeleteMessagesAfterId();
 
   const key = `message-${message.id}-part-${index}`;
 

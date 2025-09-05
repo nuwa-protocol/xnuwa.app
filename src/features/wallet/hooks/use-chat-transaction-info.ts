@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ChatStateStore } from '@/features/chat/stores';
+import { ChatSessionsStore } from '@/features/chat/stores';
 import { getHttpClient } from '@/shared/services/payment-clients';
 import type { ChatRecord, PaymentTransaction } from '../types';
 
@@ -7,7 +7,7 @@ export const useChatTransactionInfo = () => {
   const [chatRecords, setChatRecords] = useState<ChatRecord[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const { getChatSessionsSortedByUpdatedAt } = ChatStateStore.getState();
+  const { getChatSessionsSortedByUpdatedAt } = ChatSessionsStore.getState();
 
   const fetchChatRecords = useCallback(async () => {
     try {

@@ -8,7 +8,7 @@ import {
   type UIMessage,
 } from 'ai';
 import { generateUUID } from '@/shared/utils';
-import { ChatStateStore } from '../stores';
+import { ChatSessionsStore } from '../stores';
 import { CapResolve } from './cap-resolve';
 import { llmProvider } from './providers';
 
@@ -28,7 +28,7 @@ export const StreamAIResponse = async ({
 
   // create a new chat session and update the messages
   const { updateMessages, addPaymentCtxIdToChatSession } =
-    ChatStateStore.getState();
+    ChatSessionsStore.getState();
   await updateMessages(chatId, messages);
 
   // create payment CTX id header

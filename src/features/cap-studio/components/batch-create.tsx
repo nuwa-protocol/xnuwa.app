@@ -24,7 +24,7 @@ import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import { useAuth } from '@/shared/hooks';
 import { CapSchema } from '@/shared/types';
 import { useAvailableModels } from '../hooks';
-import { useLocalCapsHandler } from '../hooks/use-local-caps-handler';
+import { CapStudioStore } from '../stores';
 import type { LocalCap } from '../types';
 
 interface BatchCreateProps {
@@ -65,7 +65,7 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
   const navigate = useNavigate();
   const { did } = useAuth();
   const { models } = useAvailableModels(LLM_GATEWAY_BASE_URL);
-  const { createCap } = useLocalCapsHandler();
+  const { createCap } = CapStudioStore();
   const [uploading, setUploading] = useState(false);
   const [showJsonFormat, setShowJsonFormat] = useState(false);
   const [parsedData, setParsedData] = useState<{

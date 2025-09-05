@@ -30,8 +30,8 @@ const getCurrentDID = async () => {
 const chatDB = db;
 
 // chat store state interface
-interface ChatStoreState {
-  sessions: Record<string, ChatSession>;
+interface ChatSessionsStoreState {
+  chatSessions: Record<string, ChatSession>;
 
   // session CRUD operations
   getChatSession: (id: string) => ChatSession | null;
@@ -59,11 +59,11 @@ interface ChatStoreState {
 
 // ================= Persist Configuration ================= //
 
-const persistConfig = createPersistConfig<ChatStoreState>({
+const persistConfig = createPersistConfig<ChatSessionsStoreState>({
   name: 'chat-storage',
   getCurrentDID: getCurrentDID,
   partialize: (state) => ({
-    sessions: state.sessions,
+    chatSessions: state.chatSessions,
   }),
   onRehydrateStorage: () => (state) => {
     if (state) {
@@ -74,19 +74,19 @@ const persistConfig = createPersistConfig<ChatStoreState>({
 
 // ================= Store Factory ================= //
 
-export const ChatStateStore = create<ChatStoreState>()(
+export const ChatSessionsStore = create<ChatSessionsStoreState>()(
   persist(
     (set, get) => ({
-      sessions: {},
+      chatSessions: {},
 
       getChatSession: (id: string) => {
-        const { sessions } = get();
-        return sessions[id] || null;
+        const { chatSessions } = get();
+        return chatSessions[id] || null;
       },
 
       getChatSessionsSortedByUpdatedAt: () => {
-        const { sessions } = get();
-        return Object.values(sessions).sort(
+        const { chatSessions } = get();
+        return Object.values(chatSessions).sort(
           (a, b) => b.updatedAt - a.updatedAt,
         );
       },
@@ -96,7 +96,7 @@ export const ChatStateStore = create<ChatStoreState>()(
         updates: Partial<Omit<ChatSession, 'id'>>,
       ) => {
         set((state) => {
-          let session = state.sessions[id];
+          let session = state.chatSessions[id];
           // if session not found, create new session
           if (!session) {
             session = {
@@ -117,8 +117,8 @@ export const ChatStateStore = create<ChatStoreState>()(
           };
 
           return {
-            sessions: {
-              ...state.sessions,
+            chatSessions: {
+              ...state.chatSessions,
               [id]: updatedSession,
             },
           };
@@ -132,7 +132,7 @@ export const ChatStateStore = create<ChatStoreState>()(
         payment: ChatPayment,
       ) => {
         set((state) => {
-          const session = state.sessions[id];
+          const session = state.chatSessions[id];
           // if session not found, create new session
           if (!session) {
             const newSession = {
@@ -146,8 +146,8 @@ export const ChatStateStore = create<ChatStoreState>()(
             };
 
             return {
-              sessions: {
-                ...state.sessions,
+              chatSessions: {
+                ...state.chatSessions,
                 [id]: newSession,
               },
             };
@@ -159,8 +159,8 @@ export const ChatStateStore = create<ChatStoreState>()(
             };
 
             return {
-              sessions: {
-                ...state.sessions,
+              chatSessions: {
+                ...state.chatSessions,
                 [id]: updatedSession,
               },
             };
@@ -172,9 +172,9 @@ export const ChatStateStore = create<ChatStoreState>()(
 
       deleteSession: (id: string) => {
         set((state) => {
-          const { [id]: deleted, ...restSessions } = state.sessions;
+          const { [id]: deleted, ...restSessions } = state.chatSessions;
           return {
-            sessions: restSessions,
+            chatSessions: restSessions,
           };
         });
 
@@ -197,7 +197,7 @@ export const ChatStateStore = create<ChatStoreState>()(
 
       updateMessages: async (chatId: string, messages: UIMessage[]) => {
         set((state) => {
-          let session = state.sessions[chatId];
+          let session = state.chatSessions[chatId];
           let isNewSession = false;
 
           // if session not found, create new session
@@ -231,8 +231,8 @@ export const ChatStateStore = create<ChatStoreState>()(
             };
 
             const newState = {
-              sessions: {
-                ...state.sessions,
+              chatSessions: {
+                ...state.chatSessions,
                 [chatId]: updatedSession,
               },
             };
@@ -248,7 +248,7 @@ export const ChatStateStore = create<ChatStoreState>()(
 
       clearAllSessions: () => {
         set({
-          sessions: {},
+          chatSessions: {},
         });
 
         // clear IndexedDB
@@ -285,7 +285,7 @@ export const ChatStateStore = create<ChatStoreState>()(
           });
 
           set((state) => ({
-            sessions: { ...state.sessions, ...sessionsMap },
+            chatSessions: { ...state.chatSessions, ...sessionsMap },
           }));
         } catch (error) {
           console.error('Failed to load from DB:', error);
@@ -299,8 +299,8 @@ export const ChatStateStore = create<ChatStoreState>()(
           const currentDID = await getCurrentDID();
           if (!currentDID) return;
 
-          const { sessions } = get();
-          const chatsToSave = Object.values(sessions).map((session) => ({
+          const { chatSessions } = get();
+          const chatsToSave = Object.values(chatSessions).map((session) => ({
             ...session,
             did: currentDID,
           }));

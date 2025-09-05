@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
-import { useChatSessions } from '@/features/chat/hooks/use-chat-sessions';
+import { ChatSessionsStore } from '@/features/chat/stores';
 
 export const useSearch = () => {
-  const { sessionsMap } = useChatSessions();
+  const { chatSessions } = ChatSessionsStore();
   const [query, setQuery] = useState('');
 
   const sessionList = useMemo(
-    () => Object.values(sessionsMap).sort((a, b) => b.updatedAt - a.updatedAt),
-    [sessionsMap],
+    () => Object.values(chatSessions).sort((a, b) => b.updatedAt - a.updatedAt),
+    [chatSessions],
   );
   const filtered = useMemo(() => {
     if (!query.trim()) return sessionList;

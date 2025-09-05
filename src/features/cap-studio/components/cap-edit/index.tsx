@@ -9,8 +9,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui';
-import { useLocalCaps } from '../../hooks';
-import { useEditForm } from '../../hooks/use-edit-form';
+import { useEditForm } from '../../hooks';
+import { CapStudioStore } from '../../stores';
 import { getErrorDescription } from '../../utils';
 import { DashboardLayout } from '../layout/dashboard-layout';
 import { ArtifactTab } from './artifact';
@@ -21,7 +21,7 @@ import { PromptTab } from './prompt';
 
 export function CapEdit() {
   const { id } = useParams();
-  const localCaps = useLocalCaps();
+  const { localCaps } = CapStudioStore();
   const editingCap = id ? localCaps.find((cap) => cap.id === id) : undefined;
 
   const { form, handleFormSave, handleFormCancel, isSaving } = useEditForm({

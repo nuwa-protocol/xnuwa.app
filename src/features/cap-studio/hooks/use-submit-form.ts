@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import type { CapThumbnail } from '@/shared/types/cap-new';
-import { useLocalCapsHandler } from '../hooks/use-local-caps-handler';
-import { useSubmitCap } from '../hooks/use-submit-cap';
+import { useSubmitCap } from '../hooks';
+import { CapStudioStore } from '../stores';
 import type { LocalCap } from '../types';
 
 interface UseSubmitFormProps {
@@ -13,7 +13,7 @@ interface UseSubmitFormProps {
 export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { updateCap } = useLocalCapsHandler();
+  const { updateCap } = CapStudioStore();
   const { submitCap } = useSubmitCap();
 
   const handleCancel = () => {

@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui';
-import { useSubmitForm } from '../../hooks/use-submit-form';
+import { useSubmitForm } from '../../hooks';
 import type { LocalCap } from '../../types';
 
 interface CapSubmitFormProps {

@@ -1,6 +1,6 @@
 import { generateText, type UIMessage } from 'ai';
 import { generateUUID } from '@/shared/utils';
-import { ChatStateStore } from '../stores';
+import { ChatSessionsStore } from '../stores';
 import { llmProvider } from './providers';
 
 // Generate a title from the first message a user begins a conversation with
@@ -12,7 +12,7 @@ export async function generateTitleFromUserMessage({
   chatId: string;
   message: UIMessage;
 }) {
-  const { addPaymentCtxIdToChatSession } = ChatStateStore.getState();
+  const { addPaymentCtxIdToChatSession } = ChatSessionsStore.getState();
 
   // create payment ctx id header
   const paymentCtxId = generateUUID();

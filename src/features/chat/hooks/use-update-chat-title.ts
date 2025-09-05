@@ -1,9 +1,9 @@
 import { generateTitleFromUserMessage } from '../services';
-import { ChatStateStore } from '../stores';
+import { ChatSessionsStore } from '../stores';
 import { handleError } from '../utils';
 
 export const useUpdateChatTitle = () => {
-  const store = ChatStateStore();
+  const store = ChatSessionsStore();
 
   const updateTitle = async (chatId: string) => {
     const session = store.getChatSession(chatId);

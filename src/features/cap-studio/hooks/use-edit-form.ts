@@ -11,8 +11,8 @@ import {
   CapIDNameSchema,
   CapMetadataSchema,
 } from '@/shared/types/cap-new';
+import { CapStudioStore } from '../stores';
 import type { LocalCap } from '../types';
-import { useLocalCapsHandler } from './use-local-caps-handler';
 
 const CapFormDataSchema = z.object({
   idName: CapIDNameSchema,
@@ -29,7 +29,7 @@ interface UseEditFormProps {
 export const useEditForm = ({ editingCap }: UseEditFormProps) => {
   const navigate = useNavigate();
   const { did } = useAuth();
-  const { createCap, updateCap } = useLocalCapsHandler();
+  const { createCap, updateCap } = CapStudioStore();
   const [isSaving, setIsSaving] = useState(false);
 
   const form = useForm<CapFormData>({

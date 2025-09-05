@@ -37,7 +37,7 @@ import {
 } from '@/shared/components/ui';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import { APP_URL } from '@/shared/config/app';
-import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
+import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
 
 interface CapCardProps {
@@ -63,7 +63,7 @@ export function CapCard({
   onToggleSelect,
   onEnterMultiSelectMode,
 }: CapCardProps) {
-  const { deleteCap } = useLocalCapsHandler();
+  const { deleteCap } = CapStudioStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);

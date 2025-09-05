@@ -5,10 +5,11 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { generateUUID } from '@/shared/utils';
-import { useChatSessions } from '../hooks/use-chat-sessions';
 import { useUpdateChatTitle } from '../hooks/use-update-chat-title';
 import { createClientAIFetch } from '../services';
+import { ChatSessionsStore } from '../stores';
 import { convertToUIMessage } from '../utils';
 import { ChatErrorCode, handleError } from '../utils/handl-error';
 
@@ -37,8 +38,21 @@ interface ChatProviderProps {
 export function ChatProvider({ children }: ChatProviderProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { addCurrentCapsToChat, getSession, sessionsMap } = useChatSessions();
+  const { getChatSession, chatSessions, updateSession } = ChatSessionsStore();
   const { updateTitle } = useUpdateChatTitle();
+  const { currentCap } = useCurrentCap();
+
+  const addCurrentCapsToChat = async (chatId: string) => {
+    const currentSession = getChatSession(chatId);
+    if (!currentSession) return;
+    if (!currentCap) return;
+
+    if (currentSession.caps.some((c) => c.id === currentCap.id)) return;
+
+    await updateSession(chatId, {
+      caps: [...currentSession.caps, currentCap],
+    });
+  };
 
   // Get chatId from URL, or generate a new one for new chats
   const cid = searchParams.get('cid');
@@ -85,8 +99,8 @@ export function ChatProvider({ children }: ChatProviderProps) {
       chatIdRef.current = currentChatId;
       // Get session data - use empty array for new chats to prevent re-initialization
       const existingSession =
-        currentChatId && sessionsMap[currentChatId]
-          ? sessionsMap[currentChatId]
+        currentChatId && chatSessions[currentChatId]
+          ? chatSessions[currentChatId]
           : null;
       const initialMessages = existingSession
         ? existingSession.messages.map(convertToUIMessage)
@@ -139,7 +153,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
           window.location.search,
         ).get('cid');
         if (currentUrlChatId !== currentChatId && !chat.error) {
-          const session = getSession(currentChatId);
+          const session = getChatSession(currentChatId);
           toast.success(
             `Your chat ${session ? `"${session.title}"` : ''} is completed`,
             {
@@ -172,7 +186,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
 
       return newChatInstance;
     },
-    [cid, sessionsMap], // Add sessionsMap to dependencies to handle session changes
+    [cid, chatSessions], // Add sessionsMap to dependencies to handle session changes
   );
 
   // Handle navigation from new chat to existing chat
@@ -180,7 +194,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
     // If we're on a new chat page (no cid) and we have a generated chat ID
     if (!cid && globalNewChatId && chat.id === globalNewChatId) {
       // Only navigate when we actually start chatting (have messages)
-      const existingSession = sessionsMap[chat.id];
+      const existingSession = chatSessions[chat.id];
       if (existingSession && existingSession.messages.length > 0) {
         // Set navigation flag before navigating
         isNavigatingRef.current = true;
@@ -192,7 +206,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
     if (cid && globalNewChatId === cid && !isNavigatingRef.current) {
       globalNewChatId = null;
     }
-  }, [cid, chat.id, navigate, sessionsMap]);
+  }, [cid, chat.id, navigate, chatSessions]);
 
   const value: ChatContextValue = {
     chat,

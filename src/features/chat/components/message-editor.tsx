@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { useChatSessions } from '../hooks/use-chat-sessions';
+import { useDeleteMessagesAfterId } from '../hooks/use-delete-messages-after-id';
 
 export type MessageEditorProps = {
   chatId: string;
@@ -30,7 +30,7 @@ export function MessageEditor({
   const [draftContent, setDraftContent] = useState<string>(message.parts.find((part) => part.type === 'text')?.text ?? '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { deleteMessagesAfterId } = useChatSessions();
+  const { deleteMessagesAfterId } = useDeleteMessagesAfterId();
 
   useEffect(() => {
     if (textareaRef.current) {

@@ -1,7 +1,7 @@
 import { EditIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/shared/hooks';
-import { useChatSessions } from '../hooks/use-chat-sessions';
+import { ChatSessionsStore } from '../stores';
 import { RenameDialog } from './rename-dialog';
 
 interface HeaderProps {
@@ -9,8 +9,8 @@ interface HeaderProps {
 }
 
 export default function Header({ chatId }: HeaderProps) {
-  const { sessionsMap, updateSession } = useChatSessions();
-  const session = sessionsMap[chatId || ''] || null;
+  const { chatSessions, updateSession } = ChatSessionsStore();
+  const session = chatSessions[chatId || ''] || null;
   const { t } = useLanguage();
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);

@@ -6,8 +6,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/shared/components/ui/sheet';
-import { useUrlMetadata } from '../hooks/use-url-metadata';
 import type { UrlMetadata } from '../types';
+import { getUrlMetadata } from '../utils/url-metadata';
 import { SourceCard } from './source-card';
 
 interface MessageSourceSidebarProps {
@@ -25,7 +25,6 @@ export const MessageSourceSidebar = ({
     {},
   );
   const [loading, setLoading] = useState(false);
-  const { getUrlMetadata } = useUrlMetadata();
 
   useEffect(() => {
     if (!isOpen || sources.length === 0) return;

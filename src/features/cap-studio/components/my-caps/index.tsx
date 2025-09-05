@@ -1,4 +1,12 @@
-import { CheckSquare, ChevronDown, Plus, Search, Send, Trash2, Upload } from 'lucide-react';
+import {
+  CheckSquare,
+  ChevronDown,
+  Plus,
+  Search,
+  Send,
+  Trash2,
+  Upload,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -14,9 +22,8 @@ import {
   Input,
   Progress,
 } from '@/shared/components/ui';
-import { useLocalCaps } from '../../hooks';
-import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
-import { useSubmitCap } from '../../hooks/use-submit-cap';
+import { useSubmitCap } from '../../hooks';
+import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
 import { DashboardGrid } from '../layout/dashboard-layout';
 import { CapCard } from './cap-card';
@@ -37,9 +44,8 @@ export function MyCaps({
   onBulkDelete,
 }: MyCapsProps) {
   const navigate = useNavigate();
-  const localCaps = useLocalCaps();
   const [searchQuery, setSearchQuery] = useState('');
-  const { deleteCap } = useLocalCapsHandler();
+  const { localCaps, deleteCap } = CapStudioStore();
   const { bulkSubmitCaps, bulkProgress } = useSubmitCap();
 
   // Multi-select state
@@ -74,7 +80,9 @@ export function MyCaps({
 
   const handleBulkDelete = () => {
     const selectedCaps = allCaps.filter((cap) => selectedCapIds.has(cap.id));
-    selectedCaps.forEach((cap) => deleteCap(cap.id));
+    selectedCaps.forEach((cap) => {
+      deleteCap(cap.id);
+    });
     if (onBulkDelete) {
       onBulkDelete(selectedCaps);
     }
@@ -195,24 +203,28 @@ export function MyCaps({
         <div className="flex items-center">
           {!isMultiSelectMode ? (
             <>
-              <Button onClick={onCreateNew} className='rounded-r-none w-32'>
+              <Button onClick={onCreateNew} className="rounded-r-none w-32">
                 <Plus className="h-4 w-4 mr-2" />
                 New Cap
               </Button>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild className='focus:ring-0 focus:ring-transparent focus:ring-offset-0'>
-                  <Button className='rounded-l-none border-l-0 px-2 w-10'>
+                <DropdownMenuTrigger
+                  asChild
+                  className="focus:ring-0 focus:ring-transparent focus:ring-offset-0"
+                >
+                  <Button className="rounded-l-none border-l-0 px-2 w-10">
                     <ChevronDown />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align='end' className='w-40'>
-                  <DropdownMenuItem onClick={() => navigate('/cap-studio/batch-create')}>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem
+                    onClick={() => navigate('/cap-studio/batch-create')}
+                  >
                     <Upload className="h-4 w-4 mr-2" />
                     Batch Create
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
             </>
           ) : (
             <>
