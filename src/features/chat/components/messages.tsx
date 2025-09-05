@@ -1,5 +1,5 @@
 import { useChat } from '@ai-sdk/react';
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useChatContext } from '../contexts/chat-context';
 import {
   Conversation,
@@ -95,7 +95,4 @@ function PureMessages({ isReadonly }: MessagesProps) {
   );
 }
 
-export const Messages = memo(PureMessages, (prevProps, nextProps) => {
-  if (prevProps.isReadonly !== nextProps.isReadonly) return false;
-  return true;
-});
+export const Messages = PureMessages

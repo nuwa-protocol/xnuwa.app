@@ -9,16 +9,6 @@ function ChatContent({ isReadonly }: { isReadonly: boolean }) {
   const { chat } = useChatContext();
   const { messages } = useChat({ chat });
 
-  const renderEmptyState = () => (
-    <CenteredWelcome>
-      <div className="w-full max-w-4xl space-y-6">
-        <div className="px-4">
-          <MultimodalInput />
-        </div>
-      </div>
-    </CenteredWelcome>
-  );
-
   return (
     <div className="flex flex-col relative min-w-0 h-screen bg-background">
       {/* Chat */}
@@ -26,7 +16,13 @@ function ChatContent({ isReadonly }: { isReadonly: boolean }) {
         <Header chatId={chat.id} />
 
         {messages.length === 0 ? (
-          renderEmptyState()
+          <CenteredWelcome>
+            <div className="w-full max-w-4xl space-y-6">
+              <div className="px-4">
+                <MultimodalInput />
+              </div>
+            </div>
+          </CenteredWelcome>
         ) : (
           <>
             <Messages isReadonly={isReadonly} />
