@@ -10,7 +10,9 @@ import {
   ToolHeader,
   ToolInput,
   ToolOutput,
+  ToolResult,
 } from '@/shared/components/ui/shadcn-io/tool';
+import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { cn } from '@/shared/utils';
 import { useChatContext } from '../contexts/chat-context';
 import { MessageActions } from './message-actions';
@@ -18,7 +20,6 @@ import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { MessageText } from './message-text';
 import { PreviewAttachment } from './preview-attachment';
-import { ToolResult } from './tool-result';
 
 const PurePreviewMessage = ({
   index,
@@ -33,15 +34,12 @@ const PurePreviewMessage = ({
 }) => {
   const { chat } = useChatContext();
   const { messages, status, setMessages, regenerate } = useChat({ chat });
-
+  const [copy, isCopied] = useCopyToClipboard();
   const [mode, setMode] = useState<'view' | 'edit'>('view');
-
 
   const attachmentsFromMessage = (message.parts || []).filter(
     (part) => part.type === 'file',
   );
-
-
 
   // calculate the minimum height of the message
   const getMessageMinHeight = (shouldPushToTop: boolean, role: string) => {
@@ -56,17 +54,16 @@ const PurePreviewMessage = ({
     return undefined;
   };
 
-  const isStreaming =
-    status === 'streaming' && messages.length - 1 === index;
+  const isStreaming = status === 'streaming' && messages.length - 1 === index;
   const isStreamingReasoning =
     isStreaming &&
     message.role === 'assistant' &&
     message.parts?.some((part) => part.type === 'reasoning') &&
     !message.parts?.some((part) => part.type === 'text');
 
-  const shouldPushToTop = status === 'submitted' && index === messages.length - 1;
+  const shouldPushToTop =
+    status === 'submitted' && index === messages.length - 1;
   const minHeight = getMessageMinHeight(shouldPushToTop, message.role);
-
 
   return (
     <AnimatePresence>
@@ -168,22 +165,26 @@ const PurePreviewMessage = ({
                   <Tool key={toolCallId} defaultOpen={false}>
                     <ToolHeader type={`tool-${toolName}`} state={state} />
                     <ToolContent>
-                      {state === 'input-available' && <ToolInput input={input} />}
+                      <div className="text-xs text-muted-foreground ml-6">
+                        Tool Call ID:{' '}
+                        <code
+                          className="bg-muted-foreground/20 px-1 py-0.5 rounded text-xs font-mono cursor-pointer hover:bg-muted-foreground/10"
+                          onClick={() => copy(toolCallId)}
+                        >
+                          {isCopied ? 'Copied' : toolCallId}
+                        </code>
+                      </div>
+                      {state === 'input-available' && (
+                        <ToolInput input={input} />
+                      )}
                       {state === 'output-available' && (
                         <div>
                           <ToolInput input={input} />
                           <ToolOutput
-                            output={
-                              <ToolResult
-                                toolName={toolName}
-                                result={output}
-                                toolCallId={toolCallId}
-                              />
-                            }
+                            output={<ToolResult result={output} />}
                             errorText={undefined}
                           />
                         </div>
-
                       )}
                     </ToolContent>
                   </Tool>
@@ -192,8 +193,6 @@ const PurePreviewMessage = ({
 
               return null;
             })}
-
-
 
             {!isReadonly && (
               <MessageActions

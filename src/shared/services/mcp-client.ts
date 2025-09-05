@@ -258,8 +258,8 @@ export async function createNuwaMCPClient(
       },
     };
 
-    // Add execute() methods to prompts for easier access
-    await enhancePromptsWithExecute(client);
+    // Deprecated: Add execute() methods to prompts for easier access
+    // await enhancePromptsWithExecute(client);
 
     return client;
   })();
@@ -288,6 +288,7 @@ export async function closeNuwaMCPClient(url: string): Promise<void> {
 }
 
 /**
+ * @deprecated
  * Enhances the client by adding execute() methods to each prompt
  * for more convenient access.
  */

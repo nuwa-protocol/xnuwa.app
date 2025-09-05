@@ -104,6 +104,16 @@ export const ToolInput = ({ className, input, ...props }: ToolInputProps) => (
   </div>
 );
 
+export type ToolResultProps = ComponentProps<'div'> & {
+  result: unknown;
+};
+
+export const ToolResult = ({ className, result, ...props }: ToolResultProps) => (
+  <div className={cn('rounded-md bg-muted/50', className)} {...props}>
+    <CodeBlock code={JSON.stringify(result, null, 2)} language="json" />
+  </div>
+);
+
 export type ToolOutputProps = ComponentProps<'div'> & {
   output: ReactNode;
   errorText: ToolUIPart['errorText'];
