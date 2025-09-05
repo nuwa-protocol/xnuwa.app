@@ -51,14 +51,14 @@ interface McpProps {
   mcpUIUrl: string | null;
 }
 
-type MCPType = 'MCP Server' | 'MCP UI';
+type MCPType = 'Remote MCP' | 'Artifact MCP';
 
 export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   const navigate = useNavigate();
   const serverUrlId = useId();
   const mcpTypeId = useId();
   const [url, setUrl] = useState('');
-  const [mcpType, setMcpType] = useState<MCPType>('MCP Server');
+  const [mcpType, setMcpType] = useState<MCPType>('Remote MCP');
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [client, setClient] = useState<NuwaMCPClient | null>(null);
@@ -86,11 +86,11 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   // Auto-populate connection details when server is specified via URL parameter
   useEffect(() => {
     if (mcpServerUrl) {
-      setMcpType('MCP Server');
+      setMcpType('Remote MCP');
       setUrl(mcpServerUrl);
     }
     if (mcpUIUrl) {
-      setMcpType('MCP UI');
+      setMcpType('Artifact MCP');
       setUrl(mcpUIUrl);
     }
   }, [mcpServerUrl, mcpUIUrl]);
@@ -105,10 +105,10 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         message: `Connecting to ${url} with Streamable HTTP transport`,
       });
 
-      // Only handle MCP Server connections in this function
-      if (mcpType !== 'MCP Server') {
+      // Only handle Remote MCP connections in this function
+      if (mcpType !== 'Remote MCP') {
         throw new Error(
-          'handleConnect should only be used for MCP Server connections',
+          'handleConnect should only be used for Remote MCP connections',
         );
       }
 
@@ -117,7 +117,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
       pushLog({
         type: 'success',
-        message: 'Successfully connected to MCP server',
+        message: 'Successfully connected to Remote MCP server',
       });
 
       await handleToolsDiscovery(newClient);
@@ -182,7 +182,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         setClient(mcpClient);
         pushLog({
           type: 'success',
-          message: '🔌 MCP connection established via UI',
+          message: '🔌 MCP connection established via Artifact MCP',
         });
 
         await handleToolsDiscovery(mcpClient);
@@ -280,7 +280,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         setTools({});
       }
 
-      // Always reset UI state for MCP UI mode
+      // Always reset UI state for Artifact MCP mode
       setPenpalConnected(false);
       setShowUIPreview(false);
 
@@ -289,13 +289,13 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
       pushLog({
         type: 'info',
-        message: client ? 'Disconnected from MCP server' : 'Closed UI preview',
+        message: client ? 'Disconnected from Remote MCP server' : 'Closed Artifact MCP preview',
       });
 
       toast.success(
         client
-          ? 'Successfully disconnected from MCP server'
-          : 'UI preview closed',
+          ? 'Successfully disconnected from Remote MCP server'
+          : 'Artifact MCP preview closed',
       );
 
       // Wait for renderer to fully unmount
@@ -424,7 +424,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
   return (
     <div
-      className={`flex gap-6 ${mcpType === 'MCP UI' ? '' : 'max-w-3xl mx-auto'}`}
+      className={`flex gap-6 ${mcpType === 'Artifact MCP' ? '' : 'max-w-3xl mx-auto'}`}
     >
       <div className="flex-1 space-y-6">
         {/* Header */}
@@ -477,8 +477,8 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                     <SelectValue placeholder="Select MCP Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="MCP Server">MCP Server</SelectItem>
-                    <SelectItem value="MCP UI">MCP UI</SelectItem>
+                    <SelectItem value="Remote MCP">Remote MCP</SelectItem>
+                    <SelectItem value="Artifact MCP">Artifact MCP</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -497,7 +497,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                   disabled={
                     connecting ||
                     connected ||
-                    (mcpType === 'MCP UI' && showUIPreview)
+                    (mcpType === 'Artifact MCP' && showUIPreview)
                   }
                   className="h-10"
                 />
@@ -522,7 +522,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                   </div>
                 )}
 
-                {penpalConnected && mcpType === 'MCP UI' && (
+                {penpalConnected && mcpType === 'Artifact MCP' && (
                   <div className="flex items-center space-x-3 text-sm text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 px-4 py-3 rounded-lg">
                     <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                     <span className="font-medium">
@@ -543,8 +543,8 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
             {/* Connection Actions */}
             <div className="flex items-center justify-between pt-2">
               <div className="flex items-center space-x-2">
-                {/* Launch UI Button - only show for MCP UI type and when not connected */}
-                {mcpType === 'MCP UI' && !showUIPreview && (
+                {/* Launch UI Button - only show for Artifact MCP type and when not connected */}
+                {mcpType === 'Artifact MCP' && !showUIPreview && (
                   <Button
                     onClick={() => {
                       setShowUIPreview(true);
@@ -558,8 +558,8 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                   </Button>
                 )}
 
-                {/* Connect/Disconnect buttons - only show for MCP Server type */}
-                {mcpType === 'MCP Server' &&
+                {/* Connect/Disconnect buttons - only show for Remote MCP type */}
+                {mcpType === 'Remote MCP' &&
                   (connected ? (
                     <Button
                       onClick={handleDisconnect}
@@ -591,8 +591,8 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                     </Button>
                   ))}
 
-                {/* Disconnect button for MCP UI when connected */}
-                {mcpType === 'MCP UI' && (connected || showUIPreview) && (
+                {/* Disconnect button for Artifact MCP when connected */}
+                {mcpType === 'Artifact MCP' && (connected || showUIPreview) && (
                   <Button
                     onClick={handleDisconnect}
                     variant="destructive"
@@ -818,7 +818,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       </div>
 
       {/* UI Preview - Right Side Panel */}
-      {mcpType === 'MCP UI' && (
+      {mcpType === 'Artifact MCP' && (
         <div className="w-2/3">
           <Card className="h-full border-none shadow-none">
             <CardHeader>
@@ -828,7 +828,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
               {url && showUIPreview ? (
                 <CapUIRenderer
                   srcUrl={url}
-                  title="MCP UI Preview"
+                  title="Artifact MCP Preview"
                   artifact={true}
                   onPenpalConnected={handlePenpalConnected}
                   onMCPConnected={handleMCPConnected}
@@ -842,7 +842,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
               ) : (
                 <div className="text-muted-foreground text-center py-8 space-y-2">
                   {!url ? (
-                    <p>Enter a URL to preview the MCP UI</p>
+                    <p>Enter a URL to preview the Artifact MCP</p>
                   ) : (
                     <>
                       <p>Click "Launch UI" to preview the interface</p>

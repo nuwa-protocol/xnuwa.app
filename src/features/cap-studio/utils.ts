@@ -35,8 +35,8 @@ export const getFieldDisplayName = (path: string): string => {
     'core.prompt.suggestions': 'Prompt Suggestions',
     'core.model.gatewayUrl': 'Gateway URL',
     'core.model.modelId': 'Model ID',
-    'core.mcpServers': 'MCP Servers',
-    'core.uiUrl': 'UI URL',
+    'core.mcpServers': 'Remote MCP',
+    'core.artifact': 'Artifact URL',
   };
 
   return fieldMap[path] || path;

@@ -52,13 +52,13 @@ export const CapPromptSchema = z.object({
 
 export const CapMcpServerSchema = z.string().url('Must be a valid URL');
 
-export const CapUISchema = z.string().url('Must be a valid URL');
+export const CapArtifactSchema = z.string().url('Must be a valid URL');
 
 export const CapCoreSchema = z.object({
   prompt: CapPromptSchema,
   model: CapModelSchema,
   mcpServers: z.record(z.string(), CapMcpServerSchema),
-  uiUrl: CapUISchema.optional(),
+  artifact: CapArtifactSchema.optional(),
 });
 
 export const CapThumbnailSchema = z

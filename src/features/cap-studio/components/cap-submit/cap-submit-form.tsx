@@ -101,7 +101,7 @@ export function CapSubmitForm({
             </div>
             <div>
               <div className="text-sm font-medium text-muted-foreground">
-                MCP Servers
+                Remote MCP
               </div>
               <p className="text-sm">
                 {Object.keys(cap.capData.core.mcpServers).length > 0

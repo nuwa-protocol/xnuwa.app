@@ -147,9 +147,9 @@ export function McpServersConfig({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-base">MCP Servers</CardTitle>
+            <CardTitle className="text-base">Remote MCP</CardTitle>
             <CardDescription>
-              Set up MCP servers to provide tools for your Cap.
+              Set up Remote MCP servers to provide tools for your Cap.
             </CardDescription>
           </div>
           <Button
@@ -166,7 +166,7 @@ export function McpServersConfig({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Existing MCP servers */}
+          {/* Existing Remote MCP servers */}
           {Object.entries(mcpServers).map(([serverName, url]) => (
             <div
               key={serverName}
@@ -290,7 +290,7 @@ export function McpServersConfig({
 
           {Object.keys(mcpServers).length === 0 && !isAdding && (
             <div className="text-center py-8 text-muted-foreground">
-              <p>No MCP servers configured</p>
+              <p>No Remote MCP servers configured</p>
             </div>
           )}
         </div>

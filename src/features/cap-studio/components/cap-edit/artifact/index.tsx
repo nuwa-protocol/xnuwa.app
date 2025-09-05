@@ -17,20 +17,20 @@ import {
 } from '@/shared/components/ui';
 import { DashboardGrid } from '../../layout/dashboard-layout';
 
-interface UiTabProps {
+interface ArtifactTabProps {
   form: UseFormReturn<any>;
 }
 
-export function UiTab({ form }: UiTabProps) {
+export function ArtifactTab({ form }: ArtifactTabProps) {
   const navigate = useNavigate();
-  const currentUiUrl = form.watch('core.uiUrl') || '';
+  const currentUiUrl = form.watch('core.artifact') || '';
   const [isEditing, setIsEditing] = useState(!currentUiUrl);
   const [tempUrl, setTempUrl] = useState(currentUiUrl || '');
   const [urlError, setUrlError] = useState<string>('');
 
   const validateUrl = (url: string): string => {
     if (!url.trim()) {
-      return 'UI URL is required';
+      return 'Artifact URL is required';
     }
     try {
       new URL(url);
@@ -46,7 +46,7 @@ export function UiTab({ form }: UiTabProps) {
 
     if (!error) {
       const valueToSet = tempUrl.trim() === '' ? undefined : tempUrl;
-      form.setValue('core.uiUrl', valueToSet, { shouldValidate: true, shouldDirty: true });
+      form.setValue('core.artifact', valueToSet, { shouldValidate: true, shouldDirty: true });
       setIsEditing(false);
     }
   };
@@ -64,7 +64,7 @@ export function UiTab({ form }: UiTabProps) {
   };
 
   const handleRemove = () => {
-    form.setValue('core.uiUrl', undefined, { shouldValidate: true, shouldDirty: true });
+    form.setValue('core.artifact', undefined, { shouldValidate: true, shouldDirty: true });
     setTempUrl('');
     setIsEditing(true);
   };
@@ -81,7 +81,7 @@ export function UiTab({ form }: UiTabProps) {
     <DashboardGrid cols={1}>
       <FormField
         control={form.control}
-        name="core.uiUrl"
+        name="core.artifact"
         render={() => (
           <FormItem>
             <Card>
@@ -89,10 +89,10 @@ export function UiTab({ form }: UiTabProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-base">
-                      UI Configuration
+                      Artifact Configuration
                     </CardTitle>
                     <CardDescription>
-                      Set the URL for your Cap's user interface
+                      Set the URL for your Cap's artifact
                     </CardDescription>
                   </div>
                   {currentUiUrl && !isEditing && (
@@ -119,11 +119,11 @@ export function UiTab({ form }: UiTabProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Current UI URL Display */}
+                {/* Current Artifact URL Display */}
                 {currentUiUrl && !isEditing && (
                   <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium text-sm">UI URL</div>
+                      <div className="font-medium text-sm">Artifact URL</div>
                       <div className="text-xs text-muted-foreground truncate">
                         {currentUiUrl}
                       </div>
@@ -148,9 +148,9 @@ export function UiTab({ form }: UiTabProps) {
                     <CardContent className="pt-6">
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="ui-url">UI URL</Label>
+                          <Label htmlFor="ui-url">Artifact URL</Label>
                           <Input
-                            placeholder="https://example.com/your-ui"
+                            placeholder="https://example.com/your-artifact"
                             value={tempUrl}
                             onChange={(e) => {
                               const value = e.target.value;
@@ -190,7 +190,7 @@ export function UiTab({ form }: UiTabProps) {
 
                 {!currentUiUrl && !isEditing && (
                   <div className="text-center py-8 text-muted-foreground">
-                    <p>No UI URL configured</p>
+                    <p>No Artifact URL configured</p>
                   </div>
                 )}
               </CardContent>
