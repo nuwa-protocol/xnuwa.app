@@ -1,12 +1,12 @@
-// chat-store.ts
-// Store for managing chat sessions and message history with unified storage
+// chat-sessions-store.ts
+// Store for managing chat sessions and message history with persisted storage
 
 import type { UIMessage } from 'ai';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createPersistConfig, db } from '@/shared/storage';
-import type { ChatPayment, ChatSession } from './types';
+import type { ChatPayment, ChatSession } from '../types';
 
 // ================= Constants ================= //
 export const createInitialChatSession = (chatId: string): ChatSession => ({
