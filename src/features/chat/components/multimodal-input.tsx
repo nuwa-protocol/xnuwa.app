@@ -14,7 +14,7 @@ import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import type { Cap } from '@/shared/types';
 import { useChatContext } from '../contexts/chat-context';
 import { usePersistentInput } from '../hooks/use-persistent-input';
-import { useUpdateMessages } from '../hooks/use-update-messages';
+import { ChatStateStore } from '../stores';
 import { type AttachmentData, AttachmentInput } from './attachment-input';
 import { PreviewAttachment } from './preview-attachment';
 import { SuggestedActions } from './suggested-actions';
@@ -186,7 +186,7 @@ function PureStopButton({
   setMessages: UseChatHelpers<UIMessage>['setMessages'];
   chatId: string;
 }) {
-  const updateMessages = useUpdateMessages();
+  const { updateMessages } = ChatStateStore();
   return (
     <Button
       data-testid="stop-button"

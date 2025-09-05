@@ -1,11 +1,8 @@
 import { WalletIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { useCopyToClipboard } from 'usehooks-ts';
 import { Card, CardContent } from '@/shared/components/ui/card';
-import { useAuth } from '@/shared/hooks/use-auth';
-import { usePaymentHubRgas } from '@/shared/hooks/use-payment-hub';
 import { cn } from '@/shared/utils';
+import { WalletStore } from '../stores';
 
 interface SidebarWalletCardProps {
   className?: string;
@@ -13,34 +10,13 @@ interface SidebarWalletCardProps {
 
 export function SidebarWalletCard({ className }: SidebarWalletCardProps) {
   const navigate = useNavigate();
-  const { did, isConnected } = useAuth();
-  const { usd, loading, error } = usePaymentHubRgas();
-  const [_, copyToClipboard] = useCopyToClipboard();
+  const { usdAmount, balanceLoading, balanceError } = WalletStore();
 
-  const usdValue = loading ? '…' : error ? '-' : usd;
+  const usdValue = balanceLoading ? 'loading...' : balanceError ? 'Failed to load balance' : usdAmount;
 
   const handleClick = () => {
     navigate('/wallet');
   };
-
-  const handleCopyDid = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (did) {
-      await copyToClipboard(did);
-      toast.success('DID copied to clipboard!');
-    }
-  };
-
-  const formatDid = (did: string) => {
-    if (did.length > 16) {
-      return `${did.slice(0, 8)}...${did.slice(-8)}`;
-    }
-    return did;
-  };
-
-  if (!isConnected || !did) {
-    return null;
-  }
 
   return (
     <Card

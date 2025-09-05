@@ -7,8 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import { useDevMode } from '@/shared/hooks/use-dev-mode';
-import { usePaymentHubRgas } from '@/shared/hooks/use-payment-hub';
+import { WalletStore } from '../stores';
 import { TestnetFaucetDialog } from './testnet-faucet-dialog';
 
 interface BalanceCardProps {
@@ -16,12 +15,10 @@ interface BalanceCardProps {
 }
 
 export function BalanceCard({ onTopUp }: BalanceCardProps) {
-  const { amount, usd } = usePaymentHubRgas();
-  const isDevMode = useDevMode();
+  const { usdAmount, balanceLoading, balanceError } = WalletStore();
   const [showFaucetDialog, setShowFaucetDialog] = useState(false);
 
-  const rgasValue = amount;
-  const usdValue = usd;
+  const usdValue = balanceLoading ? 'loading...' : balanceError ? 'Failed to load balance' : usdAmount;
 
   return (
     <>

@@ -2,13 +2,19 @@ import { useChat } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { Button } from '@/shared/components/ui';
+import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { useChatContext } from '../contexts';
-import { useSuggestedActions } from '../hooks/use-suggested-actions';
 
 function PureSuggestedActions() {
-  const { chat } = useChatContext()
+  const { chat } = useChatContext();
   const { sendMessage } = useChat({ chat });
-  const suggestedActions = useSuggestedActions();
+  const { currentCap: cap } = useCurrentCap();
+
+  const suggestedActions =
+    cap?.core.prompt.suggestions?.map((suggestion) => ({
+      title: suggestion,
+      action: suggestion,
+    })) || [];
 
   return (
     <div
