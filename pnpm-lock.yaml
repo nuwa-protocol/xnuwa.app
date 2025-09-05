@@ -42,7 +42,7 @@ importers:
         specifier: link:../nuwa/nuwa-kit/typescript/packages/ui-kit
         version: link:../nuwa/nuwa-kit/typescript/packages/ui-kit
       '@openrouter/ai-sdk-provider':
-        specifier: ^1.1.2
+        specifier: ^1.2.0
         version: 1.2.0(ai@5.0.30(zod@3.25.76))(zod@3.25.76)
       '@radix-ui/react-accordion':
         specifier: ^1.2.11

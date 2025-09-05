@@ -34,7 +34,7 @@ export function AppSidebarContent() {
     navigate('/chat');
   };
 
-  // Add keyboard shortcut for new chat using manual event listener (similar to sidebar toggle)
+  // Add keyboard shortcut for new chat using manual event listener
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Try Cmd+K/Ctrl+K first

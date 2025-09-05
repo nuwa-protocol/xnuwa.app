@@ -2,9 +2,9 @@ import type { UseChatHelpers } from '@ai-sdk/react';
 import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import cx from 'classnames';
-import { ArrowUpIcon, PaperclipIcon, StopCircleIcon } from 'lucide-react';
+import { ArrowUpIcon, StopCircleIcon } from 'lucide-react';
 import type React from 'react';
-import { memo, useCallback, useEffect, useId, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWindowSize } from 'usehooks-ts';
@@ -15,12 +15,12 @@ import type { Cap } from '@/shared/types';
 import { useChatContext } from '../contexts/chat-context';
 import { usePersistentInput } from '../hooks/use-persistent-input';
 import { useUpdateMessages } from '../hooks/use-update-messages';
+import { type AttachmentData, AttachmentInput } from './attachment-input';
 import { PreviewAttachment } from './preview-attachment';
 import { SuggestedActions } from './suggested-actions';
 
 function PureMultimodalInput({ className }: { className?: string }) {
   const { chat } = useChatContext();
-  const fileInputId = useId();
   const { messages, status, stop, setMessages, sendMessage } = useChat({
     chat,
   });
@@ -30,47 +30,12 @@ function PureMultimodalInput({ className }: { className?: string }) {
     useCurrentCap();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [showAttachments, setShowAttachments] = useState(false);
-  // File attachment state with base64 encoding support
-  const [attachments, setAttachments] = useState<
-    {
-      type: 'file';
-      mediaType: string;
-      filename?: string;
-      url: string;
-    }[]
-  >([]);
+  const [attachments, setAttachments] = useState<AttachmentData[]>([]);
 
-  // File constraints
-  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-  const ACCEPTED_FILE_TYPES = [
-    // Images
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/webp',
-    'image/svg+xml',
-
-    // Documents
-    'application/pdf',
-
-    // Text files
-    'text/plain',
-    'text/csv',
-    'text/markdown',
-    'application/json',
-    'text/html',
-    'text/css',
-    'text/javascript',
-    'application/javascript',
-
-    // Code files
-    'text/typescript',
-    'text/x-python',
-    'text/x-java',
-    'text/x-c',
-    'text/x-cpp',
-  ];
+  // Remove attachment
+  const removeAttachment = useCallback((index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   // Auto focus when chat ID changes (page navigation)
   useEffect(() => {
@@ -79,75 +44,11 @@ function PureMultimodalInput({ className }: { className?: string }) {
     }
   }, [chat.id, width]);
 
-  // Convert file to base64 data URL
-  const convertFileToDataURL = useCallback((file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }, []);
-
-  // Handle file selection
-  const handleFileSelect = useCallback(async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-
-    const validFiles: File[] = [];
-    const errors: string[] = [];
-
-    // Validate files
-    Array.from(files).forEach((file) => {
-      // Check file size
-      if (file.size > MAX_FILE_SIZE) {
-        errors.push(`${file.name} exceeds maximum size of ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
-        return;
-      }
-
-      // Check file type
-      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
-        errors.push(`${file.name} has unsupported file type: ${file.type}`);
-        return;
-      }
-
-      validFiles.push(file);
-    });
-
-    // Show validation errors
-    if (errors.length > 0) {
-      toast.error(errors.join(', '));
-    }
-
-    // Convert valid files to attachments
-    try {
-      const newAttachments = await Promise.all(
-        validFiles.map(async (file) => ({
-          type: 'file' as const,
-          filename: file.name,
-          mediaType: file.type,
-          url: await convertFileToDataURL(file)
-        }))
-      );
-
-      setAttachments(prev => [...prev, ...newAttachments]);
-      setShowAttachments(true);
-    } catch (error) {
-      console.error('Error converting files:', error);
-      toast.error('Failed to process files');
-    }
-  }, [MAX_FILE_SIZE, ACCEPTED_FILE_TYPES, convertFileToDataURL]);
-
-  // Remove attachment
-  const removeAttachment = useCallback((index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
-    if (attachments.length === 1) {
-      setShowAttachments(false);
-    }
-  }, [attachments.length]);
-
   const handleSend = async () => {
     if (chat.status === 'streaming' || chat.status === 'submitted') {
-      toast.warning('Waiting for the model to finish processing the previous message...');
+      toast.warning(
+        'Waiting for the model to finish processing the previous message...',
+      );
       return;
     }
 
@@ -169,7 +70,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
 
       clearInput();
       setAttachments([]);
-      setShowAttachments(false);
 
       if (pathname !== `/chat?cid=${chat.id}`) {
         navigate(`/chat?cid=${chat.id}`, { replace: true });
@@ -179,13 +79,13 @@ function PureMultimodalInput({ className }: { className?: string }) {
     if (width && width > 768) {
       textareaRef.current?.focus();
     }
-  }
+  };
 
   return (
     <div className="relative w-full flex flex-col gap-4">
       {messages.length === 0 && <SuggestedActions />}
 
-      {showAttachments && attachments.length > 0 && (
+      {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 p-2">
           {attachments.map((attachment, index) => (
             <PreviewAttachment
@@ -193,7 +93,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
               attachment={{
                 name: attachment.filename || 'Unknown file',
                 url: attachment.url,
-                contentType: attachment.mediaType
+                contentType: attachment.mediaType,
               }}
               onRemove={() => removeAttachment(index)}
             />
@@ -247,30 +147,10 @@ function PureMultimodalInput({ className }: { className?: string }) {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* File Input */}
-            <input
-              type="file"
-              id={fileInputId}
-              multiple
-              accept={ACCEPTED_FILE_TYPES.join(',')}
-              onChange={(e) => handleFileSelect(e.target.files)}
-              className="hidden"
-              data-testid="file-input"
+            <AttachmentInput
+              attachments={attachments}
+              onAttachmentsChange={setAttachments}
             />
-            {/* Attachment Toggle Button */}
-            <Button
-              type="button"
-              onClick={() => {
-                const fileInput = document.getElementById(fileInputId) as HTMLInputElement;
-                fileInput?.click();
-              }}
-              variant="ghost"
-              size="sm"
-              className={`p-1.5 h-fit rounded-md hover:bg-accent ${attachments.length > 0 ? 'bg-accent text-primary' : ''}`}
-              data-testid="attachment-toggle"
-            >
-              <PaperclipIcon size={14} />
-            </Button>
 
             {status === 'submitted' || status === 'streaming' ? (
               <StopButton
@@ -337,12 +217,7 @@ function PureSendButton({
 }: {
   submitForm: () => void;
   input: string;
-  attachments: {
-    type: 'file';
-    mediaType: string;
-    filename?: string;
-    url: string;
-  }[];
+  attachments: AttachmentData[];
   currentCap: Cap;
   isCurrentCapMCPInitialized: boolean;
   isCurrentCapMCPError: boolean;
