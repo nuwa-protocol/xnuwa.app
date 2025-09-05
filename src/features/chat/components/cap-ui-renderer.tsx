@@ -1,3 +1,4 @@
+import { useChat } from '@ai-sdk/react';
 import { NUWA_CLIENT_TIMEOUT } from '@nuwa-ai/ui-kit';
 import { AlertCircle } from 'lucide-react';
 import { connect, WindowMessenger } from 'penpal';
@@ -92,8 +93,8 @@ export const CapUIRenderer = ({
   artifact = false,
 }: CapUIRendererProps) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const { chatState } = useChatContext();
-  const { sendMessage } = chatState;
+  const { chat } = useChatContext();
+  const { sendMessage } = useChat({ chat });
 
   const [height, setHeight] = useState<number>(100); // Default height
   const [isLoading, setIsLoading] = useState(true);
@@ -114,7 +115,7 @@ export const CapUIRenderer = ({
     getState: () => {
       // onGetState?.();
     },
-  }
+  };
 
   const connectToPenpal = useCallback(async () => {
     try {

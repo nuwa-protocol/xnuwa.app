@@ -1,6 +1,11 @@
+import { useChat } from '@ai-sdk/react';
 import { memo, useEffect, useState } from 'react';
 import { useChatContext } from '../contexts/chat-context';
-import { Conversation, ConversationContent, ConversationScrollButton } from './conversation';
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from './conversation';
 import { Loader } from './loader';
 import { PreviewMessage } from './message';
 
@@ -9,8 +14,8 @@ interface MessagesProps {
 }
 
 function PureMessages({ isReadonly }: MessagesProps) {
-  const { chatState } = useChatContext();
-  const { messages, status, setMessages, regenerate } = chatState;
+  const { chat } = useChatContext();
+  const { messages, status } = useChat({ chat });
   const [userMessagesHeight, setUserMessagesHeight] = useState(0);
 
   // when messages update, recalculate the height of the last user message
@@ -35,7 +40,10 @@ function PureMessages({ isReadonly }: MessagesProps) {
 
   const getLoaderMinHeight = () => {
     const headerHeight = 195;
-    const calculatedMinHeight = Math.max(0, window.innerHeight - headerHeight - userMessagesHeight);
+    const calculatedMinHeight = Math.max(
+      0,
+      window.innerHeight - headerHeight - userMessagesHeight,
+    );
     return `${calculatedMinHeight}px`;
   };
 
@@ -43,7 +51,6 @@ function PureMessages({ isReadonly }: MessagesProps) {
     <Conversation>
       <ConversationContent>
         {messages.map((message, index) => {
-
           return (
             <PreviewMessage
               key={message.id}
@@ -58,7 +65,11 @@ function PureMessages({ isReadonly }: MessagesProps) {
         {/* Show loader from user message submission until AI outputs meaningful content */}
         {(() => {
           // Show loader during submission
-          if (status === 'submitted' && messages.length > 0 && messages[messages.length - 1].role === 'user') {
+          if (
+            status === 'submitted' &&
+            messages.length > 0 &&
+            messages[messages.length - 1].role === 'user'
+          ) {
             return true;
           }
 
@@ -67,8 +78,10 @@ function PureMessages({ isReadonly }: MessagesProps) {
             const lastMessage = messages[messages.length - 1];
             if (lastMessage.role === 'assistant') {
               // Hide loader once AI starts outputting meaningful content
-              const hasTextOrReasoning = lastMessage.parts?.some(part =>
-                (part.type === 'text' && part.text?.trim()) || part.type === 'reasoning'
+              const hasTextOrReasoning = lastMessage.parts?.some(
+                (part) =>
+                  (part.type === 'text' && part.text?.trim()) ||
+                  part.type === 'reasoning',
               );
               return !hasTextOrReasoning;
             }

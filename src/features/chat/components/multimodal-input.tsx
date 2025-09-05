@@ -1,4 +1,4 @@
-import type { UseChatHelpers } from '@ai-sdk/react';
+import { type UseChatHelpers, useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import cx from 'classnames';
 import { ArrowUpIcon, StopCircleIcon } from 'lucide-react';
@@ -19,8 +19,10 @@ import { PreviewAttachment } from './preview-attachment';
 import { SuggestedActions } from './suggested-actions';
 
 function PureMultimodalInput({ className }: { className?: string }) {
-  const { chatState } = useChatContext();
-  const { messages, status, stop, setMessages, sendMessage } = chatState;
+  const { chat } = useChatContext();
+  const { messages, status, stop, setMessages, sendMessage } = useChat({
+    chat,
+  });
   const { input, setInput, textareaRef, clearInput } = usePersistentInput();
   const { width } = useWindowSize();
   const { currentCap, isInitialized, isError } = CurrentCapStore();
@@ -38,7 +40,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
     if (textareaRef.current && width && width > 768) {
       textareaRef.current.focus();
     }
-  }, [chatState.id, width]);
+  }, [chat.id, width]);
 
   const handleSend = async () => {
     if (status === 'streaming' || status === 'submitted') {
@@ -67,8 +69,8 @@ function PureMultimodalInput({ className }: { className?: string }) {
       clearInput();
       setAttachments([]);
 
-      if (pathname !== `/chat?cid=${chatState.id}`) {
-        navigate(`/chat?cid=${chatState.id}`, { replace: true });
+      if (pathname !== `/chat?cid=${chat.id}`) {
+        navigate(`/chat?cid=${chat.id}`, { replace: true });
       }
     }
 
@@ -152,7 +154,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
               <StopButton
                 stop={stop}
                 setMessages={setMessages}
-                chatId={chatState.id}
+                chatId={chat.id}
               />
             ) : (
               <SendButton

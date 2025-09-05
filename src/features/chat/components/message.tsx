@@ -1,3 +1,4 @@
+import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 
 import equal from 'fast-deep-equal';
@@ -31,8 +32,8 @@ const PurePreviewMessage = ({
   isReadonly: boolean;
   userMessagesHeight: number;
 }) => {
-  const { chatState } = useChatContext();
-  const { messages, status, setMessages, regenerate } = chatState;
+  const { chat } = useChatContext();
+  const { messages, status, setMessages, regenerate } = useChat({ chat });
   const [copy, isCopied] = useCopyToClipboard();
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
@@ -146,7 +147,7 @@ const PurePreviewMessage = ({
                 return (
                   <MessageText
                     key={key}
-                    chatId={chatState.id}
+                    chatId={chat.id}
                     message={message}
                     part={part}
                     index={index}

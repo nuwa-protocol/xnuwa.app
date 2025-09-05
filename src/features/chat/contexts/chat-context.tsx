@@ -1,4 +1,3 @@
-import { useChat } from '@ai-sdk/react';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -7,8 +6,7 @@ import { useChatInstance } from '../hooks';
 import { ChatSessionsStore } from '../stores';
 
 interface ChatContextValue {
-  chatState: ReturnType<typeof useChat>;
-  chatId: string;
+  chat: ReturnType<typeof useChatInstance>;
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null);
@@ -65,8 +63,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const chat = useChatInstance(chatId);
 
   const value: ChatContextValue = {
-    chatState: useChat({ chat }), // return useChat state with the chat instance
-    chatId: chatId,
+    chat,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
