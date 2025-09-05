@@ -1,4 +1,4 @@
-import { Chat } from '@ai-sdk/react';
+import { Chat, useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import { DefaultChatTransport } from 'ai';
 import type { ReactNode } from 'react';
@@ -18,7 +18,7 @@ const globalChatInstances = new Map<string, Chat<UIMessage>>();
 let globalNewChatId: string | null = null;
 
 interface ChatContextValue {
-  chat: Chat<UIMessage>;
+  chatState: ReturnType<typeof useChat>;
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null);
@@ -209,7 +209,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
   }, [cid, chat.id, navigate, chatSessions]);
 
   const value: ChatContextValue = {
-    chat,
+    chatState: useChat({ chat }),
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

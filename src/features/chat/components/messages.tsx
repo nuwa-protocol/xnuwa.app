@@ -1,4 +1,3 @@
-import { useChat } from '@ai-sdk/react';
 import { memo, useEffect, useState } from 'react';
 import { useChatContext } from '../contexts/chat-context';
 import { Conversation, ConversationContent, ConversationScrollButton } from './conversation';
@@ -10,8 +9,8 @@ interface MessagesProps {
 }
 
 function PureMessages({ isReadonly }: MessagesProps) {
-  const { chat } = useChatContext();
-  const { messages, status, setMessages, regenerate } = useChat({ chat });
+  const { chatState } = useChatContext();
+  const { messages, status, setMessages, regenerate } = chatState;
   const [userMessagesHeight, setUserMessagesHeight] = useState(0);
 
   // when messages update, recalculate the height of the last user message

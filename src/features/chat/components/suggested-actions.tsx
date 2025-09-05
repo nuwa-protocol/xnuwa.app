@@ -1,4 +1,3 @@
-import { useChat } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { Button } from '@/shared/components/ui';
@@ -6,8 +5,8 @@ import { useCurrentCap } from '@/shared/hooks/use-current-cap';
 import { useChatContext } from '../contexts';
 
 function PureSuggestedActions() {
-  const { chat } = useChatContext();
-  const { sendMessage } = useChat({ chat });
+  const { chatState } = useChatContext();
+  const { sendMessage } = chatState;
   const { currentCap: cap } = useCurrentCap();
 
   const suggestedActions =

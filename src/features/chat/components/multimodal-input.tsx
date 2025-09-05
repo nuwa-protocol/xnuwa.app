@@ -1,5 +1,4 @@
 import type { UseChatHelpers } from '@ai-sdk/react';
-import { useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import cx from 'classnames';
 import { ArrowUpIcon, StopCircleIcon } from 'lucide-react';
@@ -20,10 +19,8 @@ import { PreviewAttachment } from './preview-attachment';
 import { SuggestedActions } from './suggested-actions';
 
 function PureMultimodalInput({ className }: { className?: string }) {
-  const { chat } = useChatContext();
-  const { messages, status, stop, setMessages, sendMessage } = useChat({
-    chat,
-  });
+  const { chatState } = useChatContext();
+  const { messages, status, stop, setMessages, sendMessage } = chatState;
   const { input, setInput, textareaRef, clearInput } = usePersistentInput();
   const { width } = useWindowSize();
   const { currentCap, isCurrentCapMCPInitialized, isCurrentCapMCPError } =
@@ -42,10 +39,10 @@ function PureMultimodalInput({ className }: { className?: string }) {
     if (textareaRef.current && width && width > 768) {
       textareaRef.current.focus();
     }
-  }, [chat.id, width]);
+  }, [chatState.id, width]);
 
   const handleSend = async () => {
-    if (chat.status === 'streaming' || chat.status === 'submitted') {
+    if (status === 'streaming' || status === 'submitted') {
       toast.warning(
         'Waiting for the model to finish processing the previous message...',
       );
@@ -71,8 +68,8 @@ function PureMultimodalInput({ className }: { className?: string }) {
       clearInput();
       setAttachments([]);
 
-      if (pathname !== `/chat?cid=${chat.id}`) {
-        navigate(`/chat?cid=${chat.id}`, { replace: true });
+      if (pathname !== `/chat?cid=${chatState.id}`) {
+        navigate(`/chat?cid=${chatState.id}`, { replace: true });
       }
     }
 
@@ -156,7 +153,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
               <StopButton
                 stop={stop}
                 setMessages={setMessages}
-                chatId={chat.id}
+                chatId={chatState.id}
               />
             ) : (
               <SendButton

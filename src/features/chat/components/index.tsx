@@ -1,4 +1,3 @@
-import { useChat } from '@ai-sdk/react';
 import { useChatContext } from '../contexts/chat-context';
 import { CenteredWelcome } from './centered-welcome';
 import Header from './header';
@@ -6,8 +5,7 @@ import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';
 
 function ChatContent({ isReadonly }: { isReadonly: boolean }) {
-  const { chat } = useChatContext();
-  const { messages } = useChat({ chat });
+  const { chatState } = useChatContext();
 
   const renderEmptyState = () => (
     <CenteredWelcome>
@@ -23,9 +21,9 @@ function ChatContent({ isReadonly }: { isReadonly: boolean }) {
     <div className="flex flex-col relative min-w-0 h-screen bg-background">
       {/* Chat */}
       <div className='flex flex-col w-full h-dvh bg-background'>
-        <Header chatId={chat.id} />
+        <Header chatId={chatState.id} />
 
-        {messages.length === 0 ? (
+        {chatState.messages.length === 0 ? (
           renderEmptyState()
         ) : (
           <>
