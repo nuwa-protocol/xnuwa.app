@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { Button } from '@/shared/components/ui';
-import { useCurrentCap } from '@/shared/hooks/use-current-cap';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useChatContext } from '../contexts';
 
 function PureSuggestedActions() {
   const { chatState } = useChatContext();
   const { sendMessage } = chatState;
-  const { currentCap: cap } = useCurrentCap();
+  const { currentCap: cap } = CurrentCapStore();
 
   const suggestedActions =
     cap?.core.prompt.suggestions?.map((suggestion) => ({

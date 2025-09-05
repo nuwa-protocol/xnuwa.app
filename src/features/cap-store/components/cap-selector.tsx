@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui';
-import { useCurrentCap } from '@/shared/hooks';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 import { useCapStore } from '../hooks/use-cap-store';
 import { CapAvatar } from './cap-avatar';
@@ -33,12 +33,8 @@ const CapInfo = ({ cap }: { cap: Cap }) => (
 );
 
 function CapSelectorButton() {
-  const {
-    currentCap,
-    isCurrentCapMCPInitialized,
-    isCurrentCapMCPError,
-    errorMessage,
-  } = useCurrentCap();
+  const { currentCap, isInitialized, isError, errorMessage } =
+    CurrentCapStore();
   const { openModal } = useCapStoreModal();
   const { getFavoriteCaps, runCap } = useCapStore();
 
@@ -70,12 +66,12 @@ function CapSelectorButton() {
         >
           <div className="flex items-center gap-2">
             <CapInfo cap={currentCap} />
-            {!isCurrentCapMCPInitialized && (
+            {!isInitialized && (
               <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
             )}
           </div>
         </Button>
-        {isCurrentCapMCPError && (
+        {isError && (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <AlertCircle className="w-3 h-3 text-destructive cursor-default" />
@@ -104,7 +100,7 @@ function CapSelectorButton() {
           >
             <div className="flex items-center gap-2">
               <CapInfo cap={currentCap} />
-              {!isCurrentCapMCPInitialized && (
+              {!isInitialized && (
                 <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
               )}
               <ChevronDown className="w-3 h-3 text-muted-foreground" />
@@ -138,7 +134,7 @@ function CapSelectorButton() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {isCurrentCapMCPError && (
+      {isError && (
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <AlertCircle className="w-3 h-3 text-destructive cursor-default" />

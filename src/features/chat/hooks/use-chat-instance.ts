@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useCurrentCap } from '@/shared/hooks/use-current-cap';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { ChatInstanceStore, ChatSessionsStore } from '../stores';
 import { convertToUIMessage } from '../utils';
 import { ChatErrorCode, handleError } from '../utils/handl-error';
@@ -12,7 +12,7 @@ export function useChatInstance(chatId: string) {
   const { getChatSession, chatSessions, updateSession } = ChatSessionsStore();
   const { getInstance } = ChatInstanceStore();
   const { updateTitle } = useUpdateChatTitle();
-  const { currentCap } = useCurrentCap();
+  const { currentCap } = CurrentCapStore();
 
   // Add current cap to chat session
   const addCurrentCapsToChat = useCallback(

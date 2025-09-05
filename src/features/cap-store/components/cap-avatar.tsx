@@ -1,6 +1,6 @@
 import { useTheme } from '@/shared/components/theme-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui';
-import type { CapThumbnail } from '@/shared/types/cap';
+import type { CapThumbnail } from '@/shared/types';
 
 const sizeClasses = {
   sm: 'size-6', // 24px
@@ -30,11 +30,7 @@ export function CapAvatar({
       className={`${sizeClass} ${isDark ? 'bg-foreground' : 'bg-background'} ${className}`}
     >
       <AvatarImage
-        src={
-          capThumbnail?.type === 'file'
-            ? capThumbnail.file
-            : capThumbnail?.url || `https://avatar.vercel.sh/${capName}`
-        }
+        src={capThumbnail}
         alt={capName}
         className="object-cover"
       />

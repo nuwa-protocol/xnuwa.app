@@ -7,7 +7,7 @@ import {
   closeNuwaMCPClient,
   createNuwaMCPClient,
 } from '@/shared/services/mcp-client';
-import type { NuwaMCPClient } from '@/shared/types';
+import { useChatContext } from '../../chat/contexts/chat-context';
 
 const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
   if (artifact) {
@@ -84,49 +84,37 @@ export type CapUIRendererProps = {
   srcUrl: string;
   title?: string;
   artifact?: boolean;
-  onSendPrompt?: (prompt: string) => void;
-  onAddSelection?: (label: string, message: string) => void;
-  onSaveState?: (state: any) => void;
-  onGetState?: () => any;
-  onMCPConnected?: (mcpClient: NuwaMCPClient) => void;
-  onMCPConnectionError?: (error: Error) => void;
-  onPenpalConnected?: () => void;
-  onPenpalConnectionError?: (error: Error) => void;
 };
 
 export const CapUIRenderer = ({
   srcUrl,
   title,
   artifact = false,
-  onSendPrompt,
-  onAddSelection,
-  onSaveState,
-  onGetState,
-  onMCPConnected,
-  onMCPConnectionError,
-  onPenpalConnected,
-  onPenpalConnectionError,
 }: CapUIRendererProps) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const { chatState } = useChatContext();
+  const { sendMessage } = chatState;
 
   const [height, setHeight] = useState<number>(100); // Default height
   const [isLoading, setIsLoading] = useState(true);
 
-  const sendPrompt = (prompt: string) => {
-    onSendPrompt?.(prompt);
-  };
+  const nuwaClientMethods = {
+    sendPrompt: (prompt: string) => {
+      sendMessage({ text: prompt });
+    },
 
-  const addSelection = (label: string, message: string) => {
-    onAddSelection?.(label, message);
-  };
+    addSelection: (label: string, message: string) => {
+      // onAddSelection?.(label, message);
+    },
 
-  const saveState = (state: any) => {
-    onSaveState?.(state);
-  };
+    saveState: (state: any) => {
+      // onSaveState?.(state);
+    },
 
-  const getState = () => {
-    onGetState?.();
-  };
+    getState: () => {
+      // onGetState?.();
+    },
+  }
 
   const connectToPenpal = useCallback(async () => {
     try {
@@ -142,22 +130,19 @@ export const CapUIRenderer = ({
       await connect({
         messenger,
         methods: {
-          sendPrompt,
+          ...nuwaClientMethods,
           setHeight,
-          addSelection,
-          saveState,
-          getState,
         },
         timeout: NUWA_CLIENT_TIMEOUT,
       }).promise;
 
-      onPenpalConnected?.();
+      // onPenpalConnected?.();
     } catch (error) {
       const err =
         error instanceof Error
           ? error
           : new Error(`Failed to connect to ${title ?? srcUrl} over Penpal`);
-      onPenpalConnectionError?.(err);
+      // onPenpalConnectionError?.(err);
     }
   }, [title, srcUrl]);
 
@@ -171,13 +156,13 @@ export const CapUIRenderer = ({
         targetWindow: iframeRef.current?.contentWindow,
       });
 
-      onMCPConnected?.(mcpClient);
+      // onMCPConnected?.(mcpClient);
     } catch (error) {
       const err =
         error instanceof Error
           ? error
           : new Error(`Failed to connect to ${title ?? srcUrl} over MCP`);
-      onMCPConnectionError?.(err);
+      // onMCPConnectionError?.(err);
       await closeNuwaMCPClient(srcUrl);
     }
   }, [title, srcUrl]);

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useCapKit } from '@/shared/hooks';
-import { useCurrentCap } from '@/shared/hooks/use-current-cap';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { CapStateStore } from '../stores';
 
 /**
@@ -10,7 +10,7 @@ export const useCapStore = () => {
   const { installedCaps, addInstalledCap, updateInstalledCap } =
     CapStateStore();
   const { capKit, isLoading, error } = useCapKit();
-  const { setCurrentCap } = useCurrentCap();
+  const { setCurrentCap } = CurrentCapStore();
 
   const downloadCapWithCID = useCallback(
     async (capCid: string) => {

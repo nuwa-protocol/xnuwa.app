@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
 import { Button } from '@/shared/components/ui/button';
-import { useCurrentCap } from '@/shared/hooks/use-current-cap';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 import { useChatContext } from '../contexts/chat-context';
 import { usePersistentInput } from '../hooks/use-persistent-input';
@@ -23,8 +23,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
   const { messages, status, stop, setMessages, sendMessage } = chatState;
   const { input, setInput, textareaRef, clearInput } = usePersistentInput();
   const { width } = useWindowSize();
-  const { currentCap, isCurrentCapMCPInitialized, isCurrentCapMCPError } =
-    useCurrentCap();
+  const { currentCap, isInitialized, isError } = CurrentCapStore();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [attachments, setAttachments] = useState<AttachmentData[]>([]);
@@ -54,7 +53,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
       currentCap?.core?.mcpServers &&
       Object.keys(currentCap.core.mcpServers).length > 0;
 
-    if (hasMCPServers && !isCurrentCapMCPInitialized) {
+    if (hasMCPServers && !isInitialized) {
       toast.warning('Cap MCP is initializing, please try again later');
       return;
     }
@@ -161,8 +160,8 @@ function PureMultimodalInput({ className }: { className?: string }) {
                 attachments={attachments}
                 submitForm={handleSend}
                 currentCap={currentCap}
-                isCurrentCapMCPInitialized={isCurrentCapMCPInitialized}
-                isCurrentCapMCPError={isCurrentCapMCPError}
+                isCurrentCapMCPInitialized={isInitialized}
+                isCurrentCapMCPError={isError}
               />
             )}
           </div>

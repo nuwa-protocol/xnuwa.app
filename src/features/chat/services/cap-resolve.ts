@@ -1,4 +1,4 @@
-import { GlobalMCPManager } from '@/shared/services/global-mcp-manager';
+import { RemoteMCPManager } from '@/shared/services/global-mcp-manager';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 
@@ -65,11 +65,11 @@ export class CapResolve {
   async getResolvedTools(): Promise<Record<string, any>> {
     if (this.hasMCPServers && !this.isCurrentCapMCPError) {
       // Make sure MCP is initialized through global manager
-      const mcpManager = GlobalMCPManager.getInstance();
-      await mcpManager.initializeForCap(this.cap);
+      const remoteMCPManager = RemoteMCPManager.getInstance();
+      await remoteMCPManager.initializeForCap(this.cap);
 
       // Get tools from global manager
-      return mcpManager.getCurrentTools();
+      return remoteMCPManager.getCurrentTools();
     } else {
       return {};
     }
