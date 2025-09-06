@@ -1,13 +1,14 @@
 import { NUWA_CLIENT_TIMEOUT } from '@nuwa-ai/ui-kit';
 import { AlertCircle } from 'lucide-react';
 import { connect, WindowMessenger } from 'penpal';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { TextShimmer } from '@/shared/components/ui/text-shimmer';
 import {
   closeNuwaMCPClient,
   createNuwaMCPClient,
 } from '@/shared/services/mcp-client';
 import type { NuwaMCPClient } from '@/shared/types';
+import { validateURL, type URLValidationResult } from '@/shared/utils';
 
 const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
   if (artifact) {
@@ -111,6 +112,8 @@ export const CapUIRenderer = ({
 
   const [height, setHeight] = useState<number>(100); // Default height
   const [isLoading, setIsLoading] = useState(true);
+  const [validationResult, setValidationResult] = useState<URLValidationResult | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
 
   const nuwaClientMethods = {
     sendPrompt: (prompt: string) => {
@@ -129,6 +132,48 @@ export const CapUIRenderer = ({
       onGetState?.();
     },
   };
+
+  const validateURLBeforeRender = useCallback(async () => {
+    if (!srcUrl) {
+      setValidationResult({
+        isValid: false,
+        error: 'No URL provided for HTML resource',
+        canBeEmbedded: false,
+      });
+      return;
+    }
+
+    setIsValidating(true);
+    setValidationResult(null);
+
+    try {
+      const result = await validateURL(srcUrl, {
+        timeout: 10000,
+      });
+
+      setValidationResult(result);
+
+      if (!result.isValid) {
+        console.error(`URL validation failed for ${srcUrl}:`, result.error);
+      } else if (!result.canBeEmbedded && result.error) {
+        console.error(`URL embedding may fail for ${srcUrl}:`, result.error);
+      }
+    } catch (error) {
+      const validationError = {
+        isValid: false,
+        error: `URL validation error: ${error instanceof Error ? error.message : String(error)}`,
+        canBeEmbedded: false,
+      };
+      setValidationResult(validationError);
+      console.error(`URL validation error for ${srcUrl}:`, error);
+    } finally {
+      setIsValidating(false);
+    }
+  }, [srcUrl]);
+
+  useEffect(() => {
+    validateURLBeforeRender();
+  }, [validateURLBeforeRender]);
 
   const connectToPenpal = useCallback(async () => {
     try {
@@ -215,6 +260,16 @@ export const CapUIRenderer = ({
 
   if (!srcUrl) {
     console.error('No URL provided for HTML resource');
+    return <ErrorScreen artifact={artifact} />;
+  }
+
+  // Show loading screen while validating
+  if (isValidating || !validationResult) {
+    return <LoadingScreen artifact={artifact} />;
+  }
+
+  // Show error screen if URL validation failed
+  if (!validationResult.isValid) {
     return <ErrorScreen artifact={artifact} />;
   }
 
