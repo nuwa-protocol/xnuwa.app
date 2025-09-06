@@ -1,13 +1,24 @@
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthGuard } from '@/features/auth/components';
+import { useWalletBalanceManager } from '@/features/wallet/hooks/use-wallet-balance-manager';
+import { useGlobalRehydration } from '@/shared/hooks';
 import { useAutoLoadingDetection } from '@/shared/hooks/use-auto-loading-detection';
 import { MobileWarning } from '../shared/components/mobile-warning';
 import { ThemeProvider } from '../shared/components/theme-provider';
 
 export default function RootLayout() {
   // Check if the app is loaded, remove the HTML loading
+  useWalletBalanceManager();
+
+  // Initialize wallet balance manager
   useAutoLoadingDetection();
+
+  // Check if the app is rehydrated
+  const isRehydrated = useGlobalRehydration();
+  if (!isRehydrated) {
+    return null;
+  }
 
   return (
     <ThemeProvider>

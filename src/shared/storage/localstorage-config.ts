@@ -1,5 +1,6 @@
 import { createJSONStorage } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
+import { rehydrationTracker } from '../hooks/use-global-rehydration';
 import type { PersistConfig } from './types';
 
 // get current DID
@@ -66,10 +67,19 @@ export function createLocalStorageHelper<T>(
  * Standard persist config generator for localStorage-based stores
  */
 export function createLocalStoragePersistConfig<T>(config: PersistConfig<T>) {
+  // Register this store with the rehydration tracker
+  rehydrationTracker.registerStore(config.name);
+
   return {
     name: config.name,
     storage: createJSONStorage(() => createLocalStorageHelper(config)),
     partialize: config.partialize,
-    onRehydrateStorage: config.onRehydrateStorage,
+    onRehydrateStorage: () => {
+      return (state: any, error: Error) => {
+        if (!error) {
+          rehydrationTracker.markRehydrated(config.name);
+        }
+      };
+    },
   };
 }

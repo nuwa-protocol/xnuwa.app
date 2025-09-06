@@ -14,7 +14,7 @@ export default function LoginPage() {
   // if already logged in, redirect to home
   useEffect(() => {
     if (isConnected) {
-      navigate('/');
+      window.location.replace('/');
     }
   }, [isConnected, navigate]);
 

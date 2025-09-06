@@ -1,5 +1,6 @@
 import { createJSONStorage, type StateStorage } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
+import { rehydrationTracker } from '../hooks/use-global-rehydration';
 import { type CapStudioRecord, type ChatSessionRecord, db } from './db';
 import type { PersistConfig } from './types';
 
@@ -173,11 +174,20 @@ export class CapStudioStorage implements StateStorage {
  * Persist config generator for ChatSessions
  */
 export function createChatSessionsPersistConfig<T>(config: PersistConfig<T>) {
+  // Register this store with the rehydration tracker
+  rehydrationTracker.registerStore(config.name);
+
   return {
     name: config.name,
     storage: createJSONStorage(() => new ChatSessionsStorage()),
     partialize: config.partialize,
-    onRehydrateStorage: config.onRehydrateStorage,
+    onRehydrateStorage: () => {
+      return (state: any, error: Error) => {
+        if (!error) {
+          rehydrationTracker.markRehydrated(config.name);
+        }
+      };
+    },
   };
 }
 
@@ -185,10 +195,19 @@ export function createChatSessionsPersistConfig<T>(config: PersistConfig<T>) {
  * Persist config generator for CapStudio
  */
 export function createCapStudioPersistConfig<T>(config: PersistConfig<T>) {
+  // Register this store with the rehydration tracker
+  rehydrationTracker.registerStore(config.name);
+
   return {
     name: config.name,
     storage: createJSONStorage(() => new CapStudioStorage()),
     partialize: config.partialize,
-    onRehydrateStorage: config.onRehydrateStorage,
+    onRehydrateStorage: () => {
+      return (state: any, error: Error) => {
+        if (!error) {
+          rehydrationTracker.markRehydrated(config.name);
+        }
+      };
+    },
   };
 }

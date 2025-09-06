@@ -3,6 +3,7 @@ export * from './use-capkit';
 export * from './use-debounce-callback';
 export * from './use-debounce-value';
 export * from './use-dev-mode';
+export * from './use-global-rehydration';
 export * from './use-language';
 export * from './use-mobile';
 export * from './use-storage';

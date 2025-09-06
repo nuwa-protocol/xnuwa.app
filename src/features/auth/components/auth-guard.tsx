@@ -1,8 +1,5 @@
 import { createContext, type ReactNode, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChatSessionsStore } from '@/features/chat/stores';
-import { SettingsStateStore } from '@/features/settings/stores';
-import { WalletStore } from '@/features/wallet/stores';
 import { useAuth } from '@/shared/hooks/use-auth';
 
 type AuthGuardValue = ReturnType<typeof useAuth>;
@@ -27,18 +24,6 @@ export function AuthGuard({ children }: { children: ReactNode }) {
       hasRehydrated.current = false; // Reset rehydration flag when user logs out
     }
   }, [isInitializing, isConnecting, isConnected, navigate]);
-
-  // Trigger store rehydration when user becomes connected
-  useEffect(() => {
-    if (isConnected && !hasRehydrated.current) {
-      hasRehydrated.current = true;
-
-      // Force rehydration of all stores
-      ChatSessionsStore.persist.rehydrate();
-      SettingsStateStore.persist.rehydrate();
-      WalletStore.persist.rehydrate();
-    }
-  }, [isConnected]);
 
   return (
     <AuthGuardContext.Provider
