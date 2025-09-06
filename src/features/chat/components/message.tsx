@@ -16,6 +16,7 @@ import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { cn } from '@/shared/utils';
 import { useChatContext } from '../contexts/chat-context';
 import { MessageActions } from './message-actions';
+import { MessageImage } from './message-image';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { MessageText } from './message-text';
@@ -37,9 +38,10 @@ const PurePreviewMessage = ({
   const [copy, isCopied] = useCopyToClipboard();
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
-  const attachmentsFromMessage = (message.parts || []).filter(
-    (part) => part.type === 'file',
-  );
+  const attachmentsFromUserMessage =
+    message.role === 'user'
+      ? (message.parts || []).filter((part) => part.type === 'file')
+      : [];
 
   // calculate the minimum height of the message
   const getMessageMinHeight = (shouldPushToTop: boolean, role: string) => {
@@ -89,12 +91,12 @@ const PurePreviewMessage = ({
               minHeight: minHeight,
             }}
           >
-            {attachmentsFromMessage.length > 0 && (
+            {attachmentsFromUserMessage.length > 0 && (
               <div
                 data-testid={`message-attachments`}
                 className="flex flex-row gap-2 justify-end"
               >
-                {attachmentsFromMessage.map((attachment) => (
+                {attachmentsFromUserMessage.map((attachment) => (
                   <PreviewAttachment
                     key={attachment.url}
                     attachment={{
@@ -155,6 +157,18 @@ const PurePreviewMessage = ({
                     setMessages={setMessages}
                     regenerate={regenerate}
                     onModeChange={setMode}
+                  />
+                );
+              }
+
+              if (type === 'file' && message.role === 'assistant') {
+                return (
+                  <MessageImage
+                    key={key}
+                    imageName={part.filename}
+                    base64={part.url}
+                    mediaType={part.mediaType}
+                    alt={part.filename || 'Generated Image'}
                   />
                 );
               }
