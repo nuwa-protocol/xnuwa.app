@@ -4,18 +4,11 @@ import type { UIMessage } from 'ai';
 import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
-import {
-  Tool,
-  ToolContent,
-  ToolHeader,
-  ToolInput,
-  ToolOutput,
-  ToolResult,
-} from '@/shared/components/ui/shadcn-io/tool';
-import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
+
 import { cn } from '@/shared/utils';
 import { useChatContext } from '../contexts/chat-context';
 import { MessageActions } from './message-actions';
+import { GeneralTool } from './message-general-tool';
 import { MessageImage } from './message-image';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
@@ -35,7 +28,7 @@ const PurePreviewMessage = ({
 }) => {
   const { chat } = useChatContext();
   const { messages, status, setMessages, regenerate } = useChat({ chat });
-  const [copy, isCopied] = useCopyToClipboard();
+
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
   const attachmentsFromUserMessage =
@@ -176,32 +169,14 @@ const PurePreviewMessage = ({
               if (type === 'dynamic-tool') {
                 const { toolCallId, state, input, output, toolName } = part;
                 return (
-                  <Tool key={toolCallId} defaultOpen={false}>
-                    <ToolHeader type={`tool-${toolName}`} state={state} />
-                    <ToolContent>
-                      <div className="text-xs text-muted-foreground ml-6">
-                        Tool Call ID:{' '}
-                        <code
-                          className="bg-muted-foreground/20 px-1 py-0.5 rounded text-xs font-mono cursor-pointer hover:bg-muted-foreground/10"
-                          onClick={() => copy(toolCallId)}
-                        >
-                          {isCopied ? 'Copied' : toolCallId}
-                        </code>
-                      </div>
-                      {state === 'input-available' && (
-                        <ToolInput input={input} />
-                      )}
-                      {state === 'output-available' && (
-                        <div>
-                          <ToolInput input={input} />
-                          <ToolOutput
-                            output={<ToolResult result={output} />}
-                            errorText={undefined}
-                          />
-                        </div>
-                      )}
-                    </ToolContent>
-                  </Tool>
+                  <GeneralTool
+                    key={toolCallId}
+                    input={input}
+                    output={output}
+                    toolCallId={toolCallId}
+                    toolName={toolName}
+                    state={state}
+                  />
                 );
               }
 
