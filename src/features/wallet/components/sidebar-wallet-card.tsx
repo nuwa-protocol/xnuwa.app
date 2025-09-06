@@ -12,7 +12,11 @@ export function SidebarWalletCard({ className }: SidebarWalletCardProps) {
   const navigate = useNavigate();
   const { usdAmount, balanceLoading, balanceError } = WalletStore();
 
-  const usdValue = balanceLoading ? 'loading...' : balanceError ? 'Failed to load balance' : usdAmount;
+  const usdValue = balanceLoading
+    ? 'loading...'
+    : balanceError
+      ? 'Failed to load balance'
+      : usdAmount;
 
   const handleClick = () => {
     navigate('/wallet');

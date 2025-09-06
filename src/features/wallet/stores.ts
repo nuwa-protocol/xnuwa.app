@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getPaymentHubClient } from '@/shared/services/payment-clients';
+import { createLocalStoragePersistConfig } from '@/shared/storage';
 import type { Transaction } from './types';
 
 function formatBigIntWithDecimals(
@@ -35,6 +36,14 @@ interface WalletState {
   fetchPaymentBalance: (assetId?: string) => Promise<void>;
   setBalanceError: (error: string | null) => void;
 }
+
+const persistConfig = createLocalStoragePersistConfig<WalletState>({
+  name: 'wallet-storage',
+  partialize: (state) => ({
+    balance: state.balance,
+    transactions: state.transactions,
+  }),
+});
 
 export const WalletStore = create<WalletState>()(
   persist(
@@ -78,13 +87,6 @@ export const WalletStore = create<WalletState>()(
         set({ balanceError: error });
       },
     }),
-    {
-      name: 'wallet-storage',
-      // Only persist the balance, not the transactions or payment balance
-      partialize: (state) => ({
-        balance: state.balance,
-        transactions: state.transactions,
-      }),
-    },
+    persistConfig,
   ),
 );

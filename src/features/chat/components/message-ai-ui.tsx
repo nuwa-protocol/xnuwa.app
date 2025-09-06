@@ -83,8 +83,6 @@ export const ResponseWithUI = memo(
       return parts;
     }, [children]);
 
-
-
     return (
       <div className={className} {...props}>
         {processedContent.map((part) => {

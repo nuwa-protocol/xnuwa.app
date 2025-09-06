@@ -140,11 +140,7 @@ export function CapCard({
           <div className="flex items-start space-x-4 flex-1 min-w-0">
             <div className="w-12 h-12 flex items-center justify-center shrink-0">
               <Avatar className="rounded-lg">
-                <AvatarImage
-                  src={
-                    cap.capData.metadata.thumbnail
-                  }
-                />
+                <AvatarImage src={cap.capData.metadata.thumbnail} />
                 <AvatarFallback>
                   {cap.capData.metadata.displayName.charAt(0)}
                 </AvatarFallback>

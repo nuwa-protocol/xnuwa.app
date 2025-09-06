@@ -190,7 +190,7 @@ export const UserErrorCard = ({
 export default function ErrorPage() {
   // Hide initial loading screen when error page renders
   useHideInitialLoading();
-  
+
   const error = useRouteError();
 
   let title = 'Oops, something went wrong!';

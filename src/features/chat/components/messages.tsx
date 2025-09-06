@@ -95,4 +95,4 @@ function PureMessages({ isReadonly }: MessagesProps) {
   );
 }
 
-export const Messages = PureMessages
+export const Messages = PureMessages;

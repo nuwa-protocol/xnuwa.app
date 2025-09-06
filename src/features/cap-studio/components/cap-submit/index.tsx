@@ -25,9 +25,7 @@ export function Submit() {
 
   return (
     <DashboardLayout>
-      <CapSubmitForm
-        cap={cap}
-      />
+      <CapSubmitForm cap={cap} />
     </DashboardLayout>
   );
 }

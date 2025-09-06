@@ -1,10 +1,22 @@
 import Dexie, { type Table } from 'dexie';
 
+export interface ChatSessionRecord {
+  chatId: string;
+  did: string;
+  data: any;
+  updatedAt: number;
+}
+
+export interface CapStudioRecord {
+  id: string;
+  did: string;
+  data: any;
+  updatedAt: number;
+}
+
 class Database extends Dexie {
-  chats!: Table<any>;
-  capStore!: Table<any>;
-  settings!: Table<any>;
-  capStudio!: Table<any>;
+  chatSessions!: Table<ChatSessionRecord>;
+  capStudio!: Table<CapStudioRecord>;
 
   constructor() {
     if (typeof window === 'undefined') {
@@ -14,11 +26,10 @@ class Database extends Dexie {
 
     super('NuwaClientDB');
 
+    // Schema with separate tables for ChatSessions and CapStudio
     this.version(1).stores({
-      chats: 'id, did, createdAt, updatedAt',
-      capStore: ' id,did',
-      settings: 'did',
-      capStudio: 'id, did, createdAt, updatedAt',
+      chatSessions: '[chatId+did], chatId, did, updatedAt',
+      capStudio: '[id+did], id, did, updatedAt',
     });
   }
 }

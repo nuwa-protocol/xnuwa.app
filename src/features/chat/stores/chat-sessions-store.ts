@@ -4,8 +4,7 @@
 import type { UIMessage } from 'ai';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { NuwaIdentityKit } from '@/shared/services/identity-kit';
-import { createPersistConfig, db } from '@/shared/storage';
+import { createChatSessionsPersistConfig } from '@/shared/storage';
 import type { ChatPayment, ChatSession } from '../types';
 
 // ================= Constants ================= //
@@ -19,16 +18,6 @@ export const createInitialChatSession = (chatId: string): ChatSession => ({
   payments: [],
 });
 
-// get current DID
-const getCurrentDID = async () => {
-  const { getDid } = await NuwaIdentityKit();
-  return await getDid();
-};
-
-// ================= Database Reference ================= //
-
-const chatDB = db;
-
 // chat store state interface
 interface ChatSessionsStoreState {
   chatSessions: Record<string, ChatSession>;
@@ -39,37 +28,24 @@ interface ChatSessionsStoreState {
   updateSession: (
     id: string,
     updates: Partial<Omit<ChatSession, 'id'>>,
-  ) => Promise<void>;
-  addPaymentCtxIdToChatSession: (
-    id: string,
-    payment: ChatPayment,
-  ) => Promise<void>;
+  ) => void;
+  addPaymentCtxIdToChatSession: (id: string, payment: ChatPayment) => void;
   deleteSession: (id: string) => void;
 
   // update messages for a session and create a new session if not founds
-  updateMessages: (chatId: string, messages: UIMessage[]) => Promise<void>;
+  updateMessages: (chatId: string, messages: UIMessage[]) => void;
 
   // utility methods
   clearAllSessions: () => void;
-
-  // data persistence
-  loadFromDB: () => Promise<void>;
-  saveToDB: () => Promise<void>;
 }
 
 // ================= Persist Configuration ================= //
 
-const persistConfig = createPersistConfig<ChatSessionsStoreState>({
+const persistConfig = createChatSessionsPersistConfig<ChatSessionsStoreState>({
   name: 'chat-storage',
-  getCurrentDID: getCurrentDID,
   partialize: (state) => ({
     chatSessions: state.chatSessions,
   }),
-  onRehydrateStorage: () => (state) => {
-    if (state) {
-      state.loadFromDB();
-    }
-  },
 });
 
 // ================= Store Factory ================= //
@@ -91,7 +67,7 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
         );
       },
 
-      updateSession: async (
+      updateSession: (
         id: string,
         updates: Partial<Omit<ChatSession, 'id'>>,
       ) => {
@@ -123,14 +99,9 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
             },
           };
         });
-
-        await get().saveToDB();
       },
 
-      addPaymentCtxIdToChatSession: async (
-        id: string,
-        payment: ChatPayment,
-      ) => {
+      addPaymentCtxIdToChatSession: (id: string, payment: ChatPayment) => {
         set((state) => {
           const session = state.chatSessions[id];
           // if session not found, create new session
@@ -166,8 +137,6 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
             };
           }
         });
-
-        await get().saveToDB();
       },
 
       deleteSession: (id: string) => {
@@ -177,25 +146,9 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
             chatSessions: restSessions,
           };
         });
-
-        // async delete related data
-        const deleteFromDB = async () => {
-          try {
-            const currentDID = await getCurrentDID();
-            if (!currentDID) return;
-
-            await chatDB.chats
-              .where(['did', 'id'])
-              .equals([currentDID, id])
-              .delete();
-          } catch (error) {
-            console.error('Failed to delete from DB:', error);
-          }
-        };
-        deleteFromDB();
       },
 
-      updateMessages: async (chatId: string, messages: UIMessage[]) => {
+      updateMessages: (chatId: string, messages: UIMessage[]) => {
         set((state) => {
           let session = state.chatSessions[chatId];
           let isNewSession = false;
@@ -242,74 +195,12 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
 
           return state;
         });
-
-        await get().saveToDB();
       },
 
       clearAllSessions: () => {
         set({
           chatSessions: {},
         });
-
-        // clear IndexedDB
-        const clearDB = async () => {
-          try {
-            await chatDB.chats.clear();
-          } catch (error) {
-            console.error('Failed to clear DB:', error);
-          }
-        };
-        clearDB();
-      },
-
-      loadFromDB: async () => {
-        if (typeof window === 'undefined') return;
-
-        try {
-          const currentDID = await getCurrentDID();
-          if (!currentDID) return;
-
-          const chats = await chatDB.chats
-            .where('did')
-            .equals(currentDID)
-            .toArray();
-
-          // Sort by updatedAt in descending order
-          const sortedChats = chats.sort(
-            (a: ChatSession, b: ChatSession) => b.updatedAt - a.updatedAt,
-          );
-          const sessionsMap: Record<string, ChatSession> = {};
-
-          sortedChats.forEach((chat: ChatSession) => {
-            sessionsMap[chat.id] = chat;
-          });
-
-          set((state) => ({
-            chatSessions: { ...state.chatSessions, ...sessionsMap },
-          }));
-        } catch (error) {
-          console.error('Failed to load from DB:', error);
-        }
-      },
-
-      saveToDB: async () => {
-        if (typeof window === 'undefined') return;
-
-        try {
-          const currentDID = await getCurrentDID();
-          if (!currentDID) return;
-
-          const { chatSessions } = get();
-          const chatsToSave = Object.values(chatSessions).map((session) => ({
-            ...session,
-            did: currentDID,
-          }));
-
-          // use bulkPut to efficiently update data
-          await chatDB.chats.bulkPut(chatsToSave);
-        } catch (error) {
-          console.error('Failed to save to DB:', error);
-        }
       },
     }),
     persistConfig,

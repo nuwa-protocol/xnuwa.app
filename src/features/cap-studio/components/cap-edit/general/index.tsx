@@ -22,9 +22,7 @@ interface GeneralTabProps {
   form: UseFormReturn<any>;
 }
 
-export function GeneralTab({
-  form,
-}: GeneralTabProps) {
+export function GeneralTab({ form }: GeneralTabProps) {
   return (
     <DashboardGrid cols={1}>
       {/* Basic Information */}
@@ -125,7 +123,8 @@ export function GeneralTab({
               <FormItem>
                 <FormLabel>Homepage (Optional)</FormLabel>
                 <FormControl>
-                  <Input placeholder="https://example.com"
+                  <Input
+                    placeholder="https://example.com"
                     value={field.value || ''}
                     onChange={(e) => {
                       const value = e.target.value;

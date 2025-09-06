@@ -14,9 +14,7 @@ interface CapSubmitFormProps {
   cap: LocalCap;
 }
 
-export function CapSubmitForm({
-  cap,
-}: CapSubmitFormProps) {
+export function CapSubmitForm({ cap }: CapSubmitFormProps) {
   const { handleCancel, handleDirectSubmit, isSubmitting } = useSubmitForm({
     cap,
   });
@@ -125,13 +123,17 @@ export function CapSubmitForm({
               <div className="text-sm font-medium text-muted-foreground">
                 Homepage
               </div>
-              <p className="text-sm">{cap.capData.metadata.homepage || 'Not provided'}</p>
+              <p className="text-sm">
+                {cap.capData.metadata.homepage || 'Not provided'}
+              </p>
             </div>
             <div>
               <div className="text-sm font-medium text-muted-foreground">
                 Repository
               </div>
-              <p className="text-sm">{cap.capData.metadata.repository || 'Not provided'}</p>
+              <p className="text-sm">
+                {cap.capData.metadata.repository || 'Not provided'}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -186,9 +188,7 @@ export function CapSubmitForm({
                 Cancel
               </Button>
               <Button
-                onClick={() =>
-                  handleDirectSubmit()
-                }
+                onClick={() => handleDirectSubmit()}
                 disabled={isSubmitting}
                 size="lg"
               >

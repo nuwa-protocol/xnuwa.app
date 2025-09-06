@@ -46,7 +46,10 @@ export function ArtifactTab({ form }: ArtifactTabProps) {
 
     if (!error) {
       const valueToSet = tempUrl.trim() === '' ? undefined : tempUrl;
-      form.setValue('core.artifact', valueToSet, { shouldValidate: true, shouldDirty: true });
+      form.setValue('core.artifact', valueToSet, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
       setIsEditing(false);
     }
   };
@@ -64,16 +67,17 @@ export function ArtifactTab({ form }: ArtifactTabProps) {
   };
 
   const handleRemove = () => {
-    form.setValue('core.artifact', undefined, { shouldValidate: true, shouldDirty: true });
+    form.setValue('core.artifact', undefined, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
     setTempUrl('');
     setIsEditing(true);
   };
 
   const handleDebug = () => {
     if (currentUiUrl) {
-      navigate(
-        `/cap-studio/mcp?mcpui=${encodeURIComponent(currentUiUrl)}`,
-      );
+      navigate(`/cap-studio/mcp?mcpui=${encodeURIComponent(currentUiUrl)}`);
     }
   };
 

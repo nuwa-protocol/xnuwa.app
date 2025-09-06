@@ -67,9 +67,7 @@ export const ToolResult = ({
               Result:
             </div>
             <div className="bg-muted p-2 rounded-md text-xs font-mono overflow-x-auto max-h-32 overflow-y-auto">
-              <pre className="whitespace-pre-wrap">
-                {formatResult(result)}
-              </pre>
+              <pre className="whitespace-pre-wrap">{formatResult(result)}</pre>
             </div>
           </div>
         </div>

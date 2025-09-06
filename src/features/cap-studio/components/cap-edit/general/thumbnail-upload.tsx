@@ -52,7 +52,6 @@ export function ThumbnailUpload({
         });
 
         onThumbnailChange(base64);
-
       } catch (error) {
         toast.error('Failed to process image file');
         console.error('File conversion error:', error);
@@ -82,8 +81,6 @@ export function ThumbnailUpload({
     onThumbnailChange(undefined);
     setInputUrl('');
   };
-
-
 
   return (
     <Card>

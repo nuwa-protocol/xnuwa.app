@@ -3,7 +3,10 @@ import { useLocalStorage } from 'usehooks-ts';
 
 export function usePersistentInput(storageKey: string = 'input') {
   const [input, setInput] = useState('');
-  const [localStorageInput, setLocalStorageInput] = useLocalStorage(storageKey, '');
+  const [localStorageInput, setLocalStorageInput] = useLocalStorage(
+    storageKey,
+    '',
+  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Hydration handling - run once after mount

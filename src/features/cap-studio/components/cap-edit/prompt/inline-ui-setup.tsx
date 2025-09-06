@@ -95,12 +95,12 @@ export function InlineUISetup({ onInsertPrompt }: InlineUISetupProps) {
       urlConfigs.map((config) =>
         config.id === configId
           ? {
-            ...config,
-            parameters: [
-              ...config.parameters,
-              { id: Date.now().toString(), key: '', description: '' },
-            ],
-          }
+              ...config,
+              parameters: [
+                ...config.parameters,
+                { id: Date.now().toString(), key: '', description: '' },
+              ],
+            }
           : config,
       ),
     );
@@ -111,11 +111,11 @@ export function InlineUISetup({ onInsertPrompt }: InlineUISetupProps) {
       urlConfigs.map((config) =>
         config.id === configId
           ? {
-            ...config,
-            parameters: config.parameters.filter(
-              (param) => param.id !== paramId,
-            ),
-          }
+              ...config,
+              parameters: config.parameters.filter(
+                (param) => param.id !== paramId,
+              ),
+            }
           : config,
       ),
     );
@@ -131,11 +131,11 @@ export function InlineUISetup({ onInsertPrompt }: InlineUISetupProps) {
       urlConfigs.map((config) =>
         config.id === configId
           ? {
-            ...config,
-            parameters: config.parameters.map((param) =>
-              param.id === paramId ? { ...param, [field]: value } : param,
-            ),
-          }
+              ...config,
+              parameters: config.parameters.map((param) =>
+                param.id === paramId ? { ...param, [field]: value } : param,
+              ),
+            }
           : config,
       ),
     );

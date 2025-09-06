@@ -12,7 +12,7 @@ function ChatContent({ isReadonly }: { isReadonly: boolean }) {
   return (
     <div className="flex flex-col relative min-w-0 h-screen bg-background">
       {/* Chat */}
-      <div className='flex flex-col w-full h-dvh bg-background'>
+      <div className="flex flex-col w-full h-dvh bg-background">
         <Header chatId={chat.id} />
 
         {messages.length === 0 ? (

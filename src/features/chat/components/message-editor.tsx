@@ -27,7 +27,9 @@ export function MessageEditor({
   regenerate,
 }: MessageEditorProps) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [draftContent, setDraftContent] = useState<string>(message.parts.find((part) => part.type === 'text')?.text ?? '');
+  const [draftContent, setDraftContent] = useState<string>(
+    message.parts.find((part) => part.type === 'text')?.text ?? '',
+  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { deleteMessagesAfterId } = useDeleteMessagesAfterId();
@@ -69,10 +71,7 @@ export function MessageEditor({
       const index = messages.findIndex((m) => m.id === message.id);
 
       if (index !== -1) {
-        return [
-          ...messages.slice(0, index),
-          updatedMessage,
-        ];
+        return [...messages.slice(0, index), updatedMessage];
       }
       return messages;
     });
@@ -82,7 +81,7 @@ export function MessageEditor({
 
     setMode('view');
     regenerate();
-  }
+  };
 
   return (
     <div className="flex flex-col gap-2 w-full">

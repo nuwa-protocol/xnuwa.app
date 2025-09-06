@@ -21,10 +21,7 @@ export const SourceCard = ({
   const isExternalUrl = url.startsWith('http');
 
   // Extract best data from metadata
-  const title =
-    metadata?.['og:title'] ||
-    metadata?.title ||
-    'Untitled Source';
+  const title = metadata?.['og:title'] || metadata?.title || 'Untitled Source';
   const description = metadata?.['og:description'] || metadata?.description;
   const image = metadata?.['og:image'] || metadata?.image;
   const siteName = metadata?.['og:site_name'];
@@ -108,12 +105,12 @@ export const SourceCard = ({
   const faviconUrl = getBestFavicon();
   const hostname = url
     ? (() => {
-      try {
-        return new URL(url).hostname;
-      } catch {
-        return url;
-      }
-    })()
+        try {
+          return new URL(url).hostname;
+        } catch {
+          return url;
+        }
+      })()
     : '';
 
   if (!isExternalUrl) {

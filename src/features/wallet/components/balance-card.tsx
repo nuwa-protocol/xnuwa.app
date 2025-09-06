@@ -18,7 +18,11 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
   const { usdAmount, balanceLoading, balanceError } = WalletStore();
   const [showFaucetDialog, setShowFaucetDialog] = useState(false);
 
-  const usdValue = balanceLoading ? 'loading...' : balanceError ? 'Failed to load balance' : usdAmount;
+  const usdValue = balanceLoading
+    ? 'loading...'
+    : balanceError
+      ? 'Failed to load balance'
+      : usdAmount;
 
   return (
     <>

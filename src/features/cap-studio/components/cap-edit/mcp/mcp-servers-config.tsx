@@ -137,9 +137,7 @@ export function McpServersConfig({
   };
 
   const handleTestServer = (serverUrl: string) => {
-    navigate(
-      `/cap-studio/mcp?mcpserver=${encodeURIComponent(serverUrl)}`,
-    );
+    navigate(`/cap-studio/mcp?mcpserver=${encodeURIComponent(serverUrl)}`);
   };
 
   return (

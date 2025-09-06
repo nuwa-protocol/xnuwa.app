@@ -46,17 +46,26 @@ export function ModelTab({ form }: ModelTabProps) {
   const modelType = form.watch('core.model.modelType');
 
   // Initialize states based on form data
-  const initialGatewayType = gatewayUrl === LLM_GATEWAY_BASE_URL ? 'nuwa' : 'custom';
+  const initialGatewayType =
+    gatewayUrl === LLM_GATEWAY_BASE_URL ? 'nuwa' : 'custom';
   // For custom gateway, confirm if we have any model configuration (not just modelId)
-  const hasModelConfig = modelId || modelType || (supportedInputs && supportedInputs.length > 0);
-  const initialIsConfirmed = gatewayUrl ? (gatewayUrl === LLM_GATEWAY_BASE_URL ? true : !!hasModelConfig) : false;
+  const hasModelConfig =
+    modelId || modelType || (supportedInputs && supportedInputs.length > 0);
+  const initialIsConfirmed = gatewayUrl
+    ? gatewayUrl === LLM_GATEWAY_BASE_URL
+      ? true
+      : !!hasModelConfig
+    : false;
 
-  const [isGatewayConfirmed, setIsGatewayConfirmed] = useState(initialIsConfirmed);
+  const [isGatewayConfirmed, setIsGatewayConfirmed] =
+    useState(initialIsConfirmed);
   const [isValidatingGateway, setIsValidatingGateway] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ModelDetails | null>(null);
   const [parametersJson, setParametersJson] = useState<string>('{}');
   const [jsonError, setJsonError] = useState<string>('');
-  const [gatewayType, setGatewayType] = useState<'nuwa' | 'custom'>(initialGatewayType);
+  const [gatewayType, setGatewayType] = useState<'nuwa' | 'custom'>(
+    initialGatewayType,
+  );
 
   const handleGatewayTypeChange = (field: any, type: 'nuwa' | 'custom') => {
     if (type === 'nuwa') {

@@ -289,7 +289,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
       pushLog({
         type: 'info',
-        message: client ? 'Disconnected from Remote MCP server' : 'Closed Artifact MCP preview',
+        message: client
+          ? 'Disconnected from Remote MCP server'
+          : 'Closed Artifact MCP preview',
       });
 
       toast.success(
@@ -327,12 +329,12 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
       // Get parameters from RJSF form data and clean them
       const rawArgs = toolParams[toolName] || {};
-      
+
       // Filter out empty/undefined values
       const args = Object.fromEntries(
-        Object.entries(rawArgs).filter(([_, value]) => 
-          value !== '' && value !== null && value !== undefined
-        )
+        Object.entries(rawArgs).filter(
+          ([_, value]) => value !== '' && value !== null && value !== undefined,
+        ),
       );
 
       pushLog({
@@ -687,14 +689,19 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                                   updateToolParams(toolName, e.formData)
                                 }
                                 uiSchema={{
-                                  ...Object.keys(toolSchema).reduce((acc, paramName) => {
-                                    const paramDef = toolSchema[paramName];
-                                    acc[paramName] = {
-                                      'ui:title': `${paramName} ${paramDef.type ? `(${paramDef.type})` : ''}`,
-                                      'ui:placeholder': paramDef.description || `Enter ${paramName}`,
-                                    };
-                                    return acc;
-                                  }, {} as Record<string, any>),
+                                  ...Object.keys(toolSchema).reduce(
+                                    (acc, paramName) => {
+                                      const paramDef = toolSchema[paramName];
+                                      acc[paramName] = {
+                                        'ui:title': `${paramName} ${paramDef.type ? `(${paramDef.type})` : ''}`,
+                                        'ui:placeholder':
+                                          paramDef.description ||
+                                          `Enter ${paramName}`,
+                                      };
+                                      return acc;
+                                    },
+                                    {} as Record<string, any>,
+                                  ),
                                   'ui:submitButtonOptions': {
                                     norender: true,
                                   },
@@ -791,8 +798,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                         <span className="mt-0.5">{getLogIcon(log.type)}</span>
                         <div className="flex-1 flex items-start justify-between">
                           <span
-                            className={`${getLogColor(log.type)} flex-1 break-words ${log.type === 'result' ? 'font-mono text-xs' : ''
-                              }`}
+                            className={`${getLogColor(log.type)} flex-1 break-words ${
+                              log.type === 'result' ? 'font-mono text-xs' : ''
+                            }`}
                           >
                             {log.message}
                           </span>

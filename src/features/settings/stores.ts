@@ -5,15 +5,13 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Locale } from '@/shared/locales';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
-import { createPersistConfig, db } from '@/shared/storage';
+import { createLocalStoragePersistConfig } from '@/shared/storage';
 
 // get current DID
 const getCurrentDID = async () => {
   const { getDid } = await NuwaIdentityKit();
   return await getDid();
 };
-
-const settingsDB = db;
 
 // ================= Interfaces ================= //
 
@@ -37,25 +35,15 @@ interface SettingsState {
 
   // reset settings
   resetSettings: () => void;
-
-  // Data persistence
-  loadFromDB: () => Promise<void>;
-  saveToDB: () => Promise<void>;
 }
 
 // ================= Persist Configuration ================= //
 
-const persistConfig = createPersistConfig<SettingsState>({
+const persistConfig = createLocalStoragePersistConfig<SettingsState>({
   name: 'settings-storage',
-  getCurrentDID: getCurrentDID,
   partialize: (state) => ({
     settings: state.settings,
   }),
-  onRehydrateStorage: () => (state?: SettingsState) => {
-    if (state) {
-      state.loadFromDB();
-    }
-  },
 });
 
 // ================= Store Definition ================= //
@@ -72,7 +60,6 @@ export const SettingsStateStore = create<SettingsState>()(
       },
       setSettings: (settings: UserSettings) => {
         set({ settings });
-        get().saveToDB();
       },
       setSetting: (key, value) => {
         set((state) => ({
@@ -81,7 +68,6 @@ export const SettingsStateStore = create<SettingsState>()(
             [key]: value,
           },
         }));
-        get().saveToDB();
       },
 
       // Reset functionality
@@ -94,40 +80,6 @@ export const SettingsStateStore = create<SettingsState>()(
             devMode: false,
           },
         });
-        get().saveToDB();
-      },
-
-      // Data persistence methods
-      loadFromDB: async () => {
-        const currentDID = await getCurrentDID();
-        if (typeof window === 'undefined' || !currentDID) return;
-
-        try {
-          const userSettings = await settingsDB.settings.get(currentDID);
-
-          if (userSettings) {
-            set({
-              settings: userSettings.settings,
-            });
-          }
-        } catch (error) {
-          console.error('Failed to load settings from DB:', error);
-        }
-      },
-
-      saveToDB: async () => {
-        const currentDID = await getCurrentDID();
-        if (typeof window === 'undefined' || !currentDID) return;
-
-        try {
-          const { settings } = get();
-          await settingsDB.settings.put({
-            did: currentDID,
-            settings,
-          });
-        } catch (error) {
-          console.error('Failed to save settings to DB:', error);
-        }
       },
     }),
     persistConfig,
