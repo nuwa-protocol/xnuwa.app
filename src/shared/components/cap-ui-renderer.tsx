@@ -1,4 +1,3 @@
-import { useChat } from '@ai-sdk/react';
 import { NUWA_CLIENT_TIMEOUT } from '@nuwa-ai/ui-kit';
 import { AlertCircle } from 'lucide-react';
 import { connect, WindowMessenger } from 'penpal';
@@ -8,7 +7,7 @@ import {
   closeNuwaMCPClient,
   createNuwaMCPClient,
 } from '@/shared/services/mcp-client';
-import { useChatContext } from '../../chat/contexts/chat-context';
+import type { NuwaMCPClient } from '@/shared/types';
 
 const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
   if (artifact) {
@@ -85,35 +84,49 @@ export type CapUIRendererProps = {
   srcUrl: string;
   title?: string;
   artifact?: boolean;
+  onSendPrompt: (prompt: string) => void;
+  onAddSelection: (label: string, message: string) => void;
+  onSaveState: (state: any) => void;
+  onGetState: () => void;
+  onPenpalConnected?: () => void;
+  onMCPConnected?: (mcpClient: NuwaMCPClient) => void;
+  onPenpalConnectionError?: (error: Error) => void;
+  onMCPConnectionError?: (error: Error) => void;
 };
 
 export const CapUIRenderer = ({
   srcUrl,
   title,
   artifact = false,
+  onSendPrompt,
+  onAddSelection,
+  onSaveState,
+  onGetState,
+  onPenpalConnected,
+  onMCPConnected,
+  onPenpalConnectionError,
+  onMCPConnectionError,
 }: CapUIRendererProps) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const { chat } = useChatContext();
-  const { sendMessage } = useChat({ chat });
 
   const [height, setHeight] = useState<number>(100); // Default height
   const [isLoading, setIsLoading] = useState(true);
 
   const nuwaClientMethods = {
     sendPrompt: (prompt: string) => {
-      sendMessage({ text: prompt });
+      onSendPrompt(prompt);
     },
 
     addSelection: (label: string, message: string) => {
-      // onAddSelection?.(label, message);
+      onAddSelection?.(label, message);
     },
 
     saveState: (state: any) => {
-      // onSaveState?.(state);
+      onSaveState?.(state);
     },
 
     getState: () => {
-      // onGetState?.();
+      onGetState?.();
     },
   };
 
@@ -137,13 +150,13 @@ export const CapUIRenderer = ({
         timeout: NUWA_CLIENT_TIMEOUT,
       }).promise;
 
-      // onPenpalConnected?.();
+      onPenpalConnected?.();
     } catch (error) {
       const err =
         error instanceof Error
           ? error
           : new Error(`Failed to connect to ${title ?? srcUrl} over Penpal`);
-      // onPenpalConnectionError?.(err);
+      onPenpalConnectionError?.(err);
     }
   }, [title, srcUrl]);
 
@@ -157,13 +170,13 @@ export const CapUIRenderer = ({
         targetWindow: iframeRef.current?.contentWindow,
       });
 
-      // onMCPConnected?.(mcpClient);
+      onMCPConnected?.(mcpClient);
     } catch (error) {
       const err =
         error instanceof Error
           ? error
           : new Error(`Failed to connect to ${title ?? srcUrl} over MCP`);
-      // onMCPConnectionError?.(err);
+      onMCPConnectionError?.(err);
       await closeNuwaMCPClient(srcUrl);
     }
   }, [title, srcUrl]);
@@ -214,15 +227,15 @@ export const CapUIRenderer = ({
         style={
           isLoading
             ? {
-                width: 0,
-                height: 0,
-                position: 'absolute',
-                border: 0,
-              }
+              width: 0,
+              height: 0,
+              position: 'absolute',
+              border: 0,
+            }
             : {
-                width: '100%',
-                height: artifact ? '100%' : height,
-              }
+              width: '100%',
+              height: artifact ? '100%' : height,
+            }
         }
         sandbox={sandbox}
         title={title ?? 'Nuwa Cap UI'}

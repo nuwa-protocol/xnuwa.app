@@ -1,7 +1,7 @@
 import type { ComponentProps, HTMLAttributes } from 'react';
 import { memo, useMemo } from 'react';
-import { CapUIRenderer } from '@/features/chat/components/cap-ui-renderer';
-import { Response } from './message-ai';
+import { ResponseMarkdown } from './response-markdown';
+import { ResponseUI } from './response-ui';
 
 function parseCapUIAttributes(
   text: string,
@@ -21,16 +21,16 @@ function parseCapUIAttributes(
 interface ResponseWithUIProps extends HTMLAttributes<HTMLDivElement> {
   children: string;
   allowedImagePrefixes?: ComponentProps<
-    typeof Response
+    typeof ResponseMarkdown
   >['allowedImagePrefixes'];
-  allowedLinkPrefixes?: ComponentProps<typeof Response>['allowedLinkPrefixes'];
-  defaultOrigin?: ComponentProps<typeof Response>['defaultOrigin'];
+  allowedLinkPrefixes?: ComponentProps<typeof ResponseMarkdown>['allowedLinkPrefixes'];
+  defaultOrigin?: ComponentProps<typeof ResponseMarkdown>['defaultOrigin'];
   parseIncompleteMarkdown?: ComponentProps<
-    typeof Response
+    typeof ResponseMarkdown
   >['parseIncompleteMarkdown'];
 }
 
-export const ResponseWithUI = memo(
+export const AssistantResponse = memo(
   ({
     children,
     allowedImagePrefixes,
@@ -89,7 +89,7 @@ export const ResponseWithUI = memo(
           if (part.type === 'capui') {
             const data = part.content as { url: string; title?: string };
             return (
-              <CapUIRenderer
+              <ResponseUI
                 key={data.url}
                 srcUrl={data.url}
                 title={data.title}
@@ -97,7 +97,7 @@ export const ResponseWithUI = memo(
             );
           } else {
             return (
-              <Response
+              <ResponseMarkdown
                 key={part.content}
                 allowedImagePrefixes={allowedImagePrefixes}
                 allowedLinkPrefixes={allowedLinkPrefixes}
@@ -105,7 +105,7 @@ export const ResponseWithUI = memo(
                 parseIncompleteMarkdown={parseIncompleteMarkdown}
               >
                 {part.content}
-              </Response>
+              </ResponseMarkdown>
             );
           }
         })}
@@ -115,4 +115,4 @@ export const ResponseWithUI = memo(
   (prevProps, nextProps) => prevProps.children === nextProps.children,
 );
 
-ResponseWithUI.displayName = 'ResponseWithUI';
+AssistantResponse.displayName = 'AssistantResponse';

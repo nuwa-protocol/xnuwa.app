@@ -18,8 +18,8 @@ import {
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { cn } from '@/shared/utils';
 import { useDeleteMessagesAfterId } from '../hooks';
-import { ResponseWithUI } from './message-ai-ui';
 import { MessageEditor } from './message-editor';
+import { AssistantResponse } from './response';
 
 const MAX_MESSAGE_LENGTH = 150;
 
@@ -101,9 +101,9 @@ export const MessageText = ({
             },
           )}
         >
-          <ResponseWithUI parseIncompleteMarkdown={true}>
+          <AssistantResponse parseIncompleteMarkdown={true}>
             {displayText}
-          </ResponseWithUI>
+          </AssistantResponse>
 
           {isUserMessageLong && (
             <Button

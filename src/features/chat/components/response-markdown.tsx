@@ -380,7 +380,7 @@ const components: Options['components'] = {
   },
 };
 
-export const Response = memo(
+export const ResponseMarkdown = memo(
   ({
     className,
     options,
@@ -422,4 +422,4 @@ export const Response = memo(
   (prevProps, nextProps) => prevProps.children === nextProps.children,
 );
 
-Response.displayName = 'Response';
+ResponseMarkdown.displayName = 'ResponseMarkdown';
