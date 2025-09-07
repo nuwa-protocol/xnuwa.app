@@ -13,7 +13,8 @@ import { ChatSessionsStore } from '../stores';
 import { CapResolve } from './cap-resolve';
 import {
   convertToolsToOpenAI,
-  convertUIMessagesToOpenAI,
+  convertUIMessagesToOpenAIMessages,
+  writeOpenaAIChunkToUIMessageStream,
 } from './openai-converters';
 
 // Create OpenAI client with payment integration
@@ -47,7 +48,6 @@ export const StreamAIResponse = async ({
   const paymentCtxId = generateUUID();
   const headers = {
     'X-Client-Tx-Ref': paymentCtxId,
-    // Add any model-specific headers
     'content-type': 'application/json',
   };
 
@@ -77,7 +77,7 @@ export const StreamAIResponse = async ({
 
       try {
         // Convert inputs to OpenAI format
-        const openaiMessages = convertUIMessagesToOpenAI(messages);
+        const openaiMessages = convertUIMessagesToOpenAIMessages(messages);
         const openaiTools = convertToolsToOpenAI(
           Array.isArray(tools) ? tools : [],
         );
@@ -106,34 +106,7 @@ export const StreamAIResponse = async ({
             });
             hasSendOnResponseDataMark = true;
           }
-
-          // Process each chunk and get the event
-          const choice = chunk.choices?.[0];
-          if (!choice) continue;
-
-          const { delta } = choice;
-
-          // Handle text content
-          if (delta?.content) {
-            writer.write({
-              type: 'text-delta',
-              delta: delta.content,
-              id: 'response',
-            });
-          }
-
-          // Handle tool calls - use proper type
-          if (delta?.tool_calls) {
-            const toolCall = delta.tool_calls[0];
-            if (toolCall?.function && toolCall.id && toolCall.function.name) {
-              writer.write({
-                type: 'tool-call-delta',
-                toolCallId: toolCall.id,
-                toolName: toolCall.function.name,
-                argsTextDelta: toolCall.function.arguments || '',
-              } as any);
-            }
-          }
+          writeOpenaAIChunkToUIMessageStream(chunk, writer);
         }
       } catch (error) {
         // Handle errors
