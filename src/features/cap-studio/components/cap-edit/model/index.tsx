@@ -39,23 +39,20 @@ export function ModelTab({ form }: ModelTabProps) {
   const parametersConfigId = useId();
   const customParametersId = useId();
 
-  const gatewayUrl = form.watch('core.model.gatewayUrl');
+  const customGatewayUrl = form.watch('core.model.customGatewayUrl');
   const modelId = form.watch('core.model.modelId');
   const parameters = form.watch('core.model.parameters') || {};
   const supportedInputs = form.watch('core.model.supportedInputs');
   const modelType = form.watch('core.model.modelType');
 
   // Initialize states based on form data
-  const initialGatewayType =
-    gatewayUrl === LLM_GATEWAY_BASE_URL ? 'nuwa' : 'custom';
+  const initialGatewayType = customGatewayUrl ? 'custom' : 'nuwa';
   // For custom gateway, confirm if we have any model configuration (not just modelId)
   const hasModelConfig =
     modelId || modelType || (supportedInputs && supportedInputs.length > 0);
-  const initialIsConfirmed = gatewayUrl
-    ? gatewayUrl === LLM_GATEWAY_BASE_URL
-      ? true
-      : !!hasModelConfig
-    : false;
+  const initialIsConfirmed = customGatewayUrl
+    ? !!hasModelConfig
+    : true; // Nuwa gateway is always confirmed
 
   const [isGatewayConfirmed, setIsGatewayConfirmed] =
     useState(initialIsConfirmed);
@@ -69,7 +66,8 @@ export function ModelTab({ form }: ModelTabProps) {
 
   const handleGatewayTypeChange = (field: any, type: 'nuwa' | 'custom') => {
     if (type === 'nuwa') {
-      field.onChange(LLM_GATEWAY_BASE_URL);
+      // For Nuwa gateway, clear the customGatewayUrl field
+      field.onChange(undefined);
       setGatewayType('nuwa');
     } else {
       // Set a default URL for custom gateway to avoid immediate validation errors
@@ -82,7 +80,7 @@ export function ModelTab({ form }: ModelTabProps) {
       form.setValue('core.model.parameters', {});
       setSelectedModel(null);
     }
-    setIsGatewayConfirmed(false);
+    setIsGatewayConfirmed(type === 'nuwa'); // Nuwa gateway is always confirmed
   };
 
   const handleTestGateway = async () => {
@@ -90,7 +88,7 @@ export function ModelTab({ form }: ModelTabProps) {
       setIsValidatingGateway(true);
       try {
         // TODO: Implement custom gateway validation
-        const isValid = await validateCustomGateway(gatewayUrl);
+        const isValid = await validateCustomGateway(customGatewayUrl);
         if (isValid) {
           setIsGatewayConfirmed(true);
         } else {
@@ -175,47 +173,45 @@ export function ModelTab({ form }: ModelTabProps) {
 
   // Initialize states based on existing data
   React.useEffect(() => {
-    if (gatewayUrl) {
-      if (gatewayUrl === LLM_GATEWAY_BASE_URL) {
-        if (gatewayType !== 'nuwa') {
-          setGatewayType('nuwa');
-        }
-        setIsGatewayConfirmed(true); // Nuwa gateway is always trusted
-        // If we have a modelId but no selectedModel, create a mock model for display
-        if (modelId && !selectedModel) {
-          const mockModel: ModelDetails = {
-            id: modelId,
-            name: modelId,
-            slug: modelId,
-            providerName: 'Unknown Provider',
-            providerSlug: 'unknown',
-            description: 'Previously configured model',
-            contextLength: 0,
-            pricing: {
-              input_per_million_tokens: 0,
-              output_per_million_tokens: 0,
-              request_per_k_requests: 0,
-              image_per_k_images: 0,
-              web_search_per_k_searches: 0,
-            },
-            supported_inputs: supportedInputs || ['text'],
-            supported_parameters: [],
-          };
-          setSelectedModel(mockModel);
-        }
-      } else {
-        if (gatewayType !== 'custom') {
-          setGatewayType('custom');
-        }
-        // For custom gateway, confirm if we already have model configuration
-        // This indicates the gateway was previously validated
-        if (modelId && !isGatewayConfirmed) {
-          setIsGatewayConfirmed(true);
-        }
+    if (customGatewayUrl) {
+      if (gatewayType !== 'custom') {
+        setGatewayType('custom');
+      }
+      // For custom gateway, confirm if we already have model configuration
+      // This indicates the gateway was previously validated
+      if (modelId && !isGatewayConfirmed) {
+        setIsGatewayConfirmed(true);
+      }
+    } else {
+      if (gatewayType !== 'nuwa') {
+        setGatewayType('nuwa');
+      }
+      setIsGatewayConfirmed(true); // Nuwa gateway is always trusted
+      // If we have a modelId but no selectedModel, create a mock model for display
+      if (modelId && !selectedModel) {
+        const mockModel: ModelDetails = {
+          id: modelId,
+          name: modelId,
+          slug: modelId,
+          providerName: 'Unknown Provider',
+          providerSlug: 'unknown',
+          description: 'Previously configured model',
+          contextLength: 0,
+          pricing: {
+            input_per_million_tokens: 0,
+            output_per_million_tokens: 0,
+            request_per_k_requests: 0,
+            image_per_k_images: 0,
+            web_search_per_k_searches: 0,
+          },
+          supported_inputs: supportedInputs || ['text'],
+          supported_parameters: [],
+        };
+        setSelectedModel(mockModel);
       }
     }
   }, [
-    gatewayUrl,
+    customGatewayUrl,
     modelId,
     modelType,
     supportedInputs,
@@ -245,10 +241,10 @@ export function ModelTab({ form }: ModelTabProps) {
           <div className="space-y-3">
             <FormField
               control={form.control}
-              name="core.model.gatewayUrl"
+              name="core.model.customGatewayUrl"
               render={({ field }) => (
                 <FormItem className="ml-6">
-                  <FormLabel className="sr-only">Gateway URL</FormLabel>
+                  <FormLabel className="sr-only">Custom Gateway URL</FormLabel>
                   <FormControl>
                     <div className="flex flex-col space-y-2">
                       <RadioGroup
@@ -279,17 +275,14 @@ export function ModelTab({ form }: ModelTabProps) {
                       {gatewayType === 'nuwa' && (
                         <div className="p-3 bg-muted rounded-md">
                           <p className="text-sm text-muted-foreground">
-                            Using:{' '}
-                            <code className="text-xs bg-background px-2 py-1 rounded">
-                              {LLM_GATEWAY_BASE_URL}
-                            </code>
+                            Using Nuwa's official LLM gateway
                           </p>
                         </div>
                       )}
                       <Input
                         className={`${gatewayType === 'nuwa' ? 'hidden' : ''}`}
                         placeholder="Enter gateway URL (e.g., https://api.openai.com/v1)"
-                        value={field.value}
+                        value={field.value || ''}
                         onChange={field.onChange}
                       />
                     </div>
@@ -308,7 +301,11 @@ export function ModelTab({ form }: ModelTabProps) {
               type="button"
               size="sm"
               onClick={handleTestGateway}
-              disabled={!gatewayUrl?.trim() || isValidatingGateway}
+              disabled={
+                gatewayType === 'nuwa' ||
+                !customGatewayUrl?.trim() ||
+                isValidatingGateway
+              }
             >
               {isValidatingGateway ? 'Testing...' : 'Test Gateway'}
             </Button>
@@ -330,7 +327,7 @@ export function ModelTab({ form }: ModelTabProps) {
             </div>
             {isGatewayConfirmed && gatewayType === 'nuwa' && (
               <ModelSelectorDialog
-                gatewayUrl={gatewayUrl}
+                gatewayUrl={LLM_GATEWAY_BASE_URL}
                 onModelSelect={handleModelSelect}
               />
             )}

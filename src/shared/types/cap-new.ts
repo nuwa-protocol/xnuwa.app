@@ -21,7 +21,7 @@ export const CapIDSchema = z
   }));
 
 export const CapModelSchema = z.object({
-  gatewayUrl: z.string().url('Must be a valid URL'),
+  customGatewayUrl: z.string().url('Must be a valid URL').optional(),
   modelId: z
     .string()
     .max(50, 'Model ID must be at most 50 characters')
@@ -52,13 +52,10 @@ export const CapPromptSchema = z.object({
 
 export const CapMcpServerSchema = z.string().url('Must be a valid URL');
 
-export const CapArtifactSchema = z.string().url('Must be a valid URL');
-
 export const CapCoreSchema = z.object({
   prompt: CapPromptSchema,
   model: CapModelSchema,
   mcpServers: z.record(z.string(), CapMcpServerSchema),
-  artifact: CapArtifactSchema.optional(),
 });
 
 export const CapThumbnailSchema = z

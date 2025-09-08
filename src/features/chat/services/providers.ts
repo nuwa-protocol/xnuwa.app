@@ -8,8 +8,8 @@ export const llmProvider = {
   chat: (model: CapModel) => {
     const providerSettings = {
       apiKey: 'NOT-USED', // specify a fake api key to avoid provider errors
-      baseURL: model.gatewayUrl,
-      fetch: createPaymentFetch(model.gatewayUrl),
+      baseURL: model.customGatewayUrl || LLM_GATEWAY_BASE_URL,
+      fetch: createPaymentFetch(model.customGatewayUrl || LLM_GATEWAY_BASE_URL),
       extraBody: model.parameters,
     };
 

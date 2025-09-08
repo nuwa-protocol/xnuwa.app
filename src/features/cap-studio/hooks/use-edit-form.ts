@@ -51,8 +51,7 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
           suggestions: editingCap?.capData.core.prompt.suggestions || [],
         },
         model: {
-          gatewayUrl:
-            editingCap?.capData.core.model.gatewayUrl || LLM_GATEWAY_BASE_URL,
+          customGatewayUrl: editingCap?.capData.core.model.customGatewayUrl || undefined,
           modelId: editingCap?.capData.core.model.modelId || '',
           parameters: editingCap?.capData.core.model.parameters || {},
           supportedInputs: editingCap?.capData.core.model.supportedInputs || [
@@ -62,7 +61,6 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
             editingCap?.capData.core.model.modelType ?? 'Language Model',
         },
         mcpServers: editingCap?.capData.core.mcpServers || {},
-        artifact: editingCap?.capData.core.artifact || undefined,
       },
     },
   });
