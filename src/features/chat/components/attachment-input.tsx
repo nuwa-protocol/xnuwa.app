@@ -23,7 +23,7 @@ export function AttachmentInput({
   const fileInputId = useId();
 
   // File constraints
-  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
   const ACCEPTED_FILE_TYPES = [
     // Images
     'image/jpeg',
