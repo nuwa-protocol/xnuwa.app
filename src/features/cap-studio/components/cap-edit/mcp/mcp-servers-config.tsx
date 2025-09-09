@@ -12,7 +12,7 @@ import {
   Label,
 } from '@/shared/components/ui';
 
-import type { CapMcpServer } from '@/shared/types/cap-new';
+import type { CapMcpServer } from '@/shared/types';
 
 interface McpServersConfigProps {
   mcpServers: Record<string, CapMcpServer>;

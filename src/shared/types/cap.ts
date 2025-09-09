@@ -3,7 +3,7 @@ export type {
   Cap,
   CapCore,
   CapID,
-  CapMcpServerConfig,
+  CapMcpServer,
   CapMetadata,
   CapModel,
   CapPrompt,
@@ -14,10 +14,11 @@ export type {
 export {
   CapCoreSchema,
   CapIDSchema,
-  CapMcpServerConfigSchema,
+  CapMcpServerSchema,
   CapMetadataSchema,
   CapModelSchema,
   CapPromptSchema,
+  CapPromptSuggestionSchema,
   CapSchema,
   CapThumbnailSchema,
 } from '@nuwa-ai/cap-kit';

@@ -1,7 +1,7 @@
 import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { Badge, Button, Input, Label } from '@/shared/components/ui';
-import { CapPromptSuggestionSchema } from '@/shared/types/cap-new';
+import { CapPromptSuggestionSchema } from '@/shared/types';
 import { cn } from '@/shared/utils';
 
 interface PromptSuggestionsProps {

@@ -14,7 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui';
-import type { CapThumbnail } from '@/shared/types/cap-new';
+import type { CapThumbnail } from '@/shared/types';
 
 interface ThumbnailUploadProps {
   thumbnail: CapThumbnail;
