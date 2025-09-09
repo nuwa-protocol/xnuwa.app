@@ -1,13 +1,14 @@
 import { type UseChatHelpers, useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import cx from 'classnames';
-import { ArrowUpIcon, StopCircleIcon } from 'lucide-react';
+import { ArrowUpIcon, StopCircleIcon, TextSelect, X } from 'lucide-react';
 import type React from 'react';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
+import { Badge } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
@@ -29,6 +30,8 @@ function PureMultimodalInput({ className }: { className?: string }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [attachments, setAttachments] = useState<AttachmentData[]>([]);
+  const { chatSessions, removeSelectionFromChatSession } = ChatSessionsStore();
+  const selections = chatSessions[chat.id]?.selections;
 
   // Remove attachment
   const removeAttachment = useCallback((index: number) => {
@@ -60,6 +63,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
       return;
     }
 
+    // TODO: how to send the selections?
     if (input.trim() || attachments.length > 0) {
       sendMessage({
         text: input,
@@ -105,6 +109,25 @@ function PureMultimodalInput({ className }: { className?: string }) {
           className,
         )}
       >
+        {/* Selections */}
+        {selections && selections.length > 0 && (
+          <div className="flex flex-row gap-2 p-2 mx-2">
+            {selections?.map((selection) => (
+              <Badge
+                key={selection.label}
+                variant="default"
+                className="group cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors duration-200 flex items-center gap-1"
+                onClick={() => removeSelectionFromChatSession(chat.id, selection)}
+              >
+                <TextSelect size={12} className="group-hover:hidden" />
+                <X size={12} className="hidden group-hover:block" />
+                {selection.label}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {/*  Input Textarea */}
         <textarea
           data-testid="multimodal-input"
           ref={textareaRef}
@@ -139,6 +162,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
           }}
         />
 
+        {/* Cap Selector and Send Button */}
         <div className="flex justify-between items-center p-2">
           <div className="flex items-center gap-2">
             <CapSelector />

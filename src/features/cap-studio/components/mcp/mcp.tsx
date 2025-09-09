@@ -15,7 +15,7 @@ import {
 import { useCallback, useEffect, useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { CapUIRenderer } from '@/features/chat/components/cap-ui-renderer';
+import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
 import {
   Button,
   Card,
@@ -798,9 +798,8 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                         <span className="mt-0.5">{getLogIcon(log.type)}</span>
                         <div className="flex-1 flex items-start justify-between">
                           <span
-                            className={`${getLogColor(log.type)} flex-1 break-words ${
-                              log.type === 'result' ? 'font-mono text-xs' : ''
-                            }`}
+                            className={`${getLogColor(log.type)} flex-1 break-words ${log.type === 'result' ? 'font-mono text-xs' : ''
+                              }`}
                           >
                             {log.message}
                           </span>

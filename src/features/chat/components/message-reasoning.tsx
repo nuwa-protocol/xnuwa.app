@@ -8,7 +8,7 @@ import {
   CollapsibleTrigger,
 } from '@/shared/components/ui';
 import { cn } from '@/shared/utils/index';
-import { Response } from './message-ai';
+import { ResponseMarkdown } from './response-markdown';
 
 type AIReasoningContextValue = {
   isStreaming: boolean;
@@ -171,7 +171,7 @@ export const AIReasoningContent = memo(
       )}
       {...props}
     >
-      <Response>{children}</Response>
+      <ResponseMarkdown>{children}</ResponseMarkdown>
     </CollapsibleContent>
   ),
 );

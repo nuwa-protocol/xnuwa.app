@@ -12,7 +12,6 @@ class RehydrationTracker {
   }
 
   markRehydrated(storeName: string) {
-    console.log(`${storeName} hydration finished`);
     this.stores[storeName] = true;
     this.notifyListeners();
   }
@@ -42,7 +41,7 @@ class RehydrationTracker {
 
 export const rehydrationTracker = new RehydrationTracker();
 
-export function useGlobalRehydration() {
+export function useRehydration() {
   const [isAllRehydrated, setIsAllRehydrated] = useState(false);
 
   useEffect(() => {
@@ -52,7 +51,7 @@ export function useGlobalRehydration() {
 
     checkRehydration();
     const unsubscribe = rehydrationTracker.subscribe(checkRehydration);
-    
+
     return () => {
       unsubscribe();
     };

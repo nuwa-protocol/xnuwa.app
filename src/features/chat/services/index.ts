@@ -1,4 +1,5 @@
-import { StreamAIResponse } from './stream-ai';
+import { StreamAIResponse } from './stream-ai-openai';
+// import { StreamAIResponse } from './stream-ai';
 
 export const createClientAIFetch = (): ((
   input: RequestInfo | URL,

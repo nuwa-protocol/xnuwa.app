@@ -1,7 +1,7 @@
 import { Maximize2, Save, Variable, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Markdown } from '@/features/cap-studio/components/cap-edit/prompt/markdown';
-import { Response } from '@/features/chat/components/message-ai';
+import { ResponseMarkdown } from '@/features/chat/components/response-markdown';
 import {
   Badge,
   Button,
@@ -209,7 +209,7 @@ export function PromptEditor({
             className="min-h-[800px] p-3 border rounded-md bg-muted/20"
           >
             <div className="prose prose-sm max-w-none">
-              <Response>{value || 'No content to preview'}</Response>
+              <ResponseMarkdown>{value || 'No content to preview'}</ResponseMarkdown>
             </div>
           </TabsContent>
         </Tabs>

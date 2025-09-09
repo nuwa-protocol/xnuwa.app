@@ -5,7 +5,7 @@ import type { UIMessage } from 'ai';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createChatSessionsPersistConfig } from '@/shared/storage';
-import type { ChatPayment, ChatSession } from '../types';
+import type { ChatPayment, ChatSelection, ChatSession } from '../types';
 
 // ================= Constants ================= //
 export const createInitialChatSession = (chatId: string): ChatSession => ({
@@ -28,6 +28,11 @@ interface ChatSessionsStoreState {
   updateSession: (
     id: string,
     updates: Partial<Omit<ChatSession, 'id'>>,
+  ) => void;
+  addSelectionToChatSession: (id: string, selection: ChatSelection) => void;
+  removeSelectionFromChatSession: (
+    id: string,
+    selection: ChatSelection,
   ) => void;
   addPaymentCtxIdToChatSession: (id: string, payment: ChatPayment) => void;
   deleteSession: (id: string) => void;
@@ -90,6 +95,55 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
             ...session,
             ...updates,
             updatedAt: Date.now(),
+          };
+
+          return {
+            chatSessions: {
+              ...state.chatSessions,
+              [id]: updatedSession,
+            },
+          };
+        });
+      },
+
+      addSelectionToChatSession: (id: string, selection: ChatSelection) => {
+        set((state) => {
+          const session = state.chatSessions[id];
+          if (!session) {
+            return state;
+          }
+
+          return {
+            chatSessions: {
+              ...state.chatSessions,
+              [id]: {
+                ...session,
+                selections: [...(session.selections || []), selection],
+              },
+            },
+          };
+        });
+      },
+
+      removeSelectionFromChatSession: (
+        id: string,
+        selection: ChatSelection,
+      ) => {
+        set((state) => {
+          const session = state.chatSessions[id];
+          if (!session) {
+            return state;
+          }
+
+          const selections = session.selections;
+
+          if (!selections) {
+            return state;
+          }
+
+          const updatedSession = {
+            ...session,
+            selections: selections.filter((s) => s.label !== selection.label),
           };
 
           return {

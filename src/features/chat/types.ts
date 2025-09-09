@@ -10,6 +10,11 @@ export interface ChatPayment {
   timestamp: number;
 }
 
+export interface ChatSelection {
+  label: string;
+  message: string;
+}
+
 // client chat interface
 export interface ChatSession {
   id: string;
@@ -19,8 +24,9 @@ export interface ChatSession {
   messages: UIMessage[];
   payments: ChatPayment[];
   caps: Cap[];
+  currentArtifact?: string;
+  selections?: ChatSelection[];
   pinned?: boolean;
-  did?: string; // Added for IndexedDB storage
 }
 
 export interface UrlMetadata {

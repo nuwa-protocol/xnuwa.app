@@ -43,7 +43,7 @@ export function initSentry() {
         };
       }
 
-      // Add DID and current Cap metadata to event
+      // Add DID to event
       try {
         const did = await NuwaIdentityKit().getDid();
         if (did) {
