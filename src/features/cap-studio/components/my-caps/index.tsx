@@ -280,7 +280,7 @@ export function MyCaps({
         </div>
       </div>
 
-      {/* All Caps */}
+      {/* All */}
       {allCaps.length === 0 ? (
         <Card className="border-dashed">
           <CardHeader className="text-center py-8">

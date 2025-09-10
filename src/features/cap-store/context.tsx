@@ -18,7 +18,7 @@ interface CapStoreContextValue {
 
 const initialActiveSection = {
   id: 'all',
-  label: 'All Caps',
+  label: 'All',
   type: 'section' as const,
 };
 

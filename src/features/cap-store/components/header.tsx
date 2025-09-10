@@ -1,9 +1,9 @@
 import {
   BookOpen,
   Bot,
+  Brain,
   Code,
   Coins,
-  Grid3X3,
   History,
   Home,
   MoreHorizontal,
@@ -23,6 +23,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/shared/components/ui/navigation-menu';
+import { TooltipProvider } from '@/shared/components/ui/tooltip';
 import { predefinedTags } from '@/shared/constants/cap';
 import { useDebounceValue, useLanguage } from '@/shared/hooks';
 import { useCapStoreContext } from '../context';
@@ -54,7 +55,7 @@ export function CapStoreHeader() {
         case 'recent':
           return History;
         case 'all':
-          return Grid3X3;
+          return Bot;
         default:
           return Package;
       }
@@ -63,7 +64,7 @@ export function CapStoreHeader() {
     if (type === 'tag') {
       switch (sectionId) {
         case 'ai-model':
-          return Bot;
+          return Brain;
         case 'coding':
           return Code;
         case 'content-writing':
@@ -130,132 +131,194 @@ export function CapStoreHeader() {
   };
 
   return (
-    <div className="border-b border-muted-foreground/20 bg-background">
-      <div className="p-4">
-        <div className="flex items-center justify-between gap-4">
-          {/* Navigation Menu - Left Side */}
-          <NavigationMenu>
-            <NavigationMenuList>
+    <header className="sticky top-0 z-50 px-6 py-3">
+      <div className="container mx-auto">
+        <div className="relative bg-background/95 backdrop-blur-xl border border-border/50 rounded-2xl shadow-lg shadow-black/5 supports-[backdrop-filter]:bg-background/80">
+          <div className="px-4 py-2">
+            <TooltipProvider>
+              <div className="flex items-center justify-between gap-8">
+                {/* Navigation Menu - Left Side */}
+                <NavigationMenu>
+                  <NavigationMenuList className="gap-2">
+                    {/* Home / Featured Caps */}
+                    <NavigationMenuItem>
+                      <button
+                        type="button"
+                        onClick={() => handleActiveSectionChange({ id: 'home', label: 'Home', type: 'section' })}
+                        className={`
+                          inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md
+                          transition-all duration-200 ease-out relative
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                          ${activeSection.id === 'home'
+                            ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                          }
+                        `}
+                      >
+                        <Home className="size-4" />
+                        <span>Home</span>
+                      </button>
+                    </NavigationMenuItem>
 
-              {/* Home / Featured Caps */}
-              <NavigationMenuItem key="home">
-                <button
-                  type="button"
-                  onClick={() => handleActiveSectionChange({ id: 'home', label: 'Home', type: 'section' })}
-                  className={`h-12 px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2 hover:bg-accent hover:text-accent-foreground hover:rounded-md ${activeSection.id === 'home' ? 'bg-accent text-accent-foreground rounded-md' : ''
-                    }`}
-                >
-                  <Home className="size-4" />
-                  {'Home'}
-                </button>
-              </NavigationMenuItem>
+                    {/* All with Categories Dropdown */}
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger
+                        className={`
+                          inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md
+                          transition-all duration-200 ease-out relative
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                          data-[state=open]:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:shadow-sm
+                          ${activeSection.id === 'all' || activeSection.type === 'tag'
+                            ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                          }
+                        `}
+                      >
+                        {activeSection.type === 'tag' ? (
+                          <>
+                            {(() => {
+                              const IconComponent = getSectionIcon(activeSection.id, activeSection.type);
+                              return <IconComponent className="size-4" />;
+                            })()}
+                            <span>{activeSection.label}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Bot className="size-4" />
+                            <span>Caps</span>
+                          </>
+                        )}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent className="min-w-[240px] p-2 animate-in fade-in-0 zoom-in-95">
+                        <div className="flex flex-col gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleActiveSectionChange({ id: 'all', label: t('capStore.sidebar.all') || 'Caps', type: 'section' })}
+                            className={`
+                              flex items-center gap-3 px-3 py-2.5 rounded-md text-sm
+                              transition-all duration-200
+                              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                              ${activeSection.id === 'all'
+                                ? 'bg-gradient-to-r from-primary/15 to-primary/10 text-primary font-medium border border-primary/20 shadow-sm shadow-primary/10'
+                                : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                              }
+                            `}
+                          >
+                            <Bot className="size-4 text-muted-foreground" />
+                            <span>All Caps</span>
+                          </button>
 
-              {/* All Caps with Categories Dropdown */}
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className={`h-12 hover:bg-accent hover:text-accent-foreground hover:rounded-md ${activeSection.id === 'all' || activeSection.type === 'tag' ? 'bg-accent text-accent-foreground rounded-md' : ''
-                  }`}>
-                  {activeSection.type === 'tag' ? (
-                    <>
-                      {(() => {
-                        const IconComponent = getSectionIcon(activeSection.id, activeSection.type);
-                        return <IconComponent className="size-4 mr-2" />;
-                      })()}
-                      {activeSection.label}
-                    </>
-                  ) : (
-                    <>
-                      <Grid3X3 className="size-4 mr-2" />
-                      All Caps
-                    </>
-                  )}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="flex flex-col gap-1 p-4 w-[200px]">
-                    <button
-                      type="button"
-                      onClick={() => handleActiveSectionChange({ id: 'all', label: t('capStore.sidebar.all') || 'All Caps', type: 'section' })}
+                          <div className="my-2 h-px bg-border" />
+
+                          <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Categories
+                          </div>
+                          <div className="space-y-1">
+                            {tagSections.map((section) => {
+                              const IconComponent = getSectionIcon(section.id, section.type);
+                              const isSelected = activeSection.id === section.id;
+
+                              return (
+                                <button
+                                  type="button"
+                                  key={section.id}
+                                  onClick={() => handleActiveSectionChange(section)}
+                                  className={`
+                                    flex items-center gap-3 px-3 py-2.5 w-full rounded-md text-sm
+                                    transition-all duration-200
+                                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                                    ${isSelected
+                                      ? 'bg-gradient-to-r from-primary/15 to-primary/10 text-primary font-medium border border-primary/20 shadow-sm shadow-primary/10'
+                                      : 'text-foreground hover:bg-accent/60 hover:text-accent-foreground'
+                                    }
+                                  `}
+                                >
+                                  <IconComponent className="size-4 text-muted-foreground" />
+                                  <span>{section.label}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+
+                {/* Search Bar - Center */}
+                <div className="relative flex-1 max-w-md">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
+                    <Input
+                      placeholder={t('capStore.searchPlaceholder') || 'Search caps...'}
+                      value={searchValue}
+                      onChange={(e) => handleSearchChange(e.target.value)}
                       className={`
-                        flex items-center gap-3 px-3 py-2 rounded-md text-sm mb-2
-                        transition-colors hover:bg-accent hover:text-accent-foreground
-                        ${activeSection.id === 'all' ? 'bg-accent text-accent-foreground' : ''}
+                        pl-9 pr-9 h-8 border-0 bg-accent text-sm
+                        placeholder:text-muted-foreground/60 
+                        focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-ring
+                        transition-all duration-200 ease-out
+                        ${searchValue ? 'bg-background ring-2 ring-ring/20' : ''}
                       `}
-                    >
-                      <Grid3X3 className="size-4" />
-                      <span className="font-medium">All Caps</span>
-                    </button>
-                    <div className="border-b border-muted-foreground/20 mb-2" />
-                    {tagSections.map((section) => {
-                      const IconComponent = getSectionIcon(section.id, section.type);
-                      const isSelected = activeSection.id === section.id;
-
-                      return (
-                        <button
-                          type="button"
-                          key={section.id}
-                          onClick={() => handleActiveSectionChange(section)}
-                          className={`
-                            flex items-center gap-3 px-3 py-2 rounded-md text-sm
-                            transition-colors hover:bg-accent hover:text-accent-foreground
-                            ${isSelected ? 'bg-accent text-accent-foreground' : ''}
-                          `}
-                        >
-                          <IconComponent className="size-4" />
-                          <span className="font-medium">{section.label}</span>
-                        </button>
-                      );
-                    })}
+                    />
+                    {searchValue && (
+                      <button
+                        type="button"
+                        onClick={handleClearSearch}
+                        className="
+                          absolute right-3 top-1/2 -translate-y-1/2 size-4 
+                          text-muted-foreground/60 hover:text-foreground 
+                          transition-colors duration-200
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:rounded-sm
+                        "
+                      >
+                        <X className="size-4" />
+                      </button>
+                    )}
                   </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+                </div>
 
-              {/* Favorites and Recent Buttons */}
-              <NavigationMenuItem key="favorites">
-                <button
-                  type="button"
-                  onClick={() => handleActiveSectionChange({ id: 'favorites', label: t('capStore.sidebar.favorites') || 'Favorites', type: 'section' })}
-                  className={`h-12 px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2 hover:bg-accent hover:text-accent-foreground hover:rounded-md ${activeSection.id === 'favorites' ? 'bg-accent text-accent-foreground rounded-md' : ''
-                    }`}
-                >
-                  <Star className="size-4" />
-                  {t('capStore.sidebar.favorites') || 'Favorites'}
-                </button>
-              </NavigationMenuItem>
+                {/* Action Buttons - Right Side */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleActiveSectionChange({ id: 'favorites', label: t('capStore.sidebar.favorites') || 'Favorites', type: 'section' })}
+                    className={`
+                      inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md
+                      transition-all duration-200 ease-out relative
+                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                      ${activeSection.id === 'favorites'
+                        ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      }
+                    `}
+                  >
+                    <Star className="size-4" />
+                    <span>{t('capStore.sidebar.favorites') || 'Favorites'}</span>
+                  </button>
 
-              <NavigationMenuItem key="recent">
-                <button
-                  type="button"
-                  onClick={() => handleActiveSectionChange({ id: 'recent', label: t('capStore.sidebar.recent') || 'Recent', type: 'section' })}
-                  className={`h-12 px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2 hover:bg-accent hover:text-accent-foreground hover:rounded-md ${activeSection.id === 'recent' ? 'bg-accent text-accent-foreground rounded-md' : ''
-                    }`}
-                >
-                  <History className="size-4" />
-                  {t('capStore.sidebar.recent') || 'Recent'}
-                </button>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-
-          {/* Search Bar - Right Side */}
-          <div className="relative w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              placeholder={t('capStore.searchPlaceholder') || 'Search caps...'}
-              value={searchValue}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10 h-10"
-            />
-            {searchValue && (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="size-4" />
-              </button>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => handleActiveSectionChange({ id: 'recent', label: t('capStore.sidebar.recent') || 'Recent', type: 'section' })}
+                    className={`
+                      inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md
+                      transition-all duration-200 ease-out relative
+                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                      ${activeSection.id === 'recent'
+                        ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      }
+                    `}
+                  >
+                    <History className="size-4" />
+                    <span>{t('capStore.sidebar.recent') || 'Recent'}</span>
+                  </button>
+                </div>
+              </div>
+            </TooltipProvider>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }

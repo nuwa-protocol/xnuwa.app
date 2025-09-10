@@ -133,7 +133,7 @@ export function CapSelector() {
             onSelect={() => console.log('hahah')}
           >
             <Store className="w-4 h-4 mr-2" />
-            <span>Browse All Caps</span>
+            <span>Browse All</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -125,10 +125,10 @@ export const en = {
     description: 'Discover and install capabilities to enhance your experience',
     searchPlaceholder: 'Search caps...',
     sidebar: {
-      favorites: 'Favorite Caps',
-      recent: 'Recent Caps',
+      favorites: 'Favorites',
+      recent: 'Recent',
       installed: 'Installed',
-      all: 'All Caps',
+      all: 'All',
     },
     status: {
       loading: 'Loading caps...',
@@ -137,8 +137,8 @@ export const en = {
       errorDesc: 'Failed to fetch caps. Please try again.',
       tryAgain: 'Try Again',
       noCaps: 'No caps found',
-      noFavoriteCaps: 'No Favorite Caps',
-      noRecentCaps: 'No Recent Caps',
+      noFavoriteCaps: 'No Favorites',
+      noRecentCaps: 'No Recent',
       noInstalledCaps: 'No Installed Caps',
       noCapsDesc: {
         search:

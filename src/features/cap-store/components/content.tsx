@@ -194,9 +194,9 @@ function getBreadcrumbDescription(
 function getEmptyStateTitle(activeSection: string, t: any): string {
   switch (activeSection) {
     case 'favorites':
-      return t('capStore.status.noFavoriteCaps') || 'No Favorite Caps';
+      return t('capStore.status.noFavoriteCaps') || 'No Favorites';
     case 'recent':
-      return t('capStore.status.noRecentCaps') || 'No Recent Caps';
+      return t('capStore.status.noRecentCaps') || 'No Recent';
     default:
       return t('capStore.status.noCaps') || 'No Caps Found';
   }
