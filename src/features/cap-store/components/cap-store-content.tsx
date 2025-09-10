@@ -101,14 +101,15 @@ export function CapStoreContent() {
           {caps.length > 0 &&
             caps.map((cap) => {
               // Type guard to check if cap is RemoteCap (has cid property)
-              const isRemoteCap = 'cid' in cap;
+              const isRemoteCap = 'metadata' in cap;
+              const id = isRemoteCap ? cap.id : cap.capData.id;
 
               if (isRemoteCap) {
                 // RemoteCap type - use cid as unique key
-                return <CapCard key={cap.id} cap={cap} />;
+                return <CapCard key={id} cap={cap} />;
               } else {
                 // Cap type - use id as unique key
-                return <CapCard key={cap.id} cap={cap} />;
+                return <CapCard key={id} cap={cap} />;
               }
             })}
         </div>

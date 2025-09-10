@@ -2,6 +2,8 @@
 // Store for managing capability (Cap) states
 import { create } from 'zustand';
 import { defaultCap } from '@/shared/constants/cap';
+import { NuwaIdentityKit } from '@/shared/services/identity-kit';
+import { db } from '@/shared/storage/db';
 import type { InstalledCap, RemoteCap } from './types';
 
 // Search parameters interface
@@ -10,6 +12,13 @@ export interface UseRemoteCapParams {
   tags?: string[];
   page?: number;
   size?: number;
+  sortBy?:
+    | 'average_rating'
+    | 'downloads'
+    | 'favorites'
+    | 'rating_count'
+    | 'updated_at';
+  sortOrder?: 'asc' | 'desc';
 }
 
 // ================= Interfaces ================= //
@@ -44,30 +53,49 @@ interface CapStoreState {
   setHasMoreData: (hasMore: boolean) => void;
   setCurrentPage: (page: number) => void;
   setLastSearchParams: (params: UseRemoteCapParams) => void;
+
+  // Data persistence methods
+  loadFromDB: () => Promise<void>;
+  saveToDB: () => Promise<void>;
 }
+
+// Helper function to get current DID
+const getCurrentDID = async () => {
+  const { getDid } = await NuwaIdentityKit();
+  return await getDid();
+};
 
 // ================= Store Definition ================= //
 
-export const CapStateStore = create<CapStoreState>()((set, get) => ({
+export const CapStateStore = create<CapStoreState>((set, get) => ({
   // Store state
   installedCaps: {
     [defaultCap.id]: {
       cid: defaultCap.id,
       capData: defaultCap,
       isFavorite: false,
+      version: '0',
+      stats: {
+        capId: defaultCap.id,
+        downloads: 0,
+        ratingCount: 0,
+        averageRating: 0,
+        favorites: 0,
+      },
       lastUsedAt: null,
     },
   },
 
+  // Remote cap management state
   remoteCaps: [],
   isFetching: false,
   isLoadingMore: false,
   error: null,
   hasMoreData: true,
-  currentPage: 0,
+  currentPage: 1,
   lastSearchParams: {},
 
-  // Installation management
+  // Installed Cap management
   addInstalledCap: (cap: InstalledCap) => {
     const { installedCaps } = get();
 
@@ -84,12 +112,16 @@ export const CapStateStore = create<CapStoreState>()((set, get) => ({
           capData: cap.capData,
           isFavorite: cap.isFavorite,
           lastUsedAt: cap.lastUsedAt,
+          version: cap.version,
+          stats: cap.stats,
         },
       },
     }));
+
+    // Save to IndexedDB asynchronously
+    get().saveToDB();
   },
 
-  // Data management
   updateInstalledCap: (
     id: string,
     updates: Partial<Omit<InstalledCap, 'capData'>>,
@@ -108,6 +140,9 @@ export const CapStateStore = create<CapStoreState>()((set, get) => ({
         },
       },
     }));
+
+    // Save to IndexedDB asynchronously
+    get().saveToDB();
   },
 
   clearAllInstalledCaps: () => {
@@ -143,5 +178,60 @@ export const CapStateStore = create<CapStoreState>()((set, get) => ({
 
   setLastSearchParams: (params: UseRemoteCapParams) => {
     set({ lastSearchParams: params });
+  },
+
+  // Data persistence methods
+  loadFromDB: async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const currentDID = await getCurrentDID();
+      if (!currentDID) return;
+
+      const installedCaps = await db.capStudio
+        .where('did')
+        .equals(currentDID)
+        .toArray();
+
+      const installedCapsMap: Record<string, InstalledCap> = {};
+
+      installedCaps.forEach((installedCap: any) => {
+        const capData = installedCap.data;
+        installedCapsMap[capData.capData.id] = {
+          cid: capData.cid,
+          capData: capData.capData,
+          isFavorite: capData.isFavorite,
+          lastUsedAt: capData.lastUsedAt,
+          version: capData.version,
+          stats: capData.stats,
+        };
+      });
+
+      set((state) => ({
+        installedCaps: { ...state.installedCaps, ...installedCapsMap },
+      }));
+    } catch (error) {
+      console.error('Failed to load caps from DB:', error);
+    }
+  },
+
+  saveToDB: async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const currentDID = await getCurrentDID();
+      if (!currentDID) return;
+
+      const { installedCaps } = get();
+      const capsToSave = Object.entries(installedCaps).map(([id, cap]) => ({
+        id,
+        did: currentDID,
+        data: cap,
+        updatedAt: Date.now(),
+      }));
+      await db.capStudio.bulkPut(capsToSave);
+    } catch (error) {
+      console.error('Failed to save caps to DB:', error);
+    }
   },
 }));

@@ -14,12 +14,10 @@ import {
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 import { useCapStore } from '../hooks/use-cap-store';
+import type { InstalledCap, RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
 import { CapStoreModal } from './cap-store-modal';
-import {
-  CapStoreModalProvider,
-  useCapStoreModal,
-} from './cap-store-modal-context';
+import { CapStoreModalProvider } from './cap-store-modal-context';
 
 const CapInfo = ({ cap }: { cap: Cap }) => (
   <>
@@ -35,14 +33,19 @@ const CapInfo = ({ cap }: { cap: Cap }) => (
 function CapSelectorButton() {
   const { currentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
-  const { openModal } = useCapStoreModal();
+  // const { openModal } = useCapStoreModal();
   const { getFavoriteCaps, runCap } = useCapStore();
 
   const favoriteCaps = getFavoriteCaps();
 
-  const handleCapSelect = async (cap: Cap) => {
+  const handleCapSelect = async (cap: RemoteCap | InstalledCap) => {
+    const id = 'metadata' in cap ? cap.id : cap.capData.id;
     try {
-      await runCap(cap.id);
+      await runCap(id, {
+        version: cap.version,
+        capCid: cap.cid,
+        stats: cap.stats,
+      });
     } catch (error) {
       console.error('Failed to select cap:', error);
     }
@@ -50,7 +53,7 @@ function CapSelectorButton() {
 
   const handleOpenStore = (event: React.MouseEvent) => {
     event.preventDefault();
-    openModal();
+    // openModal();
   };
 
   // If no favorite caps, open store directly on click
@@ -110,24 +113,26 @@ function CapSelectorButton() {
         <DropdownMenuContent align="start" className="min-w-[200px]">
           {favoriteCaps.map((cap) => (
             <DropdownMenuItem
-              key={cap.id}
+              key={cap.capData.id}
               className="cursor-pointer"
               onSelect={() => handleCapSelect(cap)}
             >
               <div className="flex items-center gap-2">
                 <CapAvatar
-                  capName={cap.metadata.displayName}
-                  capThumbnail={cap.metadata.thumbnail}
+                  capName={cap.capData.metadata.displayName}
+                  capThumbnail={cap.capData.metadata.thumbnail}
                   size="sm"
                 />
-                <span className="text-sm">{cap.metadata.displayName}</span>
+                <span className="text-sm">
+                  {cap.capData.metadata.displayName}
+                </span>
               </div>
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
-            onSelect={() => openModal()}
+            onSelect={() => console.log('hahah')}
           >
             <Store className="w-4 h-4 mr-2" />
             <span>Browse All Caps</span>
