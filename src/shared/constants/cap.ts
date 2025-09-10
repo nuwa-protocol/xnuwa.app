@@ -1,5 +1,4 @@
-import { LLM_GATEWAY_BASE_URL } from '../config/llm-gateway';
-import type { Cap } from '../types/cap-new';
+import type { Cap } from '../types';
 
 export const predefinedTags = [
   'AI Model',
@@ -29,7 +28,6 @@ export const defaultCap: Cap = {
       suggestions: [],
     },
     model: {
-      gatewayUrl: LLM_GATEWAY_BASE_URL,
       modelId: 'gpt-4o',
       parameters: {
         temperature: 0.7,

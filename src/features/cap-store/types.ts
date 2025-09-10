@@ -16,7 +16,7 @@ export type InstalledCap = {
   lastUsedAt: number | null;
 };
 
-export type CapStoreSidebarSection = {
+export type CapStoreSection = {
   id: string;
   label: string;
   type: 'section' | 'tag' | 'divider';

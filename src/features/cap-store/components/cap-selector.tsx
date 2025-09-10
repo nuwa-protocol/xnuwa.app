@@ -16,8 +16,6 @@ import type { Cap } from '@/shared/types';
 import { useCapStore } from '../hooks/use-cap-store';
 import type { InstalledCap, RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
-import { CapStoreModal } from './cap-store-modal';
-import { CapStoreModalProvider } from './cap-store-modal-context';
 
 const CapInfo = ({ cap }: { cap: Cap }) => (
   <>
@@ -30,10 +28,10 @@ const CapInfo = ({ cap }: { cap: Cap }) => (
   </>
 );
 
-function CapSelectorButton() {
+export function CapSelector() {
   const { currentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
-  // const { openModal } = useCapStoreModal();
+  // const { openModal } = useCapStoreContext();
   const { getFavoriteCaps, runCap } = useCapStore();
 
   const favoriteCaps = getFavoriteCaps();
@@ -153,14 +151,5 @@ function CapSelectorButton() {
         </Tooltip>
       )}
     </TooltipProvider>
-  );
-}
-
-export function CapSelector() {
-  return (
-    <CapStoreModalProvider>
-      <CapSelectorButton />
-      <CapStoreModal />
-    </CapStoreModalProvider>
   );
 }

@@ -1,20 +1,16 @@
-import { CapStoreContent } from '@/features/cap-store/components/cap-store-content';
-import { CapStoreHeader } from '@/features/cap-store/components/cap-store-header';
-import { CapStoreModalProvider } from '@/features/cap-store/components/cap-store-modal-context';
-import { CapStoreSidebar } from '@/features/cap-store/components/cap-store-sidebar';
+import { CapStoreContent } from '@/features/cap-store/components/content';
+import { CapStoreHeader } from '@/features/cap-store/components/header';
+import { CapStoreProvider } from '@/features/cap-store/context';
 
 export default function CapStorePage() {
   return (
-    <CapStoreModalProvider>
-      <div className="flex h-screen w-full">
-        <CapStoreSidebar />
-        <div className="flex flex-1 flex-col">
-          <CapStoreHeader />
-          <main className="flex-1 overflow-y-auto">
-            <CapStoreContent />
-          </main>
+    <CapStoreProvider>
+      <div className="flex flex-col max-w-6xl mx-auto">
+        <CapStoreHeader />
+        <div className="overflow-y-auto">
+          <CapStoreContent />
         </div>
       </div>
-    </CapStoreModalProvider>
+    </CapStoreProvider>
   );
 }

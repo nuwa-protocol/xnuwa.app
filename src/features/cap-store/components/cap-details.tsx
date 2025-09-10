@@ -27,9 +27,9 @@ import {
 } from '@/shared/components/ui';
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
+import { useCapStoreContext } from '../context';
 import { useCapStore } from '../hooks/use-cap-store';
 import { CapAvatar } from './cap-avatar';
-import { useCapStoreModal } from './cap-store-modal-context';
 import { StarRating } from './star-rating';
 
 export function CapDetails() {
@@ -42,7 +42,7 @@ export function CapDetails() {
     fetchFavoriteStatus,
   } = useCapStore();
   const { capKit } = useCapKit();
-  const { selectedCap: cap } = useCapStoreModal();
+  const { selectedCap: cap } = useCapStoreContext();
   const [isLoading, setIsLoading] = useState(false);
   const [copyToClipboard, isCopied] = useCopyToClipboard();
   const navigate = useNavigate();

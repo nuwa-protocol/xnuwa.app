@@ -1,4 +1,12 @@
-import { Clock, Download, Heart, Loader2, MoreHorizontal, Share, Star } from 'lucide-react';
+import {
+  Clock,
+  Download,
+  Heart,
+  Loader2,
+  MoreHorizontal,
+  Share,
+  Star,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import {
   Card,
@@ -9,11 +17,11 @@ import {
 } from '@/shared/components/ui';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import { APP_URL } from '@/shared/config/app';
+import { useCapStoreContext } from '../context';
 import { useCapStore } from '../hooks/use-cap-store';
 import { useRemoteCap } from '../hooks/use-remote-cap';
 import type { InstalledCap, RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
-import { useCapStoreModal } from './cap-store-modal-context';
 import { StarRating } from './star-rating';
 
 export interface CapCardProps {
@@ -33,7 +41,7 @@ export function CapCard({ cap }: CapCardProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   const { downloadCap } = useRemoteCap();
-  const { activeSection, setSelectedCap } = useCapStoreModal();
+  const { activeSection, setSelectedCap } = useCapStoreContext();
   const { installedCaps } = useCapStore();
 
   /**
@@ -92,7 +100,7 @@ export function CapCard({ cap }: CapCardProps) {
       actions.push({
         icon: <Star className="size-4" />,
         label: 'Add to Favorites',
-        onClick: () => addCapToFavorite(id, cap.version, cap.cid, cap.stats)
+        onClick: () => addCapToFavorite(id, cap.version, cap.cid, cap.stats),
       });
     }
 
