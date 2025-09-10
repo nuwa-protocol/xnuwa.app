@@ -1,9 +1,13 @@
 import type { LucideIcon } from 'lucide-react';
 import { Monitor, SettingsIcon, User } from 'lucide-react';
-import { useState } from 'react';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/components/ui/tabs';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { AboutSection, GeneralSection, SystemSection } from './sections';
-import { SettingsNav } from './settings-nav';
 
 interface SettingsSection {
   id: string;
@@ -15,7 +19,6 @@ interface SettingsSection {
 
 export function Settings() {
   const { t } = useLanguage();
-  const [activeSectionIndex, setActiveSectionIndex] = useState<number>(0);
 
   // Settings sections
   const settingsSections: SettingsSection[] = [
@@ -47,9 +50,6 @@ export function Settings() {
     },
   ];
 
-  const activeSection = settingsSections[activeSectionIndex];
-  const ActiveSectionComponent = activeSection.component;
-
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl px-4 py-8">
@@ -60,20 +60,32 @@ export function Settings() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-          <div className="lg:col-span-1">
-            <SettingsNav
-              settingsSections={settingsSections}
-              setActiveSectionIndex={setActiveSectionIndex}
-              activeSectionIndex={activeSectionIndex}
-              variant="vertical"
-            />
-          </div>
+        <Tabs defaultValue="about" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            {settingsSections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <TabsTrigger
+                  key={section.id}
+                  value={section.id}
+                  className="flex items-center gap-2"
+                >
+                  <Icon className="size-4" />
+                  {section.name}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
 
-          <div className="lg:col-span-3">
-            <ActiveSectionComponent />
-          </div>
-        </div>
+          {settingsSections.map((section) => {
+            const SectionComponent = section.component;
+            return (
+              <TabsContent key={section.id} value={section.id}>
+                <SectionComponent />
+              </TabsContent>
+            );
+          })}
+        </Tabs>
       </div>
     </div>
   );

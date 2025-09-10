@@ -29,15 +29,6 @@ export function SystemSection() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">
-          {t('settings.sections.system.title')}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {t('settings.sections.system.subtitle')}
-        </p>
-      </div>
-
       <SwitchCard
         title={t('settings.system.devMode.title') || 'Developer Mode'}
         description={

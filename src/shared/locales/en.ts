@@ -133,8 +133,8 @@ export const en = {
     status: {
       loading: 'Loading caps...',
       fetching: 'Fetching the latest capabilities from the store.',
-      error: 'Error loading caps',
-      errorDesc: 'Failed to fetch caps. Please try again.',
+      error: 'Loading error',
+      errorDesc: 'Please check your network connection and try again.',
       tryAgain: 'Try Again',
       noCaps: 'No caps found',
       noFavoriteCaps: 'No Favorites',

@@ -103,7 +103,7 @@ export function useRemoteCap() {
         return response;
       } catch (err) {
         console.error('Error fetching caps:', err);
-        setError('Failed to fetch caps. Please try again.');
+        setError('Please check your network connection and try again.');
         setIsFetching(false);
         setIsLoadingMore(false);
         throw err;
