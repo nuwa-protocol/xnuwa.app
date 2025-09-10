@@ -1,5 +1,6 @@
 import { Star } from 'lucide-react';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 interface StarRatingProps {
   averageRating: number;
@@ -39,7 +40,9 @@ export const StarRating: React.FC<StarRatingProps> = ({
     }
   };
 
-  const ratingValue = isInteractive ? hoverRating ?? userRating ?? averageRating : averageRating;
+  const ratingValue = isInteractive
+    ? (hoverRating ?? userRating ?? averageRating)
+    : averageRating;
   const ratingColor =
     isInteractive && (hoverRating !== null || userRating !== undefined)
       ? 'text-blue-500'

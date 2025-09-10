@@ -53,22 +53,20 @@ export function useRemoteCap() {
       setLastSearchParams(params);
 
       try {
-        const response = await capKit.queryByName(
-          queryString,
-          {
-            tags: tagsArray,
-            page: pageNum,
-            size: sizeNum,
-            sortBy: sortByParam,
-            sortOrder: sortOrderParam,
-          }
-        );
+        const response = await capKit.queryByName(queryString, {
+          tags: tagsArray,
+          page: pageNum,
+          size: sizeNum,
+          sortBy: sortByParam,
+          sortOrder: sortOrderParam,
+        });
 
         const newRemoteCaps: RemoteCap[] =
           response.data?.items
             ?.filter((item) => {
               return item.displayName !== 'nuwa_test';
-            }).map((item) => {
+            })
+            .map((item) => {
               return {
                 cid: item.cid,
                 version: item.version,
@@ -85,7 +83,7 @@ export function useRemoteCap() {
                   submittedAt: item.submittedAt,
                   thumbnail: item.thumbnail,
                 },
-              }
+              };
             }) || [];
 
         // Check if we have more data

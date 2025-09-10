@@ -1,5 +1,14 @@
 import { format } from 'date-fns';
-import { Copy, Home, Play, Star, Tag, Download, Heart, BadgeCheck } from 'lucide-react';
+import {
+  BadgeCheck,
+  Copy,
+  Download,
+  Heart,
+  Home,
+  Play,
+  Star,
+  Tag,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -16,25 +25,29 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui';
-import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
-import { APP_URL } from '@/shared/config/app';
+import { useCapKit } from '@/shared/hooks/use-capkit';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { useCapStore } from '../hooks/use-cap-store';
 import { CapAvatar } from './cap-avatar';
 import { useCapStoreModal } from './cap-store-modal-context';
 import { StarRating } from './star-rating';
-import { useCapKit } from '@/shared/hooks/use-capkit';
 
 export function CapDetails() {
-  const { runCap, rateCap, addCapToFavorite, removeCapFromFavorite, isCapFavorite, fetchFavoriteStatus } =
-    useCapStore();
-    const { capKit } = useCapKit();
+  const {
+    runCap,
+    rateCap,
+    addCapToFavorite,
+    removeCapFromFavorite,
+    isCapFavorite,
+    fetchFavoriteStatus,
+  } = useCapStore();
+  const { capKit } = useCapKit();
   const { selectedCap: cap } = useCapStoreModal();
   const [isLoading, setIsLoading] = useState(false);
   const [copyToClipboard, isCopied] = useCopyToClipboard();
   const navigate = useNavigate();
   const [isFetchingFavorite, setIsFetchingFavorite] = useState(true);
-  
+
   useEffect(() => {
     if (cap && capKit) {
       fetchFavoriteStatus(cap.capData.id);
@@ -57,7 +70,9 @@ export function CapDetails() {
   const handleRateCap = async (rating: number) => {
     try {
       await rateCap(cap.capData.id, rating);
-      toast.success(`You rated ${cap.capData.metadata.displayName} ${rating} stars!`);
+      toast.success(
+        `You rated ${cap.capData.metadata.displayName} ${rating} stars!`,
+      );
     } catch (error) {
       toast.error('Failed to submit your rating. Please try again.');
     }
@@ -67,9 +82,10 @@ export function CapDetails() {
     setIsLoading(true);
     try {
       await runCap(cap.capData.id, {
-        version: cap.version, capCid: cap.cid, stats: cap.stats
-      }
-      );
+        version: cap.version,
+        capCid: cap.cid,
+        stats: cap.stats,
+      });
       navigate('/chat');
     } finally {
       setIsLoading(false);
@@ -157,7 +173,8 @@ export function CapDetails() {
                           <TooltipContent>
                             <p>
                               This Cap Server has passed installation
-                              verification, ensuring its quality and reliability.
+                              verification, ensuring its quality and
+                              reliability.
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -171,9 +188,6 @@ export function CapDetails() {
                         </p>
                       )}
                       {cap.capData.id && <span>·</span>}
-                      <div>
-                        {`Published on ${formatDate(cap.capData.metadata.submittedAt)}`}
-                      </div>
                     </div>
                     <div className="mt-4 flex flex-col gap-3">
                       {/* Tags */}
@@ -307,7 +321,7 @@ export function CapDetails() {
                           {typeof cap.capData.core.prompt === 'string'
                             ? cap.capData.core.prompt
                             : cap.capData.core.prompt?.value ||
-                              'No prompt configured.'}
+                            'No prompt configured.'}
                         </p>
                       </div>
                     </TabsContent>
@@ -320,54 +334,19 @@ export function CapDetails() {
                             <div className="p-4 bg-muted rounded-lg">
                               <div className="flex justify-between items-start gap-2">
                                 <span className="text-muted-foreground flex-shrink-0">
-                                  Model Name:
+                                  Model ID:
                                 </span>
                                 <span className="font-medium text-right break-words">
-                                  {cap.capData.core.model.name}
+                                  {cap.capData.core.model.modelId}
                                 </span>
                               </div>
                               <div className="flex justify-between items-start gap-2">
                                 <span className="text-muted-foreground flex-shrink-0">
-                                  Provider Name:
+                                  LLM Gateway:
                                 </span>
                                 <span className="font-medium text-right break-words">
-                                  {cap.capData.core.model.providerName}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-start gap-2">
-                                <span className="text-muted-foreground flex-shrink-0">
-                                  Input Price:
-                                </span>
-                                <span className="font-medium text-right break-words">
-                                  $
-                                  {Number(
-                                    cap.capData.core.model.pricing.input_per_million_tokens.toPrecision(
-                                      3,
-                                    ),
-                                  )}
-                                  {' / 1M Tokens'}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-start gap-2">
-                                <span className="text-muted-foreground flex-shrink-0">
-                                  Output Price:
-                                </span>
-                                <span className="font-medium text-right break-words">
-                                  $
-                                  {Number(
-                                    cap.capData.core.model.pricing.output_per_million_tokens.toPrecision(
-                                      3,
-                                    ),
-                                  )}
-                                  {' / 1M Tokens'}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-start gap-2">
-                                <span className="text-muted-foreground flex-shrink-0">
-                                  Context Length:
-                                </span>
-                                <span className="font-medium text-right break-words">
-                                  {cap.capData.core.model.contextLength}
+                                  {cap.capData.core.model.customGatewayUrl ||
+                                    'Nuwa LLM Gateway'}
                                 </span>
                               </div>
                             </div>
@@ -383,16 +362,10 @@ export function CapDetails() {
                     <TabsContent value="mcp" className="mt-4">
                       <div className="max-h-96 overflow-y-auto">
                         {cap.capData.core.mcpServers &&
-                        Object.keys(cap.capData.core.mcpServers).length > 0 ? (
+                          Object.keys(cap.capData.core.mcpServers).length > 0 ? (
                           <div className="space-y-3">
                             {Object.entries(cap.capData.core.mcpServers).map(
-                              ([name, server]: [
-                                string,
-                                {
-                                  url: string;
-                                  transport: string;
-                                },
-                              ]) => (
+                              ([name, server]: [string, string]) => (
                                 <div
                                   key={name}
                                   className="flex justify-between items-center p-3 bg-muted rounded-lg gap-2 min-w-0"
@@ -401,14 +374,8 @@ export function CapDetails() {
                                     {name}
                                   </span>
                                   <span className="font-mono truncate">
-                                    {server.url}
+                                    {server}
                                   </span>
-                                  <Badge
-                                    variant="outline"
-                                    className="flex-shrink-0"
-                                  >
-                                    {server.transport || 'Unknown'}
-                                  </Badge>
                                 </div>
                               ),
                             )}
