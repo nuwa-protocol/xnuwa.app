@@ -1,9 +1,8 @@
-import { Settings2, Wrench } from 'lucide-react';
+import { Settings2, SparklesIcon, WalletIcon, Wrench } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarCapStoreCard } from '@/features/cap-store/components/sidebar-cap-store-card';
 import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
-import { SidebarWalletCard } from '@/features/wallet/components/sidebar-wallet-card';
+import { WalletStore } from '@/features/wallet/stores';
 import { Logo } from '@/shared/components';
 import {
   Sidebar,
@@ -29,6 +28,14 @@ export function AppSidebarContent() {
   const floatingContext = useAppSidebar();
   const sidebarVariant = sidebarMode === 'floating' ? 'floating' : 'sidebar';
   const isDevMode = useDevMode();
+
+  const { usdAmount, balanceLoading, balanceError } = WalletStore();
+
+  const usdValue = balanceLoading
+    ? 'loading...'
+    : balanceError
+      ? 'Failed to load balance'
+      : `$${usdAmount} USD`;
 
   const handleNewChat = () => {
     setOpenMobile(false);
@@ -89,6 +96,7 @@ export function AppSidebarContent() {
       <SidebarHeader>
         <SidebarMenu>
           <div className="flex flex-col gap-2">
+            {/* Sidebar Header */}
             <div className="flex justify-between items-center">
               <Logo
                 size="md"
@@ -99,6 +107,7 @@ export function AppSidebarContent() {
               <SidebarToggle />
             </div>
 
+            {/* New Chat Button */}
             <SidebarButton
               text={t('nav.sidebar.new')}
               href="/chat"
@@ -107,9 +116,22 @@ export function AppSidebarContent() {
               shortcut={getShortcutDisplay()}
             />
 
-            <SidebarWalletCard className="mb-2" />
+            {/* Wallet Button */}
+            <SidebarButton
+              text={t('nav.sidebar.wallet')}
+              icon={WalletIcon}
+              href="/wallet"
+              variant="secondary"
+              endContent={<span className="text-md font-bold">{usdValue}</span>}
+            />
 
-            <SidebarCapStoreCard />
+            {/* Cap Store Button */}
+            <SidebarButton
+              text={'Explore'}
+              icon={SparklesIcon}
+              href="/cap-store"
+              variant="secondary"
+            />
 
             {isDevMode && (
               <SidebarButton
