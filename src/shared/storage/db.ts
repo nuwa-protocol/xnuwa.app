@@ -14,9 +14,17 @@ export interface CapStudioRecord {
   updatedAt: number;
 }
 
+export interface CapStoreRecord {
+  capId: string;
+  did: string;
+  data: any;
+  updatedAt: number;
+}
+
 class Database extends Dexie {
   chatSessions!: Table<ChatSessionRecord>;
   capStudio!: Table<CapStudioRecord>;
+  capStore!: Table<CapStoreRecord>;
 
   constructor() {
     if (typeof window === 'undefined') {
@@ -30,6 +38,7 @@ class Database extends Dexie {
     this.version(1).stores({
       chatSessions: '[chatId+did], chatId, did, updatedAt',
       capStudio: '[id+did], id, did, updatedAt',
+      capStore: '[capId+did], capId, did, updatedAt',
     });
   }
 }
