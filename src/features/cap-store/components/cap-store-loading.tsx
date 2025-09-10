@@ -8,13 +8,13 @@ interface CapStoreLoadingProps {
 function CapCardSkeleton() {
   return (
     <Card className="p-4">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-6">
         {/* Avatar skeleton */}
-        <Skeleton className="size-12 rounded-md flex-shrink-0" />
+        <Skeleton className="size-24 rounded-md flex-shrink-0" />
 
         <div className="flex-1 min-w-0 space-y-2">
           {/* Title skeleton */}
-          <Skeleton className="h-5 w-3/4" />
+          <Skeleton className="h-5 w-24" />
 
           {/* Description skeleton - multiple lines */}
           <div className="space-y-1.5">
@@ -40,9 +40,9 @@ function CapCardSkeleton() {
   );
 }
 
-export function CapStoreLoading({ count = 6 }: CapStoreLoadingProps) {
+export function CapStoreLoading({ count = 24 }: CapStoreLoadingProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-6">
+    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 p-6">
       {Array.from({ length: count }, (_, index) => (
         <CapCardSkeleton key={generateUUID()} />
       ))}

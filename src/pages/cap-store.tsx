@@ -5,8 +5,8 @@ import { CapStoreProvider } from '@/features/cap-store/context';
 export default function CapStorePage() {
   return (
     <CapStoreProvider>
+      <CapStoreHeader />
       <div className="flex flex-col max-w-7xl mx-auto">
-        <CapStoreHeader />
         <CapStoreContent />
       </div>
     </CapStoreProvider>
