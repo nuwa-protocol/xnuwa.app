@@ -5,11 +5,9 @@ import { CapStoreProvider } from '@/features/cap-store/context';
 export default function CapStorePage() {
   return (
     <CapStoreProvider>
-      <div className="flex flex-col max-w-6xl mx-auto">
+      <div className="flex flex-col max-w-7xl mx-auto">
         <CapStoreHeader />
-        <div className="overflow-y-auto">
-          <CapStoreContent />
-        </div>
+        <CapStoreContent />
       </div>
     </CapStoreProvider>
   );

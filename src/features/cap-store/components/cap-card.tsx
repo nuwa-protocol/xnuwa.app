@@ -1,22 +1,14 @@
 import {
-  Clock,
   Download,
   Heart,
-  Loader2,
-  MoreHorizontal,
-  Share,
-  Star,
+  Play,
+  Info,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import {
   Card,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  Button,
 } from '@/shared/components/ui';
-import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
-import { APP_URL } from '@/shared/config/app';
 import { useCapStoreContext } from '../context';
 import { useCapStore } from '../hooks/use-cap-store';
 import { useRemoteCap } from '../hooks/use-remote-cap';
@@ -29,19 +21,12 @@ export interface CapCardProps {
 }
 
 export function CapCard({ cap }: CapCardProps) {
-  const {
-    addCapToFavorite,
-    removeCapFromFavorite,
-    removeCapFromRecents,
-    isCapFavorite,
-  } = useCapStore();
-  const [isLoading, setIsLoading] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [descriptionClamp, setDescriptionClamp] = useState<number>(2);
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const { downloadCap } = useRemoteCap();
-  const { activeSection, setSelectedCap } = useCapStoreContext();
+  const { setSelectedCap } = useCapStoreContext();
   const { installedCaps } = useCapStore();
 
   /**
@@ -66,70 +51,48 @@ export function CapCard({ cap }: CapCardProps) {
     return () => window.removeEventListener('resize', recomputeClamp);
   }, [cap]);
 
-  const handleCapClick = async (cap: InstalledCap | RemoteCap) => {
+  const handleUseCap = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const id = 'metadata' in cap ? cap.id : cap.capData.id;
+    const installedCap = installedCaps[id];
+    if (installedCap) {
+      // Run the cap - you may need to implement this based on your app's navigation
+      console.log('Running cap:', installedCap);
+    } else {
+      if ('id' in cap) {
+        try {
+          const downloadedCap = await downloadCap(cap as RemoteCap);
+          console.log('Running downloaded cap:', downloadedCap);
+        } catch (error) {
+          console.error('Failed to download cap:', error);
+        }
+      }
+    }
+  };
+
+  const handleShowDetails = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const id = 'metadata' in cap ? cap.id : cap.capData.id;
     const installedCap = installedCaps[id];
     if (installedCap) {
       setSelectedCap(installedCap);
     } else {
       if ('id' in cap) {
-        setIsLoading(true);
-        try {
-          const downloadedCap = await downloadCap(cap as RemoteCap);
-          setSelectedCap(downloadedCap);
-        } finally {
-          setIsLoading(false);
-        }
+        // For remote caps, you might want to show details without downloading
+        setSelectedCap(cap as any);
       }
     }
   };
 
-  const getCapActions = (cap: InstalledCap | RemoteCap) => {
-    const actions = [];
-
-    const isRemoteCap = 'id' in cap;
-    const id = isRemoteCap ? cap.id : cap.capData.id;
-
-    if (isCapFavorite(id)) {
-      actions.push({
-        icon: <Star className="size-4" />,
-        label: 'Remove from Favorites',
-        onClick: () => removeCapFromFavorite(id),
-      });
-    } else {
-      actions.push({
-        icon: <Star className="size-4" />,
-        label: 'Add to Favorites',
-        onClick: () => addCapToFavorite(id, cap.version, cap.cid, cap.stats),
-      });
-    }
-
-    if (activeSection.id === 'recent') {
-      actions.push({
-        icon: <Clock className="size-4" />,
-        label: 'Remove from Recents',
-        onClick: () => removeCapFromRecents(id),
-      });
-    }
-
-    actions.push({
-      icon: <Share className="size-4" />,
-      label: 'Share',
-      onClick: () => setShareDialogOpen(true),
-    });
-
-    return actions;
-  };
 
   const capMetadata = 'metadata' in cap ? cap.metadata : cap.capData.metadata;
   const capStats = 'stats' in cap ? cap.stats : null;
 
-  const actions = getCapActions(cap);
-
   return (
     <Card
-      className={`p-4 hover:shadow-md transition-shadow cursor-pointer hover:scale-105 hover:shadow-lg transition-all ${isLoading ? 'opacity-75 pointer-events-none' : ''}`}
-      onClick={() => handleCapClick(cap)}
+      className="p-4 hover:shadow-md transition-shadow relative overflow-hidden group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex items-center gap-3">
         <CapAvatar
@@ -176,50 +139,27 @@ export function CapCard({ cap }: CapCardProps) {
             </div>
           ) : null}
         </div>
-        {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        ) : (
-          <>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="p-1.5 hover:bg-muted rounded-sm transition-colors"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-                  <span className="sr-only">More Actions</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                {actions?.map((action) => (
-                  <DropdownMenuItem
-                    key={action.label}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={(e) => e.stopPropagation()}
-                    onSelect={() => action.onClick()}
-                  >
-                    {action.icon}
-                    {action.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <ShareDialog
-              open={shareDialogOpen}
-              onOpenChange={setShareDialogOpen}
-              title={`Share ${capMetadata.displayName}`}
-              description="Share this cap with others"
-              links={[
-                {
-                  id: 'cap-link',
-                  label: 'Cap Link',
-                  url: `${APP_URL}/chat?capid=${'id' in cap ? cap.id : cap.capData.id}`,
-                },
-              ]}
-            />
-          </>
-        )}
+      </div>
+      
+      {/* Hover Overlay */}
+      <div className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${
+        isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}>
+        <Button
+          onClick={handleUseCap}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+        >
+          <Play className="w-4 h-4 mr-2" />
+          Use
+        </Button>
+        <Button
+          onClick={handleShowDetails}
+          variant="secondary"
+          className="bg-background/90 hover:bg-background"
+        >
+          <Info className="w-4 h-4 mr-2" />
+          Details
+        </Button>
       </div>
     </Card>
   );

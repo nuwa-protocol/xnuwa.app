@@ -1,4 +1,4 @@
-import { ChevronRight, Home, Loader2, Package } from 'lucide-react';
+import { Loader2, Package } from 'lucide-react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observer';
@@ -95,43 +95,10 @@ export function CapStoreContent() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Content Header with Breadcrumb */}
-      <div className="p-6 pb-4 border-b border-muted-foreground/10">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-          <Home className="size-4" />
-          <span>Cap Store</span>
-          <ChevronRight className="size-4" />
-          <span className="text-foreground font-medium">
-            {activeSection.label}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold mb-1">
-              {activeSection.label}
-            </h2>
-            <p className="text-muted-foreground">
-              {getBreadcrumbDescription(
-                activeSection.id,
-                activeSection.type,
-                caps.length,
-                t,
-              )}
-            </p>
-          </div>
-
-          {caps.length > 0 && (
-            <div className="text-sm text-muted-foreground">
-              {caps.length} cap{caps.length === 1 ? '' : 's'}
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Caps Grid Container with ScrollArea */}
       <ScrollArea className="flex-1">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-6">
           {caps.length > 0 &&
             caps.map((cap) => {
               // Type guard to check if cap is RemoteCap (has cid property)
@@ -167,28 +134,6 @@ export function CapStoreContent() {
       </ScrollArea>
     </div>
   );
-}
-
-function getBreadcrumbDescription(
-  activeSection: string,
-  type: string,
-  capsCount: number,
-  t: any,
-): string {
-  if (type === 'tag') {
-    return `Browse ${activeSection} related caps and tools`;
-  }
-
-  switch (activeSection) {
-    case 'favorites':
-      return 'Your favorite caps for quick access';
-    case 'recent':
-      return 'Recently used caps and tools';
-    case 'all':
-      return 'Discover and explore all available caps';
-    default:
-      return 'Browse available caps and tools';
-  }
 }
 
 function getEmptyStateTitle(activeSection: string, t: any): string {
