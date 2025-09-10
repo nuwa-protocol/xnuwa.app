@@ -27,39 +27,46 @@ import {
 } from '@/shared/components/ui';
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useCapStoreContext } from '../context';
-import { useCapStore } from '../hooks/use-cap-store';
 import { CapAvatar } from './cap-avatar';
 import { StarRating } from './star-rating';
 
 export function CapDetails() {
-  const {
-    runCap,
-    rateCap,
-    addCapToFavorite,
-    removeCapFromFavorite,
-    isCapFavorite,
-    fetchFavoriteStatus,
-  } = useCapStore();
+  const navigate = useNavigate();
   const { capKit } = useCapKit();
+  const [copyToClipboard, isCopied] = useCopyToClipboard();
+  const { setCurrentCap } = CurrentCapStore();
   const { selectedCap: cap } = useCapStoreContext();
   const [isLoading, setIsLoading] = useState(false);
-  const [copyToClipboard, isCopied] = useCopyToClipboard();
-  const navigate = useNavigate();
   const [isFetchingFavorite, setIsFetchingFavorite] = useState(true);
+  const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
 
+
+  // Fetch favorite status when component mounts or cap changes
   useEffect(() => {
-    if (cap && capKit) {
-      fetchFavoriteStatus(cap.capData.id);
-      setIsFetchingFavorite(false);
-    }
-  }, [cap?.capData.id, capKit]);
+    const fetchFavoriteStatus = async () => {
+      if (cap?.id && capKit) {
+        try {
+          setIsFetchingFavorite(true);
+          const favoriteStatus = await capKit.favorite(cap.id, 'isFavorite');
+          setIsCapFavorite(favoriteStatus.data ?? false);
+        } catch (error) {
+          console.error('Failed to fetch favorite status:', error);
+        } finally {
+          setIsFetchingFavorite(false);
+        }
+      }
+    };
+
+    fetchFavoriteStatus();
+  }, [cap?.id, capKit]);
 
   if (!cap) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <p>Cap not found, please try again</p>
-        <Button onClick={() => navigate('/chat')}>
+        <Button onClick={() => navigate('/home')}>
           <Home className="h-4 w-4" />
           Home
         </Button>
@@ -69,10 +76,8 @@ export function CapDetails() {
 
   const handleRateCap = async (rating: number) => {
     try {
-      await rateCap(cap.capData.id, rating);
-      toast.success(
-        `You rated ${cap.capData.metadata.displayName} ${rating} stars!`,
-      );
+      await capKit?.rateCap(cap.id, rating);
+      toast.success(`You rated ${cap.metadata.displayName} ${rating} stars!`);
     } catch (error) {
       toast.error('Failed to submit your rating. Please try again.');
     }
@@ -81,26 +86,34 @@ export function CapDetails() {
   const handleRunCap = async () => {
     setIsLoading(true);
     try {
-      await runCap(cap.capData.id, {
-        version: cap.version,
-        capCid: cap.cid,
-        stats: cap.stats,
-      });
-      navigate('/chat');
+      const downloadedCap = await capKit?.downloadByID(cap.id);
+      if (downloadedCap) {
+        setCurrentCap(downloadedCap);
+        navigate('/chat');
+      }
+    } catch (error) {
+      toast.error('Failed to run cap. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleToggleFavorite = () => {
-    if (isCapFavorite(cap.capData.id)) {
-      removeCapFromFavorite(cap.capData.id);
-      toast.success(
-        `Removed ${cap.capData.metadata.displayName} from favorites`,
-      );
-    } else {
-      addCapToFavorite(cap.capData.id, cap.version, cap.cid, cap.stats);
-      toast.success(`Added ${cap.capData.metadata.displayName} to favorites`);
+  const handleToggleFavorite = async () => {
+    if (!cap?.id || !capKit) return;
+
+    try {
+      if (isCapFavorite) {
+        await capKit.favorite(cap.id, 'remove');
+        setIsCapFavorite(false);
+        toast.success(`Removed ${cap.metadata.displayName} from favorites`);
+      } else {
+        await capKit.favorite(cap.id, 'add');
+        setIsCapFavorite(true);
+        toast.success(`Added ${cap.metadata.displayName} to favorites`);
+      }
+    } catch (error) {
+      toast.error('Failed to update favorite status. Please try again.');
+      console.error('Failed to toggle favorite:', error);
     }
   };
 
@@ -116,8 +129,8 @@ export function CapDetails() {
   };
 
   const handleCopyAuthor = async () => {
-    if (cap?.capData.authorDID) {
-      await copyToClipboard(cap.capData.authorDID);
+    if (cap?.authorDID) {
+      await copyToClipboard(cap.authorDID);
       toast.success('Author DID copied to clipboard!');
     }
   };
@@ -144,8 +157,8 @@ export function CapDetails() {
                 <div className="flex gap-6">
                   <div className="flex-shrink-0">
                     <CapAvatar
-                      capName={cap.capData.metadata.displayName}
-                      capThumbnail={cap.capData.metadata.thumbnail}
+                      capName={cap.metadata.displayName}
+                      capThumbnail={cap.metadata.thumbnail}
                       size="xl"
                       className="rounded-xl"
                     />
@@ -154,7 +167,7 @@ export function CapDetails() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
                       <h1 className="text-3xl font-bold break-words">
-                        {cap.capData.metadata.displayName}
+                        {cap.metadata.displayName}
                       </h1>
                       <Badge variant="outline" className="text-sm">
                         v {cap.version + 1}
@@ -182,33 +195,30 @@ export function CapDetails() {
                     </div>
 
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                      {cap.capData.id && (
-                        <p className="font-mono break-all">
-                          @{cap.capData.idName}
-                        </p>
+                      {cap.id && (
+                        <p className="font-mono break-all">@{cap.idName}</p>
                       )}
-                      {cap.capData.id && <span>·</span>}
+                      {cap.id && <span>·</span>}
                     </div>
                     <div className="mt-4 flex flex-col gap-3">
                       {/* Tags */}
-                      {cap.capData.metadata.tags &&
-                        cap.capData.metadata.tags.length > 0 && (
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-sm text-muted-foreground">
-                              Tags:
-                            </span>
-                            {cap.capData.metadata.tags.map((tag) => (
-                              <Badge
-                                key={tag}
-                                variant="secondary"
-                                className="gap-1"
-                              >
-                                <Tag className="h-3 w-3" />
-                                <span className="truncate">{tag}</span>
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
+                      {cap.metadata.tags && cap.metadata.tags.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-muted-foreground">
+                            Tags:
+                          </span>
+                          {cap.metadata.tags.map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="secondary"
+                              className="gap-1"
+                            >
+                              <Tag className="h-3 w-3" />
+                              <span className="truncate">{tag}</span>
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     {/* Action Buttons */}
                     <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -220,7 +230,7 @@ export function CapDetails() {
                         <Play className="h-4 w-4" />
                         {isLoading ? 'Running...' : 'Run Cap'}
                       </Button>
-                      {isCapFavorite(cap.capData.id) ? (
+                      {isCapFavorite ? (
                         <Button
                           variant="outline"
                           onClick={handleToggleFavorite}
@@ -250,7 +260,7 @@ export function CapDetails() {
                 {/* Right side of header */}
                 <div className="flex flex-col gap-4 sm:items-end flex-shrink-0">
                   {/* Author Badge */}
-                  {cap.capData.authorDID && (
+                  {cap.authorDID && (
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-muted-foreground">
                         Author:
@@ -262,9 +272,7 @@ export function CapDetails() {
                       >
                         <Copy className="h-3 w-3 flex-shrink-0" />
                         <span className="font-mono truncate">
-                          {isCopied
-                            ? 'Copied!'
-                            : truncateAuthor(cap.capData.authorDID)}
+                          {isCopied ? 'Copied!' : truncateAuthor(cap.authorDID)}
                         </span>
                       </Badge>
                     </div>
@@ -295,11 +303,11 @@ export function CapDetails() {
               </div>
 
               {/* Description Section */}
-              {cap.capData.metadata.description && (
+              {cap.metadata.description && (
                 <div>
                   <h2 className="text-xl font-semibold mb-3">Description</h2>
                   <p className="text-muted-foreground leading-relaxed text-base break-words">
-                    {cap.capData.metadata.description}
+                    {cap.metadata.description}
                   </p>
                 </div>
               )}
@@ -318,17 +326,16 @@ export function CapDetails() {
                     <TabsContent value="prompt" className="mt-4">
                       <div className="space-y-3 bg-muted rounded-lg p-4 max-h-96 overflow-y-auto">
                         <p className="text-muted-foreground break-words whitespace-pre-wrap font-mono text-sm">
-                          {typeof cap.capData.core.prompt === 'string'
-                            ? cap.capData.core.prompt
-                            : cap.capData.core.prompt?.value ||
-                            'No prompt configured.'}
+                          {typeof cap.core.prompt === 'string'
+                            ? cap.core.prompt
+                            : cap.core.prompt?.value || 'No prompt configured.'}
                         </p>
                       </div>
                     </TabsContent>
 
                     <TabsContent value="model" className="mt-4">
                       <div className="max-h-96 overflow-y-auto">
-                        {cap.capData.core.model ? (
+                        {cap.core.model ? (
                           <div className="space-y-4">
                             {/* Model Name and Provider */}
                             <div className="p-4 bg-muted rounded-lg">
@@ -337,7 +344,7 @@ export function CapDetails() {
                                   Model ID:
                                 </span>
                                 <span className="font-medium text-right break-words">
-                                  {cap.capData.core.model.modelId}
+                                  {cap.core.model.modelId}
                                 </span>
                               </div>
                               <div className="flex justify-between items-start gap-2">
@@ -345,7 +352,7 @@ export function CapDetails() {
                                   LLM Gateway:
                                 </span>
                                 <span className="font-medium text-right break-words">
-                                  {cap.capData.core.model.customGatewayUrl ||
+                                  {cap.core.model.customGatewayUrl ||
                                     'Nuwa LLM Gateway'}
                                 </span>
                               </div>
@@ -361,10 +368,10 @@ export function CapDetails() {
 
                     <TabsContent value="mcp" className="mt-4">
                       <div className="max-h-96 overflow-y-auto">
-                        {cap.capData.core.mcpServers &&
-                          Object.keys(cap.capData.core.mcpServers).length > 0 ? (
+                        {cap.core.mcpServers &&
+                          Object.keys(cap.core.mcpServers).length > 0 ? (
                           <div className="space-y-3">
-                            {Object.entries(cap.capData.core.mcpServers).map(
+                            {Object.entries(cap.core.mcpServers).map(
                               ([name, server]: [string, string]) => (
                                 <div
                                   key={name}

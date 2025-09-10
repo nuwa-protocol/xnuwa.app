@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useCapStoreContext } from '../context';
-import { useRemoteCap } from '../hooks/use-remote-cap';
-import type { UseRemoteCapParams, HomeData } from '../stores';
+import type { UseRemoteCapParams } from '../stores';
+import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
 import { CapCard } from './cap-card';
 
@@ -19,7 +19,7 @@ const HomeSection = ({
 }) => {
   const { t } = useLanguage();
   const { setActiveSection } = useCapStoreContext();
-  const { fetchCaps } = useRemoteCap();
+  const { fetchCaps } = useCapStore();
   const handleViewMore = (sortBy: UseRemoteCapParams['sortBy']) => {
     // Set the section to 'all' and apply the sortBy parameter
     setActiveSection({
@@ -70,10 +70,9 @@ const HomeSection = ({
   );
 };
 
-export function CapStoreContentHome() {
+export function CapStoreHomeContent() {
   const { t } = useLanguage();
-  const { homeData, isLoadingHome, homeError, fetchHome } =
-    useRemoteCap();
+  const { homeData, isLoadingHome, homeError, fetchHome } = useCapStore();
 
   useEffect(() => {
     // Fetch home data on mount if not already loaded

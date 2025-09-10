@@ -1,7 +1,7 @@
 import { createJSONStorage, type StateStorage } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { rehydrationTracker } from '../hooks/use-rehydration';
-import { type CapStudioRecord, type ChatSessionRecord, type CapStoreRecord, db } from './db';
+import { type CapStudioRecord, type ChatSessionRecord, db } from './db';
 import type { PersistConfig } from './types';
 
 // get current DID
@@ -170,89 +170,6 @@ export class CapStudioStorage implements StateStorage {
   }
 }
 
-export class CapStoreStorage implements StateStorage {
-  async getItem(name: string): Promise<string | null> {
-    if (typeof window === 'undefined') return null;
-
-    try {
-      const did = await getCurrentDID();
-      if (!did) return null;
-
-      // Get all installed caps for current DID
-      const records = await db.capStore.where('did').equals(did).toArray();
-
-      if (records.length === 0) return null;
-
-      // Convert records back to installedCaps format
-      const installedCaps: Record<string, any> = {};
-      records.forEach((record) => {
-        installedCaps[record.capId] = record.data;
-      });
-
-      // Return in zustand persist format: { state: { installedCaps: ... }, version: 0 }
-      return JSON.stringify({
-        state: { installedCaps },
-        version: 0,
-      });
-    } catch (error) {
-      console.error(`Failed to get installed caps from IndexedDB:`, error);
-      return null;
-    }
-  }
-
-  async setItem(name: string, value: string): Promise<void> {
-    if (typeof window === 'undefined') return;
-
-    try {
-      const did = await getCurrentDID();
-      if (!did) return;
-
-      const parsedData = JSON.parse(value);
-
-      // Handle zustand persist wrapper format: { state: { installedCaps: ... }, version: 0 }
-      const installedCaps =
-        parsedData.state?.installedCaps || parsedData.installedCaps;
-
-      if (!installedCaps || Object.keys(installedCaps).length === 0) {
-        return;
-      }
-
-      // Clear existing installed caps for this DID
-      await db.capStore.where('did').equals(did).delete();
-
-      // Save each installed cap as a separate record
-      const records: CapStoreRecord[] = Object.entries(installedCaps).map(
-        ([capId, data]) => ({
-          capId,
-          did,
-          data,
-          updatedAt: Date.now(),
-        }),
-      );
-
-      if (records.length > 0) {
-        await db.capStore.bulkPut(records);
-      }
-    } catch (error) {
-      console.error(`Failed to set installed caps in IndexedDB:`, error);
-      throw error;
-    }
-  }
-
-  async removeItem(name: string): Promise<void> {
-    if (typeof window === 'undefined') return;
-
-    try {
-      const did = await getCurrentDID();
-      if (!did) return;
-
-      await db.capStore.where('did').equals(did).delete();
-    } catch (error) {
-      console.error(`Failed to remove installed caps from IndexedDB:`, error);
-    }
-  }
-}
-
 /**
  * Persist config generator for ChatSessions
  */
@@ -284,27 +201,6 @@ export function createCapStudioPersistConfig<T>(config: PersistConfig<T>) {
   return {
     name: config.name,
     storage: createJSONStorage(() => new CapStudioStorage()),
-    partialize: config.partialize,
-    onRehydrateStorage: () => {
-      return (state: T | undefined, error: unknown) => {
-        if (!error && state) {
-          rehydrationTracker.markRehydrated(config.name);
-        }
-      };
-    },
-  };
-}
-
-/**
- * Persist config generator for CapStore (Installed Caps)
- */
-export function createCapStorePersistConfig<T>(config: PersistConfig<T>) {
-  // Register this store with the rehydration tracker
-  rehydrationTracker.registerStore(config.name);
-
-  return {
-    name: config.name,
-    storage: createJSONStorage(() => new CapStoreStorage()),
     partialize: config.partialize,
     onRehydrateStorage: () => {
       return (state: T | undefined, error: unknown) => {

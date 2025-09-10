@@ -1,6 +1,7 @@
 import { Star } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
+import { generateUUID } from '@/shared/utils';
 
 interface StarRatingProps {
   averageRating: number;
@@ -51,6 +52,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
   return (
     <div className="flex items-center gap-1.5">
       <div
+        role="button"
         className="flex"
         onMouseLeave={() => isInteractive && setHoverRating(null)}
       >
@@ -66,7 +68,8 @@ export const StarRating: React.FC<StarRatingProps> = ({
 
           return (
             <div
-              key={`star-${i}`}
+              key={`star-${generateUUID()}`}
+              role="button"
               className="relative"
               style={{
                 width: size,

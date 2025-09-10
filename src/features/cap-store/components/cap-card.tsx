@@ -1,23 +1,15 @@
-import {
-  Download,
-  Heart,
-  Play,
-  Info,
-} from 'lucide-react';
+import { Download, Heart, Info, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import {
-  Card,
-  Button,
-} from '@/shared/components/ui';
+import { Button, Card } from '@/shared/components/ui';
+import { useCapKit } from '@/shared/hooks/use-capkit';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useCapStoreContext } from '../context';
-import { useCapStore } from '../hooks/use-cap-store';
-import { useRemoteCap } from '../hooks/use-remote-cap';
-import type { InstalledCap, RemoteCap } from '../types';
+import type { RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
 import { StarRating } from './star-rating';
 
 export interface CapCardProps {
-  cap: InstalledCap | RemoteCap;
+  cap: RemoteCap;
 }
 
 export function CapCard({ cap }: CapCardProps) {
@@ -25,9 +17,9 @@ export function CapCard({ cap }: CapCardProps) {
   const [descriptionClamp, setDescriptionClamp] = useState<number>(2);
   const [isHovered, setIsHovered] = useState(false);
 
-  const { downloadCap } = useRemoteCap();
+  const { capKit } = useCapKit();
   const { setSelectedCap } = useCapStoreContext();
-  const { installedCaps } = useCapStore();
+  const { setCurrentCap } = CurrentCapStore();
 
   /**
    * Dynamically calculate the description line number, so that the title (up to 2 lines) and description together take up 4 lines.
@@ -53,40 +45,25 @@ export function CapCard({ cap }: CapCardProps) {
 
   const handleUseCap = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const id = 'metadata' in cap ? cap.id : cap.capData.id;
-    const installedCap = installedCaps[id];
-    if (installedCap) {
-      // Run the cap - you may need to implement this based on your app's navigation
-      console.log('Running cap:', installedCap);
-    } else {
-      if ('id' in cap) {
-        try {
-          const downloadedCap = await downloadCap(cap as RemoteCap);
-          console.log('Running downloaded cap:', downloadedCap);
-        } catch (error) {
-          console.error('Failed to download cap:', error);
-        }
+    try {
+      const downloadedCap = await capKit?.downloadByID(cap.id);
+      if (downloadedCap) {
+        setCurrentCap(downloadedCap);
+      } else {
+        console.error('Failed to download cap:', cap.id);
       }
+    } catch (error) {
+      console.error('Failed to download cap:', error);
     }
   };
 
   const handleShowDetails = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const id = 'metadata' in cap ? cap.id : cap.capData.id;
-    const installedCap = installedCaps[id];
-    if (installedCap) {
-      setSelectedCap(installedCap);
-    } else {
-      if ('id' in cap) {
-        // For remote caps, you might want to show details without downloading
-        setSelectedCap(cap as any);
-      }
-    }
+    setSelectedCap(cap);
   };
 
-
-  const capMetadata = 'metadata' in cap ? cap.metadata : cap.capData.metadata;
-  const capStats = 'stats' in cap ? cap.stats : null;
+  const capMetadata = cap.metadata;
+  const capStats = cap.stats;
 
   return (
     <Card
@@ -140,11 +117,12 @@ export function CapCard({ cap }: CapCardProps) {
           ) : null}
         </div>
       </div>
-      
+
       {/* Hover Overlay */}
-      <div className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${
-        isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
-      }`}>
+      <div
+        className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+      >
         <Button
           onClick={handleUseCap}
           className="bg-primary hover:bg-primary/90 text-primary-foreground"

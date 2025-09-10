@@ -6,14 +6,15 @@ import {
   useState,
 } from 'react';
 import { useCapKit } from '@/shared/hooks/use-capkit';
-import { useRemoteCap } from './hooks/use-remote-cap';
-import type { CapStoreSection, InstalledCap } from './types';
+import type { Cap } from '@/shared/types';
+import { useCapStore } from './stores';
+import type { CapStoreSection, RemoteCap } from './types';
 
 interface CapStoreContextValue {
   activeSection: CapStoreSection;
   setActiveSection: (section: CapStoreSection) => void;
-  selectedCap: InstalledCap | null;
-  setSelectedCap: (cap: InstalledCap | null) => void;
+  selectedCap: Cap & RemoteCap | null;
+  setSelectedCap: (cap: Cap & RemoteCap | null) => void;
 }
 
 const initialActiveSection = {
@@ -37,10 +38,10 @@ interface CapStoreProviderProps {
 }
 
 export function CapStoreProvider({ children }: CapStoreProviderProps) {
-  const [selectedCap, setSelectedCap] = useState<InstalledCap | null>(null);
+  const [selectedCap, setSelectedCap] = useState<Cap & RemoteCap | null>(null);
   const [activeSection, _setActiveSection] =
     useState<CapStoreSection>(initialActiveSection);
-  const { fetchCaps } = useRemoteCap();
+  const { fetchCaps, fetchFavoriteCaps, fetchHome } = useCapStore();
   const capKit = useCapKit();
   const [init, setInit] = useState(false);
 
@@ -52,6 +53,8 @@ export function CapStoreProvider({ children }: CapStoreProviderProps) {
   useEffect(() => {
     if (capKit.capKit && !init) {
       fetchCaps();
+      fetchFavoriteCaps();
+      fetchHome();
       setInit(true);
     }
   }, [capKit]);

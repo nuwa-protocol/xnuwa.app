@@ -40,7 +40,7 @@ import { TooltipProvider } from '@/shared/components/ui/tooltip';
 import { predefinedTags } from '@/shared/constants/cap';
 import { useDebounceValue, useLanguage } from '@/shared/hooks';
 import { useCapStoreContext } from '../context';
-import { useRemoteCap } from '../hooks/use-remote-cap';
+import { useCapStore } from '../stores';
 import type { CapStoreSection } from '../types';
 
 export function CapStoreHeader() {
@@ -55,7 +55,7 @@ export function CapStoreHeader() {
     'average_rating' | 'downloads' | 'favorites' | 'rating_count' | 'updated_at'
   >('downloads');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const { fetchCaps } = useRemoteCap();
+  const { fetchCaps } = useCapStore();
 
   const tagSections: CapStoreSection[] = predefinedTags.map((tag) => ({
     id: tag.toLowerCase().replace(/\s+/g, '-'),

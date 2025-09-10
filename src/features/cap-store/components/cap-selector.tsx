@@ -11,10 +11,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui';
+import { capKitService } from '@/shared/services/capkit-service';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
-import { useCapStore } from '../hooks/use-cap-store';
-import type { InstalledCap, RemoteCap } from '../types';
+import { useCapStore } from '../stores';
+import type { RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
 
 const CapInfo = ({ cap }: { cap: Cap }) => (
@@ -31,19 +32,15 @@ const CapInfo = ({ cap }: { cap: Cap }) => (
 export function CapSelector() {
   const { currentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
-  // const { openModal } = useCapStoreContext();
-  const { getFavoriteCaps, runCap } = useCapStore();
+  const { favoriteCaps } = useCapStore();
+  const { setCurrentCap } = CurrentCapStore();
 
-  const favoriteCaps = getFavoriteCaps();
-
-  const handleCapSelect = async (cap: RemoteCap | InstalledCap) => {
-    const id = 'metadata' in cap ? cap.id : cap.capData.id;
+  const handleCapSelect = async (cap: RemoteCap) => {
+    const id = cap.id;
     try {
-      await runCap(id, {
-        version: cap.version,
-        capCid: cap.cid,
-        stats: cap.stats,
-      });
+      const capKit = await capKitService.getCapKit();
+      const cap = (await capKit.downloadByID(id));
+      setCurrentCap(cap);
     } catch (error) {
       console.error('Failed to select cap:', error);
     }
@@ -111,19 +108,17 @@ export function CapSelector() {
         <DropdownMenuContent align="start" className="min-w-[200px]">
           {favoriteCaps.map((cap) => (
             <DropdownMenuItem
-              key={cap.capData.id}
+              key={cap.id}
               className="cursor-pointer"
               onSelect={() => handleCapSelect(cap)}
             >
               <div className="flex items-center gap-2">
                 <CapAvatar
-                  capName={cap.capData.metadata.displayName}
-                  capThumbnail={cap.capData.metadata.thumbnail}
+                  capName={cap.metadata.displayName}
+                  capThumbnail={cap.metadata.thumbnail}
                   size="sm"
                 />
-                <span className="text-sm">
-                  {cap.capData.metadata.displayName}
-                </span>
+                <span className="text-sm">{cap.metadata.displayName}</span>
               </div>
             </DropdownMenuItem>
           ))}

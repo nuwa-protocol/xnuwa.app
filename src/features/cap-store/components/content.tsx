@@ -3,38 +3,24 @@ import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observer';
 import { useCapStoreContext } from '../context';
-import { useCapStore } from '../hooks/use-cap-store';
-import { useRemoteCap } from '../hooks/use-remote-cap';
+import { useCapStore } from '../stores';
 import { CapCard } from './cap-card';
 import { CapDetails } from './cap-details';
-import { CapStoreContentHome } from './content-home';
+import { CapStoreFavoritesContent } from './content-favorites';
+import { CapStoreHomeContent } from './content-home';
 
 export function CapStoreContent() {
   const { t } = useLanguage();
   const { activeSection, selectedCap } = useCapStoreContext();
   const {
-    remoteCaps,
+    remoteCaps: caps,
     isFetching,
     isLoadingMore,
     hasMoreData,
     error,
     loadMore,
     refetch,
-  } = useRemoteCap();
-  const { getRecentCaps, getFavoriteCaps } = useCapStore();
-
-  // get caps based on active section
-  const caps =
-    activeSection.id === 'favorites'
-      ? getFavoriteCaps()
-      : activeSection.id === 'recent'
-        ? getRecentCaps()
-        : remoteCaps;
-
-  // check if showing installed caps
-  const isShowingInstalledCaps = ['favorites', 'recent'].includes(
-    activeSection.id,
-  );
+  } = useCapStore();
 
   // infinite scroll trigger and loading indicator
   const { ref: loadingTriggerRef } = useIntersectionObserver({
@@ -54,10 +40,14 @@ export function CapStoreContent() {
 
   // Show home content if active section is home
   if (activeSection.id === 'home') {
-    return <CapStoreContentHome />;
+    return <CapStoreHomeContent />;
   }
 
-  if (error && !isShowingInstalledCaps) {
+  if (activeSection.id === 'favorites') {
+    return <CapStoreFavoritesContent />;
+  }
+
+  if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
         <Package className="size-12 text-red-500 mb-4" />
@@ -74,7 +64,7 @@ export function CapStoreContent() {
     );
   }
 
-  if (isFetching && !isShowingInstalledCaps) {
+  if (isFetching) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
         <Loader2 className="size-12 text-muted-foreground mb-4 animate-spin" />
@@ -85,90 +75,32 @@ export function CapStoreContent() {
     );
   }
 
-  if (caps.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
-        <Package className="size-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium mb-2">
-          {getEmptyStateTitle(activeSection.id, t)}
-        </h3>
-        <p className="text-muted-foreground max-w-md">
-          {getEmptyStateDescription(activeSection.id, t)}
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-full">
-
       {/* Caps Grid Container with ScrollArea */}
       <ScrollArea className="flex-1">
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-6">
           {caps.length > 0 &&
             caps.map((cap) => {
-              // Type guard to check if cap is RemoteCap (has cid property)
-              const isRemoteCap = 'metadata' in cap;
-              const id = isRemoteCap ? cap.id : cap.capData.id;
+              const id = cap.id;
 
-              if (isRemoteCap) {
-                // RemoteCap type - use cid as unique key
-                return <CapCard key={id} cap={cap} />;
-              } else {
-                // Cap type - use id as unique key
-                return <CapCard key={id} cap={cap} />;
-              }
+              return <CapCard key={id} cap={cap} />;
             })}
         </div>
 
         {/* Infinite scroll trigger and loading indicator */}
-        {!isShowingInstalledCaps && (
-          <>
-            <div ref={loadingTriggerRef} />
-            {isLoadingMore && (
-              <div className="flex justify-center py-4">
-                <Loader2 className="size-8 text-muted-foreground animate-spin" />
-              </div>
-            )}
-            {!hasMoreData && caps.length > 0 && (
-              <div className="text-center py-4 text-muted-foreground text-sm">
-                {t('capStore.status.noMoreCaps') || 'No more caps to load'}
-              </div>
-            )}
-          </>
+        <div ref={loadingTriggerRef} />
+        {isLoadingMore && (
+          <div className="flex justify-center py-4">
+            <Loader2 className="size-8 text-muted-foreground animate-spin" />
+          </div>
+        )}
+        {!hasMoreData && caps.length > 0 && (
+          <div className="text-center py-4 text-muted-foreground text-sm">
+            {t('capStore.status.noMoreCaps') || 'No more caps to load'}
+          </div>
         )}
       </ScrollArea>
     </div>
   );
-}
-
-function getEmptyStateTitle(activeSection: string, t: any): string {
-  switch (activeSection) {
-    case 'favorites':
-      return t('capStore.status.noFavoriteCaps') || 'No Favorites';
-    case 'recent':
-      return t('capStore.status.noRecentCaps') || 'No Recent';
-    default:
-      return t('capStore.status.noCaps') || 'No Caps Found';
-  }
-}
-
-function getEmptyStateDescription(activeSection: string, t: any): string {
-  switch (activeSection) {
-    case 'favorites':
-      return (
-        t('capStore.status.noFavoriteCapsDesc') ||
-        "You haven't marked any caps as favorites yet. Browse the store and favorite caps you like."
-      );
-    case 'recent':
-      return (
-        t('capStore.status.noRecentCapsDesc') ||
-        "You haven't used any caps recently. Try running a cap to see it here."
-      );
-    default:
-      return (
-        t('capStore.status.noCapsDesc.category') ||
-        'No caps found in this category. Try searching or browse other categories.'
-      );
-  }
 }
