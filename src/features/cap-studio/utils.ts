@@ -33,7 +33,7 @@ export const getFieldDisplayName = (path: string): string => {
     'metadata.thumbnail': 'Thumbnail',
     'core.prompt.value': 'Prompt',
     'core.prompt.suggestions': 'Prompt Suggestions',
-    'core.model.gatewayUrl': 'Gateway URL',
+    'core.model.customGatewayUrl': 'Gateway URL',
     'core.model.modelId': 'Model ID',
     'core.mcpServers': 'Remote MCP',
     'core.artifact': 'Artifact URL',

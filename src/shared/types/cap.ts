@@ -13,6 +13,7 @@ export type {
 // re-export schemas from @nuwa-ai/cap-kit
 export {
   CapCoreSchema,
+  CapIDNameSchema,
   CapIDSchema,
   CapMcpServerSchema,
   CapMetadataSchema,

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import type { CapThumbnail } from '@/shared/types/cap-new';
+import type { CapThumbnail } from '@/shared/types';
 import { useSubmitCap } from '../hooks';
 import { CapStudioStore } from '../stores';
 import type { LocalCap } from '../types';

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useCapKit } from '@/shared/hooks/use-capkit';
-import type { Cap } from '@/shared/types/cap-new';
+import type { Cap } from '@/shared/types';
 import type { LocalCap } from '../types';
 
 interface CapSubmitResponse {

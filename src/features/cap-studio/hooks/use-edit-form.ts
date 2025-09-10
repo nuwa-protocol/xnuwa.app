@@ -4,13 +4,12 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod/v3';
-import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import { useAuth } from '@/shared/hooks';
 import {
   CapCoreSchema,
   CapIDNameSchema,
   CapMetadataSchema,
-} from '@/shared/types/cap-new';
+} from '@/shared/types';
 import { CapStudioStore } from '../stores';
 import type { LocalCap } from '../types';
 
@@ -51,7 +50,8 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
           suggestions: editingCap?.capData.core.prompt.suggestions || [],
         },
         model: {
-          customGatewayUrl: editingCap?.capData.core.model.customGatewayUrl || undefined,
+          customGatewayUrl:
+            editingCap?.capData.core.model.customGatewayUrl || undefined,
           modelId: editingCap?.capData.core.model.modelId || '',
           parameters: editingCap?.capData.core.model.parameters || {},
           supportedInputs: editingCap?.capData.core.model.supportedInputs || [
