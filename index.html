@@ -51,14 +51,47 @@
       
       // Add theme class immediately
       document.documentElement.classList.add(theme);
+
+      // Progress bar update function
+      window.updateLoadingProgress = function(percentage, text = null) {
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const loadingText = document.querySelector('.loading-text');
+        
+        if (progressFill) {
+          progressFill.style.width = Math.min(100, Math.max(0, percentage)) + '%';
+        }
+        if (progressText) {
+          progressText.textContent = Math.round(percentage) + '%';
+        }
+        if (text && loadingText) {
+          loadingText.textContent = text;
+        }
+      };
+
+      // Hide loading screen function
+      window.hideLoadingScreen = function() {
+        const loadingScreen = document.getElementById('initial-loading');
+        if (loadingScreen) {
+          loadingScreen.classList.add('hidden');
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+          }, 300);
+        }
+      };
     </script>
   </head>
   <body>
     <!-- Priority loading Loading interface -->
     <div id="initial-loading">
       <div class="loading-content">
-        <div class="loading-spinner"></div>
         <h2 class="loading-text">Loading...</h2>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-text" id="progress-text">0%</div>
+        </div>
         <p class="loading-subtext">Please check your network connection if this takes too long</p>
       </div>
     </div>
