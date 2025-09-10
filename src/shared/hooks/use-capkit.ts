@@ -1,7 +1,6 @@
-import { CapKit } from '@nuwa-ai/cap-kit';
+import type { CapKit } from '@nuwa-ai/cap-kit';
 import { useEffect, useState } from 'react';
-import { capKitConfig } from '../config/capkit';
-import { NuwaIdentityKit } from '../services/identity-kit';
+import { capKitService } from '../services/capkit-service';
 
 export const useCapKit = () => {
   const [capKit, setCapKit] = useState<CapKit | null>(null);
@@ -11,14 +10,8 @@ export const useCapKit = () => {
   useEffect(() => {
     const initializeCapKit = async () => {
       try {
-        const keyManager = await NuwaIdentityKit().getKeyManager();
-
-        const newCapKit = new CapKit({
-          ...capKitConfig,
-          signer: keyManager,
-        });
-
-        setCapKit(newCapKit);
+        const capKitInstance = await capKitService.getCapKit();
+        setCapKit(capKitInstance);
       } catch (err) {
         setError(err as Error);
         console.error('Failed to initialize CapKit:', err);

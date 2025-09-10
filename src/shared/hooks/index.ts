@@ -8,3 +8,6 @@ export * from './use-mobile';
 export * from './use-rehydration';
 export * from './use-storage';
 export * from './use-unmount';
+
+// Export the getCapKit service function for direct access
+export { getCapKit, capKitService } from '../services/capkit-service';
