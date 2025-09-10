@@ -1,4 +1,4 @@
-import { ChevronRight, Loader2, Package } from 'lucide-react';
+import { ChevronRight, Package } from 'lucide-react';
 import { useEffect } from 'react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
@@ -7,15 +7,18 @@ import type { UseRemoteCapParams } from '../stores';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
 import { CapCard } from './cap-card';
+import { CapStoreLoading } from './cap-store-loading';
 
 const HomeSection = ({
   title,
   caps,
   sortBy,
+  isLoading,
 }: {
   title: string;
   caps: RemoteCap[];
   sortBy: UseRemoteCapParams['sortBy'];
+  isLoading: boolean;
 }) => {
   const { t } = useLanguage();
   const { setActiveSection } = useCapStoreContext();
@@ -41,18 +44,22 @@ const HomeSection = ({
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">{title}</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => handleViewMore(sortBy)}
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          {t('capStore.home.viewMore') || 'View More'}
-          <ChevronRight className="ml-1 h-4 w-4" />
-        </Button>
+        {!isLoading && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleViewMore(sortBy)}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            {t('capStore.home.viewMore') || 'View More'}
+            <ChevronRight className="ml-1 h-4 w-4" />
+          </Button>
+        )}
       </div>
 
-      {caps.length === 0 ? (
+      {isLoading ? (
+        <CapStoreLoading />
+      ) : caps.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           <Package className="size-8 mx-auto mb-2" />
           <p className="text-sm">
@@ -101,17 +108,6 @@ export function CapStoreHomeContent() {
     );
   }
 
-  if (isLoadingHome) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
-        <Loader2 className="size-12 text-muted-foreground mb-4 animate-spin" />
-        <h3 className="text-lg font-medium mb-2">
-          {t('capStore.status.loading') || 'Loading...'}
-        </h3>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-full">
       <ScrollArea className="flex-1">
@@ -120,18 +116,21 @@ export function CapStoreHomeContent() {
             title={t('capStore.home.topRated') || 'Top Rated Caps'}
             caps={homeData.topRated}
             sortBy="average_rating"
+            isLoading={isLoadingHome}
           />
 
           <HomeSection
             title={t('capStore.home.trending') || 'Trending Caps'}
             caps={homeData.trending}
             sortBy="downloads"
+            isLoading={isLoadingHome}
           />
 
           <HomeSection
             title={t('capStore.home.latest') || 'Latest Caps'}
             caps={homeData.latest}
             sortBy="updated_at"
+            isLoading={isLoadingHome}
           />
         </div>
       </ScrollArea>

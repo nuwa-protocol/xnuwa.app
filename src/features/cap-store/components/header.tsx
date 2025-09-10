@@ -320,7 +320,7 @@ export function CapStoreHeader() {
                           ) : (
                             <>
                               <Bot className="size-4" />
-                              <span>Caps</span>
+                              <span>AI Caps</span>
                             </>
                           )}
                         </NavigationMenuTrigger>

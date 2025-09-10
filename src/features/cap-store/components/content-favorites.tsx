@@ -1,8 +1,9 @@
-import { Loader2, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useCapStore } from '../stores';
 import { CapCard } from './cap-card';
+import { CapStoreLoading } from './cap-store-loading';
 
 export function CapStoreFavoritesContent() {
     const { t } = useLanguage();
@@ -34,12 +35,7 @@ export function CapStoreFavoritesContent() {
 
     if (isFetchingFavoriteCaps) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
-                <Loader2 className="size-12 text-muted-foreground mb-4 animate-spin" />
-                <h3 className="text-lg font-medium mb-2">
-                    {t('capStore.status.loading')}
-                </h3>
-            </div>
+            <CapStoreLoading />
         );
     }
 

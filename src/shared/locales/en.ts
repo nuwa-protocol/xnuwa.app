@@ -133,7 +133,7 @@ export const en = {
     home: {
       topRated: 'Top Rated AI Caps',
       trending: 'Trending AI Caps',
-      latest: 'Latest AICaps',
+      latest: 'Latest AI Caps',
       viewMore: 'View More',
       noCaps: 'No AI caps available',
     },
