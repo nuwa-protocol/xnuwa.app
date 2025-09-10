@@ -1,13 +1,20 @@
 import { useCallback } from 'react';
 import { useCapKit } from '@/shared/hooks/use-capkit';
-import { CapStateStore, type UseRemoteCapParams } from '../stores';
+import type { HomeData } from '../stores';
+import {
+  type UseRemoteCapParams,
+  useInstalledCapStore,
+  useRemoteCapStore,
+} from '../stores';
 import type { InstalledCap, RemoteCap } from '../types';
+import { mapToRemoteCap } from '../utils';
 
 /**
  * Hook for accessing the remote caps with advanced filtering, sorting, and pagination
  */
 export function useRemoteCap() {
   const { capKit } = useCapKit();
+  const { installedCaps, addInstalledCap } = useInstalledCapStore();
   const {
     remoteCaps,
     isFetching,
@@ -23,9 +30,14 @@ export function useRemoteCap() {
     setHasMoreData,
     setCurrentPage,
     setLastSearchParams,
-    installedCaps,
-    addInstalledCap,
-  } = CapStateStore();
+
+    homeData,
+    isLoadingHome,
+    homeError,
+    setHomeData,
+    setIsLoadingHome,
+    setHomeError,
+  } = useRemoteCapStore();
 
   const fetchCaps = useCallback(
     async (params: UseRemoteCapParams = {}, append = false) => {
@@ -61,30 +73,9 @@ export function useRemoteCap() {
           sortOrder: sortOrderParam,
         });
 
-        const newRemoteCaps: RemoteCap[] =
-          response.data?.items
-            ?.filter((item) => {
-              return item.displayName !== 'nuwa_test';
-            })
-            .map((item) => {
-              return {
-                cid: item.cid,
-                version: item.version,
-                id: item.id,
-                idName: item.name,
-                stats: item.stats,
-                authorDID: item.id.split(':')[0],
-                metadata: {
-                  displayName: item.displayName,
-                  description: item.description,
-                  tags: item.tags,
-                  repository: item.repository,
-                  homepage: item.homepage,
-                  submittedAt: item.submittedAt,
-                  thumbnail: item.thumbnail,
-                },
-              };
-            }) || [];
+        const newRemoteCaps: RemoteCap[] = mapToRemoteCap(
+          response.data?.items || [],
+        );
 
         // Check if we have more data
         const totalItems = response.data?.items?.length || 0;
@@ -159,15 +150,7 @@ export function useRemoteCap() {
 
       // download cap if not installed
       const downloadedCap = await capKit.downloadByCID(remoteCap.cid);
-      await addInstalledCap({
-        cid: remoteCap.cid,
-        capData: downloadedCap,
-        stats: remoteCap.stats,
-        version: remoteCap.version,
-        isFavorite: false,
-        lastUsedAt: null,
-      });
-      return {
+      const capToInstall = {
         cid: remoteCap.cid,
         capData: downloadedCap,
         stats: remoteCap.stats,
@@ -175,9 +158,63 @@ export function useRemoteCap() {
         isFavorite: false,
         lastUsedAt: null,
       };
+      await addInstalledCap(capToInstall);
+      return capToInstall;
     },
     [capKit, installedCaps, addInstalledCap],
   );
+
+  const fetchHome = useCallback(async (): Promise<HomeData | null> => {
+    if (!capKit) {
+      return null;
+    }
+
+    setIsLoadingHome(true);
+    setHomeError(null);
+
+    try {
+      // Fetch all cap categories in parallel
+      const [topRatedResponse, trendingResponse, latestResponse] =
+        await Promise.all([
+          // Fetch top rated caps (6 caps with highest average rating)
+          capKit.queryByName('', {
+            sortBy: 'average_rating',
+            sortOrder: 'desc',
+            page: 0,
+            size: 6,
+          }),
+          // Fetch trending caps (6 caps with most downloads)
+          capKit.queryByName('', {
+            sortBy: 'downloads',
+            sortOrder: 'desc',
+            page: 0,
+            size: 6,
+          }),
+          // Fetch latest caps (6 caps with latest updated_at)
+          capKit.queryByName('', {
+            sortBy: 'updated_at',
+            sortOrder: 'desc',
+            page: 0,
+            size: 6,
+          }),
+        ]);
+
+      const homeData: HomeData = {
+        topRated: mapToRemoteCap(topRatedResponse.data?.items || []),
+        trending: mapToRemoteCap(trendingResponse.data?.items || []),
+        latest: mapToRemoteCap(latestResponse.data?.items || []),
+      };
+
+      setHomeData(homeData);
+      setIsLoadingHome(false);
+      return homeData;
+    } catch (err) {
+      console.error('Error fetching home data:', err);
+      setHomeError('Failed to load home data. Please try again.');
+      setIsLoadingHome(false);
+      throw err;
+    }
+  }, [capKit, setHomeData, setIsLoadingHome, setHomeError]);
 
   return {
     remoteCaps,
@@ -190,5 +227,9 @@ export function useRemoteCap() {
     goToPage,
     refetch,
     downloadCap,
+    homeData,
+    isLoadingHome,
+    homeError,
+    fetchHome,
   };
 }

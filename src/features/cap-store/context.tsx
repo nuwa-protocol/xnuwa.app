@@ -17,8 +17,8 @@ interface CapStoreContextValue {
 }
 
 const initialActiveSection = {
-  id: 'all',
-  label: 'All',
+  id: 'home',
+  label: 'Home',
   type: 'section' as const,
 };
 
@@ -37,20 +37,12 @@ interface CapStoreProviderProps {
 }
 
 export function CapStoreProvider({ children }: CapStoreProviderProps) {
-  // const [isOpen, setIsOpen] = useState(false);
   const [selectedCap, setSelectedCap] = useState<InstalledCap | null>(null);
   const [activeSection, _setActiveSection] =
     useState<CapStoreSection>(initialActiveSection);
   const { fetchCaps } = useRemoteCap();
   const capKit = useCapKit();
   const [init, setInit] = useState(false);
-
-  // const openModal = () => setIsOpen(true);
-  // const closeModal = () => {
-  //   setIsOpen(false);
-  //   setActiveSection(initialActiveSection);
-  // };
-  // const toggleModal = () => setIsOpen((prev) => !prev);
 
   const setActiveSection = (section: CapStoreSection) => {
     _setActiveSection(section);

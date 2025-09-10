@@ -7,6 +7,7 @@ import { useCapStore } from '../hooks/use-cap-store';
 import { useRemoteCap } from '../hooks/use-remote-cap';
 import { CapCard } from './cap-card';
 import { CapDetails } from './cap-details';
+import { CapStoreContentHome } from './content-home';
 
 export function CapStoreContent() {
   const { t } = useLanguage();
@@ -49,6 +50,11 @@ export function CapStoreContent() {
   // Show cap details if a cap is selected
   if (selectedCap) {
     return <CapDetails />;
+  }
+
+  // Show home content if active section is home
+  if (activeSection.id === 'home') {
+    return <CapStoreContentHome />;
   }
 
   if (error && !isShowingInstalledCaps) {

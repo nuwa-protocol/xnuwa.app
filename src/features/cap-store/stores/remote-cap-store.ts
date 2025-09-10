@@ -16,6 +16,13 @@ export interface UseRemoteCapParams {
   sortOrder?: 'asc' | 'desc';
 }
 
+// Home data structure
+export interface HomeData {
+  topRated: RemoteCap[];
+  trending: RemoteCap[];
+  latest: RemoteCap[];
+}
+
 interface RemoteCapStoreState {
   // Remote cap management
   remoteCaps: RemoteCap[];
@@ -25,6 +32,11 @@ interface RemoteCapStoreState {
   hasMoreData: boolean;
   currentPage: number;
   lastSearchParams: UseRemoteCapParams;
+
+  // Home data management
+  homeData: HomeData;
+  isLoadingHome: boolean;
+  homeError: string | null;
 
   // Actions
   setRemoteCaps: (caps: RemoteCap[]) => void;
@@ -37,6 +49,11 @@ interface RemoteCapStoreState {
   setLastSearchParams: (params: UseRemoteCapParams) => void;
   resetState: () => void;
   getRemoteCapById: (id: string) => RemoteCap | undefined;
+
+  // Home data actions
+  setHomeData: (homeData: HomeData) => void;
+  setIsLoadingHome: (loading: boolean) => void;
+  setHomeError: (error: string | null) => void;
 }
 
 const initialState = {
@@ -47,6 +64,13 @@ const initialState = {
   hasMoreData: true,
   currentPage: 1,
   lastSearchParams: {},
+  homeData: {
+    topRated: [],
+    trending: [],
+    latest: [],
+  },
+  isLoadingHome: false,
+  homeError: null,
 };
 
 export const useRemoteCapStore = create<RemoteCapStoreState>((set, get) => ({
@@ -93,5 +117,18 @@ export const useRemoteCapStore = create<RemoteCapStoreState>((set, get) => ({
 
   getRemoteCapById: (id: string) => {
     return get().remoteCaps.find((cap) => cap.id === id);
+  },
+
+  // Home data actions
+  setHomeData: (homeData: HomeData) => {
+    set({ homeData });
+  },
+
+  setIsLoadingHome: (loading: boolean) => {
+    set({ isLoadingHome: loading });
+  },
+
+  setHomeError: (error: string | null) => {
+    set({ homeError: error });
   },
 }));

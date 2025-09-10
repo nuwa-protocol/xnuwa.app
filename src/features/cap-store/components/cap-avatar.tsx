@@ -30,7 +30,7 @@ export function CapAvatar({
       className={`${sizeClass} ${isDark ? 'bg-foreground' : 'bg-background'} ${className}`}
     >
       <AvatarImage src={capThumbnail} alt={capName} className="object-cover" />
-      <AvatarFallback className="text-xs">
+      <AvatarFallback className="text-xs rounded-none">
         {capName.slice(0, 2).toUpperCase()}
       </AvatarFallback>
     </Avatar>

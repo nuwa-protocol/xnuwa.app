@@ -2,14 +2,14 @@ import type { CapStats } from '@nuwa-ai/cap-kit';
 import { useCallback } from 'react';
 import { useCapKit } from '@/shared/hooks';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import { CapStateStore } from '../stores';
+import { useInstalledCapStore } from '../stores';
 
 /**
  * Hook for managing the installed caps
  */
 export const useCapStore = () => {
   const { installedCaps, addInstalledCap, updateInstalledCap } =
-    CapStateStore();
+    useInstalledCapStore();
   const { capKit, isLoading, error } = useCapKit();
   const { setCurrentCap } = CurrentCapStore();
 

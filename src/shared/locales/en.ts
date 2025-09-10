@@ -130,6 +130,13 @@ export const en = {
       installed: 'Installed',
       all: 'All',
     },
+    home: {
+      topRated: 'Top Rated AI Caps',
+      trending: 'Trending AI Caps',
+      latest: 'Latest AICaps',
+      viewMore: 'View More',
+      noCaps: 'No AI caps available',
+    },
     status: {
       loading: 'Loading caps...',
       fetching: 'Fetching the latest capabilities from the store.',
