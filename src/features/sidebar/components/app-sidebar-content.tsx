@@ -100,7 +100,7 @@ export function AppSidebarContent() {
             <div className="flex justify-between items-center">
               <Logo
                 size="md"
-                variant="app-brand"
+                variant="basic"
                 onClick={() => navigate('/chat')}
                 className="rounded-md hover:bg-sidebar-accent"
               />

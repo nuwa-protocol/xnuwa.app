@@ -1,5 +1,7 @@
 import { Download, Heart, Info, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { Button, Card } from '@/shared/components/ui';
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
@@ -13,6 +15,7 @@ export interface CapCardProps {
 }
 
 export function CapCard({ cap }: CapCardProps) {
+  const navigate = useNavigate();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [descriptionClamp, setDescriptionClamp] = useState<number>(2);
   const [isHovered, setIsHovered] = useState(false);
@@ -46,12 +49,22 @@ export function CapCard({ cap }: CapCardProps) {
   const handleUseCap = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const downloadedCap = await capKit?.downloadByID(cap.id);
-      if (downloadedCap) {
-        setCurrentCap(downloadedCap);
-      } else {
-        console.error('Failed to download cap:', cap.id);
-      }
+      toast.promise(
+        async () => {
+          const downloadedCap = await capKit?.downloadByID(cap.id);
+          if (downloadedCap) {
+            setCurrentCap(downloadedCap);
+            navigate('/chat');
+          } else {
+            console.error('Failed to download cap:', cap.id);
+          }
+        },
+        {
+          loading: 'Loading cap...',
+          success: 'Cap loaded successfully',
+          error: 'Failed to load cap',
+        },
+      );
     } catch (error) {
       console.error('Failed to download cap:', error);
     }
