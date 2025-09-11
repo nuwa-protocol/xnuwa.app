@@ -64,10 +64,21 @@ export function useChatInstance(chatId: string) {
   // chat data handler
   const handleOnData = useCallback(
     (data: any) => {
-      if (data.type !== 'data-mark' || data.data !== 'onResponse') return;
-
-      updateTitle(chatId);
-      addCurrentCapsToChat(chatId);
+      if (data.type === 'data-mark' && data.data === 'onResponse') {
+        updateTitle(chatId);
+        addCurrentCapsToChat(chatId);
+      }
+      if (data.type === 'data-finishReason') {
+        const finishReason = data.data.finishReason;
+        if (finishReason === 'content-filter') {
+          toast.warning(
+            'The AI has refused to continue due to content moderation policy of the LLM provider',
+            {
+              duration: 8000,
+            },
+          );
+        }
+      }
     },
     [chatId, updateTitle, addCurrentCapsToChat],
   );

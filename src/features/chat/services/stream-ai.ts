@@ -70,7 +70,6 @@ export const StreamAIResponse = async ({
           });
           hasSendOnResponseDataMark = true;
         },
-        providerOptions: model.parameters,
       });
       writer.merge(
         result.toUIMessageStream({
@@ -78,6 +77,12 @@ export const StreamAIResponse = async ({
           sendSources: true,
         }),
       );
+      result.finishReason.then((finishReason) => {
+        writer.write({
+          type: 'data-finishReason',
+          data: { finishReason },
+        });
+      });
     },
     onFinish: async ({ messages }) => {
       await updateMessages(chatId, messages);
