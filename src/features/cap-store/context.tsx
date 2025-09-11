@@ -41,7 +41,7 @@ export function CapStoreProvider({ children }: CapStoreProviderProps) {
   const [selectedCap, setSelectedCap] = useState<Cap & RemoteCap | null>(null);
   const [activeSection, _setActiveSection] =
     useState<CapStoreSection>(initialActiveSection);
-  const { fetchCaps, fetchFavoriteCaps, fetchHome } = useCapStore();
+  const { fetchCaps, fetchFavoriteCaps } = useCapStore();
   const capKit = useCapKit();
   const [init, setInit] = useState(false);
 
@@ -54,7 +54,6 @@ export function CapStoreProvider({ children }: CapStoreProviderProps) {
     if (capKit.capKit && !init) {
       fetchCaps();
       fetchFavoriteCaps();
-      fetchHome();
       setInit(true);
     }
   }, [capKit]);
