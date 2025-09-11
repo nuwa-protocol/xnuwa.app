@@ -21,7 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Input } from '@/shared/components/ui';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -40,40 +40,73 @@ import {
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
 import { predefinedTags } from '@/shared/constants/cap';
 import { useDebounceValue, useLanguage } from '@/shared/hooks';
-import { useCapStore } from '../stores';
 import type { CapStoreSection } from '../types';
 
 export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
   const { t } = useLanguage();
-  const { activeSection, setActiveSection } = useCapStore();
-  const [searchValue, setSearchValue] = useState('');
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { pathname } = useLocation();
+  const urlSearchValue = searchParams.get('search') || '';
+  const [searchValue, setSearchValue] = useState(urlSearchValue);
   const [debouncedSearchValue, setDebouncedSearchValue] = useDebounceValue(
-    '',
+    urlSearchValue,
     500,
   );
-  const [sortBy, setSortBy] = useState<
-    'average_rating' | 'downloads' | 'favorites' | 'rating_count' | 'updated_at'
-  >('downloads');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const { fetchCaps } = useCapStore();
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (pathname === '/chat') {
-      setActiveSection({
-        id: 'home',
-        label: 'Home',
-        type: 'section',
-      });
-    }
-  }, [pathname]);
 
   const tagSections: CapStoreSection[] = predefinedTags.map((tag) => ({
     id: tag.toLowerCase().replace(/\s+/g, '-'),
     label: tag,
     type: 'tag' as const,
   }));
+
+  // Sync debounced search value with URL
+  useEffect(() => {
+    if (debouncedSearchValue !== urlSearchValue) {
+      handleDebouncedSearchChange(debouncedSearchValue);
+    }
+  }, [debouncedSearchValue]);
+
+  // Update local search when URL changes
+  useEffect(() => {
+    setSearchValue(urlSearchValue);
+  }, [urlSearchValue]);
+
+  const getActiveSection = (): CapStoreSection => {
+    const pathSegments = pathname.split('/');
+    const path = pathSegments[2]; // Changed from [1] to [2] since explore is at index 1
+
+    // Get tag from URL query
+    const tag = searchParams.get('tag');
+
+    // Handle favorites route
+    if (path === 'favorites') {
+      return { id: 'favorites', label: 'Favorites', type: 'section' };
+    }
+
+    // Handle caps route with tag
+    if (path === 'caps' && tag) {
+      // Find the matching tag section
+      const tagSection = tagSections.find(
+        (section) => section.id === tag.toLowerCase().replace(/\s+/g, '-'),
+      );
+      if (tagSection) {
+        return tagSection;
+      }
+    }
+
+    // Handle caps route without tag
+    if (path === 'caps') {
+      return { id: 'all', label: 'All Caps', type: 'section' };
+    }
+
+    // Default to home
+    return { id: 'home', label: 'Home', type: 'section' };
+  };
+
+  const activeSection = getActiveSection();
+  const sortBy = searchParams.get('sortBy') || 'downloads';
+  const sortOrder = searchParams.get('sortOrder') || 'desc';
 
   const sortOptions = [
     { value: 'downloads' as const, label: 'Downloads', icon: CloudDownload },
@@ -121,23 +154,6 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
     return Package;
   };
 
-  // reset search value when active section changes
-  useEffect(() => {
-    setSearchValue('');
-  }, [activeSection]);
-
-  // fetch caps when debounced search value changes
-  useEffect(() => {
-    handleDebouncedSearchChange(debouncedSearchValue);
-  }, [debouncedSearchValue]);
-
-  // fetch caps when sorting changes
-  useEffect(() => {
-    if (activeSection.id) {
-      handleDebouncedSearchChange(searchValue);
-    }
-  }, [sortBy, sortOrder]);
-
   // handle search change
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
@@ -147,80 +163,31 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
   // handle clear search
   const handleClearSearch = () => {
     setSearchValue('');
-    handleDebouncedSearchChange('');
     setDebouncedSearchValue('');
+    handleDebouncedSearchChange('');
   };
-
-
 
   // handle debounced search change
   const handleDebouncedSearchChange = (value: string) => {
-    const searchParams: {
-      searchQuery: string;
-      sortBy: typeof sortBy;
-      sortOrder: typeof sortOrder;
-    } = {
-      searchQuery: value,
-      sortBy,
-      sortOrder,
-    };
-
-    if (activeSection.type === 'tag') {
-      fetchCaps({
-        ...searchParams,
-        tags: [activeSection.label],
-      });
-    } else if (activeSection.type === 'section') {
-      fetchCaps(searchParams);
+    const newParams = new URLSearchParams(searchParams);
+    if (value) {
+      newParams.set('search', value);
+    } else {
+      newParams.delete('search');
     }
+    setSearchParams(newParams);
   };
 
   // handle active section change
   const handleActiveSectionChange = (section: CapStoreSection) => {
-    setActiveSection(section);
-    const searchParams: {
-      searchQuery: string;
-      sortBy: typeof sortBy;
-      sortOrder: typeof sortOrder;
-    } = {
-      searchQuery: searchValue,
-      sortBy,
-      sortOrder,
-    };
-
-    if (section.type === 'tag') {
-      fetchCaps({
-        ...searchParams,
-        tags: [section.label],
-      });
-    } else if (section.id === 'all') {
-      fetchCaps(searchParams);
-    }
-    if (pathname === '/chat') {
+    if (section.id === 'home') {
       navigate('/explore');
-    }
-  };
-
-  // handle sort change
-  const handleSortChange = (newSortBy: typeof sortBy) => {
-    setSortBy(newSortBy);
-    const searchParams: {
-      searchQuery: string;
-      sortBy: typeof newSortBy;
-      sortOrder: typeof sortOrder;
-    } = {
-      searchQuery: searchValue,
-      sortBy: newSortBy,
-      sortOrder,
-    };
-
-    if (activeSection.type === 'tag') {
-      fetchCaps({
-        ...searchParams,
-        tags: [activeSection.label],
-      });
-    } else if (activeSection.type === 'section') {
-      fetchCaps(searchParams);
+    } else if (section.id === 'favorites') {
+      navigate('/explore/favorites');
+    } else if (section.id === 'all') {
+      navigate('/explore/caps');
+    } else if (section.type === 'tag') {
+      navigate(`/explore/caps?tag=${section.id}`);
     }
   };
 
@@ -228,32 +195,9 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
     <header className="sticky top-0 z-10" style={style}>
       <div className="relative bg-background/95 backdrop-blur-xl border border-border/50 rounded-t rounded-lg shadow-lg shadow-black/5 supports-[backdrop-filter]:bg-background/80 px-4 py-2 w-full">
         <TooltipProvider>
-          <div className="flex items-center gap-8 max-w-7xl mx-auto px-4">
+          <div className="flex items-center gap-4 max-w-7xl mx-auto px-4">
             {/* Navigation Menu - Left Side */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Favorites Button - Start of navbar */}
-              <button
-                type="button"
-                onClick={() =>
-                  handleActiveSectionChange({
-                    id: 'favorites',
-                    label: t('capStore.sidebar.favorites') || 'Favorites',
-                    type: 'section',
-                  })
-                }
-                className={`
-                      inline-flex items-center justify-center p-2 rounded-md
-                      transition-all duration-200 ease-out relative
-                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                      ${activeSection.id === 'favorites'
-                    ? 'text-yellow-500 after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
-                    : 'text-muted-foreground hover:text-yellow-500 hover:bg-muted/50'
-                  }
-                    `}
-              >
-                <Star className="size-5 fill-yellow-500 text-yellow-500" />
-              </button>
-
               <NavigationMenu>
                 <NavigationMenuList className="gap-2">
                   {/* Home / Featured Caps */}
@@ -379,13 +323,34 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                       </div>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
+
+                  {/* Favorites - Third menu item */}
+                  <NavigationMenuItem>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/explore/favorites')}
+                      className={`
+                            inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md
+                            transition-all duration-200 ease-out relative
+                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                            ${activeSection.id === 'favorites'
+                          ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        }
+                          `}
+                    >
+                      <Star className="size-4" />
+                      <span>Favorites</span>
+                    </button>
+                  </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
 
-            {/* Search Bar - Center */}
-            <div className="absolute left-1/2 -translate-x-1/2 w-full max-w-md">
-              <div className="relative">
+            {/* Right Side - Search Bar and Sort Dropdown */}
+            <div className="flex items-center gap-3 flex-shrink-0 ml-auto">
+              {/* Search Bar */}
+              <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
                 <Input
                   placeholder={
@@ -416,10 +381,6 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                   </button>
                 )}
               </div>
-            </div>
-
-            {/* Single Sort Dropdown - Right Side */}
-            <div className="flex items-center flex-shrink-0 ml-auto">
               {activeSection.id !== 'favorites' &&
                 activeSection.id !== 'home' && (
                   <DropdownMenu>
@@ -450,10 +411,10 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                           <DropdownMenuItem
                             key={`${option.value}-desc`}
                             onClick={() => {
-                              handleSortChange(option.value);
-                              if (sortOrder !== 'desc') {
-                                setSortOrder('desc');
-                              }
+                              const newParams = new URLSearchParams(searchParams);
+                              newParams.set('sortBy', option.value);
+                              newParams.set('sortOrder', 'desc');
+                              setSearchParams(newParams);
                             }}
                             className={`
                              flex items-center gap-2 cursor-pointer

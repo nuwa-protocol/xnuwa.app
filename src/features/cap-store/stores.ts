@@ -1,8 +1,8 @@
+import type { Page, Result, ResultCap } from '@nuwa-ai/cap-kit';
 import { create } from 'zustand';
 import { capKitService } from '@/shared/services/capkit-service';
-import type { Cap } from '@/shared/types';
 import type { CapStoreSection, RemoteCap } from './types';
-import { mapToRemoteCap } from './utils';
+import { mapResultsToRemoteCaps } from './utils';
 
 // Search parameters interface
 export interface UseRemoteCapParams {
@@ -28,8 +28,6 @@ export interface HomeData {
 
 interface CapStoreState {
   // UI State (from context)
-  activeSection: CapStoreSection;
-  selectedCap: (Cap & RemoteCap) | null;
   isInitialized: boolean;
 
   // Remote cap management
@@ -52,12 +50,13 @@ interface CapStoreState {
   favoriteCapsError: string | null;
 
   // UI Actions (from context)
-  setActiveSection: (section: CapStoreSection) => void;
-  setSelectedCap: (cap: (Cap & RemoteCap) | null) => void;
   initialize: () => Promise<void>;
 
   // Main actions
-  fetchCaps: (params?: UseRemoteCapParams, append?: boolean) => Promise<any>;
+  fetchCaps: (
+    params?: UseRemoteCapParams,
+    append?: boolean,
+  ) => Promise<Result<Page<ResultCap>>>;
   refetch: () => void;
   loadMore: () => Promise<any> | undefined;
   goToPage: (newPage: number) => Promise<any>;
@@ -122,24 +121,15 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
   return {
     ...initialState,
 
-    // UI Actions (from context)
-    setActiveSection: (section: CapStoreSection) => {
-      set({ activeSection: section, selectedCap: null });
-    },
-
-    setSelectedCap: (cap: (Cap & RemoteCap) | null) => {
-      set({ selectedCap: cap });
-    },
-
     // Initialize method (can still be called manually if needed)
     initialize,
 
     // Main fetch functions
-    fetchCaps: async (params: UseRemoteCapParams = {}, append = false) => {
+    fetchCaps: async (
+      params: UseRemoteCapParams = {},
+      append = false,
+    ): Promise<Result<Page<ResultCap>>> => {
       const capKit = await capKitService.getCapKit();
-      if (!capKit) {
-        return;
-      }
 
       const {
         searchQuery: queryString = '',
@@ -166,9 +156,7 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
           sortOrder: sortOrderParam,
         });
 
-        const newRemoteCaps: RemoteCap[] = mapToRemoteCap(
-          response.data?.items || [],
-        );
+        const newRemoteCaps: RemoteCap[] = mapResultsToRemoteCaps(response);
 
         const totalItems = response.data?.items?.length || 0;
         const { remoteCaps } = get();
@@ -242,27 +230,28 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
               sortOrder: 'desc',
               page: 0,
               size: 6,
-            }),
+            }) as Promise<Result<Page<ResultCap>>>,
             fetchCaps({
               searchQuery: '',
               sortBy: 'downloads',
               sortOrder: 'desc',
               page: 0,
               size: 6,
-            }),
+            }) as Promise<Result<Page<ResultCap>>>,
             fetchCaps({
               searchQuery: '',
               sortBy: 'updated_at',
               sortOrder: 'desc',
               page: 0,
               size: 6,
-            }),
-          ]);
-
+            }) as Promise<Result<Page<ResultCap>>>,
+          ]).catch((e) => {
+            throw e;
+          });
         const homeData: HomeData = {
-          topRated: mapToRemoteCap(topRatedResponse.data?.items || []),
-          trending: mapToRemoteCap(trendingResponse.data?.items || []),
-          latest: mapToRemoteCap(latestResponse.data?.items || []),
+          topRated: mapResultsToRemoteCaps(topRatedResponse),
+          trending: mapResultsToRemoteCaps(trendingResponse),
+          latest: mapResultsToRemoteCaps(latestResponse),
         };
 
         set({ homeData, isLoadingHome: false });
@@ -287,9 +276,7 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
 
       try {
         const response = await capKit.queryMyFavorite();
-        const newFavoriteCaps: RemoteCap[] = mapToRemoteCap(
-          response.data?.items || [],
-        );
+        const newFavoriteCaps: RemoteCap[] = mapResultsToRemoteCaps(response);
         set({ favoriteCaps: newFavoriteCaps, isFetchingFavoriteCaps: false });
         return newFavoriteCaps;
       } catch (err) {

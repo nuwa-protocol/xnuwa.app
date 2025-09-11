@@ -4,7 +4,6 @@ import {
   Copy,
   Download,
   Heart,
-  Home,
   Play,
   Star,
   Tag,
@@ -16,6 +15,7 @@ import {
   Badge,
   Button,
   Card,
+  Skeleton,
   Tabs,
   TabsContent,
   TabsList,
@@ -28,55 +28,160 @@ import {
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import { useCapStore } from '../stores';
+import type { Cap } from '@/shared/types';
+import type { RemoteCap } from '../types';
+import { mapResultToRemoteCap } from '../utils';
 import { CapAvatar } from './cap-avatar';
 import { StarRating } from './star-rating';
 
-export function CapDetails() {
+export function CapDetails({ capId }: { capId: string }) {
   const navigate = useNavigate();
   const { capKit } = useCapKit();
   const [copyToClipboard, isCopied] = useCopyToClipboard();
   const { setCurrentCap } = CurrentCapStore();
-  const { selectedCap: cap } = useCapStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetchingFavorite, setIsFetchingFavorite] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [downloadedCapData, setDownloadedCapData] = useState<Cap | null>(null);
+  const [capQueryData, setCapQueryData] = useState<RemoteCap | null>(null);
   const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState<boolean>(false);
 
-  // Fetch favorite status when component mounts or cap changes
+  // Fetch full cap data when selectedCap changes
   useEffect(() => {
-    const fetchFavoriteStatus = async () => {
-      if (cap?.id && capKit) {
-        try {
-          setIsFetchingFavorite(true);
-          const favoriteStatus = await capKit.favorite(cap.id, 'isFavorite');
-          setIsCapFavorite(favoriteStatus.data ?? false);
-        } catch (error) {
-          console.error('Failed to fetch favorite status:', error);
-        } finally {
-          setIsFetchingFavorite(false);
-        }
+    const fetchCap = async () => {
+      if (!capKit) return;
+
+      try {
+        const downloadedCap = await capKit.downloadByID(capId);
+        setDownloadedCapData(downloadedCap);
+      } catch (error) {
+        console.error('Failed to download cap data:', error);
+        toast.error('Failed to find the cap.');
+        navigate('/explore');
       }
     };
 
-    fetchFavoriteStatus();
-  }, [cap?.id, capKit]);
+    const fetchFavoriteStatus = async () => {
+      if (!capKit) return;
 
-  if (!cap) {
+      try {
+        const favoriteStatus = await capKit.favorite(capId, 'isFavorite');
+        setIsCapFavorite(favoriteStatus.data ?? false);
+      } catch (error) {
+        console.error('Failed to fetch favorite status:', error);
+      }
+
+    };
+
+    const queryCap = async () => {
+      if (!capKit) return;
+
+      try {
+        const queriedCap = await capKit.queryByID({ id: capId });
+        setCapQueryData(mapResultToRemoteCap(queriedCap));
+      } catch (error) {
+        console.error('Failed to download cap data:', error);
+        toast.error('Failed to find the cap.');
+        navigate('/explore');
+      }
+    };
+
+    Promise.all([fetchCap(), fetchFavoriteStatus(), queryCap()]).finally(() => {
+      setIsLoading(false);
+    });
+  }, [capKit]);
+
+  if (isLoading || !downloadedCapData || !capQueryData) {
     return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <p>Cap not found, please try again</p>
-        <Button onClick={() => navigate('/home')}>
-          <Home className="h-4 w-4" />
-          Home
-        </Button>
+      <div className="flex flex-col h-full">
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 mb-4 hide-scrollbar">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-span-4 space-y-6">
+                {/* Header Section Skeleton */}
+                <div className="flex flex-col sm:flex-row gap-6 justify-between items-start">
+                  <div className="flex gap-6">
+                    {/* Avatar skeleton */}
+                    <div className="flex-shrink-0">
+                      <Skeleton className="w-20 h-20 rounded-xl" />
+                    </div>
+
+                    <div className="flex-1 min-w-0 space-y-4">
+                      {/* Title and badges skeleton */}
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-8 w-64" />
+                        <Skeleton className="h-6 w-12" />
+                        <Skeleton className="h-6 w-20" />
+                      </div>
+
+                      {/* ID skeleton */}
+                      <Skeleton className="h-4 w-48" />
+
+                      {/* Tags skeleton */}
+                      <div className="flex gap-2">
+                        <Skeleton className="h-6 w-16" />
+                        <Skeleton className="h-6 w-20" />
+                        <Skeleton className="h-6 w-14" />
+                      </div>
+
+                      {/* Action buttons skeleton */}
+                      <div className="flex gap-3">
+                        <Skeleton className="h-10 w-24" />
+                        <Skeleton className="h-10 w-32" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right side skeleton */}
+                  <div className="flex flex-col gap-4 items-end">
+                    <Skeleton className="h-6 w-40" />
+                    <div className="flex gap-6">
+                      <Skeleton className="h-4 w-12" />
+                      <Skeleton className="h-4 w-12" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description skeleton */}
+                <div className="space-y-3">
+                  <Skeleton className="h-6 w-24" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-5/6" />
+                  </div>
+                </div>
+
+                {/* Configuration skeleton */}
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <Card className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <Skeleton className="h-10 w-20" />
+                        <Skeleton className="h-10 w-20" />
+                        <Skeleton className="h-10 w-24" />
+                      </div>
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-4/5" />
+                        <Skeleton className="h-4 w-3/5" />
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   const handleRateCap = async (rating: number) => {
     try {
-      await capKit?.rateCap(cap.id, rating);
-      toast.success(`You rated ${cap.metadata.displayName} ${rating} stars!`);
+      await capKit?.rateCap(capId, rating);
+      toast.success(`You rated ${capQueryData.metadata.displayName} ${rating} stars!`);
     } catch (error) {
       toast.error('Failed to submit your rating. Please try again.');
     }
@@ -85,9 +190,9 @@ export function CapDetails() {
   const handleRunCap = async () => {
     setIsLoading(true);
     try {
-      const downloadedCap = await capKit?.downloadByID(cap.id);
-      if (downloadedCap) {
-        setCurrentCap(downloadedCap);
+      // If we already have the full cap data, use it directly
+      if (downloadedCapData) {
+        setCurrentCap(downloadedCapData);
         navigate('/chat');
       }
     } catch (error) {
@@ -98,21 +203,24 @@ export function CapDetails() {
   };
 
   const handleToggleFavorite = async () => {
-    if (!cap?.id || !capKit) return;
+    setIsTogglingFavorite(true);
+    if (!capKit) return;
 
     try {
       if (isCapFavorite) {
-        await capKit.favorite(cap.id, 'remove');
+        await capKit.favorite(capId, 'remove');
         setIsCapFavorite(false);
-        toast.success(`Removed ${cap.metadata.displayName} from favorites`);
+        toast.success(`Removed ${capQueryData.metadata.displayName} from favorites`);
       } else {
-        await capKit.favorite(cap.id, 'add');
+        await capKit.favorite(capId, 'add');
         setIsCapFavorite(true);
-        toast.success(`Added ${cap.metadata.displayName} to favorites`);
+        toast.success(`Added ${capQueryData.metadata.displayName} to favorites`);
       }
     } catch (error) {
       toast.error('Failed to update favorite status. Please try again.');
       console.error('Failed to toggle favorite:', error);
+    } finally {
+      setIsTogglingFavorite(false);
     }
   };
 
@@ -128,8 +236,8 @@ export function CapDetails() {
   };
 
   const handleCopyAuthor = async () => {
-    if (cap?.authorDID) {
-      await copyToClipboard(cap.authorDID);
+    if (capQueryData?.authorDID) {
+      await copyToClipboard(capQueryData.authorDID);
       toast.success('Author DID copied to clipboard!');
     }
   };
@@ -156,8 +264,8 @@ export function CapDetails() {
                 <div className="flex gap-6">
                   <div className="flex-shrink-0">
                     <CapAvatar
-                      capName={cap.metadata.displayName}
-                      capThumbnail={cap.metadata.thumbnail}
+                      capName={capQueryData.metadata.displayName}
+                      capThumbnail={capQueryData.metadata.thumbnail}
                       size="xl"
                       className="rounded-xl"
                     />
@@ -166,10 +274,10 @@ export function CapDetails() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
                       <h1 className="text-3xl font-bold break-words">
-                        {cap.metadata.displayName}
+                        {capQueryData.metadata.displayName}
                       </h1>
                       <Badge variant="outline" className="text-sm">
-                        v {cap.version + 1}
+                        v {capQueryData.version}
                       </Badge>
                       <TooltipProvider>
                         <Tooltip>
@@ -194,30 +302,33 @@ export function CapDetails() {
                     </div>
 
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                      {cap.id && (
-                        <p className="font-mono break-all">@{cap.idName}</p>
+                      {capQueryData.id && (
+                        <p className="font-mono break-all">
+                          @{capQueryData.idName}
+                        </p>
                       )}
-                      {cap.id && <span>·</span>}
+                      {capQueryData.id && <span>·</span>}
                     </div>
                     <div className="mt-4 flex flex-col gap-3">
                       {/* Tags */}
-                      {cap.metadata.tags && cap.metadata.tags.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm text-muted-foreground">
-                            Tags:
-                          </span>
-                          {cap.metadata.tags.map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="gap-1"
-                            >
-                              <Tag className="h-3 w-3" />
-                              <span className="truncate">{tag}</span>
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
+                      {capQueryData.metadata.tags &&
+                        capQueryData.metadata.tags.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm text-muted-foreground">
+                              Tags:
+                            </span>
+                            {capQueryData.metadata.tags.map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="secondary"
+                                className="gap-1"
+                              >
+                                <Tag className="h-3 w-3" />
+                                <span className="truncate">{tag}</span>
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                     </div>
                     {/* Action Buttons */}
                     <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -233,6 +344,7 @@ export function CapDetails() {
                         <Button
                           variant="outline"
                           onClick={handleToggleFavorite}
+                          disabled={isTogglingFavorite}
                           className="gap-2 group"
                         >
                           <Star className="h-4 w-4 fill-current text-yellow-500" />
@@ -245,7 +357,6 @@ export function CapDetails() {
                         <Button
                           variant="outline"
                           onClick={handleToggleFavorite}
-                          disabled={isFetchingFavorite}
                           className="gap-2"
                         >
                           <Star className="h-4 w-4" />
@@ -259,7 +370,7 @@ export function CapDetails() {
                 {/* Right side of header */}
                 <div className="flex flex-col gap-4 sm:items-end flex-shrink-0">
                   {/* Author Badge */}
-                  {cap.authorDID && (
+                  {capQueryData.authorDID && (
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-muted-foreground">
                         Author:
@@ -271,7 +382,9 @@ export function CapDetails() {
                       >
                         <Copy className="h-3 w-3 flex-shrink-0" />
                         <span className="font-mono truncate">
-                          {isCopied ? 'Copied!' : truncateAuthor(cap.authorDID)}
+                          {isCopied
+                            ? 'Copied!'
+                            : truncateAuthor(capQueryData.authorDID)}
                         </span>
                       </Badge>
                     </div>
@@ -281,17 +394,21 @@ export function CapDetails() {
                   <div className="flex items-center gap-6 text-sm">
                     <div className="flex items-center gap-2">
                       <Download className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{cap.stats.downloads}</span>
+                      <span className="font-medium">
+                        {capQueryData.stats.downloads}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Heart className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{cap.stats.favorites}</span>
+                      <span className="font-medium">
+                        {capQueryData.stats.favorites}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <StarRating
-                        averageRating={cap.stats.averageRating}
-                        userRating={cap.stats.userRating}
-                        ratingCount={cap.stats.ratingCount}
+                        averageRating={capQueryData.stats.averageRating}
+                        userRating={capQueryData.stats.userRating}
+                        ratingCount={capQueryData.stats.ratingCount}
                         size={16}
                         isInteractive
                         onRate={handleRateCap}
@@ -302,11 +419,11 @@ export function CapDetails() {
               </div>
 
               {/* Description Section */}
-              {cap.metadata.description && (
+              {capQueryData.metadata.description && (
                 <div>
                   <h2 className="text-xl font-semibold mb-3">Description</h2>
                   <p className="text-muted-foreground leading-relaxed text-base break-words">
-                    {cap.metadata.description}
+                    {capQueryData.metadata.description}
                   </p>
                 </div>
               )}
@@ -325,16 +442,17 @@ export function CapDetails() {
                     <TabsContent value="prompt" className="mt-4">
                       <div className="space-y-3 bg-muted rounded-lg p-4 max-h-96 overflow-y-auto">
                         <p className="text-muted-foreground break-words whitespace-pre-wrap font-mono text-sm">
-                          {typeof cap.core.prompt === 'string'
-                            ? cap.core.prompt
-                            : cap.core.prompt?.value || 'No prompt configured.'}
+                          {typeof downloadedCapData.core.prompt === 'string'
+                            ? downloadedCapData.core.prompt
+                            : downloadedCapData.core.prompt.value ||
+                            'No prompt configured.'}
                         </p>
                       </div>
                     </TabsContent>
 
                     <TabsContent value="model" className="mt-4">
                       <div className="max-h-96 overflow-y-auto">
-                        {cap.core.model ? (
+                        {downloadedCapData.core.model ? (
                           <div className="space-y-4">
                             {/* Model Name and Provider */}
                             <div className="p-4 bg-muted rounded-lg">
@@ -343,7 +461,7 @@ export function CapDetails() {
                                   Model ID:
                                 </span>
                                 <span className="font-medium text-right break-words">
-                                  {cap.core.model.modelId}
+                                  {downloadedCapData.core.model.modelId}
                                 </span>
                               </div>
                               <div className="flex justify-between items-start gap-2">
@@ -351,7 +469,7 @@ export function CapDetails() {
                                   LLM Gateway:
                                 </span>
                                 <span className="font-medium text-right break-words">
-                                  {cap.core.model.customGatewayUrl ||
+                                  {downloadedCapData.core.model.customGatewayUrl ||
                                     'Nuwa LLM Gateway'}
                                 </span>
                               </div>
@@ -367,11 +485,11 @@ export function CapDetails() {
 
                     <TabsContent value="mcp" className="mt-4">
                       <div className="max-h-96 overflow-y-auto">
-                        {cap.core.mcpServers &&
-                          Object.keys(cap.core.mcpServers).length > 0 ? (
+                        {downloadedCapData.core.mcpServers &&
+                          Object.keys(downloadedCapData.core.mcpServers).length > 0 ? (
                           <div className="space-y-3">
-                            {Object.entries(cap.core.mcpServers).map(
-                              ([name, server]: [string, string]) => (
+                            {Object.entries(downloadedCapData.core.mcpServers).map(
+                              ([name, server]: [string, any]) => (
                                 <div
                                   key={name}
                                   className="flex justify-between items-center p-3 bg-muted rounded-lg gap-2 min-w-0"
@@ -380,7 +498,9 @@ export function CapDetails() {
                                     {name}
                                   </span>
                                   <span className="font-mono truncate">
-                                    {server}
+                                    {typeof server === 'string'
+                                      ? server
+                                      : server.command || 'N/A'}
                                   </span>
                                 </div>
                               ),

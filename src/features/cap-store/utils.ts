@@ -1,28 +1,50 @@
+import type { Page, Result, ResultCap } from '@nuwa-ai/cap-kit';
 import type { RemoteCap } from './types';
+
+export function mapResultCapToRemoteCap(
+  data: ResultCap | undefined,
+): RemoteCap {
+  if (!data) {
+    throw new Error('Invalid cap data');
+  }
+
+  return {
+    cid: data.cid,
+    version: data.version,
+    id: data.id,
+    idName: data.name,
+    stats: data.stats,
+    authorDID: data.id.split(':')[0],
+    metadata: {
+      displayName: data.displayName,
+      description: data.description,
+      tags: data.tags,
+      repository: data.repository,
+      homepage: data.homepage,
+      thumbnail: data.thumbnail,
+    },
+  };
+}
+
+export function mapResultToRemoteCap(
+  item: Result<ResultCap> | undefined,
+): RemoteCap {
+  if (!item?.data) {
+    throw new Error('Invalid cap data');
+  }
+
+  return mapResultCapToRemoteCap(item.data);
+}
 
 /**
  * Maps API response items to RemoteCap objects
  */
-export function mapToRemoteCap(items: any[]): RemoteCap[] {
+export function mapResultsToRemoteCaps(
+  response: Result<Page<ResultCap>>,
+): RemoteCap[] {
   return (
-    items
+    response.data?.items
       ?.filter((item) => item.displayName !== 'nuwa_test')
-      .map((item) => ({
-        cid: item.cid,
-        version: item.version,
-        id: item.id,
-        idName: item.name,
-        stats: item.stats,
-        authorDID: item.id.split(':')[0],
-        metadata: {
-          displayName: item.displayName,
-          description: item.description,
-          tags: item.tags,
-          repository: item.repository,
-          homepage: item.homepage,
-          submittedAt: item.submittedAt,
-          thumbnail: item.thumbnail,
-        },
-      })) || []
+      .map((item) => mapResultCapToRemoteCap(item)) || []
   );
 }

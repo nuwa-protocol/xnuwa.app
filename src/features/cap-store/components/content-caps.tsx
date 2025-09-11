@@ -1,17 +1,22 @@
 import { Loader2, Package } from 'lucide-react';
+import { useEffect } from 'react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observer';
-import { useCapStore } from '../stores';
+import { type UseRemoteCapParams, useCapStore } from '../stores';
 import { CapCard } from './cap-card';
-import { CapDetails } from './cap-details';
 import { CapStoreLoading } from './cap-store-loading';
-import { CapStoreFavoritesContent } from './content-favorites';
-import { CapStoreHomeContent } from './content-home';
 
-export function CapStoreContent() {
+export function CapStoreCapsContent({
+  tag,
+  sortBy,
+  search,
+}: {
+  tag: string | null;
+  sortBy: string | null;
+  search: string | null;
+}) {
   const { t } = useLanguage();
-  const { activeSection, selectedCap } = useCapStore();
   const {
     remoteCaps: caps,
     isFetching,
@@ -20,7 +25,16 @@ export function CapStoreContent() {
     error,
     loadMore,
     refetch,
+    fetchCaps,
   } = useCapStore();
+
+  useEffect(() => {
+    fetchCaps({
+      tags: tag ? [tag] : undefined,
+      sortBy: sortBy ? (sortBy as UseRemoteCapParams['sortBy']) : undefined,
+      searchQuery: search || undefined,
+    });
+  }, [tag, sortBy, search, fetchCaps]);
 
   // infinite scroll trigger and loading indicator
   const { ref: loadingTriggerRef } = useIntersectionObserver({
@@ -32,20 +46,6 @@ export function CapStoreContent() {
       }
     },
   });
-
-  // Show cap details if a cap is selected
-  if (selectedCap) {
-    return <CapDetails />;
-  }
-
-  // Show home content if active section is home
-  if (activeSection.id === 'home') {
-    return <CapStoreHomeContent />;
-  }
-
-  if (activeSection.id === 'favorites') {
-    return <CapStoreFavoritesContent />;
-  }
 
   if (error) {
     return (

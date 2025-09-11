@@ -10,5 +10,5 @@ export type RemoteCap = CapID & {
 export type CapStoreSection = {
   id: string;
   label: string;
-  type: 'section' | 'tag' | 'divider';
+  type: 'section' | 'tag';
 };

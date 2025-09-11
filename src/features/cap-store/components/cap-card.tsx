@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { Button, Card } from '@/shared/components/ui';
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
 import { StarRating } from './star-rating';
@@ -21,7 +20,6 @@ export function CapCard({ cap }: CapCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const { capKit } = useCapKit();
-  const { setSelectedCap } = useCapStore();
   const { setCurrentCap } = CurrentCapStore();
 
   /**
@@ -72,7 +70,7 @@ export function CapCard({ cap }: CapCardProps) {
 
   const handleShowDetails = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedCap(cap);
+    navigate(`/explore/caps/${cap.id}`);
   };
 
   const capMetadata = cap.metadata;
