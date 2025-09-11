@@ -1,6 +1,7 @@
 import { DownloadIcon, ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/shared/utils';
+import { ImagePreviewDialog } from './image-preview-dialog';
 
 export type MessageImageProps = {
   imageName?: string;
@@ -18,6 +19,7 @@ export const MessageImage = ({
   className,
 }: MessageImageProps) => {
   const [hasError, setHasError] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const handleDownload = () => {
     try {
@@ -65,31 +67,44 @@ export const MessageImage = ({
   }
 
   return (
-    <div className="w-full flex justify-center">
-      <div className="relative group">
-        <img
-          alt={alt}
-          className={cn(
-            'h-auto max-w-md overflow-hidden rounded-md',
-            'hover:scale-105 hover:shadow-lg transition-all duration-300',
-            className,
-          )}
-          src={base64}
-          onError={(e) => {
-            console.error('Error loading image', e);
-            setHasError(true);
-          }}
-        />
-        {/* Download button in top right corner */}
-        <button
-          type="button"
-          onClick={handleDownload}
-          className="absolute bottom-2 left-2 bg-black/70 text-gray-400 hover:bg-muted  hover:text-foreground p-2 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
-          title="Download image"
-        >
-          <DownloadIcon className="size-6" />
-        </button>
+    <>
+      <div className="w-full flex justify-center">
+        <div className="relative group">
+          <img
+            alt={alt}
+            className={cn(
+              'h-auto max-w-md overflow-hidden rounded-md cursor-pointer',
+              'hover:scale-105 hover:shadow-lg transition-all duration-300',
+              className,
+            )}
+            src={base64}
+            onClick={() => setIsPreviewOpen(true)}
+            onError={(e) => {
+              console.error('Error loading image', e);
+              setHasError(true);
+            }}
+          />
+          {/* Download button in top right corner */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDownload();
+            }}
+            className="absolute bottom-2 left-2 bg-black/70 text-gray-400 hover:bg-muted  hover:text-foreground p-2 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
+            title="Download image"
+          >
+            <DownloadIcon className="size-6" />
+          </button>
+        </div>
       </div>
-    </div>
+      
+      <ImagePreviewDialog
+        imageUrl={base64}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        alt={alt}
+      />
+    </>
   );
 };

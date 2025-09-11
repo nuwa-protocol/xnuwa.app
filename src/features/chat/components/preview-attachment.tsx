@@ -6,7 +6,9 @@ import {
   FileTypeIcon,
   XIcon,
 } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
+import { ImagePreviewDialog } from './image-preview-dialog';
 
 export interface Attachment {
   name: string;
@@ -74,43 +76,60 @@ export const PreviewAttachment = ({
   const isImage = contentType?.startsWith('image/');
   const fileTypeLabel = getFileTypeLabel(contentType);
   const fileName = name || 'Unknown file';
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   return (
-    <div
-      data-testid="input-attachment-preview"
-      className="group relative w-20 h-20 rounded-lg overflow-hidden bg-muted border hover:border-primary/20 transition-colors"
-    >
-      {isImage ? (
-        <img
-          src={url}
-          alt={fileName}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
-      ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground p-2">
-          {getFileIcon(contentType, 20)}
-          <span className="text-[10px] font-medium mt-1 text-center">
-            {fileTypeLabel}
-          </span>
+    <>
+      <div
+        data-testid="input-attachment-preview"
+        className="group relative w-20 h-20 rounded-lg overflow-hidden bg-muted border hover:border-primary/20 transition-colors"
+        onClick={() => isImage && setIsPreviewOpen(true)}
+        style={{ cursor: isImage ? 'pointer' : 'default' }}
+      >
+        {isImage ? (
+          <img
+            src={url}
+            alt={fileName}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground p-2">
+            {getFileIcon(contentType, 20)}
+            <span className="text-[10px] font-medium mt-1 text-center">
+              {fileTypeLabel}
+            </span>
+          </div>
+        )}
+
+        {onRemove && (
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            size="sm"
+            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity size-5 p-0 rounded-full"
+            data-testid="remove-attachment"
+          >
+            <XIcon size={10} />
+          </Button>
+        )}
+
+        {/* File name overlay */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white text-[9px] px-1.5 py-1 truncate">
+          {fileName}
         </div>
-      )}
-
-      {onRemove && (
-        <Button
-          onClick={onRemove}
-          size="sm"
-          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity size-5 p-0 rounded-full"
-          data-testid="remove-attachment"
-        >
-          <XIcon size={10} />
-        </Button>
-      )}
-
-      {/* File name overlay */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white text-[9px] px-1.5 py-1 truncate">
-        {fileName}
       </div>
-    </div>
+
+      {isImage && (
+        <ImagePreviewDialog
+          imageUrl={url}
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+          alt={fileName}
+        />
+      )}
+    </>
   );
 };
