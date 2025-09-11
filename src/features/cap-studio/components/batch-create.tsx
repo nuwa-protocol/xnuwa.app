@@ -20,10 +20,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui';
-import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import { useAuth } from '@/shared/hooks';
-import { CapSchema } from '@/shared/types';
-import { useAvailableModels } from '../hooks';
+import { type Cap, CapSchema } from '@/shared/types';
 import { CapStudioStore } from '../stores';
 import type { LocalCap } from '../types';
 
@@ -31,45 +29,18 @@ interface BatchCreateProps {
   onBatchCreate?: (caps: LocalCap[]) => void;
 }
 
-// simplified Cap input format, without id, authorDID, submittedAt
-interface SimplifiedCapInput {
-  idName: string;
-  metadata: {
-    displayName: string;
-    description: string;
-    tags: string[];
-    thumbnail?: {
-      type: 'url';
-      url: string;
-    };
-    homepage?: string;
-    repository?: string;
-  };
-  core: {
-    prompt: {
-      value: string;
-      suggestions?: string[];
-    };
-    modelId: string; // only model ID
-    mcpServers?: Record<
-      string,
-      {
-        url: string;
-        transport: string;
-      }
-    >;
-  };
-}
+// Uploaded Cap format should contain all required fields from CapSchema,
+// except for `id` and `authorDID` which are injected here.
+type UploadedCapInput = Omit<Cap, 'id' | 'authorDID'>;
 
 export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
   const navigate = useNavigate();
   const { did } = useAuth();
-  const { models } = useAvailableModels(LLM_GATEWAY_BASE_URL);
   const { createCap } = CapStudioStore();
   const [uploading, setUploading] = useState(false);
   const [showJsonFormat, setShowJsonFormat] = useState(false);
   const [parsedData, setParsedData] = useState<{
-    validCaps: SimplifiedCapInput[];
+    validCaps: Cap[];
     invalidCaps: { cap: any; error: string }[];
   } | null>(null);
   const [uploadResults, setUploadResults] = useState<{
@@ -79,123 +50,27 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
   const [isCreating, setIsCreating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // validate simplified Cap input format
-  const validateSimplifiedCap = (capData: any): SimplifiedCapInput | null => {
-    // validate idName
-    if (!capData.idName || typeof capData.idName !== 'string') {
-      throw new Error('Missing or invalid idName');
-    }
-    if (capData.idName.length < 6) {
-      throw new Error('idName must be at least 6 characters');
-    }
-    if (capData.idName.length > 20) {
-      throw new Error('idName must be at most 20 characters');
-    }
-    if (!/^[a-zA-Z0-9_]+$/.test(capData.idName)) {
-      throw new Error(
-        'idName must contain only letters, numbers, and underscores',
-      );
-    }
-
-    if (!capData.metadata || typeof capData.metadata !== 'object') {
-      throw new Error('Missing metadata');
-    }
-
-    // validate displayName
-    if (
-      !capData.metadata.displayName ||
-      typeof capData.metadata.displayName !== 'string'
-    ) {
-      throw new Error('Missing displayName in metadata');
-    }
-    if (capData.metadata.displayName.length < 1) {
-      throw new Error('Display name is required');
-    }
-    if (capData.metadata.displayName.length > 50) {
-      throw new Error('Display name too long (max 50 characters)');
-    }
-
-    // validate description
-    if (
-      !capData.metadata.description ||
-      typeof capData.metadata.description !== 'string'
-    ) {
-      throw new Error('Missing description in metadata');
-    }
-    if (capData.metadata.description.length < 20) {
-      throw new Error('Description must be at least 20 characters');
-    }
-    if (capData.metadata.description.length > 500) {
-      throw new Error('Description too long (max 500 characters)');
-    }
-
-    // validate tags
-    if (!capData.metadata.tags || !Array.isArray(capData.metadata.tags)) {
-      throw new Error('Missing or invalid tags in metadata');
-    }
-    if (!capData.metadata.tags.every((tag: any) => typeof tag === 'string')) {
-      throw new Error('All tags must be strings');
-    }
-
-    // validate optional homepage URL
-    if (capData.metadata.homepage && capData.metadata.homepage !== '') {
-      try {
-        new URL(capData.metadata.homepage);
-      } catch {
-        throw new Error('Homepage must be a valid URL');
-      }
-    }
-
-    // validate optional repository URL
-    if (capData.metadata.repository && capData.metadata.repository !== '') {
-      try {
-        new URL(capData.metadata.repository);
-      } catch {
-        throw new Error('Repository must be a valid URL');
-      }
-    }
-
-    if (!capData.core || typeof capData.core !== 'object') {
-      throw new Error('Missing core');
-    }
-
-    if (!capData.core.prompt || typeof capData.core.prompt !== 'object') {
-      throw new Error('Missing prompt in core');
-    }
-
-    if (!capData.core.modelId || typeof capData.core.modelId !== 'string') {
-      throw new Error('Missing modelId in core');
-    }
-
-    // validate model exists
-    if (!models || !models.find((model) => model.id === capData.core.modelId)) {
-      throw new Error(`Model with ID "${capData.core.modelId}" not found`);
-    }
-
-    return capData as SimplifiedCapInput;
-  };
-
-  // convert simplified input to full Cap object
-  const convertToFullCap = (simplifiedCap: SimplifiedCapInput): any => {
-    const model = models?.find((m) => m.id === simplifiedCap.core.modelId);
-    if (!model) {
-      throw new Error(`Model not found: ${simplifiedCap.core.modelId}`);
-    }
-
-    return {
-      id: `${did}:${simplifiedCap.idName}`,
-      authorDID: did,
-      idName: simplifiedCap.idName,
-      metadata: {
-        ...simplifiedCap.metadata,
-        submittedAt: Date.now(),
-      },
-      core: {
-        prompt: simplifiedCap.core.prompt,
-        model: model,
-        mcpServers: simplifiedCap.core.mcpServers || {},
-      },
+  // Build a full Cap object by injecting id and authorDID, then validate via CapSchema
+  const buildAndValidateCap = (capData: any): Cap => {
+    const partial = capData as UploadedCapInput;
+    const normalizeAuthorDid = (raw?: string | null): string => {
+      if (!raw) return 'did::unknown';
+      if (raw.startsWith('did::')) return raw;
+      if (raw.startsWith('did:')) return `did::${raw.slice(4)}`;
+      return `did::${raw}`;
     };
+
+    const authorDID = normalizeAuthorDid(did);
+
+    const fullCap: Cap = {
+      id: `${authorDID}:${partial.idName}`,
+      authorDID,
+      ...partial,
+    } as Cap;
+
+    // Throws if invalid
+    CapSchema.parse(fullCap);
+    return fullCap;
   };
 
   const handleBatchUpload = async (
@@ -222,17 +97,15 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
         throw new Error('File must contain an array of Cap objects');
       }
 
-      const validCaps: SimplifiedCapInput[] = [];
+      const validCaps: Cap[] = [];
       const invalidCaps: { cap: any; error: string }[] = [];
 
       // Validate each cap without creating them yet
       for (let i = 0; i < data.length; i++) {
         const capData = data[i];
         try {
-          const validatedCap = validateSimplifiedCap(capData);
-          if (validatedCap) {
-            validCaps.push(validatedCap);
-          }
+          const validatedFullCap = buildAndValidateCap(capData);
+          validCaps.push(validatedFullCap);
         } catch (error) {
           let errorMessage = 'Invalid cap format';
 
@@ -281,22 +154,15 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
       };
 
       // Create each validated cap
-      for (const simplifiedCap of parsedData.validCaps) {
+      for (const fullCap of parsedData.validCaps) {
         try {
-          const fullCap = convertToFullCap(simplifiedCap);
-
-          // validate full Cap object
-          CapSchema.parse(fullCap);
-
           const newLocalCap = createCap(fullCap);
           results.success.push(newLocalCap);
         } catch (error) {
           const capName =
-            simplifiedCap.metadata?.displayName ||
-            simplifiedCap.idName ||
-            'Unknown Cap';
+            fullCap.metadata?.displayName || fullCap.idName || 'Unknown Cap';
           results.errors.push({
-            cap: simplifiedCap,
+            cap: fullCap,
             error: `"${capName}": Failed to create cap - ${error instanceof Error ? error.message : 'Unknown error'}`,
           });
         }
@@ -358,9 +224,9 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
         <CardHeader>
           <CardTitle>Upload JSON File</CardTitle>
           <CardDescription>
-            Select a JSON file containing an array of simplified cap objects.
-            The system will automatically fill in required fields like ID,
-            authorDID, and submission time.
+            Select a JSON file containing an array of cap objects that conform
+            to the CapSchema. Your DID will be used to fill in the required
+            fields: id and authorDID.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -391,7 +257,7 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
               onClick={() => setShowJsonFormat(!showJsonFormat)}
               className="flex items-center justify-between w-full text-left font-medium text-sm mb-2 hover:text-foreground transition-colors"
             >
-              <span>Expected JSON format (simplified):</span>
+              <span>Expected JSON format (no id/authorDID):</span>
               {showJsonFormat ? (
                 <ChevronDown className="h-4 w-4" />
               ) : (
@@ -407,10 +273,7 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
       "displayName": "My Awesome Cap",
       "description": "A detailed description of what this cap does and how it helps users accomplish their tasks effectively",
       "tags": ["productivity", "assistant"],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://example.com/thumbnail.png"
-      },
+      "thumbnail": "https://example.com/thumbnail.png",
       "homepage": "https://example.com",
       "repository": "https://github.com/user/repo"
     },
@@ -419,30 +282,24 @@ export function BatchCreate({ onBatchCreate }: BatchCreateProps) {
         "value": "You are a helpful assistant that...",
         "suggestions": ["How can I help you today?", "What would you like to know?"]
       },
-      "modelId": "openai/gpt-4o-mini",
+      "model": {
+        "modelId": "openai/gpt-4o-mini",
+        "modelType": "Language Model",
+        "supportedInputs": ["text", "image"],
+        "parameters": { "temperature": 0.7 },
+        "customGatewayUrl": "https://your-gateway.example.com" // optional
+      },
       "mcpServers": {
-        "server-name": {
-          "url": "npm:@example/mcp-server",
-          "transport": "httpStream"
-        }
+        "server-name": "https://example.com/sse"
       }
     }
   }
 ]
 
-Validation Rules:
-- idName: 6-20 chars, letters/numbers/underscores only (no dashes)
-- displayName: 1-50 characters required
-- description: 20-500 characters required
-- tags: array of strings required
-- homepage/repository: valid URLs (optional)
-- thumbnail/mcpServers: optional
-- prompt.suggestions: optional array
-
 Auto-generated fields:
 - id: "authorDID:idName"
 - authorDID: from your authentication
-- submittedAt: current timestamp`}
+`}
               </pre>
             )}
           </div>
