@@ -12,6 +12,8 @@ export const NuwaIdentityKit = (options: UseIdentityKitOptions = {}) => {
     ...options,
   });
 
+  const isConnected = identityKit.then((identityKit) => identityKit);
+
   const getKeyManager = async () => {
     return await identityKit.then((identityKit) => identityKit.getKeyManager());
   };
@@ -51,6 +53,7 @@ export const NuwaIdentityKit = (options: UseIdentityKitOptions = {}) => {
   };
 
   return {
+    isConnected,
     connect,
     logout,
     handleCallback,

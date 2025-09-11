@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useEffect, useRef } from 'react';
+import { createContext, type ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/shared/hooks/use-auth';
 
@@ -10,7 +10,6 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   const { did, isConnecting, isConnected, isError, isInitializing } = useAuth();
 
   const navigate = useNavigate();
-  const hasRehydrated = useRef(false);
 
   // Keep legacy DID store in sync so existing code relying on it continues to work.
   useEffect(() => {
@@ -21,7 +20,6 @@ export function AuthGuard({ children }: { children: ReactNode }) {
 
     if (!isConnecting && !isConnected) {
       navigate('/login');
-      hasRehydrated.current = false; // Reset rehydration flag when user logs out
     }
   }, [isInitializing, isConnecting, isConnected, navigate]);
 
