@@ -1,7 +1,14 @@
 import { Star, TrendingUp } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Progress } from '@/shared/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Progress,
+} from '@/shared/components/ui';
+import { Rating, RatingButton } from '@/shared/components/ui/shadcn-io/rating';
+import { generateUUID } from '@/shared/utils';
 import type { RemoteCap } from '../../types';
-import { StarRating } from '../star-rating';
 
 interface CapDetailsRatingProps {
   capQueryData: RemoteCap;
@@ -46,14 +53,18 @@ export function CapDetailsRating({
               {capQueryData.stats.averageRating.toFixed(1)}
             </div>
             <div className="mb-3">
-              <StarRating
-                averageRating={capQueryData.stats.averageRating}
-                userRating={capQueryData.stats.userRating}
-                ratingCount={capQueryData.stats.ratingCount}
-                size={24}
-                isInteractive={false}
-                onRate={() => {}}
-              />
+              <Rating
+                readOnly
+                value={Math.round(capQueryData.stats.averageRating)}
+              >
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <RatingButton
+                    key={generateUUID()}
+                    size={24}
+                    className="text-yellow-500"
+                  />
+                ))}
+              </Rating>
             </div>
             <p className="text-sm text-muted-foreground">
               Based on {capQueryData.stats.ratingCount} reviews
@@ -68,7 +79,10 @@ export function CapDetailsRating({
                   <span className="text-sm font-medium w-4 text-right">
                     {d.stars}
                   </span>
-                  <Star className="h-3.5 w-3.5 text-yellow-500" fill="currentColor" />
+                  <Star
+                    className="h-3.5 w-3.5 text-yellow-500"
+                    fill="currentColor"
+                  />
                 </div>
                 <Progress value={(d.count / maxCount) * 100} className="h-2" />
                 <span className="text-xs text-muted-foreground w-10 text-right">
@@ -91,14 +105,18 @@ export function CapDetailsRating({
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <StarRating
-                averageRating={0}
-                userRating={capQueryData.stats.userRating}
-                ratingCount={0}
-                size={28}
-                isInteractive
-                onRate={onRate}
-              />
+              <Rating
+                defaultValue={capQueryData.stats.userRating ?? 0}
+                onValueChange={onRate}
+              >
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <RatingButton
+                    key={generateUUID()}
+                    size={28}
+                    className="text-yellow-500"
+                  />
+                ))}
+              </Rating>
             </div>
           </div>
         </div>

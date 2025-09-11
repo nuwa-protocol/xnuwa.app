@@ -29,19 +29,21 @@ const HomeSection = ({
 
   return (
     <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">{title}</h2>
-        {!isLoading && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleViewMore(sortBy)}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            {t('capStore.home.viewMore') || 'View More'}
-            <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
-        )}
+      <div className="mb-4">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-semibold">{title}</h2>
+          {!isLoading && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleViewMore(sortBy)}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {t('capStore.home.viewMore') || 'View More'}
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {isLoading ? (

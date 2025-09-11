@@ -1,5 +1,6 @@
 import { AlertCircle, ChevronDown, Loader2, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   Button,
   DropdownMenu,
@@ -39,9 +40,15 @@ export function CapSelector() {
   const handleCapSelect = async (cap: RemoteCap) => {
     const id = cap.id;
     try {
-      const capKit = await capKitService.getCapKit();
-      const cap = await capKit.downloadByID(id);
-      setCurrentCap(cap);
+      toast.promise(async () => {
+        const capKit = await capKitService.getCapKit();
+        const cap = await capKit.downloadByID(id);
+        setCurrentCap(cap);
+      }, {
+        loading: 'Loading cap...',
+        success: 'Cap is ready to use!',
+        error: 'Failed to load cap',
+      });
     } catch (error) {
       console.error('Failed to select cap:', error);
     }

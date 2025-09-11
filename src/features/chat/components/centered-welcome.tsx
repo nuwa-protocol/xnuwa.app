@@ -14,8 +14,8 @@ export function CenteredWelcome({ children }: CenteredWelcomeProps) {
           transition={{ delay: 0.2 }}
           className="flex flex-col items-center gap-4"
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-theme-primary to-theme-primary/60 bg-clip-text text-transparent">
-            What do you want to accomplish?
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
+            Get Started with every AI You Need
           </h1>
           <p className="text-muted-foreground text-center max-w-md">
             Start chatting or explore amazing AI capabilities

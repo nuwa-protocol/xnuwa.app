@@ -103,7 +103,9 @@ export function CapDetailsHeader({
               {/* Status */}
               <div className="flex items-center gap-2 min-w-0">
                 <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Validation:</span>
+                <span className="text-xs text-muted-foreground">
+                  Validation:
+                </span>
                 <Badge className="gap-1">Verified</Badge>
               </div>
 

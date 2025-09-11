@@ -83,11 +83,18 @@ export function CapDetails({ capId }: { capId: string }) {
   }
 
   const handleRateCap = async (rating: number) => {
+    if (!capKit) return;
+
     try {
-      await capKit?.rateCap(capId, rating);
-      toast.success(
-        `You rated ${capQueryData.metadata.displayName} ${rating} stars!`,
-      );
+      toast.promise(capKit.rateCap(capId, rating), {
+        loading: 'Submitting your rating...',
+        success: (data) => {
+          return `You rated ${capQueryData.metadata.displayName} ${rating} stars!`;
+        },
+        error: 'Failed to submit your rating. Please try again.',
+      });
+      const queriedCap = await capKit.queryByID({ id: capId });
+      setCapQueryData(mapResultToRemoteCap(queriedCap));
     } catch (error) {
       toast.error('Failed to submit your rating. Please try again.');
     }
