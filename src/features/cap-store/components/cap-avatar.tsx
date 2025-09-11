@@ -6,7 +6,9 @@ const sizeClasses = {
   sm: 'size-6', // 24px
   md: 'size-8', // 32px
   lg: 'size-10', // 40px
-  xl: 'size-16', // 48px
+  xl: 'size-16', // 64px
+  '2xl': 'size-24', // 96px
+  '3xl': 'size-32', // 128px
 } as const;
 
 export function CapAvatar({

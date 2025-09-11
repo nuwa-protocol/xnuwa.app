@@ -191,7 +191,7 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
     <header className="sticky top-0 z-10" style={style}>
       <div className="relative bg-background/95 backdrop-blur-xl border border-border/50 rounded-t rounded-lg shadow-lg shadow-black/5 supports-[backdrop-filter]:bg-background/80 px-4 py-2 w-full">
         <TooltipProvider>
-          <div className="flex items-center gap-4 max-w-7xl mx-auto px-4">
+          <div className="flex items-center gap-4 max-w-6xl mx-auto px-4">
             {/* Navigation Menu - Left Side */}
             <div className="flex items-center gap-2 flex-shrink-0">
               <NavigationMenu>
@@ -271,7 +271,7 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                               transition-all duration-200
                               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                               ${activeSection.id === 'all'
-                              ? 'bg-gradient-to-r from-primary/15 to-primary/10 text-primary font-medium border border-primary/20 shadow-sm shadow-primary/10'
+                              ? 'bg-accent text-accent-foreground font-semibold'
                               : 'text-foreground hover:bg-accent hover:text-accent-foreground'
                             }
                             `}
@@ -305,7 +305,7 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                                     transition-all duration-200
                                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                                     ${isSelected
-                                    ? 'bg-gradient-to-r from-primary/15 to-primary/10 text-primary font-medium border border-primary/20 shadow-sm shadow-primary/10'
+                                    ? 'bg-accent text-accent-foreground font-semibold'
                                     : 'text-foreground hover:bg-accent/60 hover:text-accent-foreground'
                                   }
                                   `}

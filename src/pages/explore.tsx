@@ -31,7 +31,7 @@ export default function ExplorePage() {
   return (
     <>
       <CapStoreHeader />
-      <div className="flex flex-col max-w-7xl mx-auto">
+      <div className="flex flex-col max-w-6xl mx-auto">
         <ExplorePageContent />
       </div>
     </>

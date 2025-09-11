@@ -1,4 +1,5 @@
-import { AlertCircle, ChevronDown, Loader2, Store } from 'lucide-react';
+import { AlertCircle, ChevronDown, Loader2, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import {
   Button,
   DropdownMenu,
@@ -34,21 +35,16 @@ export function CapSelector() {
     CurrentCapStore();
   const { favoriteCaps } = useCapStore();
   const { setCurrentCap } = CurrentCapStore();
-
+  const navigate = useNavigate();
   const handleCapSelect = async (cap: RemoteCap) => {
     const id = cap.id;
     try {
       const capKit = await capKitService.getCapKit();
-      const cap = (await capKit.downloadByID(id));
+      const cap = await capKit.downloadByID(id);
       setCurrentCap(cap);
     } catch (error) {
       console.error('Failed to select cap:', error);
     }
-  };
-
-  const handleOpenStore = (event: React.MouseEvent) => {
-    event.preventDefault();
-    // openModal();
   };
 
   // If no favorite caps, open store directly on click
@@ -58,7 +54,7 @@ export function CapSelector() {
         <Button
           variant="outline"
           size="sm"
-          onClick={handleOpenStore}
+          onClick={() => navigate('/explore')}
           className="rounded-lg"
           type="button"
         >
@@ -125,10 +121,10 @@ export function CapSelector() {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
-            onSelect={() => console.log('hahah')}
+            onSelect={() => navigate('/explore')}
           >
-            <Store className="w-4 h-4 mr-2" />
-            <span>Browse All</span>
+            <Sparkles className="w-4 h-4 mr-2" />
+            <span>Explore More</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

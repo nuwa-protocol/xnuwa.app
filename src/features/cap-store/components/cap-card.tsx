@@ -136,10 +136,10 @@ export function CapCard({ cap }: CapCardProps) {
       >
         <Button
           onClick={handleUseCap}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="bg-theme-primary hover:bg-theme-primary/90 text-theme-primary-foreground"
         >
           <Play className="w-4 h-4 mr-2" />
-          Use
+          Run
         </Button>
         <Button
           onClick={handleShowDetails}

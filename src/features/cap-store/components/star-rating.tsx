@@ -104,7 +104,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
       )}
       {ratingCount > 0 && (
         <span className="text-xs text-muted-foreground">
-          ({formatRatingCount(5)})
+          ({formatRatingCount(ratingCount)})
         </span>
       )}
     </div>
