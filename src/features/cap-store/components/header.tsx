@@ -1,6 +1,5 @@
 import {
   ArrowDownWideNarrow,
-  ArrowUpDown,
   BookOpen,
   Bot,
   Brain,
@@ -9,7 +8,6 @@ import {
   Code,
   Coins,
   Heart,
-  History,
   Home,
   MoreHorizontal,
   Package,
@@ -121,8 +119,6 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
       switch (sectionId) {
         case 'favorites':
           return Star;
-        case 'recent':
-          return History;
         case 'all':
           return Bot;
         default:
@@ -187,7 +183,7 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
     } else if (section.id === 'all') {
       navigate('/explore/caps');
     } else if (section.type === 'tag') {
-      navigate(`/explore/caps?tag=${section.id}`);
+      navigate(`/explore/caps?tag=${section.label}`);
     }
   };
 
@@ -339,7 +335,7 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                         }
                           `}
                     >
-                      <Star className="size-4" />
+                      <Heart className="size-4" />
                       <span>Favorites</span>
                     </button>
                   </NavigationMenuItem>
@@ -394,7 +390,6 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                           const option = sortOptions.find(
                             (opt) => opt.value === sortBy,
                           );
-                          const IconComponent = option?.icon || ArrowUpDown;
                           return (
                             <>
                               {option?.label}

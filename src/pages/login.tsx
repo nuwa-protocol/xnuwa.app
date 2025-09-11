@@ -16,12 +16,7 @@ export default function LoginPage() {
     if (isConnected) {
       window.location.replace('/');
     }
-  }, [isConnected, navigate]);
-
-  // if already logged in, do not show login form
-  if (isConnected) {
-    return null;
-  }
+  }, [isConnected]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-fuchsia-100 dark:from-gray-900 dark:via-purple-900 dark:to-fuchsia-900 p-4 relative">

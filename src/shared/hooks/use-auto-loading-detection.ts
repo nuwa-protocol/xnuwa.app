@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
 
+declare global {
+  interface Window {
+    updateLoadingProgress?: (percentage: number, text?: string) => void;
+    hideLoadingScreen?: () => void;
+  }
+}
+
 // Track the current progress globally to prevent regression
 let globalProgress = 0;
 let isLoadingComplete = false;

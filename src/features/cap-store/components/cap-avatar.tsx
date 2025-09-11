@@ -31,7 +31,7 @@ export function CapAvatar({
     >
       <AvatarImage src={capThumbnail} alt={capName} className="object-cover" />
       <AvatarFallback className="text-xs rounded-none">
-        {capName.slice(0, 2).toUpperCase()}
+        {capName && capName.length > 2 ? capName.slice(0, 2).toUpperCase() : 'Unamed Cap'}
       </AvatarFallback>
     </Avatar>
   );

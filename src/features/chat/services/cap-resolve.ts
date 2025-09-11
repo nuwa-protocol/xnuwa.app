@@ -8,12 +8,12 @@ export class CapResolve {
   private hasMCPServers: boolean;
 
   constructor() {
-    const { currentCap, isCurrentCapMCPError } = CurrentCapStore.getState();
+    const { currentCap, isError } = CurrentCapStore.getState();
     if (!currentCap) {
       throw new Error('No cap selected. Please select a cap to use.');
     }
     this.cap = currentCap;
-    this.isCurrentCapMCPError = isCurrentCapMCPError;
+    this.isCurrentCapMCPError = isError;
     this.hasMCPServers = Object.keys(this.cap.core.mcpServers).length > 0;
   }
 

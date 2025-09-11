@@ -26,7 +26,7 @@ export function SidebarButton({
   const isPrimary = variant === 'primary';
   const pathname = useLocation().pathname;
   const isActive = useMemo(() => {
-    return pathname === href;
+    return pathname.split('/')[1] === href.split('/')[1];
   }, [pathname, href]);
 
   return (
@@ -49,8 +49,8 @@ export function SidebarButton({
           'transition-all duration-150 ease-out',
         ],
         isActive &&
-          !isPrimary &&
-          'bg-sidebar-accent text-sidebar-primary font-medium',
+        !isPrimary &&
+        'bg-sidebar-accent text-sidebar-primary font-medium',
         className,
       )}
     >
