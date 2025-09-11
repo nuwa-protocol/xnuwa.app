@@ -21,7 +21,6 @@ export function CapDetailsRating({
 }: CapDetailsRatingProps) {
   const getRatingDistribution = () => {
     const total = capQueryData.stats.ratingCount || 0;
-    if (total === 0) return [];
 
     // Mock distribution for now - you can replace with actual data if available
     const distribution = [

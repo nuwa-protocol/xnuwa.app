@@ -1,4 +1,4 @@
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Info, Star, Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -36,6 +36,9 @@ export function CapDetails({ capId }: { capId: string }) {
 
   // Fetch full cap data when selectedCap changes
   useEffect(() => {
+    setIsLoading(true);
+    setDownloadedCapData(null);
+    setCapQueryData(null);
     const fetchCap = async () => {
       if (!capKit) return;
 
@@ -76,7 +79,7 @@ export function CapDetails({ capId }: { capId: string }) {
     Promise.all([fetchCap(), fetchFavoriteStatus(), queryCap()]).finally(() => {
       setIsLoading(false);
     });
-  }, [capKit]);
+  }, [capKit, capId]);
 
   if (isLoading || !downloadedCapData || !capQueryData) {
     return <CapDetailsLoadingSkeleton />;
@@ -119,25 +122,37 @@ export function CapDetails({ capId }: { capId: string }) {
     setIsTogglingFavorite(true);
     if (!capKit) return;
 
-    try {
-      if (isCapFavorite) {
-        await capKit.favorite(capId, 'remove');
-        setIsCapFavorite(false);
-        toast.success(
-          `Removed ${capQueryData.metadata.displayName} from favorites`,
-        );
-      } else {
-        await capKit.favorite(capId, 'add');
-        setIsCapFavorite(true);
-        toast.success(
-          `Added ${capQueryData.metadata.displayName} to favorites`,
-        );
-      }
-    } catch (error) {
-      toast.error('Failed to update favorite status. Please try again.');
-      console.error('Failed to toggle favorite:', error);
-    } finally {
-      setIsTogglingFavorite(false);
+    if (isCapFavorite) {
+      toast.promise(capKit.favorite(capId, 'remove'), {
+        loading: 'Removing from favorites...',
+        success: () => {
+          setIsCapFavorite(false);
+          return `Removed ${capQueryData.metadata.displayName} from favorites`;
+        },
+        error: (error) => {
+          console.error('Failed to remove from favorites:', error);
+          return 'Failed to remove from favorites. Please try again.';
+        },
+        finally: () => {
+          setIsTogglingFavorite(false);
+        },
+      });
+
+    } else {
+      toast.promise(capKit.favorite(capId, 'add'), {
+        loading: 'Adding to favorites...',
+        success: () => {
+          setIsCapFavorite(true);
+          return `Added ${capQueryData.metadata.displayName} to favorites`;
+        },
+        error: (error) => {
+          console.error('Failed to add to favorites:', error);
+          return 'Failed to add to favorites. Please try again.';
+        },
+        finally: () => {
+          setIsTogglingFavorite(false);
+        },
+      });
     }
   };
 
@@ -169,32 +184,37 @@ export function CapDetails({ capId }: { capId: string }) {
             downloadedCapData={downloadedCapData}
           />
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Tabbed Content */}
-            <div className="lg:col-span-2 space-y-6">
-              <Tabs defaultValue="overview">
-                <TabsList className="w-full p-0 bg-background justify-start border-b rounded-none mb-4">
-                  <TabsTrigger
-                    value="overview"
-                    className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary"
-                  >
-                    Overview
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="ratings"
-                    className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary"
-                  >
-                    Ratings
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="configuration"
-                    className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary"
-                  >
-                    Configuration
-                  </TabsTrigger>
-                </TabsList>
+          {/* Tabs + Content/Grid */}
+          <Tabs defaultValue="overview" className="w-full">
+            {/* Full-width Tab List */}
+            <TabsList className="w-full p-0 bg-background justify-start border-b rounded-none mb-4">
+              <TabsTrigger
+                value="overview"
+                className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary"
+              >
+                <Info className="w-4 h-4 mr-2" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="ratings"
+                className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary"
+              >
+                <Star className="w-4 h-4 mr-2" />
+                Ratings
+              </TabsTrigger>
+              <TabsTrigger
+                value="configuration"
+                className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Configuration
+              </TabsTrigger>
+            </TabsList>
 
+            {/* Below the tab list: content 2/3, recommendations 1/3 */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left: Tab Content (2/3) */}
+              <div className="lg:col-span-2 space-y-6">
                 <TabsContent value="overview" className="mt-0">
                   <Card>
                     <CardHeader>
@@ -216,21 +236,17 @@ export function CapDetails({ capId }: { capId: string }) {
                 </TabsContent>
 
                 <TabsContent value="configuration" className="mt-0">
-                  <CapDetailsConfiguration
-                    downloadedCapData={downloadedCapData}
-                  />
+                  <CapDetailsConfiguration downloadedCapData={downloadedCapData} />
                 </TabsContent>
-              </Tabs>
-            </div>
+              </div>
 
-            {/* Right Column - Recommendations */}
-            <div className="space-y-6 mt-14">
+              {/* Right: Recommendations (1/3) */}
               <CapDetailsRecommendations
                 currentCapId={capId}
                 tags={capQueryData.metadata.tags}
               />
             </div>
-          </div>
+          </Tabs>
         </div>
       </div>
     </div>

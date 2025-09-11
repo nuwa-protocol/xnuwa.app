@@ -52,17 +52,20 @@ export function CapDetailsActions({
               >
                 <Heart className="h-4 w-4 fill-current text-red-500" />
                 <span className="group-hover:hidden">Favorited</span>
-                <span className="hidden group-hover:inline">Remove</span>
+                <span className="hidden group-hover:inline">
+                  {isTogglingFavorite ? 'Removing...' : 'Remove'}
+                </span>
               </Button>
             ) : (
               <Button
                 variant="outline"
                 onClick={onToggleFavorite}
+                disabled={isTogglingFavorite}
                 className={`gap-2 ${isVertical ? 'w-full' : ''}`}
                 aria-label="Add to favorites"
               >
                 <Heart className="h-4 w-4" />
-                Favorite
+                {isTogglingFavorite ? 'Adding...' : 'Favorite'}
               </Button>
             )}
           </TooltipTrigger>

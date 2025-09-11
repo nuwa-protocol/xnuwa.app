@@ -200,6 +200,10 @@
   -ms-overflow-style: none;
 }
 
+[data-scroll-locked][data-scroll-locked] {
+  overflow: scroll !important;
+}
+
 
 
 /* Toast width customization */

@@ -100,6 +100,48 @@ export function CapDetailsHeader({
           {/* Structured metadata below title (compact) */}
           <div className="mt-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+
+              {/* Version (next line) */}
+              <div className="flex items-center gap-2 min-w-0">
+                <GitBranch className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Version:</span>
+                <Badge variant="secondary">v{capQueryData.version}</Badge>
+              </div>
+
+
+
+              {/* CID (next line) */}
+              <div className="flex items-center gap-2 min-w-0">
+                <Fingerprint className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">CID:</span>
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge
+                        asChild
+                        variant="outline"
+                        className="cursor-pointer select-none"
+                      >
+                        <button
+                          type="button"
+                          aria-label="Copy CID"
+                          onClick={() => {
+                            navigator.clipboard.writeText(capQueryData.cid);
+                            setCidCopied(true);
+                            setTimeout(() => setCidCopied(false), 1500);
+                          }}
+                        >
+                          {truncate(capQueryData.cid)}
+                        </button>
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {cidCopied ? 'Copied' : 'Click to copy'}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+
               {/* Status */}
               <div className="flex items-center gap-2 min-w-0">
                 <ShieldCheck className="h-4 w-4 text-muted-foreground" />
@@ -109,14 +151,9 @@ export function CapDetailsHeader({
                 <Badge className="gap-1">Verified</Badge>
               </div>
 
-              {/* Version */}
-              <div className="flex items-center gap-2 min-w-0">
-                <GitBranch className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Version:</span>
-                <Badge variant="secondary">v{capQueryData.version}</Badge>
-              </div>
 
-              {/* Author (next line) */}
+
+              {/* Author */}
               <div className="flex items-center gap-2 min-w-0">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">Author:</span>
@@ -150,37 +187,7 @@ export function CapDetailsHeader({
                 </TooltipProvider>
               </div>
 
-              {/* CID (next line) */}
-              <div className="flex items-center gap-2 min-w-0">
-                <Fingerprint className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">CID:</span>
-                <TooltipProvider delayDuration={100}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Badge
-                        asChild
-                        variant="outline"
-                        className="cursor-pointer select-none"
-                      >
-                        <button
-                          type="button"
-                          aria-label="Copy CID"
-                          onClick={() => {
-                            navigator.clipboard.writeText(capQueryData.cid);
-                            setCidCopied(true);
-                            setTimeout(() => setCidCopied(false), 1500);
-                          }}
-                        >
-                          {truncate(capQueryData.cid)}
-                        </button>
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {cidCopied ? 'Copied' : 'Click to copy'}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+
             </div>
           </div>
 

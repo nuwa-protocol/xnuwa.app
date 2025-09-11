@@ -1,17 +1,13 @@
-import { Lightbulb } from 'lucide-react';
+import { Download, Heart } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Skeleton,
-} from '@/shared/components/ui';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/shared/components/ui';
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import { generateUUID } from '@/shared/utils';
 import type { RemoteCap } from '../../types';
 import { mapResultsToRemoteCaps } from '../../utils';
-import { CapCard } from '../cap-card';
+import { CapAvatar } from '../cap-avatar';
+import { StarRating } from '../star-rating';
 
 interface CapDetailsRecommendationsProps {
   currentCapId: string;
@@ -23,6 +19,7 @@ export function CapDetailsRecommendations({
   tags = [],
 }: CapDetailsRecommendationsProps) {
   const { capKit } = useCapKit();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [caps, setCaps] = useState<RemoteCap[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +36,7 @@ export function CapDetailsRecommendations({
         const response = await capKit.queryByName('', {
           tags: queryTags,
           page: 0,
-          size: 6,
+          size: 15,
           sortBy: 'downloads',
           sortOrder: 'desc',
         });
@@ -63,17 +60,17 @@ export function CapDetailsRecommendations({
   }, [capKit, currentCapId, queryTags.join(',')]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-primary" /> Try These Next
+    <Card className="border-none shadow-none p-0 gap-4">
+      <CardHeader className='pb-0 mb-0'>
+        <CardTitle className="flex items-center gap-2 pt-2 pb-0 mb-0">
+          More Similar Caps
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         {isLoading ? (
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={generateUUID()} className="h-24 w-full" />
+          <div className="space-y-2">
+            {[...Array(4)].map(() => (
+              <Skeleton key={generateUUID()} className="h-12 w-full" />
             ))}
           </div>
         ) : error ? (
@@ -83,10 +80,52 @@ export function CapDetailsRecommendations({
             No recommendations yet.
           </p>
         ) : (
-          <div className="grid gap-3">
-            {caps.map((cap) => (
-              <CapCard key={cap.id} cap={cap} />
-            ))}
+          <div className="h-[50vh] pr-2 overflow-y-auto hide-scrollbar">
+            <div className="flex flex-col gap-2">
+              {caps.map((cap) => {
+                const meta = cap.metadata;
+                const stats = cap.stats;
+                return (
+                  <div
+                    key={cap.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => navigate(`/explore/caps/${cap.id}`)}
+                    className="flex items-center gap-3 rounded-md border px-2 py-2 hover:bg-muted cursor-pointer"
+                  >
+                    <CapAvatar
+                      capName={meta.displayName}
+                      capThumbnail={meta.thumbnail}
+                      size="lg"
+                      className="rounded-md"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium leading-5 line-clamp-1">
+                        {meta.displayName}
+                      </div>
+                      {stats ? (
+                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Download className="size-3" />
+                            <span>{stats.downloads}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Heart className="size-3" />
+                            <span>{stats.favorites}</span>
+                          </div>
+                          <StarRating
+                            averageRating={stats.averageRating}
+                            userRating={stats.userRating}
+                            ratingCount={stats.ratingCount}
+                            size={12}
+                          />
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </CardContent>

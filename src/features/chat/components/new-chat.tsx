@@ -9,6 +9,7 @@ import { MultimodalInput } from './multimodal-input';
 
 export function NewChat() {
     const [headerOpacity, setHeaderOpacity] = useState(0);
+    const [squares, setSquares] = useState<Array<[number, number]>>([]);
     const sidebarOpen = useSidebarOpenState();
 
     useEffect(() => {
@@ -24,17 +25,49 @@ export function NewChat() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Generate randomized squares for the grid pattern based on viewport size
+    useEffect(() => {
+        const CELL_SIZE = 40; // keep in sync with GridPattern props
+        const DENSITY = 0.05; // ~5% of cells filled
+
+        const generateSquares = () => {
+            const cols = Math.ceil(window.innerWidth / CELL_SIZE);
+            const rows = Math.ceil(window.innerHeight / CELL_SIZE);
+            const total = cols * rows;
+
+            // Cap the number of squares for performance on very large screens
+            const targetCount = Math.min(Math.max(Math.floor(total * DENSITY), 16), 120);
+
+            const picked = new Set<string>();
+            while (picked.size < targetCount) {
+                const x = Math.floor(Math.random() * cols);
+                const y = Math.floor(Math.random() * rows);
+                picked.add(`${x},${y}`);
+            }
+            const coords = Array.from(picked).map((s) => {
+                const [x, y] = s.split(',').map((n) => Number(n));
+                return [x, y] as [number, number];
+            });
+            setSquares(coords);
+        };
+
+        generateSquares();
+        window.addEventListener('resize', generateSquares);
+        return () => window.removeEventListener('resize', generateSquares);
+    }, []);
+
     return (
         <div className="flex flex-col relative min-w-0 min-h-screen bg-background  hide-scrollbar">
             {/* Grid Pattern Background */}
             <GridPattern
                 width={40}
                 height={40}
-                x={-1}
-                y={-1}
-                strokeDasharray={"4 2"}
+                strokeDasharray={"2 4"}
+                squares={squares}
                 className={cn(
-                    "[mask-image:linear-gradient(to_bottom,white,transparent,transparent)] "
+                    "[mask-image:linear-gradient(to_bottom,white,transparent,transparent)]",
+                    "dark:[mask-image:linear-gradient(to_bottom,black,transparent,transparent)]",
+                    "fill-muted/20"
                 )}
             />
 
