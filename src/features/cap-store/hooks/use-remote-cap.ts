@@ -54,7 +54,7 @@ export function useRemoteCap() {
 
       try {
         const response = await capKit.queryByName(
-          queryString,
+          queryString === '' ? undefined : queryString,
           {
             tags: tagsArray,
             page: pageNum,
@@ -91,13 +91,8 @@ export function useRemoteCap() {
         // Check if we have more data
         const totalItems = response.data?.items?.length || 0;
         setHasMoreData(totalItems === sizeNum);
-        if (append) {
-          setRemoteCaps([...remoteCaps, ...newRemoteCaps]);
-          setCurrentPage(pageNum);
-        } else {
-          setRemoteCaps(newRemoteCaps);
-          setCurrentPage(pageNum);
-        }
+        setRemoteCaps(newRemoteCaps);
+        setCurrentPage(pageNum);
 
         setIsFetching(false);
         setIsLoadingMore(false);

@@ -183,7 +183,9 @@ export const CapStateStore = create<CapStoreState>(
 
       // Remote cap management
       setRemoteCaps: (caps: RemoteCap[]) => {
-        set({ remoteCaps: caps });
+        set((state) => ({
+          remoteCaps: [...state.remoteCaps, ...caps]
+        }));
       },
 
       setIsFetching: (fetching: boolean) => {
