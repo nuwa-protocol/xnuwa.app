@@ -34,9 +34,8 @@ export const useSubmitCap = () => {
           throw new Error('Failed to initialize CapKit');
         }
 
-        // Register the capability using CapKit (TODO: need to upgrade cap kit)
-        // const cid = await capKit.registerCap(capData);
-        const cid = '';
+        // Register the capability using CapKit
+        const cid = await capKit.registerCap(capData);
 
         return {
           success: true,
@@ -83,8 +82,8 @@ export const useSubmitCap = () => {
         }));
 
         try {
-          // Register the capability using CapKit (TODO: need to upgrade cap kit)
-          // await capKit.registerCap(cap.capData);
+          // Register the capability using CapKit
+          await capKit.registerCap(cap.capData);
           setBulkProgress((prev) => ({
             ...prev,
             completed: prev.completed + 1,

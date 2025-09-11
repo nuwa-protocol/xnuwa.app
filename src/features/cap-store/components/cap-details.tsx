@@ -28,7 +28,7 @@ import {
 import { useCapKit } from '@/shared/hooks/use-capkit';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import { useCapStoreContext } from '../context';
+import { useCapStore } from '../stores';
 import { CapAvatar } from './cap-avatar';
 import { StarRating } from './star-rating';
 
@@ -37,11 +37,10 @@ export function CapDetails() {
   const { capKit } = useCapKit();
   const [copyToClipboard, isCopied] = useCopyToClipboard();
   const { setCurrentCap } = CurrentCapStore();
-  const { selectedCap: cap } = useCapStoreContext();
+  const { selectedCap: cap } = useCapStore();
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingFavorite, setIsFetchingFavorite] = useState(true);
   const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
-
 
   // Fetch favorite status when component mounts or cap changes
   useEffect(() => {

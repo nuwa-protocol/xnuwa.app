@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Input } from '@/shared/components/ui';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -39,13 +40,12 @@ import {
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
 import { predefinedTags } from '@/shared/constants/cap';
 import { useDebounceValue, useLanguage } from '@/shared/hooks';
-import { useCapStoreContext } from '../context';
 import { useCapStore } from '../stores';
 import type { CapStoreSection } from '../types';
 
 export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
   const { t } = useLanguage();
-  const { activeSection, setActiveSection } = useCapStoreContext();
+  const { activeSection, setActiveSection } = useCapStore();
   const [searchValue, setSearchValue] = useState('');
   const [debouncedSearchValue, setDebouncedSearchValue] = useDebounceValue(
     '',
@@ -56,6 +56,18 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
   >('downloads');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const { fetchCaps } = useCapStore();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (pathname === '/chat') {
+      setActiveSection({
+        id: 'home',
+        label: 'Home',
+        type: 'section',
+      });
+    }
+  }, [pathname]);
 
   const tagSections: CapStoreSection[] = predefinedTags.map((tag) => ({
     id: tag.toLowerCase().replace(/\s+/g, '-'),
@@ -139,6 +151,8 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
     setDebouncedSearchValue('');
   };
 
+
+
   // handle debounced search change
   const handleDebouncedSearchChange = (value: string) => {
     const searchParams: {
@@ -182,6 +196,9 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
     } else if (section.id === 'all') {
       fetchCaps(searchParams);
     }
+    if (pathname === '/chat') {
+      navigate('/explore');
+    }
   };
 
   // handle sort change
@@ -209,7 +226,6 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
 
   return (
     <header className="sticky top-0 z-10" style={style}>
-
       <div className="relative bg-background/95 backdrop-blur-xl border border-border/50 rounded-t rounded-lg shadow-lg shadow-black/5 supports-[backdrop-filter]:bg-background/80 px-4 py-2 w-full">
         <TooltipProvider>
           <div className="flex items-center gap-8 max-w-7xl mx-auto px-4">
@@ -335,8 +351,7 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                               section.id,
                               section.type,
                             );
-                            const isSelected =
-                              activeSection.id === section.id;
+                            const isSelected = activeSection.id === section.id;
 
                             return (
                               <button
@@ -405,58 +420,58 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
 
             {/* Single Sort Dropdown - Right Side */}
             <div className="flex items-center flex-shrink-0 ml-auto">
-              {activeSection.id !== 'favorites' && activeSection.id !== 'home' && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 px-3 text-sm items-center justify-center font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                    >
-                      {(() => {
-                        const option = sortOptions.find(
-                          (opt) => opt.value === sortBy,
-                        );
-                        const IconComponent = option?.icon || ArrowUpDown;
+              {activeSection.id !== 'favorites' &&
+                activeSection.id !== 'home' && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-3 text-sm items-center justify-center font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                      >
+                        {(() => {
+                          const option = sortOptions.find(
+                            (opt) => opt.value === sortBy,
+                          );
+                          const IconComponent = option?.icon || ArrowUpDown;
+                          return (
+                            <>
+                              {option?.label}
+                              <ArrowDownWideNarrow className="size-4" />
+                            </>
+                          );
+                        })()}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      {sortOptions.map((option) => {
+                        const IconComponent = option.icon;
                         return (
-                          <>
-                            {option?.label}
-                            <ArrowDownWideNarrow className="size-4" />
-                          </>
-                        );
-                      })()}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    {sortOptions.map((option) => {
-                      const IconComponent = option.icon;
-                      return (
-                        <DropdownMenuItem
-                          key={`${option.value}-desc`}
-                          onClick={() => {
-                            handleSortChange(option.value);
-                            if (sortOrder !== 'desc') {
-                              setSortOrder('desc');
-                            }
-                          }}
-                          className={`
+                          <DropdownMenuItem
+                            key={`${option.value}-desc`}
+                            onClick={() => {
+                              handleSortChange(option.value);
+                              if (sortOrder !== 'desc') {
+                                setSortOrder('desc');
+                              }
+                            }}
+                            className={`
                              flex items-center gap-2 cursor-pointer
                              ${sortBy === option.value && sortOrder === 'desc' ? 'bg-accent text-accent-foreground' : ''}
                            `}
-                        >
-                          <IconComponent className="size-4" />
-                          <span className="text-sm">{option.label}</span>
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+                          >
+                            <IconComponent className="size-4" />
+                            <span className="text-sm">{option.label}</span>
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
             </div>
           </div>
         </TooltipProvider>
       </div>
-
     </header>
   );
 }

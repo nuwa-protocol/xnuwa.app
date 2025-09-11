@@ -2,7 +2,6 @@ import { Loader2, Package } from 'lucide-react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observer';
-import { useCapStoreContext } from '../context';
 import { useCapStore } from '../stores';
 import { CapCard } from './cap-card';
 import { CapDetails } from './cap-details';
@@ -12,7 +11,7 @@ import { CapStoreHomeContent } from './content-home';
 
 export function CapStoreContent() {
   const { t } = useLanguage();
-  const { activeSection, selectedCap } = useCapStoreContext();
+  const { activeSection, selectedCap } = useCapStore();
   const {
     remoteCaps: caps,
     isFetching,
@@ -70,12 +69,14 @@ export function CapStoreContent() {
   }
 
   if (caps.length === 0) {
-    return <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
-      <Package className="size-12 text-muted-foreground mb-4" />
-      <h3 className="text-lg font-medium mb-2 text-muted-foreground">
-        No AI Caps Found
-      </h3>
-    </div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
+        <Package className="size-12 text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2 text-muted-foreground">
+          No AI Caps Found
+        </h3>
+      </div>
+    );
   }
 
   return (

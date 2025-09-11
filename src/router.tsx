@@ -2,13 +2,13 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import MainLayout from './layout/main-layout';
 import RootLayout from './layout/root-layout';
 import CallbackPage from './pages/callback';
+import CapStorePage from './pages/cap-store';
 import CapStudioPage from './pages/cap-studio';
 import CapStudioBatchCreatePage from './pages/cap-studio-batch-create';
 import CapStudioCreatePage from './pages/cap-studio-create';
 import CapStudioEditPage from './pages/cap-studio-edit';
 import CapStudioMcpPage from './pages/cap-studio-mcp';
 import CapStudioSubmitPage from './pages/cap-studio-submit';
-import CapStorePage from './pages/cap-store';
 import ChatPage from './pages/chat';
 import ErrorPage from './pages/error';
 import LoginPage from './pages/login';
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
           { path: 'chat', element: <ChatPage /> },
           { path: 'wallet', element: <WalletPage /> },
           { path: 'settings', element: <SettingsPage /> },
-          { path: 'cap-store', element: <CapStorePage /> },
+          { path: 'explore', element: <CapStorePage /> },
           { path: 'cap-studio', element: <CapStudioPage /> },
           { path: 'cap-studio/create', element: <CapStudioCreatePage /> },
           {

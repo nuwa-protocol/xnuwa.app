@@ -129,7 +129,7 @@ export function AppSidebarContent() {
             <SidebarButton
               text={'Explore'}
               icon={SparklesIcon}
-              href="/cap-store"
+              href="/explore"
               variant="secondary"
             />
 

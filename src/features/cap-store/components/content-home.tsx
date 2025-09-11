@@ -1,8 +1,7 @@
 import { ChevronRight, Package } from 'lucide-react';
-import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
-import { useCapStoreContext } from '../context';
 import type { UseRemoteCapParams } from '../stores';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
@@ -21,8 +20,13 @@ const HomeSection = ({
   isLoading: boolean;
 }) => {
   const { t } = useLanguage();
-  const { setActiveSection } = useCapStoreContext();
+  const { setActiveSection } = useCapStore();
   const { fetchCaps } = useCapStore();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+
+
   const handleViewMore = (sortBy: UseRemoteCapParams['sortBy']) => {
     // Set the section to 'all' and apply the sortBy parameter
     setActiveSection({
@@ -38,6 +42,10 @@ const HomeSection = ({
       page: 0,
       size: 45,
     });
+
+    if (pathname === '/chat') {
+      navigate('/explore');
+    }
   };
 
   return (
@@ -81,17 +89,17 @@ export function CapStoreHomeContent() {
   const { t } = useLanguage();
   const { homeData, isLoadingHome, homeError, fetchHome } = useCapStore();
 
-  useEffect(() => {
-    // Fetch home data on mount if not already loaded
-    if (
-      homeData.topRated.length === 0 &&
-      homeData.trending.length === 0 &&
-      homeData.latest.length === 0 &&
-      !isLoadingHome
-    ) {
-      fetchHome();
-    }
-  }, [homeData, isLoadingHome, fetchHome]);
+  // // Fetch home data on mount if not already loaded
+  // useEffect(() => {
+  //   if (
+  //     homeData.topRated.length === 0 &&
+  //     homeData.trending.length === 0 &&
+  //     homeData.latest.length === 0 &&
+  //     !isLoadingHome
+  //   ) {
+  //     fetchHome();
+  //   }
+  // }, [homeData, isLoadingHome, fetchHome]);
 
   if (homeError) {
     return (
