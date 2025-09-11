@@ -229,29 +229,29 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
     },
 
     fetchHome: async (): Promise<HomeData | null> => {
-      const capKit = await capKitService.getCapKit();
-      if (!capKit) {
-        return null;
-      }
+      const { fetchCaps } = get();
 
       set({ isLoadingHome: true, homeError: null });
 
       try {
         const [topRatedResponse, trendingResponse, latestResponse] =
           await Promise.all([
-            capKit.queryByName('', {
+            fetchCaps({
+              searchQuery: '',
               sortBy: 'average_rating',
               sortOrder: 'desc',
               page: 0,
               size: 6,
             }),
-            capKit.queryByName('', {
+            fetchCaps({
+              searchQuery: '',
               sortBy: 'downloads',
               sortOrder: 'desc',
               page: 0,
               size: 6,
             }),
-            capKit.queryByName('', {
+            fetchCaps({
+              searchQuery: '',
               sortBy: 'updated_at',
               sortOrder: 'desc',
               page: 0,

@@ -1,4 +1,4 @@
-import type { CapID, CapMetadata, CapStats } from '@/shared/types/cap';
+import type { CapID, CapMetadata, CapStats } from '@/shared/types';
 
 export type RemoteCap = CapID & {
   cid: string;
