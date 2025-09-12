@@ -1,6 +1,6 @@
 import { ChevronDown, EditIcon, FilePlusIcon } from 'lucide-react';
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
   useSidebar,
 } from '@/shared/components/ui';
+import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { cn } from '@/shared/utils';
 import { useAppSidebar } from './app-sidebar';
@@ -18,11 +19,17 @@ export function SidebarNewButton() {
   const { setOpenMobile } = useSidebar();
   const floatingContext = useAppSidebar();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isDevMode = useDevMode();
+  const { pathname } = useLocation();
 
   const handleNewChat = React.useCallback(() => {
     setOpenMobile(false);
-    navigate('/chat');
-  }, [navigate, setOpenMobile]);
+    if (pathname.includes('artifacts')) {
+      navigate('/artifacts');
+    } else {
+      navigate('/chat');
+    }
+  }, [pathname, navigate, setOpenMobile]);
 
   // Keyboard shortcut: Cmd/Ctrl + K
   React.useEffect(() => {
@@ -98,51 +105,54 @@ export function SidebarNewButton() {
       </button>
 
       {/* Dropdown trigger (right segment) */}
-      <DropdownMenu
-        modal={true}
-        open={menuOpen}
-        onOpenChange={(open) => {
-          setMenuOpen(open);
-          floatingContext.stayHovering(open);
-          if (!open) {
-            floatingContext.closeSidebar();
-            // Remove focus from the trigger button to eliminate the ring
-            setTimeout(() => {
-              (document.activeElement as HTMLElement)?.blur();
-            }, 0);
-          }
-        }}
-      >
-        <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            className={cn(
-              'inline-flex items-center justify-center h-full px-2',
-              'bg-transparent shadow-none border-0 rounded-none',
-              'transition-colors duration-200 ease-out',
-            )}
-            aria-label="Open new options"
-          >
-            <ChevronDown size={16} />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          sideOffset={4}
-          style={{ width: splitWidth || undefined }}
+
+      {isDevMode && (
+        <DropdownMenu
+          modal={true}
+          open={menuOpen}
+          onOpenChange={(open) => {
+            setMenuOpen(open);
+            floatingContext.stayHovering(open);
+            if (!open) {
+              floatingContext.closeSidebar();
+              // Remove focus from the trigger button to eliminate the ring
+              setTimeout(() => {
+                (document.activeElement as HTMLElement)?.blur();
+              }, 0);
+            }
+          }}
         >
-          <DropdownMenuItem
-            className="hover:cursor-pointer"
-            onClick={() => {
-              setOpenMobile(false);
-              navigate('/artifacts');
-            }}
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                'inline-flex items-center justify-center h-full px-2',
+                'bg-transparent shadow-none border-0 rounded-none',
+                'transition-colors duration-200 ease-out',
+              )}
+              aria-label="Open new options"
+            >
+              <ChevronDown size={16} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            sideOffset={4}
+            style={{ width: splitWidth || undefined }}
           >
-            <FilePlusIcon className="h-4 w-4" />
-            New Artifact
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <DropdownMenuItem
+              className="hover:cursor-pointer"
+              onClick={() => {
+                setOpenMobile(false);
+                navigate('/artifacts');
+              }}
+            >
+              <FilePlusIcon className="h-4 w-4" />
+              New Artifact
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 }
