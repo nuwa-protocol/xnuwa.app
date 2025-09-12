@@ -115,12 +115,12 @@ function PureMultimodalInput({ className }: { className?: string }) {
       >
         {/* Selections */}
         {selections && selections.length > 0 && (
-          <div className="flex flex-row gap-2 p-2 mx-2">
+          <div className="flex flex-row flex-wrap gap-2 p-2 mx-2">
             {selections?.map((selection) => (
               <Badge
                 key={selection.label}
                 variant="default"
-                className="group cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors duration-200 flex items-center gap-1"
+                className="group cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors duration-200 flex items-center gap-1 shrink-0"
                 onClick={() => removeSelectionFromChatSession(chat.id, selection)}
               >
                 <TextSelect size={12} className="group-hover:hidden" />
