@@ -6,7 +6,7 @@ import {
   TrashIcon,
 } from 'lucide-react';
 import { memo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RenameDialog } from '@/features/chat/components/rename-dialog';
 import type { ChatSession } from '@/features/chat/types';
 import {
@@ -38,6 +38,7 @@ const PureChatItem = ({
   setOpenMobile: (open: boolean) => void;
 }) => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useLanguage();
   const floatingContext = useAppSidebar();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,7 +46,9 @@ const PureChatItem = ({
 
   const handleChatSelect = () => {
     setOpenMobile(false);
-    navigate(`/chat?cid=${chat.id}`);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('cid', chat.id);
+    setSearchParams(newParams);
   };
 
   const handleRename = () => {

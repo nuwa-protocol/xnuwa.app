@@ -1,30 +1,22 @@
 import { Settings2, SparklesIcon, WalletIcon, Wrench } from 'lucide-react';
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
 import { WalletStore } from '@/features/wallet/stores';
 import { Logo } from '@/shared/components';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  useSidebar,
-} from '@/shared/components/ui';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu } from '@/shared/components/ui';
 import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { cn } from '@/shared/utils';
+import { useSidebarStore } from '../stores';
 import { useAppSidebar } from './app-sidebar';
 import { SidebarButton } from './sidebar-button';
 import { SidebarHistory } from './sidebar-history';
+import { SidebarNewButton } from './sidebar-new-button';
 import { SidebarToggle } from './sidebar-toggle';
 
 export function AppSidebarContent() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { setOpenMobile } = useSidebar();
-  const { mode: sidebarMode } = useSidebarFloating();
+  const { mode: sidebarMode } = useSidebarStore();
   const floatingContext = useAppSidebar();
   const sidebarVariant = sidebarMode === 'floating' ? 'floating' : 'sidebar';
   const isDevMode = useDevMode();
@@ -37,36 +29,7 @@ export function AppSidebarContent() {
       ? 'Failed to load balance'
       : `$${usdAmount} USD`;
 
-  const handleNewChat = () => {
-    setOpenMobile(false);
-    navigate('/chat');
-  };
-
-  // Add keyboard shortcut for new chat using manual event listener
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Try Cmd+K/Ctrl+K first
-      if (
-        event.key === 'k' &&
-        (event.metaKey || event.ctrlKey) &&
-        !event.shiftKey &&
-        !event.altKey
-      ) {
-        event.preventDefault();
-        handleNewChat();
-        return;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleNewChat]);
-
-  // Get the appropriate keyboard shortcut display based on platform
-  const getShortcutDisplay = () => {
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    return isMac ? '⌘K' : 'Ctrl+K';
-  };
+  // New Chat keyboard shortcut handled inside SidebarNewButton
 
   const handleMouseEnter = () => {
     if (sidebarMode === 'floating' && floatingContext) {
@@ -79,6 +42,8 @@ export function AppSidebarContent() {
       floatingContext.setIsHovering(false);
     }
   };
+
+  // Dropdown sizing handled inside SidebarNewButton
 
   return (
     <Sidebar
@@ -107,14 +72,8 @@ export function AppSidebarContent() {
               <SidebarToggle />
             </div>
 
-            {/* New Chat Button */}
-            <SidebarButton
-              text={t('nav.sidebar.new')}
-              href="/chat"
-              variant="primary"
-              className="my-2"
-              shortcut={getShortcutDisplay()}
-            />
+            {/* New Chat Split Button with Dropdown */}
+            <SidebarNewButton />
 
             {/* Wallet Button */}
             <SidebarButton
