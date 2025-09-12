@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { ChatInstanceStore, ChatSessionsStore } from '../stores';
@@ -13,6 +13,7 @@ export function useChatInstance(chatId: string) {
   const { getInstance } = ChatInstanceStore();
   const { updateTitle } = useUpdateChatTitle();
   const { currentCap } = CurrentCapStore();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Add current cap to chat session
   const addCurrentCapsToChat = useCallback(
@@ -97,12 +98,16 @@ export function useChatInstance(chatId: string) {
         {
           action: {
             label: 'View Chat',
-            onClick: () => navigate(`/chat?cid=${chatId}`),
+            onClick: () => {
+              const newSearchParams = new URLSearchParams(searchParams);
+              newSearchParams.set('cid', chatId);
+              setSearchParams(newSearchParams);
+            },
           },
         },
       );
     }
-  }, [chatId, getChatSession, navigate]);
+  }, [chatId, getChatSession, searchParams, setSearchParams]);
 
   // chat init config
   const useChatInitConfig = {
