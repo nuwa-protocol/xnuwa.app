@@ -4,14 +4,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Locale } from '@/shared/locales';
-import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { createLocalStoragePersistConfig } from '@/shared/storage';
-
-// get current DID
-const getCurrentDID = async () => {
-  const { getDid } = await NuwaIdentityKit();
-  return await getDid();
-};
 
 // ================= Interfaces ================= //
 

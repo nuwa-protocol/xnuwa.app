@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { useSettings } from '@/features/settings/hooks/use-settings';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { useStorage } from '@/shared/hooks/use-storage';
+import { SettingsStateStore } from '../../stores';
 import { DangerActionCard, SwitchCard } from '../cards';
 
 export function SystemSection() {
   const { t } = useLanguage();
   const [isClearing, setIsClearing] = useState(false);
   const { clearAllStorage } = useStorage();
-  const { settings, setSetting } = useSettings();
+  const { settings, setSetting } = SettingsStateStore();
   const isDevMode = settings.devMode;
 
   // Clear all storage logic

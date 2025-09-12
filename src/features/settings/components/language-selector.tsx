@@ -1,9 +1,10 @@
-import { useSettings } from '@/features/settings/hooks/use-settings';
+
 import { Tabs, TabsList, TabsTrigger } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
+import { SettingsStateStore } from '../stores';
 
 export function LanguageSelector() {
-  const { settings, setSetting } = useSettings();
+  const { settings, setSetting } = SettingsStateStore();
   const { t } = useLanguage();
 
   return (
