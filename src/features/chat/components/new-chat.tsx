@@ -1,5 +1,13 @@
-import { useEffect, useState } from 'react';
-import { CapStoreHomeContent } from '@/features/cap-store/components/content-home';
+import { lazy, Suspense, useEffect, useState } from 'react';
+
+// Lazy-load the Cap Store home content to avoid blocking route transition
+const LazyCapStoreHomeContent = lazy(() =>
+    import('@/features/cap-store/components/content-home').then((m) => ({
+        default: m.CapStoreHomeContent,
+    })),
+);
+
+import { CapStoreLoading } from '@/features/cap-store/components/cap-store-loading';
 import { CapStoreHeader } from '@/features/cap-store/components/header';
 import { useSidebarOpenState } from '@/features/sidebar/components/app-sidebar';
 import { GridPattern } from '@/shared/components/ui/shadcn-io/grid-pattern';
@@ -11,6 +19,7 @@ export function NewChat() {
     const [headerOpacity, setHeaderOpacity] = useState(0);
     const [squares, setSquares] = useState<Array<[number, number]>>([]);
     const sidebarOpen = useSidebarOpenState();
+    const [showHome, setShowHome] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -36,7 +45,10 @@ export function NewChat() {
             const total = cols * rows;
 
             // Cap the number of squares for performance on very large screens
-            const targetCount = Math.min(Math.max(Math.floor(total * DENSITY), 16), 120);
+            const targetCount = Math.min(
+                Math.max(Math.floor(total * DENSITY), 16),
+                120,
+            );
 
             const picked = new Set<string>();
             while (picked.size < targetCount) {
@@ -56,27 +68,44 @@ export function NewChat() {
         return () => window.removeEventListener('resize', generateSquares);
     }, []);
 
+    // Defer loading of heavy home content until idle for snappier navigation
+    useEffect(() => {
+        const schedule = (cb: () => void) => {
+            // Prefer requestIdleCallback if available
+            if (typeof (window as any).requestIdleCallback === 'function') {
+                const id = (window as any).requestIdleCallback(cb, { timeout: 1200 });
+                return () => (window as any).cancelIdleCallback?.(id);
+            }
+            const id = window.setTimeout(cb, 0);
+            return () => window.clearTimeout(id);
+        };
+        const cancel = schedule(() => setShowHome(true));
+        return cancel;
+    }, []);
+
     return (
         <div className="flex flex-col relative min-w-0 min-h-screen bg-background  hide-scrollbar">
             {/* Grid Pattern Background */}
             <GridPattern
                 width={40}
                 height={40}
-                strokeDasharray={"2 4"}
+                strokeDasharray={'2 4'}
                 squares={squares}
                 className={cn(
-                    "[mask-image:linear-gradient(to_bottom,white,transparent,transparent)]",
-                    "dark:[mask-image:linear-gradient(to_bottom,black,transparent,transparent)]",
-                    "fill-muted/80 dark:fill-muted/20",
-                    "z-0"
+                    '[mask-image:linear-gradient(to_bottom,white,transparent,transparent)]',
+                    'dark:[mask-image:linear-gradient(to_bottom,black,transparent,transparent)]',
+                    'fill-muted/80 dark:fill-muted/20',
+                    'z-0',
                 )}
             />
 
             {/* Sticky Header - appears on scroll and respects sidebar */}
-            <CapStoreHeader style={{
-                opacity: headerOpacity,
-                zIndex: 20,
-            }} />
+            <CapStoreHeader
+                style={{
+                    opacity: headerOpacity,
+                    zIndex: 20,
+                }}
+            />
 
             {/* Main Content */}
             <div className="flex flex-col w-full bg-background">
@@ -89,9 +118,23 @@ export function NewChat() {
                     </CenteredWelcome>
                 </div>
 
-                {/* Cap Store Content Section */}
+                {/* Cap Store Content Section (lazy) */}
                 <div className="flex-1 bg-background max-w-7xl mx-auto min-h-screen">
-                    <CapStoreHomeContent />
+                    {showHome ? (
+                        <Suspense
+                            fallback={
+                                <div className="p-6">
+                                    <CapStoreLoading count={12} />
+                                </div>
+                            }
+                        >
+                            <LazyCapStoreHomeContent />
+                        </Suspense>
+                    ) : (
+                        <div className="p-6">
+                            <CapStoreLoading count={9} />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
