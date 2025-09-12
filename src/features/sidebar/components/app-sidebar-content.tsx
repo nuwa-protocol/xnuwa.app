@@ -1,8 +1,20 @@
-import { Settings2, SparklesIcon, WalletIcon, Wrench } from 'lucide-react';
+import {
+  Loader2,
+  Settings2,
+  SparklesIcon,
+  WalletIcon,
+  Wrench,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WalletStore } from '@/features/wallet/stores';
 import { Logo } from '@/shared/components';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu } from '@/shared/components/ui';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+} from '@/shared/components/ui';
 import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { cn } from '@/shared/utils';
@@ -24,7 +36,7 @@ export function AppSidebarContent() {
   const { usdAmount, balanceLoading, balanceError } = WalletStore();
 
   const usdValue = balanceLoading
-    ? 'loading...'
+    ? `$${usdAmount} ${<Loader2 className="size-2 animate-spin" />}`
     : balanceError
       ? 'Failed to load balance'
       : `$${usdAmount} USD`;
