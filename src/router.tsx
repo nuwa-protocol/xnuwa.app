@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import MainLayout from './layout/main-layout';
 import RootLayout from './layout/root-layout';
+import ArtifactsPage from './pages/artifacts';
 import CallbackPage from './pages/callback';
 import CapStudioPage from './pages/cap-studio';
 import CapStudioBatchCreatePage from './pages/cap-studio-batch-create';
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/chat" replace /> },
           { path: 'chat', element: <ChatPage /> },
+          { path: 'artifacts', element: <ArtifactsPage /> },
           { path: 'wallet', element: <WalletPage /> },
           { path: 'settings', element: <SettingsPage /> },
           { path: 'explore/*', element: <ExplorePage /> },

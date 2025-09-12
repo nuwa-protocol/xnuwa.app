@@ -1,5 +1,10 @@
-import { Artifacts } from "@/features/artifacts/components";
+import { ArtifactMain } from "@/features/artifacts/components";
+import { ChatProvider } from "@/features/chat/contexts/chat-context";
 
 export default function ArtifactsPage() {
-    return <Artifacts />;
+    return (
+        <ChatProvider>
+            <ArtifactMain />
+        </ChatProvider>
+    )
 }
