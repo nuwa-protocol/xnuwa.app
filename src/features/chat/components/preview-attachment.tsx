@@ -82,7 +82,7 @@ export const PreviewAttachment = ({
     <>
       <div
         data-testid="input-attachment-preview"
-        className="group relative w-20 h-20 rounded-lg overflow-hidden bg-muted border hover:border-primary/20 transition-colors"
+        className="group relative w-20 h-20 rounded-lg overflow-hidden bg-muted border hover:scale-105 hover:shadow-lg transition-all"
         onClick={() => isImage && setIsPreviewOpen(true)}
         style={{ cursor: isImage ? 'pointer' : 'default' }}
       >
