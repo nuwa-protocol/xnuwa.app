@@ -75,7 +75,7 @@ export function NewChat() {
             {/* Sticky Header - appears on scroll and respects sidebar */}
             <CapStoreHeader style={{
                 opacity: headerOpacity,
-                zIndex: 100,
+                zIndex: 20,
             }} />
             {/* Main Content */}
             <div className="flex flex-col w-full bg-background">
