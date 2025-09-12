@@ -44,7 +44,7 @@ const ContentWrapper = memo(
           isFloating
             ? 'w-full ml-0'
             : // Full width in floating mode
-              '', // Normal layout in pinned mode
+            '', // Normal layout in pinned mode
         )}
       >
         <div
