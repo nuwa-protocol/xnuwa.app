@@ -7,11 +7,6 @@ import { Artifact } from './artifact';
 export const ArtifactMain = () => {
     const { setMode } = useSidebarStore();
     const srcUrl = 'http://localhost:3000/note';
-    const handleTitleChange = (next: string) => {
-        // Mock handler: log the new title for now
-        // eslint-disable-next-line no-console
-        console.log('Artifact title changed to:', next);
-    };
 
     useEffect(() => {
         setMode('floating');
@@ -20,12 +15,12 @@ export const ArtifactMain = () => {
     return (
         <div className="flex w-full h-full">
             <ResizablePanelGroup direction="horizontal">
-                <ResizablePanel defaultSize={30} minSize={20}>
+                <ResizablePanel defaultSize={40} minSize={20}>
                     <ChatContent isReadonly={false} />
                 </ResizablePanel>
                 <ResizableHandle withHandle className='h-4 my-auto' />
-                <ResizablePanel defaultSize={70} minSize={50} className='mr-2 my-3 border border-border rounded-xl'>
-                    <Artifact artifactUrl={srcUrl} title="Note" onTitleChange={handleTitleChange} />
+                <ResizablePanel defaultSize={60} minSize={50} className='mt-3 border border-border rounded-tl-xl'>
+                    <Artifact artifactUrl={srcUrl} title="Note" />
                 </ResizablePanel>
             </ResizablePanelGroup>
         </div>
