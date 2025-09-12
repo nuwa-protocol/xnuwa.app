@@ -110,6 +110,20 @@ export const CapUIRenderer = ({
 }: CapUIRendererProps) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
+  // Use refs to always have the latest callbacks
+  const onSendPromptRef = useRef(onSendPrompt);
+  const onAddSelectionRef = useRef(onAddSelection);
+  const onSaveStateRef = useRef(onSaveState);
+  const onGetStateRef = useRef(onGetState);
+
+  // Update refs when props change
+  useEffect(() => {
+    onSendPromptRef.current = onSendPrompt;
+    onAddSelectionRef.current = onAddSelection;
+    onSaveStateRef.current = onSaveState;
+    onGetStateRef.current = onGetState;
+  }, [onSendPrompt, onAddSelection, onSaveState, onGetState]);
+
   const [height, setHeight] = useState<number>(100); // Default height
   const [isLoading, setIsLoading] = useState(true);
   const [validationResult, setValidationResult] = useState<URLValidationResult | null>(null);
@@ -117,19 +131,19 @@ export const CapUIRenderer = ({
 
   const nuwaClientMethods = {
     sendPrompt: (prompt: string) => {
-      onSendPrompt(prompt);
+      onSendPromptRef.current(prompt);
     },
 
     addSelection: (label: string, message: string) => {
-      onAddSelection?.(label, message);
+      onAddSelectionRef.current?.(label, message);
     },
 
     saveState: (state: any) => {
-      onSaveState?.(state);
+      onSaveStateRef.current?.(state);
     },
 
     getState: () => {
-      onGetState?.();
+      onGetStateRef.current?.();
     },
   };
 
@@ -203,7 +217,7 @@ export const CapUIRenderer = ({
           : new Error(`Failed to connect to ${title ?? srcUrl} over Penpal`);
       onPenpalConnectionError?.(err);
     }
-  }, [title, srcUrl]);
+  }, [title, srcUrl, onPenpalConnected, onPenpalConnectionError]);
 
   const connectToMCP = useCallback(async () => {
     try {

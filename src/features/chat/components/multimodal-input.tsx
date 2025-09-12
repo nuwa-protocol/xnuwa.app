@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { ArrowUpIcon, StopCircleIcon, TextSelect, X } from 'lucide-react';
 import type React from 'react';
 import { memo, useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
@@ -27,8 +27,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
   const { input, setInput, textareaRef, clearInput } = usePersistentInput();
   const { width } = useWindowSize();
   const { currentCap, isInitialized, isError } = CurrentCapStore();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
   const [attachments, setAttachments] = useState<AttachmentData[]>([]);
   const { chatSessions, removeSelectionFromChatSession } = ChatSessionsStore();
   const selections = chatSessions[chat.id]?.selections;

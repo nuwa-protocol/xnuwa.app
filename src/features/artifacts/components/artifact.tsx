@@ -1,4 +1,5 @@
 import { useChat } from '@ai-sdk/react';
+import { useCallback } from 'react';
 import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
 import { useChatContext } from '../../chat/contexts/chat-context';
 import { ChatSessionsStore } from '../../chat/stores/chat-sessions-store';
@@ -17,13 +18,19 @@ export const Artifact = ({
     const { chat } = useChatContext();
     const { sendMessage } = useChat({ chat });
 
-    const handleSendPrompt = (prompt: string) => {
-        sendMessage({ text: prompt });
-    };
+    const handleSendPrompt = useCallback(
+        (prompt: string) => {
+            sendMessage({ text: prompt });
+        },
+        [sendMessage, chat],
+    );
 
-    const handleAddSelection = (label: string, message: string) => {
-        addSelectionToChatSession(chat.id, { label, message });
-    };
+    const handleAddSelection = useCallback(
+        (label: string, message: string) => {
+            addSelectionToChatSession(chat.id, { label, message });
+        },
+        [chat, addSelectionToChatSession],
+    );
 
     return (
         <div className="flex h-full w-full flex-col overflow-hidden">
