@@ -67,13 +67,14 @@ export function NewChat() {
                 className={cn(
                     "[mask-image:linear-gradient(to_bottom,white,transparent,transparent)]",
                     "dark:[mask-image:linear-gradient(to_bottom,black,transparent,transparent)]",
-                    "fill-muted/20"
+                    "fill-muted/80 dark:fill-muted/20",
+                    "z-0"
                 )}
             />
 
             {/* Sticky Header - appears on scroll and respects sidebar */}
             <CapStoreHeader style={{
-                opacity: headerOpacity
+                opacity: headerOpacity,
             }} />
             {/* Main Content */}
             <div className="flex flex-col w-full bg-background">

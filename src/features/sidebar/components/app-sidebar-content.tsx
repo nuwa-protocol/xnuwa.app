@@ -83,11 +83,11 @@ export function AppSidebarContent() {
   return (
     <Sidebar
       className={cn(
-        'group-data-[side=left]:border-r-0',
+        'shadow-lg',
         // Add smooth transition animations
         'transition-all duration-300 ease-in-out',
         // Custom padding for floating mode
-        sidebarMode === 'floating' && '[&>div:last-child]:ml-2',
+        sidebarMode === 'floating' && '[&>div:last-child]:ml-2 shadow-none',
       )}
       variant={sidebarVariant}
       onMouseEnter={handleMouseEnter}

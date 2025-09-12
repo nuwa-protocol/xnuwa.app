@@ -6,7 +6,7 @@ interface CenteredWelcomeProps {
 
 export function CenteredWelcome({ children }: CenteredWelcomeProps) {
   return (
-    <div className="flex flex-col items-center justify-center h-full min-h-0 px-4">
+    <div className="flex flex-col items-center justify-center h-full min-h-0 px-4 z-10">
       <div className="flex flex-col items-center gap-8 w-full max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
