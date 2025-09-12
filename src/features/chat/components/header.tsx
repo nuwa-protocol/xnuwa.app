@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Title } from '@/shared/components/title';
-import { useLanguage } from '@/shared/hooks';
 import { ChatSessionsStore } from '../stores';
 import { RenameDialog } from './rename-dialog';
 
@@ -12,13 +10,9 @@ interface HeaderProps {
 export default function Header({ chatId }: HeaderProps) {
   const { chatSessions, updateSession } = ChatSessionsStore();
   const session = chatSessions[chatId || ''] || null;
-  const { t } = useLanguage();
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const pathname = useLocation().pathname;
-  const isArtifact = pathname.includes('artifacts');
 
-  const title = session?.title || '';
+  const title = session?.title || 'New Chat';
 
   const handleRename = async (newTitle: string) => {
     if (chatId) {
