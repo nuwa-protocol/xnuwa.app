@@ -17,7 +17,7 @@ export function NewChat() {
             const currentScrollY = window.scrollY;
 
             // Header starts appearing after 150px scroll, fully visible at 300px
-            const opacity = Math.min((currentScrollY - 150) / 150, 1);
+            const opacity = Math.min((currentScrollY - 250) / 250, 1);
             setHeaderOpacity(Math.max(opacity, 0));
         };
 
@@ -77,15 +77,14 @@ export function NewChat() {
                 opacity: headerOpacity,
                 zIndex: 20,
             }} />
+
             {/* Main Content */}
             <div className="flex flex-col w-full bg-background">
                 {/* Welcome Section with Input - reduced height */}
                 <div className="min-h-[50vh] flex flex-col justify-end py-8 mb-20">
                     <CenteredWelcome>
-                        <div className="w-full max-w-4xl space-y-6">
-                            <div className="px-4">
-                                <MultimodalInput />
-                            </div>
+                        <div className="w-full max-w-4xl space-y-6 px-4">
+                            <MultimodalInput />
                         </div>
                     </CenteredWelcome>
                 </div>
