@@ -1,5 +1,5 @@
-import { ChatProvider } from '@/features/chat/contexts/chat-context';
 import { Outlet } from 'react-router-dom';
+import { ChatProvider } from '@/features/chat/contexts/chat-context';
 
 export default function ChatLayout() {
   return (

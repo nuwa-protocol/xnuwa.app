@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { generateUUID } from '@/shared/utils';
 import { useChatInstance } from '../hooks';
 import { ChatSessionsStore } from '../stores';
@@ -24,22 +24,34 @@ interface ChatProviderProps {
 }
 
 export function ChatProvider({ children }: ChatProviderProps) {
-  const navigate = useNavigate();
   const { chatSessions } = ChatSessionsStore();
   const newChatIdRef = useRef<string | null>(null);
   const isNavigatingRef = useRef(false);
-  const [chatId, setChatId] = useState<string>(generateUUID());
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Get chat ID from URL
   const urlChatId = searchParams.get('cid');
 
+  // Initialize chat ID - only generate new UUID if there's no URL param and no existing ID
+  const [chatId, setChatId] = useState<string>(() => {
+    if (urlChatId) {
+      return urlChatId;
+    }
+    // Generate a new ID for the session, but keep it stable
+    const newId = generateUUID();
+    newChatIdRef.current = newId;
+    return newId;
+  });
+
   useEffect(() => {
     if (urlChatId) {
       setChatId(urlChatId);
-    } else {
-      setChatId(generateUUID());
+      // Clear the new chat ref if we're navigating to a specific chat
+      if (newChatIdRef.current === urlChatId) {
+        newChatIdRef.current = null;
+      }
     }
+    // Don't generate a new ID when urlChatId is null - keep the existing one
   }, [urlChatId]);
 
   // Handle navigation from new chat to permanent URL when messages exist
@@ -51,15 +63,13 @@ export function ChatProvider({ children }: ChatProviderProps) {
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set('cid', chatId);
         setSearchParams(newSearchParams);
+        // Reset the navigation flag after setting params
+        setTimeout(() => {
+          isNavigatingRef.current = false;
+        }, 100);
       }
     }
-
-    // Clean up new chat ID ref when navigating to specific chat
-    if (urlChatId && newChatIdRef.current === urlChatId) {
-      newChatIdRef.current = null;
-      isNavigatingRef.current = false;
-    }
-  }, [urlChatId, chatId, chatSessions, navigate]);
+  }, [urlChatId, chatId, chatSessions, searchParams, setSearchParams]);
 
   // Get chat instance
   const chat = useChatInstance(chatId);
