@@ -1,4 +1,4 @@
-import { ChevronLeft, Info, Star, Settings } from 'lucide-react';
+import { ChevronLeft, Info, Settings, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -88,19 +88,17 @@ export function CapDetails({ capId }: { capId: string }) {
   const handleRateCap = async (rating: number) => {
     if (!capKit) return;
 
-    try {
-      toast.promise(capKit.rateCap(capId, rating), {
-        loading: 'Submitting your rating...',
-        success: (data) => {
-          return `You rated ${capQueryData.metadata.displayName} ${rating} stars!`;
-        },
-        error: 'Failed to submit your rating. Please try again.',
-      });
-      const queriedCap = await capKit.queryByID({ id: capId });
-      setCapQueryData(mapResultToRemoteCap(queriedCap));
-    } catch (error) {
-      toast.error('Failed to submit your rating. Please try again.');
-    }
+    toast.promise(capKit.rateCap(capId, rating), {
+      loading: 'Submitting your rating...',
+      success: async (data) => {
+        const queriedCap = await capKit.queryByID({ id: capId });
+        setCapQueryData(mapResultToRemoteCap(queriedCap));
+        return `You rated ${capQueryData.metadata.displayName} ${rating} stars!`;
+      },
+      error: () => {
+        return 'Failed to submit your rating. Please try again.';
+      },
+    });
   };
 
   const handleRunCap = async () => {
@@ -137,7 +135,6 @@ export function CapDetails({ capId }: { capId: string }) {
           setIsTogglingFavorite(false);
         },
       });
-
     } else {
       toast.promise(capKit.favorite(capId, 'add'), {
         loading: 'Adding to favorites...',
@@ -236,7 +233,9 @@ export function CapDetails({ capId }: { capId: string }) {
                 </TabsContent>
 
                 <TabsContent value="configuration" className="mt-0">
-                  <CapDetailsConfiguration downloadedCapData={downloadedCapData} />
+                  <CapDetailsConfiguration
+                    downloadedCapData={downloadedCapData}
+                  />
                 </TabsContent>
               </div>
 
