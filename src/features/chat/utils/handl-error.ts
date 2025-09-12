@@ -7,7 +7,7 @@ export enum ChatErrorCode {
 }
 
 // Configuration: Error patterns to ignore (case-insensitive matching) for the client user
-const IGNORED_ERROR_PATTERNS = ['json parsing', 'payeedid'];
+const IGNORED_ERROR_PATTERNS = ['payeedid'];
 
 // Configuration: Error patterns to ignore (case-insensitive matching) for the developer
 const IGNORED_ERROR_PATTERNS_DEVELOPER = ['aborterror'];

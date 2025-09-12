@@ -8,6 +8,7 @@ import {
 } from 'ai';
 import { generateUUID } from '@/shared/utils';
 import { ChatSessionsStore } from '../stores';
+import { handleError } from '../utils/handl-error';
 import { CapResolve } from './cap-resolve';
 import { llmProvider } from './providers';
 
@@ -70,11 +71,17 @@ export const StreamAIResponse = async ({
           });
           hasSendOnResponseDataMark = true;
         },
+        onError: (error: any) => {
+          handleError(error);
+        },
       });
       writer.merge(
         result.toUIMessageStream({
           sendReasoning: true,
           sendSources: true,
+          onError: (error: any) => {
+            return error.toString();
+          },
         }),
       );
       result.finishReason.then((finishReason) => {
