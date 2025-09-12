@@ -20,7 +20,7 @@ export function SidebarNewButton() {
   const floatingContext = useAppSidebar();
   const [menuOpen, setMenuOpen] = useState(false);
   const isDevMode = useDevMode();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
 
   const handleNewChat = React.useCallback(() => {
     setOpenMobile(false);
@@ -30,6 +30,11 @@ export function SidebarNewButton() {
       navigate('/chat');
     }
   }, [pathname, navigate, setOpenMobile]);
+
+  const handleNewArtifact = React.useCallback(() => {
+    setOpenMobile(false);
+    navigate(`/artifacts${search}`);
+  }, [navigate, setOpenMobile]);
 
   // Keyboard shortcut: Cmd/Ctrl + K
   React.useEffect(() => {
@@ -142,10 +147,7 @@ export function SidebarNewButton() {
           >
             <DropdownMenuItem
               className="hover:cursor-pointer"
-              onClick={() => {
-                setOpenMobile(false);
-                navigate('/artifacts');
-              }}
+              onClick={handleNewArtifact}
             >
               <FilePlusIcon className="h-4 w-4" />
               New Artifact
