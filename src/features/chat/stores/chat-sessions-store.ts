@@ -30,10 +30,7 @@ interface ChatSessionsStoreState {
     updates: Partial<Omit<ChatSession, 'id'>>,
   ) => void;
   addSelectionToChatSession: (id: string, selection: ChatSelection) => void;
-  removeSelectionFromChatSession: (
-    id: string,
-    selection: ChatSelection,
-  ) => void;
+  removeSelectionFromChatSession: (id: string, selectionId: string) => void;
   addPaymentCtxIdToChatSession: (id: string, payment: ChatPayment) => void;
   deleteSession: (id: string) => void;
 
@@ -110,8 +107,23 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
         set((state) => {
           const session = state.chatSessions[id];
           if (!session) {
-            //TODO: need to create a new session if not found
-            return state;
+            const newSession = {
+              id: id,
+              title: 'New Chat',
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+              messages: [],
+              payments: [],
+              selections: [selection],
+              caps: [],
+            };
+
+            return {
+              chatSessions: {
+                ...state.chatSessions,
+                [id]: newSession,
+              },
+            };
           }
 
           return {
@@ -126,11 +138,7 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
         });
       },
 
-      // TODO: need to add id for selections in case some selections have the same label and gets deleted
-      removeSelectionFromChatSession: (
-        id: string,
-        selection: ChatSelection,
-      ) => {
+      removeSelectionFromChatSession: (id: string, selectionId: string) => {
         set((state) => {
           const session = state.chatSessions[id];
           if (!session) {
@@ -145,7 +153,7 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
 
           const updatedSession = {
             ...session,
-            selections: selections.filter((s) => s.label !== selection.label),
+            selections: selections.filter((s) => s.id !== selectionId),
           };
 
           return {

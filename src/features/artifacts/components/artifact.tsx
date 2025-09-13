@@ -1,6 +1,7 @@
 import { useChat } from '@ai-sdk/react';
 import { useCallback } from 'react';
 import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
+import { generateUUID } from '@/shared/utils';
 import { useChatContext } from '../../chat/contexts/chat-context';
 import { ChatSessionsStore } from '../../chat/stores/chat-sessions-store';
 import { ArtifactHeader } from './artifact-header';
@@ -27,7 +28,11 @@ export const Artifact = ({
 
     const handleAddSelection = useCallback(
         (label: string, message: string) => {
-            addSelectionToChatSession(chat.id, { label, message });
+            addSelectionToChatSession(chat.id, {
+                id: generateUUID(),
+                label,
+                message,
+            });
         },
         [chat, addSelectionToChatSession],
     );

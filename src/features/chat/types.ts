@@ -11,6 +11,7 @@ export interface ChatPayment {
 }
 
 export interface ChatSelection {
+  id: string;
   label: string;
   message: string;
 }

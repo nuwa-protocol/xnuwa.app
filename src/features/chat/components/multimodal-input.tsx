@@ -119,7 +119,9 @@ function PureMultimodalInput({ className }: { className?: string }) {
                 key={selection.label}
                 variant="default"
                 className="group cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors duration-200 flex items-center gap-1 shrink-0"
-                onClick={() => removeSelectionFromChatSession(chat.id, selection)}
+                onClick={() =>
+                  removeSelectionFromChatSession(chat.id, selection.id)
+                }
               >
                 <TextSelect size={12} className="group-hover:hidden" />
                 <X size={12} className="hidden group-hover:block" />
