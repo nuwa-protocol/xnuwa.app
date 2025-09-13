@@ -1,14 +1,8 @@
-import { NUWA_CLIENT_TIMEOUT } from '@nuwa-ai/ui-kit';
 import { AlertCircle } from 'lucide-react';
-import { connect, WindowMessenger } from 'penpal';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { TextShimmer } from '@/shared/components/ui/text-shimmer';
-import {
-  closeNuwaMCPClient,
-  createNuwaMCPClient,
-} from '@/shared/services/mcp-client';
+import { useCapUIRender } from '@/shared/hooks/use-cap-ui-render';
 import type { NuwaMCPClient } from '@/shared/types';
-import { validateURL, type URLValidationResult } from '@/shared/utils';
 
 const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
   if (artifact) {
@@ -95,182 +89,24 @@ export type CapUIRendererProps = {
   onMCPConnectionError?: (error: Error) => void;
 };
 
-export const CapUIRenderer = ({
-  srcUrl,
-  title,
-  artifact = false,
-  onSendPrompt,
-  onAddSelection,
-  onSaveState,
-  onGetState,
-  onPenpalConnected,
-  onMCPConnected,
-  onPenpalConnectionError,
-  onMCPConnectionError,
-}: CapUIRendererProps) => {
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-
-  // Use refs to always have the latest callbacks
-  const onSendPromptRef = useRef(onSendPrompt);
-  const onAddSelectionRef = useRef(onAddSelection);
-  const onSaveStateRef = useRef(onSaveState);
-  const onGetStateRef = useRef(onGetState);
-
-  // Update refs when props change
-  useEffect(() => {
-    onSendPromptRef.current = onSendPrompt;
-    onAddSelectionRef.current = onAddSelection;
-    onSaveStateRef.current = onSaveState;
-    onGetStateRef.current = onGetState;
-  }, [onSendPrompt, onAddSelection, onSaveState, onGetState]);
-
-  const [height, setHeight] = useState<number>(100); // Default height
+export const CapUIRenderer = (props: CapUIRendererProps) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [validationResult, setValidationResult] = useState<URLValidationResult | null>(null);
-  const [isValidating, setIsValidating] = useState(false);
+  const {
+    iframeRef,
+    connectToPenpal,
+    connectToMCP,
+    sandbox,
+    allowPermissions,
+    height,
+    validationResult,
+    isValidating,
+  } = useCapUIRender(props);
+  const {
+    srcUrl,
+    title,
+    artifact = false,
+  } = props;
 
-  const nuwaClientMethods = {
-    sendPrompt: (prompt: string) => {
-      onSendPromptRef.current(prompt);
-    },
-
-    addSelection: (label: string, message: string) => {
-      onAddSelectionRef.current?.(label, message);
-    },
-
-    saveState: (state: any) => {
-      onSaveStateRef.current?.(state);
-    },
-
-    getState: () => {
-      onGetStateRef.current?.();
-    },
-  };
-
-  const validateURLBeforeRender = useCallback(async () => {
-    if (!srcUrl) {
-      setValidationResult({
-        isValid: false,
-        error: 'No URL provided for HTML resource',
-        canBeEmbedded: false,
-      });
-      return;
-    }
-
-    setIsValidating(true);
-    setValidationResult(null);
-
-    try {
-      const result = await validateURL(srcUrl, {
-        timeout: 10000,
-      });
-
-      setValidationResult(result);
-
-      if (!result.isValid) {
-        console.error(`URL validation failed for ${srcUrl}:`, result.error);
-      } else if (!result.canBeEmbedded && result.error) {
-        console.error(`URL embedding may fail for ${srcUrl}:`, result.error);
-      }
-    } catch (error) {
-      const validationError = {
-        isValid: false,
-        error: `URL validation error: ${error instanceof Error ? error.message : String(error)}`,
-        canBeEmbedded: false,
-      };
-      setValidationResult(validationError);
-      console.error(`URL validation error for ${srcUrl}:`, error);
-    } finally {
-      setIsValidating(false);
-    }
-  }, [srcUrl]);
-
-  useEffect(() => {
-    validateURLBeforeRender();
-  }, [validateURLBeforeRender]);
-
-  const connectToPenpal = useCallback(async () => {
-    try {
-      if (!iframeRef.current?.contentWindow) {
-        throw new Error('Iframe content not accessible');
-      }
-
-      const messenger = new WindowMessenger({
-        remoteWindow: iframeRef.current.contentWindow,
-        allowedOrigins: ['*'],
-      });
-
-      await connect({
-        messenger,
-        methods: {
-          ...nuwaClientMethods,
-          setHeight,
-        },
-        timeout: NUWA_CLIENT_TIMEOUT,
-      }).promise;
-
-      onPenpalConnected?.();
-    } catch (error) {
-      const err =
-        error instanceof Error
-          ? error
-          : new Error(`Failed to connect to ${title ?? srcUrl} over Penpal`);
-      onPenpalConnectionError?.(err);
-    }
-  }, [title, srcUrl, onPenpalConnected, onPenpalConnectionError]);
-
-  const connectToMCP = useCallback(async () => {
-    try {
-      if (!iframeRef.current?.contentWindow) {
-        throw new Error('Iframe not ready');
-      }
-
-      const mcpClient = await createNuwaMCPClient(srcUrl, 'postMessage', {
-        targetWindow: iframeRef.current?.contentWindow,
-      });
-
-      onMCPConnected?.(mcpClient);
-    } catch (error) {
-      const err =
-        error instanceof Error
-          ? error
-          : new Error(`Failed to connect to ${title ?? srcUrl} over MCP`);
-      onMCPConnectionError?.(err);
-      await closeNuwaMCPClient(srcUrl);
-    }
-  }, [title, srcUrl]);
-
-  const sandbox = 'allow-scripts';
-
-  const allowPermissions = `accelerometer 'none'; 
-         ambient-light-sensor 'none'; 
-         autoplay 'none'; 
-         battery 'none'; 
-         camera 'none'; 
-         display-capture 'none'; 
-         document-domain 'none'; 
-         encrypted-media 'none'; 
-         fullscreen 'none'; 
-         gamepad 'none'; 
-         geolocation 'none'; 
-         gyroscope 'none'; 
-         layout-animations 'none'; 
-         legacy-image-formats 'none'; 
-         magnetometer 'none'; 
-         microphone 'none'; 
-         midi 'none'; 
-         oversized-images 'none'; 
-         payment 'none'; 
-         picture-in-picture 'none'; 
-         publickey-credentials-get 'none'; 
-         speaker-selection 'none'; 
-         sync-xhr 'none'; 
-         unoptimized-images 'none'; 
-         unsized-media 'none'; 
-         usb 'none'; 
-         screen-wake-lock 'none'; 
-         web-share 'none'; 
-         xr-spatial-tracking 'none';`;
 
   if (!srcUrl) {
     console.error('No URL provided for HTML resource');

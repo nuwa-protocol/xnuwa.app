@@ -21,12 +21,12 @@ export const ArtifactMain = () => {
     return (
         <div className="flex w-full h-full">
             <ResizablePanelGroup direction="horizontal">
-                <ResizablePanel defaultSize={40} minSize={20}>
+                <ResizablePanel defaultSize={35} minSize={20}>
                     <ChatContent isReadonly={false} />
                 </ResizablePanel>
                 <ResizableHandle withHandle className="h-4 my-auto" />
                 <ResizablePanel
-                    defaultSize={60}
+                    defaultSize={65}
                     minSize={50}
                     className="overflow-hidden"
                 >
@@ -39,7 +39,7 @@ export const ArtifactMain = () => {
                             stiffness: 300,
                             damping: 30,
                         }}
-                        className="h-full mt-3 border border-border rounded-tl-xl"
+                        className="h-full border-l-2"
                     >
                         <Artifact artifactUrl={srcUrl} title="Note" />
                     </motion.div>
