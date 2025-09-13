@@ -3,10 +3,8 @@
 
 import { Chat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
-import { DefaultChatTransport } from 'ai';
 import { create } from 'zustand';
-import { generateUUID } from '@/shared/utils';
-import { createClientAIFetch } from '../services';
+import { ClientChatTransport } from '../services';
 
 interface ChatInstanceStoreState {
   instances: Map<string, Chat<UIMessage>>;
@@ -40,13 +38,7 @@ export const ChatInstanceStore = create<ChatInstanceStoreState>()(
       const newChatInstance = new Chat({
         id: chatId,
         messages: initialMessages,
-        generateId: generateUUID,
-        transport: new DefaultChatTransport({
-          fetch: createClientAIFetch(),
-          prepareSendMessagesRequest: ({ id, messages }) => ({
-            body: { id, messages },
-          }),
-        }),
+        transport: new ClientChatTransport(),
         onError: callbacks.onError,
         onFinish: callbacks.onFinish,
         onData: callbacks.onData,

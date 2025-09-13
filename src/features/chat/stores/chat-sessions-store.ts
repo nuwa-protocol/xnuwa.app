@@ -110,6 +110,7 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
         set((state) => {
           const session = state.chatSessions[id];
           if (!session) {
+            //TODO: need to create a new session if not found
             return state;
           }
 
@@ -125,6 +126,7 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
         });
       },
 
+      // TODO: need to add id for selections in case some selections have the same label and gets deleted
       removeSelectionFromChatSession: (
         id: string,
         selection: ChatSelection,

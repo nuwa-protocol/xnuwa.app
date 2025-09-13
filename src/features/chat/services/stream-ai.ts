@@ -1,7 +1,6 @@
 import {
   convertToModelMessages,
   createUIMessageStream,
-  createUIMessageStreamResponse,
   stepCountIs,
   streamText,
   type UIMessage,
@@ -80,7 +79,16 @@ export const StreamAIResponse = async ({
           sendReasoning: true,
           sendSources: true,
           onError: (error: any) => {
-            return error.toString();
+            if (error == null) {
+              return 'Unknown error';
+            }
+            if (typeof error === 'string') {
+              return error;
+            }
+            if (error instanceof Error) {
+              return error.message;
+            }
+            return JSON.stringify(error);
           },
         }),
       );
@@ -96,5 +104,5 @@ export const StreamAIResponse = async ({
     },
   });
 
-  return createUIMessageStreamResponse({ stream });
+  return stream;
 };
