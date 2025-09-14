@@ -1,5 +1,6 @@
 import { createNuwaMCPClient } from '@/shared/services/mcp-client';
-import type { Cap } from '@/shared/types';
+import { createPaymentMcpClient } from '@/shared/services/payment-mcp-client';
+import type { Cap } from '@/shared/types/cap';
 
 interface RemoteMCPInstance {
   clients: Map<string, any>;
@@ -21,7 +22,10 @@ class RemoteMCPManager {
     return RemoteMCPManager.instance;
   }
 
-  async initializeForCap(cap: Cap): Promise<Record<string, any>> {
+  async initializeForCap(
+    cap: Cap,
+    usePaymentClient: boolean = true,
+  ): Promise<Record<string, any>> {
     // If already initialized for this cap, return existing tools
     if (
       this.currentInstance &&
@@ -43,7 +47,14 @@ class RemoteMCPManager {
     // Initialize all MCP clients
     for (const [serverName, server] of Object.entries(mcpServers)) {
       try {
-        const client = await createNuwaMCPClient(server);
+        let client: any;
+        if (usePaymentClient) {
+          // Use payment-enabled MCP client
+          client = await createPaymentMcpClient(server);
+        } else {
+          // Use standard MCP client
+          client = await createNuwaMCPClient(server);
+        }
         clients.set(serverName, client);
       } catch (error) {
         throw new Error(
