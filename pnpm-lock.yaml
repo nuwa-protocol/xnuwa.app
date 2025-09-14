@@ -39,11 +39,11 @@ importers:
         specifier: ^0.5.2
         version: 0.5.2(react@19.1.1)(typescript@5.8.3)
       '@nuwa-ai/payment-kit':
-        specifier: ^0.5.15
-        version: 0.5.15(express@5.1.0)(react@19.1.1)(typescript@5.8.3)
+        specifier: ^0.5.16
+        version: 0.5.16(express@5.1.0)(react@19.1.1)(typescript@5.8.3)
       '@nuwa-ai/ui-kit':
-        specifier: ^0.5.2
-        version: 0.5.2(react@19.1.1)
+        specifier: 0.5.3
+        version: 0.5.3(react@19.1.1)
       '@openrouter/ai-sdk-provider':
         specifier: ^1.2.0
         version: 1.2.0(ai@5.0.44(zod@3.25.76))(zod@3.25.76)
@@ -1184,8 +1184,8 @@ packages:
   '@nuwa-ai/identity-kit@0.5.1':
     resolution: {integrity: sha512-4IAAAs/NEg97rvLcp0OTxAHsXFU5Z7JojzXViDGrlVYQBlcNMV7wjghpDZYf2d1EHc04CthIzE/N9BeF4g9Xtg==}
 
-  '@nuwa-ai/payment-kit@0.5.15':
-    resolution: {integrity: sha512-bDtMPIRXgdogjkPWYasUNJUDi1vOPnld60ZH4+3mT/7/gief4Trf2AV3vmkIRSC5KZnwu0lB/md6HFpHg/8pFA==}
+  '@nuwa-ai/payment-kit@0.5.16':
+    resolution: {integrity: sha512-NlvhoJYHP3rtfTXjStNtVNL4PvxqpWzTB5rou/brrwCyaLjur3xibFmhuuT3nbLF3CLMyz44Lmvow67pzwV6ZQ==}
     peerDependencies:
       express: '>=4'
       pg: '>=8'
@@ -1195,8 +1195,8 @@ packages:
       pg:
         optional: true
 
-  '@nuwa-ai/ui-kit@0.5.2':
-    resolution: {integrity: sha512-tl8K6xAOFWECAA/aDFqABwmfcPmjmaEjqxYylUywAWZozWmmjzt3P84U4LqRQDM/+HSEVWZcLrgaM9SieEz8EQ==}
+  '@nuwa-ai/ui-kit@0.5.3':
+    resolution: {integrity: sha512-iQu+MxpYG+7ua76NilHI+I+LbBuwPsr+nr4ysuK+2klTmQDC9WFrOocA0YMaReVP+P/zqwZyQeW9s3ZMBGzHmQ==}
     peerDependencies:
       react: '>=16.8.0'
 
@@ -8866,7 +8866,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@nuwa-ai/payment-kit@0.5.15(express@5.1.0)(react@19.1.1)(typescript@5.8.3)':
+  '@nuwa-ai/payment-kit@0.5.16(express@5.1.0)(react@19.1.1)(typescript@5.8.3)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.18.0
       '@nuwa-ai/identity-kit': 0.5.1(typescript@5.8.3)
@@ -8892,7 +8892,7 @@ snapshots:
       - sury
       - typescript
 
-  '@nuwa-ai/ui-kit@0.5.2(react@19.1.1)':
+  '@nuwa-ai/ui-kit@0.5.3(react@19.1.1)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.18.0
       penpal: 7.0.4

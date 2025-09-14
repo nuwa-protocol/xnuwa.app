@@ -55,7 +55,7 @@ export const useCapUIRender = ({
     },
 
     getState: () => {
-      onGetStateRef.current?.();
+      return onGetStateRef.current?.();
     },
   };
 

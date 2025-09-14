@@ -37,6 +37,23 @@ export const Artifact = ({
         [chat, addSelectionToChatSession],
     );
 
+    // temporary method to save state to local storage
+    const handleSaveState = useCallback(
+        (state: any) => {
+            localStorage.setItem(`artifact_state_${artifactUrl}`, JSON.stringify(state));
+        },
+        [],
+    );
+
+    // temporary method to get state from local storage
+    const handleGetState = useCallback(
+        () => {
+            const state = localStorage.getItem(`artifact_state_${artifactUrl}`);
+            console.log('handle get state', state);
+            return state ? JSON.parse(state) : null;
+        },
+        [],
+    );
     return (
         <div className="flex h-full w-full flex-col overflow-hidden">
             {/* Header */}
@@ -48,8 +65,8 @@ export const Artifact = ({
                     artifact={true}
                     onSendPrompt={handleSendPrompt}
                     onAddSelection={handleAddSelection}
-                    onSaveState={() => { }}
-                    onGetState={() => { }}
+                    onSaveState={handleSaveState}
+                    onGetState={handleGetState}
                 />
             </div>
         </div>

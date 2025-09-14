@@ -3,8 +3,10 @@ import { useCreateBlockNote } from "@blocknote/react";
 import { useNuwaClient } from "@nuwa-ai/ui-kit";
 import { useNoteMCP } from "../hooks/use-note-mcp";
 import "@blocknote/mantine/style.css";
+import { useState } from "react";
 
 export default function NotePage() {
+  const [isLoading, setIsLoading] = useState(true);
 
   // create blocknote editor
   const editor = useCreateBlockNote({
@@ -19,19 +21,28 @@ export default function NotePage() {
     ],
   });
 
-
   // connect to Nuwa Client on mount and obtain nuwa client methods
-  const { nuwaClient, isConnected: isNuwaConnected } = useNuwaClient({
+  const { nuwaClient } = useNuwaClient({
     onError: (error) => {
       console.error("Nuwa client error:", error);
+    },
+    onConnected: async () => {
+      try {
+        const savedData = await nuwaClient.getState();
+        if (savedData?.noteContent) {
+          editor.replaceBlocks(editor.document, savedData.noteContent);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Failed to load saved content:", error);
+      }
     },
   });
 
   // start MCP server for Nuwa Client to connect
   useNoteMCP(editor);
 
-
-  const handleSendNote = async () => {
+  const handleSendPrompt = async () => {
     const content = JSON.stringify(editor.document);
     try {
       await nuwaClient.sendPrompt(`Here's my note content: ${content}`);
@@ -40,7 +51,7 @@ export default function NotePage() {
     }
   };
 
-  const handleAddNoteSelection = async () => {
+  const handleAddSelection = async () => {
     const content = JSON.stringify(editor.document);
     try {
       await nuwaClient.addSelection("Note Content", content);
@@ -49,25 +60,32 @@ export default function NotePage() {
     }
   };
 
-  const handleSaveNote = async () => {
+  const handleOnChange = async () => {
     const content = editor.document;
     try {
-      await nuwaClient.saveState({ noteContent: content, timestamp: Date.now() });
+      await nuwaClient.saveState({ noteContent: content });
     } catch (error) {
       console.error("Failed to save note:", error);
     }
   };
 
-  const handleLoadNote = async () => {
+  const handleGetState = async () => {
     try {
-      const savedData = await nuwaClient.getState();
-      if (savedData?.noteContent) {
-        editor.replaceBlocks(editor.document, savedData.noteContent);
+      const state = await nuwaClient.getState();
+      if (state?.noteContent) {
+        editor.replaceBlocks(editor.document, state.noteContent);
       }
-    } catch (error) {
-      console.error("Failed to load note:", error);
+    }
+    catch (error) {
+      console.error("Failed to get state:", error);
     }
   };
+
+  if (isLoading) {
+    return <div className="h-screen w-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+    </div>
+  }
 
   return (
     <div className="h-screen w-screen flex flex-col max-w-5xl mx-auto bg-white">
@@ -76,49 +94,29 @@ export default function NotePage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-semibold text-gray-800">Note Editor</h1>
-            <div className="flex items-center">
-              <div
-                className={`w-2 h-2 rounded-full mr-2 ${isNuwaConnected ? "bg-green-500" : "bg-red-500 animate-pulse"
-                  }`}
-              />
-              <span className="text-sm text-gray-600">
-                {isNuwaConnected ? "Connected" : "Disconnected"}
-              </span>
-            </div>
           </div>
 
           <div className="flex space-x-2">
             <button
               type="button"
-              onClick={handleSendNote}
-              disabled={!isNuwaConnected}
+              onClick={handleSendPrompt}
               className="px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 disabled:bg-gray-300  transition-colors"
             >
               Send Prompt
             </button>
             <button
               type="button"
-              onClick={handleAddNoteSelection}
-              disabled={!isNuwaConnected}
+              onClick={handleAddSelection}
               className="px-3 py-2 bg-purple-500 text-white text-sm rounded hover:bg-purple-600 disabled:bg-gray-300  transition-colors"
             >
               Add Selection
             </button>
             <button
               type="button"
-              onClick={handleSaveNote}
-              disabled={!isNuwaConnected}
-              className="px-3 py-2 bg-green-500 text-white text-sm rounded hover:bg-green-600 disabled:bg-gray-300  transition-colors"
+              onClick={handleGetState}
+              className="px-3 py-2 bg-purple-500 text-white text-sm rounded hover:bg-purple-600 disabled:bg-gray-300  transition-colors"
             >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={handleLoadNote}
-              disabled={!isNuwaConnected}
-              className="px-3 py-2 bg-orange-500 text-white text-sm rounded hover:bg-orange-600 disabled:bg-gray-300 transition-colors"
-            >
-              Load
+              Get State
             </button>
           </div>
         </div>
@@ -126,7 +124,7 @@ export default function NotePage() {
 
       {/* Editor */}
       <div className="flex-1 py-10 px-6 bg-white">
-        <BlockNoteView editor={editor} theme={'light'} />
+        <BlockNoteView editor={editor} theme={'light'} onChange={handleOnChange} />
       </div>
     </div>
   );
