@@ -35,6 +35,7 @@ import {
   closeNuwaMCPClient,
   createNuwaMCPClient,
 } from '@/shared/services/mcp-client';
+import { createPaymentMcpClient } from '@/shared/services/payment-mcp-client';
 import type { NuwaMCPClient } from '@/shared/types';
 
 interface LogEntry {
@@ -112,7 +113,12 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         );
       }
 
-      const newClient = await createNuwaMCPClient(url);
+      let newClient: any;
+      if (mcpType === 'Remote MCP') {
+        newClient = await createPaymentMcpClient(url);
+      } else {
+        newClient = await createNuwaMCPClient(url, 'postMessage');
+      }
       setClient(newClient);
 
       pushLog({
