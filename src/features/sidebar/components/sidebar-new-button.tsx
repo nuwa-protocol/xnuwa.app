@@ -34,7 +34,7 @@ export function SidebarNewButton() {
   const handleNewArtifact = React.useCallback(() => {
     setOpenMobile(false);
     navigate(`/artifacts${search}`);
-  }, [navigate, setOpenMobile]);
+  }, [navigate, setOpenMobile, search]);
 
   // Keyboard shortcut: Cmd/Ctrl + K
   React.useEffect(() => {
