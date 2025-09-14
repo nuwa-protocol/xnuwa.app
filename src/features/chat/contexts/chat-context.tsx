@@ -28,7 +28,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const { chatSessions } = ChatSessionsStore();
   const isNavigatingRef = useRef(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const urlChatId = searchParams.get('cid');
+  const urlChatId = searchParams.get('chat_id');
   const newChatIdRef = useRef<string | null>(null);
   const chatId = useMemo(() => {
     if (urlChatId) {
@@ -48,7 +48,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
       if (session && session.messages.length > 0 && !isNavigatingRef.current) {
         isNavigatingRef.current = true;
         const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.set('cid', chatId);
+        newSearchParams.set('chat_id', chatId);
         setSearchParams(newSearchParams);
       }
     }

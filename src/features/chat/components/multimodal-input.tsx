@@ -72,10 +72,10 @@ function PureMultimodalInput({ className }: { className?: string }) {
       clearInput();
       setAttachments([]);
 
-      const currentUrlCid = searchParams.get('cid');
+      const currentUrlCid = searchParams.get('chat_id');
       if (currentUrlCid !== chat.id) {
         const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.set('cid', chat.id);
+        newSearchParams.set('chat_id', chat.id);
         setSearchParams(newSearchParams);
       }
     }

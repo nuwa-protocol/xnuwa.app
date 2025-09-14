@@ -47,7 +47,7 @@ const PureChatItem = ({
   const handleChatSelect = () => {
     setOpenMobile(false);
     const newParams = new URLSearchParams(searchParams);
-    newParams.set('cid', chat.id);
+    newParams.set('chat_id', chat.id);
     setSearchParams(newParams);
   };
 

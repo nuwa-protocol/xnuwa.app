@@ -45,7 +45,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
       updateCap(cap.id, {
         ...cap,
         status: 'submitted',
-        cid: result.capId,
+        cid: result.message,
       });
 
       toast.success(result.message);

@@ -87,7 +87,7 @@ export function useChatInstance(chatId: string) {
   // chat finish handler
   const handleOnFinish = useCallback(() => {
     const currentUrlChatId = new URLSearchParams(window.location.search).get(
-      'cid',
+      'chat_id',
     );
 
     // Show completion toast for background chats
@@ -100,7 +100,7 @@ export function useChatInstance(chatId: string) {
             label: 'View Chat',
             onClick: () => {
               const newSearchParams = new URLSearchParams(searchParams);
-              newSearchParams.set('cid', chatId);
+              newSearchParams.set('chat_id', chatId);
               setSearchParams(newSearchParams);
             },
           },

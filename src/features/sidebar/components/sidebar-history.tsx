@@ -21,7 +21,7 @@ export function SidebarHistory() {
   const { t } = useLanguage();
 
   const [searchParams] = useSearchParams();
-  const chatSessionId = searchParams.get('cid');
+  const chatSessionId = searchParams.get('chat_id');
 
   // get all sessions with messages
   const now = Date.now();
