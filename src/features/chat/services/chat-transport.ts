@@ -1,6 +1,6 @@
 import type { UIMessage } from '@ai-sdk/react';
 import type { ChatRequestOptions, ChatTransport, UIMessageChunk } from 'ai';
-import { StreamAIResponse } from './stream-ai';
+import { CreateAIStream } from './stream-ai';
 
 export class ClientChatTransport implements ChatTransport<UIMessage> {
   async sendMessages(
@@ -13,7 +13,7 @@ export class ClientChatTransport implements ChatTransport<UIMessage> {
       messageId: string | undefined;
     } & ChatRequestOptions,
   ): Promise<ReadableStream<UIMessageChunk>> {
-    const Stream = StreamAIResponse({
+    const Stream = CreateAIStream({
       chatId: options.chatId,
       messages: options.messages,
       signal: options.abortSignal,

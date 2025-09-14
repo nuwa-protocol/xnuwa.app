@@ -12,7 +12,7 @@ import { CapResolve } from './cap-resolve';
 import { llmProvider } from './providers';
 
 // Handle AI request, entrance of the AI workflow
-export const StreamAIResponse = async ({
+export const CreateAIStream = async ({
   chatId,
   messages,
   signal,
