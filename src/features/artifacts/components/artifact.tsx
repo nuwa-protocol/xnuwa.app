@@ -51,10 +51,10 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
         },
         [artifactId, getArtifact],
     );
-    
+
     // Get artifact from store
     const artifact = getArtifact(artifactId);
-    
+
     if (!artifact) {
         return <div>Artifact not found</div>;
     }
@@ -64,6 +64,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
             <ArtifactHeader title={artifact.title} />
             <div className="min-h-0 flex-1 overflow-hidden">
                 <CapUIRenderer
+                    key={artifactId}
                     srcUrl={artifact.source.url}
                     title={artifact.title}
                     artifact={true}
