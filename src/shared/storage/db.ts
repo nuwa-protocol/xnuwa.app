@@ -14,9 +14,17 @@ export interface CapStudioRecord {
   updatedAt: number;
 }
 
+export interface ArtifactRecord {
+  id: string;
+  did: string;
+  data: any;
+  updatedAt: number;
+}
+
 class Database extends Dexie {
   chatSessions!: Table<ChatSessionRecord>;
   capStudio!: Table<CapStudioRecord>;
+  artifacts!: Table<ArtifactRecord>;
 
   constructor() {
     if (typeof window === 'undefined') {
@@ -26,10 +34,11 @@ class Database extends Dexie {
 
     super('NuwaClientDB');
 
-    // Schema with separate tables for ChatSessions and CapStudio
+    // Schema with separate tables for ChatSessions, CapStudio, and Artifacts
     this.version(1).stores({
       chatSessions: '[chatId+did], chatId, did, updatedAt',
       capStudio: '[id+did], id, did, updatedAt',
+      artifacts: '[id+did], id, did, updatedAt',
     });
   }
 }

@@ -1,5 +1,6 @@
 import { useChat } from '@ai-sdk/react';
 import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
+import { generateUUID } from '@/shared/utils';
 import { useChatContext } from '../contexts/chat-context';
 import { ChatSessionsStore } from '../stores/chat-sessions-store';
 
@@ -18,9 +19,8 @@ export const ResponseUI = ({ srcUrl, title }: ResponseUIProps) => {
     };
 
     const handleAddSelection = (label: string, message: string) => {
-        addSelectionToChatSession(chat.id, { label, message });
+        addSelectionToChatSession(chat.id, { id: generateUUID(), label, message });
     };
-
 
     return (
         <CapUIRenderer

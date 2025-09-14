@@ -4,26 +4,24 @@ import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
 import { generateUUID } from '@/shared/utils';
 import { useChatContext } from '../../chat/contexts/chat-context';
 import { ChatSessionsStore } from '../../chat/stores/chat-sessions-store';
+import { useArtifactsStore } from '../stores';
 import { ArtifactHeader } from './artifact-header';
 
 type ArtifactProps = {
-    artifactUrl: string;
-    title?: string;
+    artifactId: string;
 };
 
-export const Artifact = ({
-    artifactUrl,
-    title = 'Untitled Artifact',
-}: ArtifactProps) => {
+export const Artifact = ({ artifactId }: ArtifactProps) => {
     const { addSelectionToChatSession } = ChatSessionsStore();
     const { chat } = useChatContext();
     const { sendMessage } = useChat({ chat });
+    const { getArtifact, updateArtifact } = useArtifactsStore();
 
     const handleSendPrompt = useCallback(
         (prompt: string) => {
             sendMessage({ text: prompt });
         },
-        [sendMessage, chat],
+        [sendMessage],
     );
 
     const handleAddSelection = useCallback(
@@ -37,31 +35,37 @@ export const Artifact = ({
         [chat, addSelectionToChatSession],
     );
 
-    // temporary method to save state to local storage
+    // Save state to store instead of localStorage
     const handleSaveState = useCallback(
         (state: any) => {
-            localStorage.setItem(`artifact_state_${artifactUrl}`, JSON.stringify(state));
+            updateArtifact(artifactId, { state });
         },
-        [],
+        [artifactId, updateArtifact],
     );
 
-    // temporary method to get state from local storage
+    // Get state from store instead of localStorage
     const handleGetState = useCallback(
         () => {
-            const state = localStorage.getItem(`artifact_state_${artifactUrl}`);
-            console.log('handle get state', state);
-            return state ? JSON.parse(state) : null;
+            const currentArtifact = getArtifact(artifactId);
+            return currentArtifact?.state || null;
         },
-        [],
+        [artifactId, getArtifact],
     );
+    
+    // Get artifact from store
+    const artifact = getArtifact(artifactId);
+    
+    if (!artifact) {
+        return <div>Artifact not found</div>;
+    }
     return (
         <div className="flex h-full w-full flex-col overflow-hidden">
             {/* Header */}
-            <ArtifactHeader title={title} />
+            <ArtifactHeader title={artifact.title} />
             <div className="min-h-0 flex-1 overflow-hidden">
                 <CapUIRenderer
-                    srcUrl={artifactUrl}
-                    title={title}
+                    srcUrl={artifact.source.url}
+                    title={artifact.title}
                     artifact={true}
                     onSendPrompt={handleSendPrompt}
                     onAddSelection={handleAddSelection}

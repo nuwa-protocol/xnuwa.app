@@ -1,14 +1,14 @@
 import { X } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Title } from '@/shared/components/title';
 import { Button } from '@/shared/components/ui/button';
 
 export const ArtifactHeader = ({ title }: { title: string }) => {
   const navigate = useNavigate();
-  const { search } = useLocation();
-
+  const [searchParams] = useSearchParams();
+  const chatId = searchParams.get('chat_id');
   const handleClose = () => {
-    navigate(`/chat${search}`);
+    navigate(`/chat${chatId ? `?chat_id=${chatId}` : ''}`);
   };
 
   return (

@@ -1,7 +1,12 @@
 import { createJSONStorage, type StateStorage } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { rehydrationTracker } from '../hooks/use-rehydration';
-import { type CapStudioRecord, type ChatSessionRecord, db } from './db';
+import {
+  type ArtifactRecord,
+  type CapStudioRecord,
+  type ChatSessionRecord,
+  db,
+} from './db';
 import type { PersistConfig } from './types';
 
 // get current DID
@@ -170,6 +175,88 @@ export class CapStudioStorage implements StateStorage {
   }
 }
 
+export class ArtifactsStorage implements StateStorage {
+  async getItem(name: string): Promise<string | null> {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      const did = await getCurrentDID();
+      if (!did) return null;
+
+      // Get all artifact records for current DID
+      const records = await db.artifacts.where('did').equals(did).toArray();
+
+      if (records.length === 0) return null;
+
+      // Convert records back to artifacts format (id -> artifact map)
+      const artifacts: Record<string, any> = {};
+      records.forEach((record) => {
+        artifacts[record.id] = record.data;
+      });
+
+      // Return in zustand persist format: { state: { artifacts: ... }, version: 0 }
+      return JSON.stringify({
+        state: { artifacts },
+        version: 0,
+      });
+    } catch (error) {
+      console.error(`Failed to get artifacts from IndexedDB:`, error);
+      return null;
+    }
+  }
+
+  async setItem(name: string, value: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const did = await getCurrentDID();
+      if (!did) return;
+
+      const parsedData = JSON.parse(value);
+
+      // Handle zustand persist wrapper format: { state: { artifacts: ... }, version: 0 }
+      const artifacts = parsedData.state?.artifacts || parsedData.artifacts;
+
+      if (!artifacts || Object.keys(artifacts).length === 0) {
+        return;
+      }
+
+      // Clear existing artifacts for this DID
+      await db.artifacts.where('did').equals(did).delete();
+
+      // Save each artifact as a separate record
+      const records: ArtifactRecord[] = Object.entries(artifacts).map(
+        ([id, data]) => ({
+          id,
+          did,
+          data,
+          updatedAt: Date.now(),
+        }),
+      );
+
+      if (records.length > 0) {
+        await db.artifacts.bulkPut(records);
+      }
+    } catch (error) {
+      console.error(`Failed to set artifacts in IndexedDB:`, error);
+      throw error;
+    }
+  }
+
+  async removeItem(name: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const did = await getCurrentDID();
+      if (!did) return;
+
+      await db.artifacts.where('did').equals(did).delete();
+    } catch (error) {
+      console.error(`Failed to remove artifacts from IndexedDB:`, error);
+    }
+  }
+}
+
 /**
  * Persist config generator for ChatSessions
  */
@@ -201,6 +288,27 @@ export function createCapStudioPersistConfig<T>(config: PersistConfig<T>) {
   return {
     name: config.name,
     storage: createJSONStorage(() => new CapStudioStorage()),
+    partialize: config.partialize,
+    onRehydrateStorage: () => {
+      return (state: T | undefined, error: unknown) => {
+        if (!error && state) {
+          rehydrationTracker.markRehydrated(config.name);
+        }
+      };
+    },
+  };
+}
+
+/**
+ * Persist config generator for Artifacts
+ */
+export function createArtifactsPersistConfig<T>(config: PersistConfig<T>) {
+  // Register this store with the rehydration tracker
+  rehydrationTracker.registerStore(config.name);
+
+  return {
+    name: config.name,
+    storage: createJSONStorage(() => new ArtifactsStorage()),
     partialize: config.partialize,
     onRehydrateStorage: () => {
       return (state: T | undefined, error: unknown) => {

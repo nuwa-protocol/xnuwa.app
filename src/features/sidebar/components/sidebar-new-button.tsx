@@ -1,6 +1,6 @@
 import { ChevronDown, EditIcon, FilePlusIcon } from 'lucide-react';
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,21 +20,25 @@ export function SidebarNewButton() {
   const floatingContext = useAppSidebar();
   const [menuOpen, setMenuOpen] = useState(false);
   const isDevMode = useDevMode();
-  const { pathname, search } = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { pathname } = useLocation();
 
   const handleNewChat = React.useCallback(() => {
     setOpenMobile(false);
     if (pathname.includes('artifacts')) {
-      navigate('/artifacts');
+      const artifactId = searchParams.get('artifact_id');
+      navigate(`/artifacts${artifactId ? `?artifact_id=${artifactId}` : ''}`);
     } else {
       navigate('/chat');
     }
-  }, [pathname, navigate, setOpenMobile]);
+  }, [setOpenMobile, searchParams]);
 
   const handleNewArtifact = React.useCallback(() => {
     setOpenMobile(false);
-    navigate(`/artifacts${search}`);
-  }, [navigate, setOpenMobile, search]);
+    const chatId = searchParams.get('chat_id');
+    console.log('chatId', chatId);
+    navigate(`/artifacts${chatId ? `?chat_id=${chatId}` : ''}`);
+  }, [setOpenMobile, searchParams]);
 
   // Keyboard shortcut: Cmd/Ctrl + K
   React.useEffect(() => {

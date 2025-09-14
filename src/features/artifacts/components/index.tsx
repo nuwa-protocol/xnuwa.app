@@ -7,16 +7,16 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/shared/components/ui/resizable';
+import { useArtifactPage } from '../hooks/use-artifact-page';
 import { Artifact } from './artifact';
 
 export const ArtifactMain = () => {
     const { setMode } = useSidebarStore();
-    const srcUrl = 'http://localhost:3000/note';
-
+    const { artifactId } = useArtifactPage();
     // set the app sidebar to floating mode when showing artifact
     useEffect(() => {
         setMode('floating');
-    }, []);
+    }, [setMode]);
 
     return (
         <div className="flex w-full h-full">
@@ -41,7 +41,7 @@ export const ArtifactMain = () => {
                         }}
                         className="h-full border-l-2"
                     >
-                        <Artifact artifactUrl={srcUrl} title="Note" />
+                        {artifactId && <Artifact artifactId={artifactId} />}
                     </motion.div>
                 </ResizablePanel>
             </ResizablePanelGroup>
