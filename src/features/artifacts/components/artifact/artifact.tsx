@@ -1,4 +1,5 @@
 import { useChat } from '@ai-sdk/react';
+import type { StreamAIRequest } from '@nuwa-ai/ui-kit';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useChatContext } from '@/features/chat/contexts/chat-context';
@@ -86,6 +87,19 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
         [setConnectionError],
     );
 
+    // Handle stream request
+    const handleStreamRequest = useCallback(
+        (request: StreamAIRequest, streamId: string) => {
+            // TODO: Implement stream request
+        },
+        [],
+    );
+
+    // Handle abort stream
+    const handleAbortStream = useCallback((streamId: string) => {
+        // TODO: Implement abort stream
+    }, []);
+
     // Clear tools on unmount to avoid leaking session-scoped UI tools
     useEffect(() => {
         return () => {
@@ -102,7 +116,10 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
     return (
         <div className="flex h-full w-full flex-col overflow-hidden">
             {/* Header */}
-            <ArtifactHeader title={artifact.title} connectionError={connectionError} />
+            <ArtifactHeader
+                title={artifact.title}
+                connectionError={connectionError}
+            />
             <div className="min-h-0 flex-1 overflow-hidden">
                 <CapUIRenderer
                     key={artifactId}
@@ -116,6 +133,8 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
                     onMCPConnected={handleMCPConnected}
                     onMCPConnectionError={handleMCPConnectionError}
                     onPenpalConnectionError={handlePenpalConnectionError}
+                    onStreamRequest={handleStreamRequest}
+                    onAbortStream={handleAbortStream}
                 />
             </div>
         </div>

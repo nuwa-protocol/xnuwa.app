@@ -1,10 +1,9 @@
 import { generateText, type UIMessage } from 'ai';
+import { llmProvider } from '@/shared/services/llm-providers';
 import { generateUUID } from '@/shared/utils';
 import { ChatSessionsStore } from '../stores';
-import { llmProvider } from './providers';
 
 // Generate a title from the first message a user begins a conversation with
-// TODO: currently still using the remote AI models, need to switch to local models
 export async function generateTitleFromUserMessage({
   chatId,
   message,

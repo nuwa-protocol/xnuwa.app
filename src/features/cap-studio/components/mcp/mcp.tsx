@@ -183,26 +183,30 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   }, [pushLog]);
 
   const handleMCPConnected = useCallback(
-    async (mcpClient: NuwaMCPClient) => {
-      try {
-        setClient(mcpClient);
-        pushLog({
-          type: 'success',
-          message: '🔌 MCP connection established via Artifact MCP',
-        });
+    async (tools: Record<string, any>) => {
+      pushLog({
+        type: 'success',
+        message: '🔌 MCP connection established via Artifact MCP',
+      });
 
-        await handleToolsDiscovery(mcpClient);
-        toast.success(`Successfully connected to ${url}`);
-        setConnected(true);
-      } catch (err) {
-        pushLog({
-          type: 'error',
-          message: `MCP connection failed: ${String(err)}`,
-        });
-        toast.error(String(err));
-      }
+      setTools(tools);
+      pushLog({
+        type: 'info',
+        message: `Discovered ${Object.keys(tools).length} tools`,
+        data: { tools: Object.keys(tools) },
+      });
+
+      // Initialize tool parameters
+      const initialParams: Record<string, any> = {};
+      Object.entries(tools).forEach(([toolName, tool]) => {
+        initialParams[toolName] = {};
+      });
+
+      setToolParams(initialParams);
+      toast.success(`Successfully connected to ${url}`);
+      setConnected(true);
     },
-    [pushLog, url, handleToolsDiscovery],
+    [pushLog, url],
   );
 
   const handleMCPConnectionError = useCallback(
@@ -282,9 +286,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       if (client) {
         await client.close();
         setClient(null);
-        setConnected(false);
-        setTools({});
       }
+      setConnected(false);
+      setTools({});
 
       // Always reset UI state for Artifact MCP mode
       setPenpalConnected(false);
@@ -617,7 +621,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         </Card>
 
         {/* Tools */}
-        {connected && client && (
+        {connected && (
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">

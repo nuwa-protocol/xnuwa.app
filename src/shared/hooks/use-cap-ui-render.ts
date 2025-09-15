@@ -1,4 +1,4 @@
-import { NUWA_CLIENT_TIMEOUT } from '@nuwa-ai/ui-kit';
+import { NUWA_CLIENT_TIMEOUT, type StreamAIRequest } from '@nuwa-ai/ui-kit';
 import { connect, WindowMessenger } from 'penpal';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CapUIRendererProps } from '@/shared/components/cap-ui-renderer';
@@ -8,12 +8,23 @@ import {
 } from '@/shared/services/mcp-client';
 import { type URLValidationResult, validateURL } from '@/shared/utils';
 
+type ChildStreamMethods = {
+  pushStreamChunk(
+    streamId: string,
+    chunk: { type: 'content' | 'error'; content?: any; error?: any },
+  ): void;
+  completeStream(streamId: string): void;
+  errorStream(streamId: string, error: any): void;
+};
+
 export const useCapUIRender = ({
   srcUrl,
   onSendPrompt,
   onAddSelection,
   onSaveState,
   onGetState,
+  onStreamRequest,
+  onAbortStream,
   title,
   onPenpalConnected,
   onMCPConnected,
@@ -27,37 +38,32 @@ export const useCapUIRender = ({
   const onAddSelectionRef = useRef(onAddSelection);
   const onSaveStateRef = useRef(onSaveState);
   const onGetStateRef = useRef(onGetState);
-
+  const onStreamRequestRef = useRef(onStreamRequest);
+  const onAbortStreamRef = useRef(onAbortStream);
   // Update refs when props change
   useEffect(() => {
     onSendPromptRef.current = onSendPrompt;
     onAddSelectionRef.current = onAddSelection;
     onSaveStateRef.current = onSaveState;
     onGetStateRef.current = onGetState;
-  }, [onSendPrompt, onAddSelection, onSaveState, onGetState]);
+    onStreamRequestRef.current = onStreamRequest;
+    onAbortStreamRef.current = onAbortStream;
+  }, [
+    onSendPrompt,
+    onAddSelection,
+    onSaveState,
+    onGetState,
+    onStreamRequest,
+    onAbortStream,
+  ]);
+
+  // Keep a ref to child's exposed methods
+  const childStreamRef = useRef<ChildStreamMethods | null>(null);
 
   const [height, setHeight] = useState<number>(100); // Default height
   const [validationResult, setValidationResult] =
     useState<URLValidationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
-
-  const nuwaClientMethods = {
-    sendPrompt: (prompt: string) => {
-      onSendPromptRef.current(prompt);
-    },
-
-    addSelection: (label: string, message: string) => {
-      onAddSelectionRef.current?.(label, message);
-    },
-
-    saveState: (state: any) => {
-      onSaveStateRef.current?.(state);
-    },
-
-    getState: () => {
-      return onGetStateRef.current?.();
-    },
-  };
 
   const validateURLBeforeRender = useCallback(async () => {
     if (!srcUrl) {
@@ -101,6 +107,33 @@ export const useCapUIRender = ({
     validateURLBeforeRender();
   }, [validateURLBeforeRender]);
 
+  const nuwaClientMethods = {
+    sendPrompt: (prompt: string) => {
+      onSendPromptRef.current?.(prompt);
+    },
+
+    addSelection: (label: string, message: string) => {
+      onAddSelectionRef.current?.(label, message);
+    },
+
+    saveState: (state: any) => {
+      onSaveStateRef.current?.(state);
+    },
+
+    getState: () => {
+      return onGetStateRef.current?.();
+    },
+
+    // Streaming entrypoints called by child
+    handleStreamRequest: async (request: StreamAIRequest, streamId: string) => {
+      onStreamRequestRef.current?.(request, streamId);
+    },
+
+    abortStream: async (streamId: string) => {
+      onAbortStreamRef.current?.(streamId);
+    },
+  };
+
   const connectToPenpal = useCallback(async () => {
     try {
       if (!iframeRef.current?.contentWindow) {
@@ -112,14 +145,17 @@ export const useCapUIRender = ({
         allowedOrigins: ['*'],
       });
 
-      await connect({
+      const connection = connect<ChildStreamMethods>({
         messenger,
         methods: {
           ...nuwaClientMethods,
           setHeight,
         },
         timeout: NUWA_CLIENT_TIMEOUT,
-      }).promise;
+      });
+
+      const child = await connection.promise;
+      childStreamRef.current = child;
 
       onPenpalConnected?.();
     } catch (error) {
@@ -195,5 +231,6 @@ export const useCapUIRender = ({
     height,
     validationResult,
     isValidating,
+    childStreamMethods: childStreamRef.current,
   };
 };

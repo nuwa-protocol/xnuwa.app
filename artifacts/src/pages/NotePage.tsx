@@ -9,7 +9,6 @@ import { useNuwaClient } from '@nuwa-ai/ui-kit';
 import { useNoteMCP } from '../hooks/use-note-mcp';
 import '@blocknote/mantine/style.css';
 import { useState } from 'react';
-import '@blocknote/xl-ai/style.css';
 import { AddSelectionButton, ImproveWithAIButton } from '@/components/AIButton';
 
 

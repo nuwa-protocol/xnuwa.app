@@ -1,3 +1,4 @@
+import type { StreamAIRequest } from '@nuwa-ai/ui-kit';
 import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { TextShimmer } from '@/shared/components/ui/text-shimmer';
@@ -78,10 +79,12 @@ export type CapUIRendererProps = {
   srcUrl: string;
   title?: string;
   artifact?: boolean;
-  onSendPrompt: (prompt: string) => void;
-  onAddSelection: (label: string, message: string) => void;
-  onSaveState: (state: any) => void;
-  onGetState: () => any;
+  onSendPrompt?: (prompt: string) => void;
+  onAddSelection?: (label: string, message: string) => void;
+  onSaveState?: (state: any) => void;
+  onGetState?: () => any;
+  onStreamRequest?: (request: StreamAIRequest, streamId: string) => void;
+  onAbortStream?: (streamId: string) => void;
   onPenpalConnected?: () => void;
   onMCPConnected?: (tools: Record<string, any>) => void;
   onPenpalConnectionError?: (error: Error) => void;
@@ -100,12 +103,7 @@ export const CapUIRenderer = (props: CapUIRendererProps) => {
     validationResult,
     isValidating,
   } = useCapUIRender(props);
-  const {
-    srcUrl,
-    title,
-    artifact = false,
-  } = props;
-
+  const { srcUrl, title, artifact = false } = props;
 
   if (!srcUrl) {
     console.error('No URL provided for HTML resource');

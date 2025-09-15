@@ -1,6 +1,6 @@
+import { handleError } from '@/shared/utils/handl-error';
 import { generateTitleFromUserMessage } from '../services';
 import { ChatSessionsStore } from '../stores';
-import { handleError } from '../utils';
 
 export const useUpdateChatTitle = () => {
   const store = ChatSessionsStore();

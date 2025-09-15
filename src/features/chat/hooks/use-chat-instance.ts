@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import { ChatErrorCode, handleError } from '@/shared/utils/handl-error';
 import { ChatInstanceStore, ChatSessionsStore } from '../stores';
 import { convertToUIMessage } from '../utils';
-import { ChatErrorCode, handleError } from '../utils/handl-error';
 import { useUpdateChatTitle } from './use-update-chat-title';
 
 export function useChatInstance(chatId: string) {

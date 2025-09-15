@@ -7,7 +7,6 @@ import type {
 
 async function modelFetch(gatewayUrl: string): Promise<OpenRouterAPIResponse> {
   const authorizedFetch = createAuthorizedFetch();
-  // TODO: need to make sure NUWA LLM Gateway supports models endpoint
   // const endpoint = `${gatewayUrl}/models`;
   const endpoint = `https://openrouter.ai/api/v1/models`;
 

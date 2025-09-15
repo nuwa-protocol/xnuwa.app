@@ -6,12 +6,12 @@ import {
   streamText,
   type UIMessage,
 } from 'ai';
+import { CapResolve } from '@/shared/services/cap-resolve';
+import { llmProvider } from '@/shared/services/llm-providers';
 import { CurrentArtifactMCPToolsStore } from '@/shared/stores/current-artifact-store';
 import { generateUUID } from '@/shared/utils';
+import { handleError } from '@/shared/utils/handl-error';
 import { ChatSessionsStore } from '../stores';
-import { handleError } from '../utils/handl-error';
-import { CapResolve } from './cap-resolve';
-import { llmProvider } from './providers';
 
 // Handle AI request, entrance of the AI workflow
 export const CreateAIStream = async ({

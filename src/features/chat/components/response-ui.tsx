@@ -1,8 +1,6 @@
 import { useChat } from '@ai-sdk/react';
 import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
-import { generateUUID } from '@/shared/utils';
 import { useChatContext } from '../contexts/chat-context';
-import { ChatSessionsStore } from '../stores/chat-sessions-store';
 
 interface ResponseUIProps {
     srcUrl: string;
@@ -10,7 +8,6 @@ interface ResponseUIProps {
 }
 
 export const ResponseUI = ({ srcUrl, title }: ResponseUIProps) => {
-    const { addSelectionToChatSession } = ChatSessionsStore();
     const { chat } = useChatContext();
     const { sendMessage } = useChat({ chat });
 
@@ -18,18 +15,12 @@ export const ResponseUI = ({ srcUrl, title }: ResponseUIProps) => {
         sendMessage({ text: prompt });
     };
 
-    const handleAddSelection = (label: string, message: string) => {
-        addSelectionToChatSession(chat.id, { id: generateUUID(), label, message });
-    };
 
     return (
         <CapUIRenderer
             srcUrl={srcUrl}
             title={title}
             onSendPrompt={handleSendPrompt}
-            onAddSelection={handleAddSelection}
-            onSaveState={() => { }}
-            onGetState={() => { }}
         />
     );
 };
