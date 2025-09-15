@@ -8,10 +8,10 @@ import { MobileWarning } from '../shared/components/mobile-warning';
 import { ThemeProvider } from '../shared/components/theme-provider';
 
 export default function RootLayout() {
-  // Check if the app is loaded, remove the HTML loading
+  // Initialize wallet balance manager
   useWalletBalanceManager();
 
-  // Initialize wallet balance manager
+  // Check if the app is loaded, remove the HTML loading
   useAutoLoadingDetection();
 
   // Check if the app is rehydrated

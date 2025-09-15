@@ -2,8 +2,6 @@ import { Outlet } from 'react-router-dom';
 import { SidebarLayout } from '@/features/sidebar/components';
 
 export default function MainLayout() {
-
-
   return (
     <>
       <script
