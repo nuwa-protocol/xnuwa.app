@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button, Card } from '@/shared/components/ui';
-import { useCapKit } from '@/shared/hooks/use-capkit';
+import { capKitService } from '@/shared/services/capkit-service';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
@@ -19,7 +19,6 @@ export function CapCard({ cap }: CapCardProps) {
   const [descriptionClamp, setDescriptionClamp] = useState<number>(2);
   const [isHovered, setIsHovered] = useState(false);
 
-  const { capKit } = useCapKit();
   const { setCurrentCap } = CurrentCapStore();
 
   /**
@@ -49,7 +48,8 @@ export function CapCard({ cap }: CapCardProps) {
     try {
       toast.promise(
         async () => {
-          const downloadedCap = await capKit?.downloadByID(cap.id);
+          const capKit = await capKitService.getCapKit();
+          const downloadedCap = await capKit.downloadByID(cap.id);
           if (downloadedCap) {
             setCurrentCap(downloadedCap);
             navigate('/chat');

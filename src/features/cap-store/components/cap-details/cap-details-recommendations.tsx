@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/shared/components/ui';
-import { useCapKit } from '@/shared/hooks/use-capkit';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from '@/shared/components/ui';
+import { capKitService } from '@/shared/services/capkit-service';
 import { generateUUID } from '@/shared/utils';
 import type { RemoteCap } from '../../types';
 import { mapResultsToRemoteCaps } from '../../utils';
@@ -16,7 +22,6 @@ export function CapDetailsRecommendations({
   currentCapId,
   tags = [],
 }: CapDetailsRecommendationsProps) {
-  const { capKit } = useCapKit();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [caps, setCaps] = useState<RemoteCap[]>([]);
@@ -27,7 +32,7 @@ export function CapDetailsRecommendations({
   useEffect(() => {
     let mounted = true;
     const run = async () => {
-      if (!capKit) return;
+      const capKit = await capKitService.getCapKit();
       setIsLoading(true);
       setError(null);
       try {
@@ -55,11 +60,11 @@ export function CapDetailsRecommendations({
     return () => {
       mounted = false;
     };
-  }, [capKit, currentCapId, queryTags.join(',')]);
+  }, [currentCapId, queryTags.join(',')]);
 
   return (
     <Card className="border-none shadow-none p-0 gap-4">
-      <CardHeader className='pb-0 mb-0 px-0'>
+      <CardHeader className="pb-0 mb-0 px-0">
         <CardTitle className="flex items-center gap-2 pt-2 pb-0 mb-0">
           More Similar Caps
         </CardTitle>

@@ -13,7 +13,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui';
-import { useCapKit } from '@/shared/hooks/use-capkit';
+import { capKitService } from '@/shared/services/capkit-service';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 import type { RemoteCap } from '../../types';
@@ -26,7 +26,6 @@ import { CapDetailsRecommendations } from './cap-details-recommendations';
 
 export function CapDetails({ capId }: { capId: string }) {
   const navigate = useNavigate();
-  const { capKit } = useCapKit();
   const { setCurrentCap } = CurrentCapStore();
   const [isLoading, setIsLoading] = useState(true);
   const [downloadedCapData, setDownloadedCapData] = useState<Cap | null>(null);
@@ -40,7 +39,7 @@ export function CapDetails({ capId }: { capId: string }) {
     setDownloadedCapData(null);
     setCapQueryData(null);
     const fetchCap = async () => {
-      if (!capKit) return;
+      const capKit = await capKitService.getCapKit();
 
       try {
         const downloadedCap = await capKit.downloadByID(capId);
@@ -53,7 +52,7 @@ export function CapDetails({ capId }: { capId: string }) {
     };
 
     const fetchFavoriteStatus = async () => {
-      if (!capKit) return;
+      const capKit = await capKitService.getCapKit();
 
       try {
         const favoriteStatus = await capKit.favorite(capId, 'isFavorite');
@@ -64,7 +63,7 @@ export function CapDetails({ capId }: { capId: string }) {
     };
 
     const queryCap = async () => {
-      if (!capKit) return;
+      const capKit = await capKitService.getCapKit();
 
       try {
         const queriedCap = await capKit.queryByID({ id: capId });
@@ -79,14 +78,14 @@ export function CapDetails({ capId }: { capId: string }) {
     Promise.all([fetchCap(), fetchFavoriteStatus(), queryCap()]).finally(() => {
       setIsLoading(false);
     });
-  }, [capKit, capId]);
+  }, [capId]);
 
   if (isLoading || !downloadedCapData || !capQueryData) {
     return <CapDetailsLoadingSkeleton />;
   }
 
   const handleRateCap = async (rating: number) => {
-    if (!capKit) return;
+    const capKit = await capKitService.getCapKit();
 
     toast.promise(capKit.rateCap(capId, rating), {
       loading: 'Submitting your rating...',
@@ -118,7 +117,7 @@ export function CapDetails({ capId }: { capId: string }) {
 
   const handleToggleFavorite = async () => {
     setIsTogglingFavorite(true);
-    if (!capKit) return;
+    const capKit = await capKitService.getCapKit();
 
     if (isCapFavorite) {
       toast.promise(capKit.favorite(capId, 'remove'), {
