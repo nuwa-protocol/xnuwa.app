@@ -1,9 +1,16 @@
-import { X } from 'lucide-react';
+import { AlertTriangle, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components';
 import { Title } from '@/shared/components/title';
 import { Button } from '@/shared/components/ui/button';
 
-export const ArtifactHeader = ({ title }: { title: string }) => {
+export const ArtifactHeader = ({
+  title,
+  connectionError,
+}: {
+  title: string;
+  connectionError: boolean;
+}) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const chatId = searchParams.get('chat_id');
@@ -27,11 +34,29 @@ export const ArtifactHeader = ({ title }: { title: string }) => {
         </Button>
       </div>
       {/* Center: Title (editable) */}
-      <div className="justify-self-center min-w-0 max-w-[min(70vw,700px)]">
+      <div className="flex flex-row justify-self-center min-w-0 max-w-[min(70vw,700px)]">
+        {connectionError && (
+          <Tooltip>
+            <TooltipTrigger>
+              <AlertTriangle className="h-4 w-4 text-destructive" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <h3 className="text-destructive font-medium">
+                Connection Failed
+              </h3>
+              <p className="text-muted-foreground max-w-xs">
+                Artifact might not respond to AI functions.
+                Please try refreshing the page.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        )}
         <Title title={title} onCommit={() => { }} />
       </div>
       {/* Right: Placeholder to balance center */}
-      <div className="justify-self-end"></div>
+      <div className="justify-self-end">
+
+      </div>
     </div>
   );
 };

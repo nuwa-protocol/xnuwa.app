@@ -1,5 +1,5 @@
 import { useChat } from '@ai-sdk/react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useChatContext } from '@/features/chat/contexts/chat-context';
 import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
@@ -19,6 +19,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
     const { sendMessage, status } = useChat({ chat });
     const { getArtifact, updateArtifact } = useArtifactsStore();
     const { setTools, clearTools } = CurrentArtifactMCPToolsStore();
+    const [connectionError, setConnectionError] = useState<boolean>(false);
 
     const handleSendPrompt = useCallback(
         (prompt: string) => {
@@ -66,13 +67,23 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
         [setTools],
     );
 
-    // Clear artifact mcp tools from the global store when error
+    // Handle mcp connection error
     const handleMCPConnectionError = useCallback(
         (error: Error) => {
             console.error('Artifact MCP connection error:', error);
+            setConnectionError(true);
             clearTools();
         },
-        [clearTools],
+        [setConnectionError],
+    );
+
+    // Handle penpal connection error
+    const handlePenpalConnectionError = useCallback(
+        (error: Error) => {
+            console.error('Penpal connection error:', error);
+            setConnectionError(true);
+        },
+        [setConnectionError],
     );
 
     // Clear tools on unmount to avoid leaking session-scoped UI tools
@@ -91,7 +102,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
     return (
         <div className="flex h-full w-full flex-col overflow-hidden">
             {/* Header */}
-            <ArtifactHeader title={artifact.title} />
+            <ArtifactHeader title={artifact.title} connectionError={connectionError} />
             <div className="min-h-0 flex-1 overflow-hidden">
                 <CapUIRenderer
                     key={artifactId}
@@ -104,6 +115,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
                     onGetState={handleGetState}
                     onMCPConnected={handleMCPConnected}
                     onMCPConnectionError={handleMCPConnectionError}
+                    onPenpalConnectionError={handlePenpalConnectionError}
                 />
             </div>
         </div>
