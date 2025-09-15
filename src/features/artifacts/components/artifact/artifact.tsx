@@ -28,7 +28,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
             }
             sendMessage({ text: prompt });
         },
-        [sendMessage],
+        [sendMessage, status],
     );
 
     const handleAddSelection = useCallback(
