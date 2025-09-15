@@ -1,4 +1,4 @@
-import { ChevronLeft, Info, Settings, Star } from 'lucide-react';
+import { ChevronLeft, Github, Globe, Info, Settings, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -206,6 +206,31 @@ export function CapDetails({ capId }: { capId: string }) {
                 <Settings className="w-4 h-4 mr-2" />
                 Configuration
               </TabsTrigger>
+              {/* External links (GitHub/Homepage) */}
+              <div className="ml-auto flex items-center gap-2 pr-2">
+                {capQueryData.metadata.repository ? (
+                  <a
+                    href={capQueryData.metadata.repository}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Open ${capQueryData.metadata.displayName} repository`}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Github className="w-4 h-4" />
+                  </a>
+                ) : null}
+                {capQueryData.metadata.homepage ? (
+                  <a
+                    href={capQueryData.metadata.homepage}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Open ${capQueryData.metadata.displayName} homepage`}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Globe className="w-4 h-4" />
+                  </a>
+                ) : null}
+              </div>
             </TabsList>
 
             {/* Below the tab list: content 2/3, recommendations 1/3 */}
@@ -215,7 +240,7 @@ export function CapDetails({ capId }: { capId: string }) {
                 <TabsContent value="overview" className="mt-0">
                   <Card>
                     <CardHeader>
-                      <CardTitle>About This Cap</CardTitle>
+                      <CardTitle className='text-xl'>About This Cap</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-muted-foreground leading-relaxed text-base break-words">

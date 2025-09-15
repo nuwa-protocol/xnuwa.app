@@ -1,4 +1,3 @@
-import { Download, Heart } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/shared/components/ui';
@@ -7,7 +6,6 @@ import { generateUUID } from '@/shared/utils';
 import type { RemoteCap } from '../../types';
 import { mapResultsToRemoteCaps } from '../../utils';
 import { CapAvatar } from '../cap-avatar';
-import { StarRating } from '../star-rating';
 
 interface CapDetailsRecommendationsProps {
   currentCapId: string;
@@ -61,12 +59,12 @@ export function CapDetailsRecommendations({
 
   return (
     <Card className="border-none shadow-none p-0 gap-4">
-      <CardHeader className='pb-0 mb-0'>
+      <CardHeader className='pb-0 mb-0 px-0'>
         <CardTitle className="flex items-center gap-2 pt-2 pb-0 mb-0">
           More Similar Caps
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="p-0">
         {isLoading ? (
           <div className="space-y-2">
             {[...Array(4)].map(() => (
@@ -103,24 +101,9 @@ export function CapDetailsRecommendations({
                       <div className="text-sm font-medium leading-5 line-clamp-1">
                         {meta.displayName}
                       </div>
-                      {stats ? (
-                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Download className="size-3" />
-                            <span>{stats.downloads}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Heart className="size-3" />
-                            <span>{stats.favorites}</span>
-                          </div>
-                          <StarRating
-                            averageRating={stats.averageRating}
-                            userRating={stats.userRating}
-                            ratingCount={stats.ratingCount}
-                            size={12}
-                          />
-                        </div>
-                      ) : null}
+                      <div className="text-xs text-muted-foreground line-clamp-3">
+                        {meta.description}
+                      </div>
                     </div>
                   </div>
                 );

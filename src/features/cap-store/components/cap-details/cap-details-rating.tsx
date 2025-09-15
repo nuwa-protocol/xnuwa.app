@@ -20,6 +20,7 @@ export function CapDetailsRating({
   onRate,
 }: CapDetailsRatingProps) {
   const getRatingDistribution = () => {
+    console.log('capQueryData', capQueryData);
     const total = capQueryData.stats.ratingCount || 0;
 
     // Mock distribution for now - you can replace with actual data if available
