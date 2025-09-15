@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button, Card } from '@/shared/components/ui';
-import { capKitService } from '@/shared/services/capkit-service';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
 import { StarRating } from './star-rating';
@@ -20,6 +20,7 @@ export function CapCard({ cap }: CapCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const { setCurrentCap } = CurrentCapStore();
+  const { downloadCapByIDWithCache } = useCapStore();
 
   /**
    * Dynamically calculate the description line number, so that the title (up to 2 lines) and description together take up 4 lines.
@@ -48,8 +49,7 @@ export function CapCard({ cap }: CapCardProps) {
     try {
       toast.promise(
         async () => {
-          const capKit = await capKitService.getCapKit();
-          const downloadedCap = await capKit.downloadByID(cap.id);
+          const downloadedCap = await downloadCapByIDWithCache(cap.id);
           if (downloadedCap) {
             setCurrentCap(downloadedCap);
             navigate('/chat');

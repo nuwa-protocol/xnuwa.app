@@ -1,4 +1,4 @@
-import type { Page, Result, ResultCap } from '@nuwa-ai/cap-kit';
+import type { Cap, Page, Result, ResultCap } from '@nuwa-ai/cap-kit';
 import { create } from 'zustand';
 import { capKitService } from '@/shared/services/capkit-service';
 import type { CapStoreSection, RemoteCap } from './types';
@@ -49,6 +49,9 @@ interface CapStoreState {
   isFetchingFavoriteCaps: boolean;
   favoriteCapsError: string | null;
 
+  //downloaded caps management
+  downloadedCaps: Record<string, Cap>;
+
   // UI Actions (from context)
   initialize: () => Promise<void>;
 
@@ -62,6 +65,7 @@ interface CapStoreState {
   goToPage: (newPage: number) => Promise<any>;
   fetchHome: () => Promise<HomeData | null>;
   fetchFavoriteCaps: () => Promise<RemoteCap[]>;
+  downloadCapByIDWithCache: (id: string) => Promise<Cap>;
 }
 
 const initialActiveSection: CapStoreSection = {
@@ -98,6 +102,9 @@ const initialState = {
   favoriteCapsError: null,
   isLoadingHome: false,
   homeError: null,
+
+  //downloaded caps management
+  downloadedCaps: {},
 };
 
 export const useCapStore = create<CapStoreState>()((set, get) => {
@@ -287,6 +294,17 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
         });
         throw err;
       }
+    },
+
+    downloadCapByIDWithCache: async (id: string): Promise<Cap> => {
+      const cachedCap = get().downloadedCaps[id];
+      if (cachedCap) {
+        return cachedCap;
+      }
+      const capKit = await capKitService.getCapKit();
+      const cap = await capKit.downloadByID(id);
+      set({ downloadedCaps: { ...get().downloadedCaps, [id]: cap } });
+      return cap;
     },
   };
 });

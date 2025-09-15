@@ -16,6 +16,7 @@ import {
 import { capKitService } from '@/shared/services/capkit-service';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
+import { useCapStore } from '../../stores';
 import type { RemoteCap } from '../../types';
 import { mapResultToRemoteCap } from '../../utils';
 import { CapDetailsConfiguration } from './cap-details-configuration';
@@ -32,6 +33,7 @@ export function CapDetails({ capId }: { capId: string }) {
   const [capQueryData, setCapQueryData] = useState<RemoteCap | null>(null);
   const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<boolean>(false);
+  const { downloadCapByIDWithCache } = useCapStore();
 
   // Fetch full cap data when selectedCap changes
   useEffect(() => {
@@ -39,10 +41,8 @@ export function CapDetails({ capId }: { capId: string }) {
     setDownloadedCapData(null);
     setCapQueryData(null);
     const fetchCap = async () => {
-      const capKit = await capKitService.getCapKit();
-
       try {
-        const downloadedCap = await capKit.downloadByID(capId);
+        const downloadedCap = await downloadCapByIDWithCache(capId);
         setDownloadedCapData(downloadedCap);
       } catch (error) {
         console.error('Failed to download cap data:', error);
@@ -239,7 +239,7 @@ export function CapDetails({ capId }: { capId: string }) {
                 <TabsContent value="overview" className="mt-0">
                   <Card>
                     <CardHeader>
-                      <CardTitle className='text-xl'>About This Cap</CardTitle>
+                      <CardTitle className="text-xl">About This Cap</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-muted-foreground leading-relaxed text-base break-words">

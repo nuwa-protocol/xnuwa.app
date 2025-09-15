@@ -13,7 +13,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui';
-import { capKitService } from '@/shared/services/capkit-service';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 import { useCapStore } from '../stores';
@@ -26,6 +25,7 @@ const CapInfo = ({ cap }: { cap: Cap }) => (
       capName={cap.metadata.displayName}
       capThumbnail={cap.metadata.thumbnail}
       size="sm"
+      className='rounded-md'
     />
     <span className="text-sm font-normal">{cap.metadata.displayName}</span>
   </>
@@ -34,15 +34,14 @@ const CapInfo = ({ cap }: { cap: Cap }) => (
 export function CapSelector() {
   const { currentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
-  const { favoriteCaps } = useCapStore();
+  const { favoriteCaps, downloadCapByIDWithCache } = useCapStore();
   const { setCurrentCap } = CurrentCapStore();
   const navigate = useNavigate();
   const handleCapSelect = async (cap: RemoteCap) => {
     const id = cap.id;
     try {
       toast.promise(async () => {
-        const capKit = await capKitService.getCapKit();
-        const cap = await capKit.downloadByID(id);
+        const cap = await downloadCapByIDWithCache(id);
         setCurrentCap(cap);
       }, {
         loading: 'Loading cap...',
@@ -92,7 +91,7 @@ export function CapSelector() {
   return (
     <TooltipProvider>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger asChild className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
           <Button
             variant="outline"
             size="sm"
