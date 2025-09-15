@@ -1,3 +1,4 @@
+import type { Cap } from '@nuwa-ai/cap-kit';
 import {
   convertToModelMessages,
   createUIMessageStream,
@@ -16,13 +17,15 @@ export const CreateAIStream = async ({
   chatId,
   messages,
   signal,
+  cap,
 }: {
   chatId: string;
   messages: UIMessage[];
   signal?: AbortSignal;
+  cap: Cap;
 }) => {
   // Resolve cap configuration
-  const capResolve = new CapResolve();
+  const capResolve = new CapResolve(cap);
   const { prompt, model, tools } = await capResolve.getResolvedConfig();
 
   // create a new chat session and update the messages

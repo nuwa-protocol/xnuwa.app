@@ -1,5 +1,4 @@
 import { RemoteMCPManager } from '@/shared/services/global-mcp-manager';
-import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 
 export class CapResolve {
@@ -7,13 +6,9 @@ export class CapResolve {
   private isCurrentCapMCPError: boolean;
   private hasMCPServers: boolean;
 
-  constructor() {
-    const { currentCap, isError } = CurrentCapStore.getState();
-    if (!currentCap) {
-      throw new Error('No cap selected. Please select a cap to use.');
-    }
-    this.cap = currentCap;
-    this.isCurrentCapMCPError = isError;
+  constructor(cap: Cap) {
+    this.cap = cap;
+    this.isCurrentCapMCPError = false;
     this.hasMCPServers = Object.keys(this.cap.core.mcpServers).length > 0;
   }
 

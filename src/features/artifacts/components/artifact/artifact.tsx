@@ -1,5 +1,6 @@
 import { useChat } from '@ai-sdk/react';
 import { useCallback } from 'react';
+import { toast } from 'sonner';
 import { useChatContext } from '@/features/chat/contexts/chat-context';
 import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
 import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
@@ -14,11 +15,17 @@ type ArtifactProps = {
 export const Artifact = ({ artifactId }: ArtifactProps) => {
     const { addSelectionToChatSession } = ChatSessionsStore();
     const { chat } = useChatContext();
-    const { sendMessage } = useChat({ chat });
+    const { sendMessage, status } = useChat({ chat });
     const { getArtifact, updateArtifact } = useArtifactsStore();
 
     const handleSendPrompt = useCallback(
         (prompt: string) => {
+            if (status === 'streaming' || status === 'submitted') {
+                toast.warning(
+                    'Waiting for the model to finish processing the previous message...',
+                );
+                return;
+            }
             sendMessage({ text: prompt });
         },
         [sendMessage],

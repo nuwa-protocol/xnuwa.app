@@ -1,5 +1,6 @@
 import type { UIMessage } from '@ai-sdk/react';
 import type { ChatRequestOptions, ChatTransport, UIMessageChunk } from 'ai';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { CreateAIStream } from './stream-ai';
 
 export class ClientChatTransport implements ChatTransport<UIMessage> {
@@ -13,10 +14,12 @@ export class ClientChatTransport implements ChatTransport<UIMessage> {
       messageId: string | undefined;
     } & ChatRequestOptions,
   ): Promise<ReadableStream<UIMessageChunk>> {
+    const { currentCap } = CurrentCapStore.getState();
     const Stream = CreateAIStream({
       chatId: options.chatId,
       messages: options.messages,
       signal: options.abortSignal,
+      cap: currentCap,
     });
     return Stream;
   }
