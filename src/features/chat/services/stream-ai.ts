@@ -6,6 +6,7 @@ import {
   streamText,
   type UIMessage,
 } from 'ai';
+import { CurrentArtifactMCPToolsStore } from '@/shared/stores/current-artifact-store';
 import { generateUUID } from '@/shared/utils';
 import { ChatSessionsStore } from '../stores';
 import { handleError } from '../utils/handl-error';
@@ -26,7 +27,21 @@ export const CreateAIStream = async ({
 }) => {
   // Resolve cap configuration
   const capResolve = new CapResolve(cap);
-  const { prompt, model, tools } = await capResolve.getResolvedConfig();
+  const {
+    prompt,
+    model,
+    tools: remoteMCPTools,
+  } = await capResolve.getResolvedConfig();
+
+  // Add artifact tools
+  const artifactTools = CurrentArtifactMCPToolsStore.getState().getTools();
+
+  const mergedTools = artifactTools
+    ? {
+        ...remoteMCPTools,
+        ...artifactTools,
+      }
+    : remoteMCPTools;
 
   // create a new chat session and update the messages
   const { updateMessages, addPaymentCtxIdToChatSession } =
@@ -60,7 +75,7 @@ export const CreateAIStream = async ({
         model: llmProvider.chat(model),
         system: prompt,
         messages: convertToModelMessages(messages),
-        tools,
+        tools: mergedTools,
         abortSignal: signal,
         maxRetries: 3,
         stopWhen: stepCountIs(10),

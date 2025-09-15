@@ -1,9 +1,10 @@
 import { useChat } from '@ai-sdk/react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useChatContext } from '@/features/chat/contexts/chat-context';
 import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
 import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
+import { CurrentArtifactMCPToolsStore } from '@/shared/stores/current-artifact-store';
 import { generateUUID } from '@/shared/utils';
 import { useArtifactsStore } from '../../stores';
 import { ArtifactHeader } from './artifact-header';
@@ -17,6 +18,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
     const { chat } = useChatContext();
     const { sendMessage, status } = useChat({ chat });
     const { getArtifact, updateArtifact } = useArtifactsStore();
+    const { setTools, clearTools } = CurrentArtifactMCPToolsStore();
 
     const handleSendPrompt = useCallback(
         (prompt: string) => {
@@ -56,10 +58,29 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
         return currentArtifact?.state || null;
     }, [artifactId, getArtifact]);
 
-    const handleMCPConnected = useCallback((tools: Record<string, any>) => {
-        console.log('tools', tools);
-    }, []);
+    // Set artifact mcp tools to the global store
+    const handleMCPConnected = useCallback(
+        (tools: Record<string, any>) => {
+            setTools(tools);
+        },
+        [setTools],
+    );
 
+    // Clear artifact mcp tools from the global store when error
+    const handleMCPConnectionError = useCallback(
+        (error: Error) => {
+            console.error('Artifact MCP connection error:', error);
+            clearTools();
+        },
+        [clearTools],
+    );
+
+    // Clear tools on unmount to avoid leaking session-scoped UI tools
+    useEffect(() => {
+        return () => {
+            clearTools();
+        };
+    }, []);
 
     // Get artifact from store
     const artifact = getArtifact(artifactId);
@@ -82,6 +103,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
                     onSaveState={handleSaveState}
                     onGetState={handleGetState}
                     onMCPConnected={handleMCPConnected}
+                    onMCPConnectionError={handleMCPConnectionError}
                 />
             </div>
         </div>
