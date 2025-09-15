@@ -141,7 +141,9 @@ export const useCapUIRender = ({
         targetWindow: iframeRef.current?.contentWindow,
       });
 
-      onMCPConnected?.(mcpClient);
+      const tools = await mcpClient.tools();
+
+      onMCPConnected?.(tools);
     } catch (error) {
       const err =
         error instanceof Error

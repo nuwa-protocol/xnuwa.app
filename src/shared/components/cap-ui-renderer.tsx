@@ -2,7 +2,6 @@ import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { TextShimmer } from '@/shared/components/ui/text-shimmer';
 import { useCapUIRender } from '@/shared/hooks/use-cap-ui-render';
-import type { NuwaMCPClient } from '@/shared/types';
 
 const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
   if (artifact) {
@@ -84,7 +83,7 @@ export type CapUIRendererProps = {
   onSaveState: (state: any) => void;
   onGetState: () => any;
   onPenpalConnected?: () => void;
-  onMCPConnected?: (mcpClient: NuwaMCPClient) => void;
+  onMCPConnected?: (tools: Record<string, any>) => void;
   onPenpalConnectionError?: (error: Error) => void;
   onMCPConnectionError?: (error: Error) => void;
 };

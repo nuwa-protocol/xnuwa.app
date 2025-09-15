@@ -56,6 +56,11 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
         return currentArtifact?.state || null;
     }, [artifactId, getArtifact]);
 
+    const handleMCPConnected = useCallback((tools: Record<string, any>) => {
+        console.log('tools', tools);
+    }, []);
+
+
     // Get artifact from store
     const artifact = getArtifact(artifactId);
 
@@ -76,6 +81,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
                     onAddSelection={handleAddSelection}
                     onSaveState={handleSaveState}
                     onGetState={handleGetState}
+                    onMCPConnected={handleMCPConnected}
                 />
             </div>
         </div>
