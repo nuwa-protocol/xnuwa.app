@@ -7,7 +7,7 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/shared/components/ui/resizable';
-import { useArtifactPage } from '../hooks/use-artifact-page';
+import { useArtifactPage } from '../../hooks/use-artifact-page';
 import { Artifact } from './artifact';
 
 export const ArtifactMain = () => {

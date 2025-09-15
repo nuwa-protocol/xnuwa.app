@@ -1,10 +1,10 @@
 import { useChat } from '@ai-sdk/react';
 import { useCallback } from 'react';
+import { useChatContext } from '@/features/chat/contexts/chat-context';
+import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
 import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
 import { generateUUID } from '@/shared/utils';
-import { useChatContext } from '../../chat/contexts/chat-context';
-import { ChatSessionsStore } from '../../chat/stores/chat-sessions-store';
-import { useArtifactsStore } from '../stores';
+import { useArtifactsStore } from '../../stores';
 import { ArtifactHeader } from './artifact-header';
 
 type ArtifactProps = {
@@ -44,13 +44,10 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
     );
 
     // Get state from store instead of localStorage
-    const handleGetState = useCallback(
-        () => {
-            const currentArtifact = getArtifact(artifactId);
-            return currentArtifact?.state || null;
-        },
-        [artifactId, getArtifact],
-    );
+    const handleGetState = useCallback(() => {
+        const currentArtifact = getArtifact(artifactId);
+        return currentArtifact?.state || null;
+    }, [artifactId, getArtifact]);
 
     // Get artifact from store
     const artifact = getArtifact(artifactId);

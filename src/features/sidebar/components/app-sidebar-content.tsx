@@ -1,4 +1,5 @@
 import {
+  File,
   Loader2,
   Settings2,
   SparklesIcon,
@@ -103,6 +104,15 @@ export function AppSidebarContent() {
               href="/explore"
               variant="secondary"
             />
+
+            {isDevMode && (
+              <SidebarButton
+                icon={File}
+                text={'Artifacts'}
+                href="/artifacts"
+                variant="secondary"
+              />
+            )}
 
             {isDevMode && (
               <SidebarButton

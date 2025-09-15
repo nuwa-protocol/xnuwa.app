@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import ChatLayout from './layout/chat-layout';
 import MainLayout from './layout/main-layout';
 import RootLayout from './layout/root-layout';
+import ArtifactPage from './pages/artifact';
 import ArtifactsPage from './pages/artifacts';
 import CallbackPage from './pages/callback';
 import CapStudioPage from './pages/cap-studio';
@@ -32,9 +33,10 @@ const router = createBrowserRouter([
             element: <ChatLayout />,
             children: [
               { path: 'chat', element: <ChatPage /> },
-              { path: 'artifacts', element: <ArtifactsPage /> },
+              { path: 'artifact', element: <ArtifactPage /> },
             ],
           },
+          { path: 'artifacts', element: <ArtifactsPage /> },
           { path: 'wallet', element: <WalletPage /> },
           { path: 'settings', element: <SettingsPage /> },
           { path: 'explore/*', element: <ExplorePage /> },

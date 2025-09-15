@@ -25,9 +25,9 @@ export function SidebarNewButton() {
 
   const handleNewChat = React.useCallback(() => {
     setOpenMobile(false);
-    if (pathname.includes('artifacts')) {
+    if (pathname.includes('artifact')) {
       const artifactId = searchParams.get('artifact_id');
-      navigate(`/artifacts${artifactId ? `?artifact_id=${artifactId}` : ''}`);
+      navigate(`/artifact${artifactId ? `?artifact_id=${artifactId}` : ''}`);
     } else {
       navigate('/chat');
     }
@@ -36,8 +36,7 @@ export function SidebarNewButton() {
   const handleNewArtifact = React.useCallback(() => {
     setOpenMobile(false);
     const chatId = searchParams.get('chat_id');
-    console.log('chatId', chatId);
-    navigate(`/artifacts${chatId ? `?chat_id=${chatId}` : ''}`);
+    navigate(`/artifact${chatId ? `?chat_id=${chatId}` : ''}`);
   }, [setOpenMobile, searchParams]);
 
   // Keyboard shortcut: Cmd/Ctrl + K
