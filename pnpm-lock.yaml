@@ -42,8 +42,8 @@ importers:
         specifier: ^0.5.16
         version: 0.5.16(express@5.1.0)(react@19.1.1)(typescript@5.8.3)
       '@nuwa-ai/ui-kit':
-        specifier: 0.5.3
-        version: 0.5.3(react@19.1.1)
+        specifier: 0.5.4
+        version: 0.5.4(react@19.1.1)
       '@openrouter/ai-sdk-provider':
         specifier: ^1.2.0
         version: 1.2.0(ai@5.0.44(zod@3.25.76))(zod@3.25.76)
@@ -1195,8 +1195,8 @@ packages:
       pg:
         optional: true
 
-  '@nuwa-ai/ui-kit@0.5.3':
-    resolution: {integrity: sha512-iQu+MxpYG+7ua76NilHI+I+LbBuwPsr+nr4ysuK+2klTmQDC9WFrOocA0YMaReVP+P/zqwZyQeW9s3ZMBGzHmQ==}
+  '@nuwa-ai/ui-kit@0.5.4':
+    resolution: {integrity: sha512-65bqhjCyuY02O4QAriUahratJsipVwvI2vDJ6U3aUwIon7fXNGWHR5F2/VvmcpfwQ4jP6cRnPFVnvsj6f47nZw==}
     peerDependencies:
       react: '>=16.8.0'
 
@@ -8892,7 +8892,7 @@ snapshots:
       - sury
       - typescript
 
-  '@nuwa-ai/ui-kit@0.5.3(react@19.1.1)':
+  '@nuwa-ai/ui-kit@0.5.4(react@19.1.1)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.18.0
       penpal: 7.0.4
