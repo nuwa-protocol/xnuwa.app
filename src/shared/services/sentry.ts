@@ -1,10 +1,11 @@
 import * as Sentry from '@sentry/react';
+import { sentryConfig } from '../config/sentry';
 import { CurrentCapStore } from '../stores/current-cap-store';
 import { NuwaIdentityKit } from './identity-kit';
 
 export function initSentry() {
   Sentry.init({
-    dsn: 'https://8a147dea8eaeca163e509904ee82de3a@o4509880950194176.ingest.us.sentry.io/4509880959500288',
+    dsn: sentryConfig.dsn,
     environment: import.meta.env.MODE,
     integrations: [
       Sentry.browserTracingIntegration(),
