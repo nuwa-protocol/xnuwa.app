@@ -25,6 +25,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
     const { getArtifact, updateArtifact } = useArtifactsStore();
     const { setTools, clearTools } = CurrentArtifactMCPToolsStore();
     const [connectionError, setConnectionError] = useState<boolean>(false);
+    const [processingAIRequest, setProcessingAIRequest] = useState<boolean>(false);
     const navigate = useNavigate();
     // Track active streams' abort flags
     const streamAbortMap = useRef(new Map<string, { aborted: boolean }>());
@@ -101,6 +102,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
             streamId: string,
             child: ChildStreamMethods,
         ) => {
+            setProcessingAIRequest(true);
             const token = { aborted: false };
             streamAbortMap.current.set(streamId, token);
             try {
@@ -160,6 +162,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
                 }
             } finally {
                 streamAbortMap.current.delete(streamId);
+                setProcessingAIRequest(false);
             }
         },
         [artifactId],
@@ -190,6 +193,7 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
             <ArtifactHeader
                 title={artifact.title}
                 connectionError={connectionError}
+                processingAIRequest={processingAIRequest}
             />
             <div className="min-h-0 flex-1 overflow-hidden">
                 <CapUIRenderer

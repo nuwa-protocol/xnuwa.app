@@ -5,12 +5,11 @@ import {
   getFormattingToolbarItems,
   useCreateBlockNote,
 } from '@blocknote/react';
-import { useNuwaClient } from '@nuwa-ai/ui-kit';
+import { type StreamChunk, useNuwaClient } from '@nuwa-ai/ui-kit';
 import { useNoteMCP } from '../hooks/use-note-mcp';
 import '@blocknote/mantine/style.css';
 import { useState } from 'react';
 import { AddSelectionButton, ImproveWithAIButton } from '@/components/AIButton';
-
 
 export default function NotePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +44,7 @@ export default function NotePage() {
         console.error('Failed to load saved content:', error);
       }
     },
-    debug: true,
+    debug: false
   });
 
   // start MCP server for Nuwa Client to connect
@@ -55,7 +54,9 @@ export default function NotePage() {
     try {
       const selection = editor.getSelection();
       if (selection) {
-        await nuwaClient.sendPrompt(`Please improve the following content: ${JSON.stringify(selection)}`);
+        await nuwaClient.sendPrompt(
+          `Please improve the following content: ${JSON.stringify(selection)}`,
+        );
       }
     } catch (error) {
       console.error('Failed to add note selection:', error);
@@ -63,15 +64,11 @@ export default function NotePage() {
   };
 
   const handleAddSelection = async () => {
-
     try {
       const selectedText = editor.getSelectedText();
       const selection = editor.getSelection();
       if (selection) {
-        await nuwaClient.addSelection(
-          selectedText,
-          selection,
-        );
+        await nuwaClient.addSelection(selectedText, selection);
       }
     } catch (error) {
       console.error('Failed to add note selection:', error);
@@ -87,6 +84,18 @@ export default function NotePage() {
     }
   };
 
+  const handleTestStream = async () => {
+    await nuwaClient.streamAI(
+      {
+        capId: 'did::rooch:rooch1p97qa8yzw75ffrhnlxfueaepyxr3c4nap3jdqzcyv7306qw3003s6w45we:gpt_4o_mini',
+        prompt: 'Please write a simple paragraph about AI. Around 100 words. Anything would be fine.',
+      },
+      (chunk: StreamChunk<string>) => {
+        editor.insertInlineContent(chunk.content ?? '');
+      },
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="h-screen w-screen flex items-center justify-center">
@@ -97,6 +106,15 @@ export default function NotePage() {
 
   return (
     <div className="h-screen w-screen flex flex-col max-w-5xl mx-auto bg-white">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          onClick={handleTestStream}
+        >
+          Test Stream
+        </button>
+      </div>
       {/* Editor */}
       <div className="flex-1 py-10 px-6 bg-white">
         <BlockNoteView
@@ -111,7 +129,8 @@ export default function NotePage() {
                 <AddSelectionButton onClick={handleAddSelection} />
                 <ImproveWithAIButton onClick={handleImproveWithAI} />
               </FormattingToolbar>
-            )} />
+            )}
+          />
         </BlockNoteView>
       </div>
     </div>

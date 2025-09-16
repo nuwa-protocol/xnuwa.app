@@ -37,7 +37,6 @@ const createNoteMCP = (editor: BlockNoteEditor) => {
     ({ content }) => {
       // Insert content into the BlockNote editor
       editor.insertInlineContent(content);
-      console.log(`Adding content ${content}`);
       return {
         content: [
           {

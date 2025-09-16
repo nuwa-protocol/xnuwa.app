@@ -1,4 +1,4 @@
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components';
 import { Title } from '@/shared/components/title';
@@ -7,9 +7,11 @@ import { Button } from '@/shared/components/ui/button';
 export const ArtifactHeader = ({
   title,
   connectionError,
+  processingAIRequest,
 }: {
   title: string;
   connectionError: boolean;
+  processingAIRequest: boolean;
 }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -34,7 +36,21 @@ export const ArtifactHeader = ({
         </Button>
       </div>
       {/* Center: Title (editable) */}
-      <div className="flex flex-row justify-self-center min-w-0 max-w-[min(70vw,700px)]">
+      <div className="flex flex-row justify-center items-center min-w-0 max-w-[min(70vw,700px)]">
+
+        <div className="flex flex-row justify-center items-center gap-2">
+          <Title title={title} onCommit={() => { }} />
+
+        </div>
+      </div>
+      {/* Right: Placeholder to balance center */}
+      <div className="justify-self-end">
+        {processingAIRequest && (
+          <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>AI Processing</span>
+          </div>
+        )}
         {connectionError && (
           <Tooltip>
             <TooltipTrigger>
@@ -51,11 +67,6 @@ export const ArtifactHeader = ({
             </TooltipContent>
           </Tooltip>
         )}
-        <Title title={title} onCommit={() => { }} />
-      </div>
-      {/* Right: Placeholder to balance center */}
-      <div className="justify-self-end">
-
       </div>
     </div>
   );
