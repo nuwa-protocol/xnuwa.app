@@ -2,7 +2,10 @@ import type { StreamAIRequest } from '@nuwa-ai/ui-kit';
 import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { TextShimmer } from '@/shared/components/ui/text-shimmer';
-import { useCapUIRender } from '@/shared/hooks/use-cap-ui-render';
+import {
+  type ChildStreamMethods,
+  useCapUIRender,
+} from '@/shared/hooks/use-cap-ui-render';
 
 const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
   if (artifact) {
@@ -83,7 +86,11 @@ export type CapUIRendererProps = {
   onAddSelection?: (label: string, message: string) => void;
   onSaveState?: (state: any) => void;
   onGetState?: () => any;
-  onStreamRequest?: (request: StreamAIRequest, streamId: string) => void;
+  onStreamRequest?: (
+    request: StreamAIRequest,
+    streamId: string,
+    child: ChildStreamMethods,
+  ) => void;
   onAbortStream?: (streamId: string) => void;
   onPenpalConnected?: () => void;
   onMCPConnected?: (tools: Record<string, any>) => void;

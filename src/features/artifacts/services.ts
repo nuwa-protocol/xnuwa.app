@@ -1,21 +1,23 @@
-import type { Cap } from '@nuwa-ai/cap-kit';
-import { stepCountIs, streamText } from 'ai';
+import type { StreamAIRequest } from '@nuwa-ai/ui-kit';
+import { stepCountIs, streamObject, streamText } from 'ai';
 import { CapResolve } from '@/shared/services/cap-resolve';
 import { llmProvider } from '@/shared/services/llm-providers';
 import { generateUUID } from '@/shared/utils';
-import { handleError } from '@/shared/utils/handl-error';
+import { useCapStore } from '../cap-store/stores';
+import { useArtifactsStore } from './stores';
 
-// Handle AI request, entrance of the AI workflow
+// Handle AI request from artifact
 export const CreateAIStream = async ({
   artifactId,
-  signal,
-  cap,
+  request,
 }: {
   artifactId: string;
-  signal?: AbortSignal;
-  cap: Cap;
+  request: StreamAIRequest;
 }) => {
   // Resolve cap configuration
+  const cap = await useCapStore
+    .getState()
+    .downloadCapByIDWithCache(request.capId);
   const capResolve = new CapResolve(cap);
   const { prompt, model, tools } = await capResolve.getResolvedConfig();
 
@@ -25,21 +27,39 @@ export const CreateAIStream = async ({
     'X-Client-Tx-Ref': paymentCtxId,
   };
 
-  // TODO: add payment info to artifact session
-  //   await addPaymentCtxIdToArtifactSession(artifactId, {
-  //   });
+  const { addPaymentCtxIdToArtifactSession } = useArtifactsStore.getState();
+  await addPaymentCtxIdToArtifactSession(artifactId, {
+    type: 'stream-request',
+    ctxId: paymentCtxId,
+    message: request.prompt,
+    timestamp: Date.now(),
+  });
+
+  if (request.schema) {
+    return streamObject({
+      model: llmProvider.chat(model),
+      system: prompt,
+      prompt: request.prompt,
+      schema: request.schema,
+      // tools: tools, Tools are not supported by object generation
+      maxRetries: 3,
+      headers,
+      onError: (error: any) => {
+        throw new Error(error);
+      },
+    });
+  }
 
   return streamText({
     model: llmProvider.chat(model),
     system: prompt,
-    messages: [],
+    prompt: request.prompt,
     tools: tools,
-    abortSignal: signal,
     maxRetries: 3,
     stopWhen: stepCountIs(10),
     headers,
     onError: (error: any) => {
-      handleError(error);
+      throw new Error(error);
     },
   });
 };

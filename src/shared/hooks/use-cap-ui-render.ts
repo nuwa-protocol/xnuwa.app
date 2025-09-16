@@ -8,7 +8,7 @@ import {
 } from '@/shared/services/mcp-client';
 import { type URLValidationResult, validateURL } from '@/shared/utils';
 
-type ChildStreamMethods = {
+export type ChildStreamMethods = {
   pushStreamChunk(
     streamId: string,
     chunk: { type: 'content' | 'error'; content?: any; error?: any },
@@ -126,7 +126,11 @@ export const useCapUIRender = ({
 
     // Streaming entrypoints called by child
     handleStreamRequest: async (request: StreamAIRequest, streamId: string) => {
-      onStreamRequestRef.current?.(request, streamId);
+      if (!childStreamRef.current) {
+        console.error('Child stream method not found');
+        return;
+      }
+      onStreamRequestRef.current?.(request, streamId, childStreamRef.current);
     },
 
     abortStream: async (streamId: string) => {

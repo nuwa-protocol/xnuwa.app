@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createArtifactsPersistConfig } from '@/shared/storage/indexeddb-config';
-import type { Artifact } from './types';
+import type { Artifact, ArtifactPayment } from './types';
 
 interface ArtifactsState {
   artifacts: Record<string, Artifact>;
@@ -14,6 +14,10 @@ interface ArtifactsState {
   getArtifactsBySource: (sourceId: string) => Artifact[];
   getAllArtifacts: () => Artifact[];
   clearArtifacts: () => void;
+  addPaymentCtxIdToArtifactSession: (
+    id: string,
+    payment: ArtifactPayment,
+  ) => void;
 }
 
 export const useArtifactsStore = create<ArtifactsState>()(
@@ -62,12 +66,25 @@ export const useArtifactsStore = create<ArtifactsState>()(
       getArtifactsBySource: (sourceId) => {
         const artifacts = get().artifacts;
         return Object.values(artifacts).filter(
-          (artifact) => artifact.source.id === sourceId
+          (artifact) => artifact.source.id === sourceId,
         );
       },
 
       getAllArtifacts: () => {
         return Object.values(get().artifacts);
+      },
+
+      addPaymentCtxIdToArtifactSession: (id, payment) => {
+        set((state) => {
+          const artifact = state.artifacts[id];
+          if (!artifact) return state;
+          return {
+            artifacts: {
+              ...state.artifacts,
+              [id]: { ...artifact, payments: [...artifact.payments, payment] },
+            },
+          };
+        });
       },
 
       clearArtifacts: () => {
