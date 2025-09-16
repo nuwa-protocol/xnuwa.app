@@ -1,11 +1,11 @@
 import { useParams } from 'react-router-dom';
-import { useLocalCaps } from '../../hooks';
+import { CapStudioStore } from '../../stores';
 import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
 import { CapSubmitForm } from './cap-submit-form';
 
 export function Submit() {
   const { id } = useParams();
-  const localCaps = useLocalCaps();
+  const { localCaps } = CapStudioStore();
 
   const cap = localCaps.find((cap) => cap.id === id);
 
@@ -25,12 +25,7 @@ export function Submit() {
 
   return (
     <DashboardLayout>
-      <CapSubmitForm
-        cap={cap}
-        thumbnail={cap.capData.metadata.thumbnail}
-        homepage={cap.capData.metadata.homepage}
-        repository={cap.capData.metadata.repository}
-      />
+      <CapSubmitForm cap={cap} />
     </DashboardLayout>
   );
 }

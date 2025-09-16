@@ -1,7 +1,7 @@
 import { Bug } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
-import { useCurrentCap } from '@/shared/hooks';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { LocalCap } from '../types';
 import { BatchCreate } from './batch-create';
 import { DashboardHeader, DashboardLayout } from './layout/dashboard-layout';
@@ -9,7 +9,7 @@ import { MyCaps } from './my-caps';
 
 export function CapStudio() {
   const navigate = useNavigate();
-  const { setCurrentCap } = useCurrentCap();
+  const { setCurrentCap } = CurrentCapStore();
 
   const handleEditCap = (cap: LocalCap) => {
     navigate(`/cap-studio/edit/${cap.id}`);
@@ -29,7 +29,7 @@ export function CapStudio() {
     navigate('/cap-studio/create');
   };
 
-  const handleGoToMcpDebug = () => {
+  const handleGoToMcp = () => {
     navigate('/cap-studio/mcp');
   };
 
@@ -39,8 +39,8 @@ export function CapStudio() {
         title="Cap Studio"
         description="Create, test, and publish powerful AI capabilities with integrated MCP tools"
         actions={
-          <Button onClick={handleGoToMcpDebug} variant="outline" size="sm">
-            <Bug className="mr-1" /> MCP Tools
+          <Button onClick={handleGoToMcp} variant="outline" size="sm">
+            <Bug className="mr-1" /> MCP Debug Tool
           </Button>
         }
       />

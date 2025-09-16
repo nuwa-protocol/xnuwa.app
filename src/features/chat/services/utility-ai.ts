@@ -1,18 +1,17 @@
-import { generateText, type Message } from 'ai';
+import { generateText, type UIMessage } from 'ai';
+import { llmProvider } from '@/shared/services/llm-providers';
 import { generateUUID } from '@/shared/utils';
-import { ChatStateStore } from '../stores';
-import { llmProvider } from './providers';
+import { ChatSessionsStore } from '../stores';
 
 // Generate a title from the first message a user begins a conversation with
-// TODO: currently still using the remote AI models, need to switch to local models
 export async function generateTitleFromUserMessage({
   chatId,
   message,
 }: {
   chatId: string;
-  message: Message;
+  message: UIMessage;
 }) {
-  const { addPaymentCtxIdToChatSession } = ChatStateStore.getState();
+  const { addPaymentCtxIdToChatSession } = ChatSessionsStore.getState();
 
   // create payment ctx id header
   const paymentCtxId = generateUUID();

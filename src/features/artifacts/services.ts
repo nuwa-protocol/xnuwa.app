@@ -1,0 +1,65 @@
+import type { StreamAIRequest } from '@nuwa-ai/ui-kit';
+import { stepCountIs, streamObject, streamText } from 'ai';
+import { CapResolve } from '@/shared/services/cap-resolve';
+import { llmProvider } from '@/shared/services/llm-providers';
+import { generateUUID } from '@/shared/utils';
+import { useCapStore } from '../cap-store/stores';
+import { useArtifactsStore } from './stores';
+
+// Handle AI request from artifact
+export const CreateAIStream = async ({
+  artifactId,
+  request,
+}: {
+  artifactId: string;
+  request: StreamAIRequest;
+}) => {
+  // Resolve cap configuration
+  const cap = await useCapStore
+    .getState()
+    .downloadCapByIDWithCache(request.capId);
+  const capResolve = new CapResolve(cap);
+  const { prompt, model, tools } = await capResolve.getResolvedConfig();
+
+  // create payment CTX id header
+  const paymentCtxId = generateUUID();
+  const headers = {
+    'X-Client-Tx-Ref': paymentCtxId,
+  };
+
+  const { addPaymentCtxIdToArtifactSession } = useArtifactsStore.getState();
+  await addPaymentCtxIdToArtifactSession(artifactId, {
+    type: 'stream-request',
+    ctxId: paymentCtxId,
+    message: request.prompt,
+    timestamp: Date.now(),
+  });
+
+  if (request.schema) {
+    return streamObject({
+      model: llmProvider.chat(model),
+      system: prompt,
+      prompt: request.prompt,
+      schema: request.schema,
+      // tools: tools, Tools are not supported by object generation
+      maxRetries: 3,
+      headers,
+      onError: (error: any) => {
+        throw new Error(error);
+      },
+    });
+  }
+
+  return streamText({
+    model: llmProvider.chat(model),
+    system: prompt,
+    prompt: request.prompt,
+    tools: tools,
+    maxRetries: 3,
+    stopWhen: stepCountIs(10),
+    headers,
+    onError: (error: any) => {
+      throw new Error(error);
+    },
+  });
+};

@@ -1,88 +1,98 @@
-import type { UseChatHelpers } from '@ai-sdk/react';
-import type { UIMessage } from 'ai';
-import equal from 'fast-deep-equal';
-import { motion } from 'framer-motion';
-import { memo } from 'react';
-import { useMessagesUI } from '@/features/chat/hooks/use-messages-ui';
-import { PreviewMessage, ThinkingMessage } from './message';
+import { useChat } from '@ai-sdk/react';
+import { useEffect, useState } from 'react';
+import { useChatContext } from '../contexts/chat-context';
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from './conversation';
+import { Loader } from './loader';
+import { PreviewMessage } from './message';
 
 interface MessagesProps {
-  chatId: string;
-  status: UseChatHelpers['status'];
-  messages: Array<UIMessage>;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
   isReadonly: boolean;
 }
 
-function PureMessages({
-  chatId,
-  status,
-  messages,
-  setMessages,
-  reload,
-  isReadonly,
-}: MessagesProps) {
-  const {
-    containerRef: messagesContainerRef,
-    endRef: messagesEndRef,
-    onViewportEnter,
-    onViewportLeave,
-    hasSentMessage,
-  } = useMessagesUI({
-    chatId,
-    status,
-  });
+function PureMessages({ isReadonly }: MessagesProps) {
+  const { chat } = useChatContext();
+  const { messages, status } = useChat({ chat });
+  const [userMessagesHeight, setUserMessagesHeight] = useState(0);
+
+  // when messages update, recalculate the height of the last user message
+  useEffect(() => {
+    const calculateLastUserMessageHeight = () => {
+      // find the last user message DOM element
+      const userMessages = document.querySelectorAll('[data-role="user"]');
+      const lastUserMessage = userMessages[userMessages.length - 1];
+
+      if (lastUserMessage) {
+        const height = lastUserMessage.getBoundingClientRect().height;
+        setUserMessagesHeight(height);
+      } else {
+        setUserMessagesHeight(0);
+      }
+    };
+
+    // delay execution to ensure the DOM has been updated to ensure the user message get scrolled to the top
+    const timer = setTimeout(calculateLastUserMessageHeight, 100);
+    return () => clearTimeout(timer);
+  }, [messages]);
+
+  const getLoaderMinHeight = () => {
+    const headerHeight = 195;
+    const calculatedMinHeight = Math.max(
+      0,
+      window.innerHeight - headerHeight - userMessagesHeight,
+    );
+    return `${calculatedMinHeight}px`;
+  };
 
   return (
-    <div
-      ref={messagesContainerRef}
-      className="flex flex-col min-w-0 gap-6 h-full overflow-y-scroll pt-4 relative"
-    >
-      {messages.map((message, index) => {
-        const isStreaming =
-          status === 'streaming' && messages.length - 1 === index;
-        const isStreamingReasoning =
-          isStreaming &&
-          message.role === 'assistant' &&
-          message.parts?.some((part) => part.type === 'reasoning') &&
-          !message.parts?.some((part) => part.type === 'text');
-        return (
-          <PreviewMessage
-            key={message.id}
-            chatId={chatId}
-            message={message}
-            isStreaming={isStreaming}
-            isStreamingReasoning={isStreamingReasoning}
-            setMessages={setMessages}
-            reload={reload}
-            isReadonly={isReadonly}
-            requiresScrollPadding={
-              hasSentMessage && index === messages.length - 1
+    <Conversation>
+      <ConversationContent>
+        {messages.map((message, index) => {
+          return (
+            <PreviewMessage
+              key={message.id}
+              index={index}
+              message={message}
+              isReadonly={isReadonly}
+              userMessagesHeight={userMessagesHeight}
+            />
+          );
+        })}
+
+        {/* Show loader from user message submission until AI outputs meaningful content */}
+        {(() => {
+          // Show loader during submission
+          if (
+            status === 'submitted' &&
+            messages.length > 0 &&
+            messages[messages.length - 1].role === 'user'
+          ) {
+            return true;
+          }
+
+          // Show loader during streaming if AI hasn't started outputting text/reasoning yet
+          if (status === 'streaming' && messages.length >= 2) {
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessage.role === 'assistant') {
+              // Hide loader once AI starts outputting meaningful content
+              const hasTextOrReasoning = lastMessage.parts?.some(
+                (part) =>
+                  (part.type === 'text' && part.text?.trim()) ||
+                  part.type === 'reasoning',
+              );
+              return !hasTextOrReasoning;
             }
-          />
-        );
-      })}
+          }
 
-      {status === 'submitted' &&
-        messages.length > 0 &&
-        messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
-
-      <motion.div
-        ref={messagesEndRef}
-        className="shrink-0 min-w-[24px] min-h-[24px]"
-        onViewportLeave={onViewportLeave}
-        onViewportEnter={onViewportEnter}
-      />
-    </div>
+          return false;
+        })() && <Loader minHeight={getLoaderMinHeight()} />}
+        <ConversationScrollButton />
+      </ConversationContent>
+    </Conversation>
   );
 }
 
-export const Messages = memo(PureMessages, (prevProps, nextProps) => {
-  if (prevProps.status !== nextProps.status) return false;
-  if (prevProps.status && nextProps.status) return false;
-  if (prevProps.messages.length !== nextProps.messages.length) return false;
-  if (!equal(prevProps.messages, nextProps.messages)) return false;
-
-  return true;
-});
+export const Messages = PureMessages;

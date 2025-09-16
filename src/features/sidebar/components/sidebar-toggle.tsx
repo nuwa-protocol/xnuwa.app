@@ -1,5 +1,4 @@
 import { Pin, PinOff } from 'lucide-react';
-import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
 import {
   Button,
   Tooltip,
@@ -8,10 +7,11 @@ import {
   useSidebar,
 } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
+import { useSidebarStore } from '../stores';
 
 export function SidebarToggle() {
   const { setOpen } = useSidebar();
-  const { mode: sidebarMode, setSidebarMode } = useSidebarFloating();
+  const { mode: sidebarMode, setMode: setSidebarMode } = useSidebarStore();
   const { t } = useLanguage();
 
   const handleToggleMode = () => {

@@ -7,9 +7,9 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
 import { SidebarInset, SidebarProvider } from '@/shared/components/ui';
 import { cn } from '@/shared/utils';
+import { useSidebarStore } from '../stores';
 import { AppSidebarContent } from './app-sidebar-content';
 
 // Context for managing sidebar hover state
@@ -44,7 +44,7 @@ const ContentWrapper = memo(
           isFloating
             ? 'w-full ml-0'
             : // Full width in floating mode
-              '', // Normal layout in pinned mode
+            '', // Normal layout in pinned mode
         )}
       >
         <div
@@ -62,8 +62,7 @@ const ContentWrapper = memo(
 ContentWrapper.displayName = 'ContentWrapper';
 
 function SidebarLayoutContent({ children }: SidebarLayoutProps) {
-  const { collapsed: sidebarCollapsed, mode: sidebarMode } =
-    useSidebarFloating();
+  const { collapsed: sidebarCollapsed, mode: sidebarMode } = useSidebarStore();
 
   // Get hover state from context (handle null gracefully)
   const floatingContext = useContext(AppSidebarContext);
@@ -105,7 +104,7 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
 export function SidebarLayout({ children }: SidebarLayoutProps) {
   const [isHovering, setIsHovering] = useState(false);
   const [isStaying, setIsStaying] = useState(false);
-  const { mode: sidebarMode } = useSidebarFloating();
+  const { mode: sidebarMode } = useSidebarStore();
 
   // stayHovering: lock or unlock the hover state
   const stayHovering = useCallback((stay: boolean) => {
@@ -159,7 +158,7 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
 // Hook to get the computed open state based on mode (for external use)
 export const useSidebarOpenState = () => {
   const { collapsed: sidebarCollapsed, mode: sidebarMode } =
-    useSidebarFloating();
+    useSidebarStore();
 
   // Get hover state from context (handle null gracefully)
   const floatingContext = useContext(AppSidebarContext);

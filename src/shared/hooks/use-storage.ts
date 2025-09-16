@@ -1,4 +1,4 @@
-import { ChatStateStore } from '@/features/chat/stores';
+import { ChatSessionsStore } from '@/features/chat/stores';
 import { SettingsStateStore } from '@/features/settings/stores';
 
 // Check if we're in a browser environment
@@ -12,7 +12,7 @@ export const useStorage = () => {
     }
 
     // reset all Zustand stores
-    ChatStateStore.persist.clearStorage();
+    ChatSessionsStore.persist.clearStorage();
     SettingsStateStore.persist.clearStorage();
 
     // clear localStorage
@@ -32,12 +32,12 @@ export const useStorage = () => {
 
   // reset all stores for logging out
   const resetAllStores = () => {
-    ChatStateStore.setState(ChatStateStore.getInitialState());
+    ChatSessionsStore.setState(ChatSessionsStore.getInitialState());
     SettingsStateStore.setState(SettingsStateStore.getInitialState());
   };
 
   const initalizeAllStores = () => {
-    ChatStateStore.persist.rehydrate();
+    ChatSessionsStore.persist.rehydrate();
     SettingsStateStore.persist.rehydrate();
   };
 

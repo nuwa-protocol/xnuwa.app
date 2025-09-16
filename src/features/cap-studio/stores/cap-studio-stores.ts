@@ -1,19 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { NuwaIdentityKit } from '@/shared/services/identity-kit';
-import { createPersistConfig, db } from '@/shared/storage';
-import type { Cap } from '@/shared/types/cap';
+import { createCapStudioPersistConfig } from '@/shared/storage';
+import type { Cap } from '@/shared/types';
 import { generateUUID } from '@/shared/utils';
 import type { LocalCap } from '../types';
-
-// get current DID
-const getCurrentDID = async () => {
-  const { getDid } = await NuwaIdentityKit();
-  return await getDid();
-};
-
-// Database reference
-const capStudioDB = db;
 
 interface CapStudioState {
   // Local caps being developed
@@ -28,23 +18,13 @@ interface CapStudioState {
   getCapById: (id: string) => LocalCap | undefined;
   getCapsByTag: (tag: string) => LocalCap[];
   clearAllCaps: () => void;
-
-  // Data persistence
-  loadFromDB: () => Promise<void>;
-  saveToDB: () => Promise<void>;
 }
 
-const persistConfig = createPersistConfig<CapStudioState>({
+const persistConfig = createCapStudioPersistConfig<CapStudioState>({
   name: 'cap-studio-storage',
-  getCurrentDID: getCurrentDID,
   partialize: (state) => ({
     localCaps: state.localCaps,
   }),
-  onRehydrateStorage: () => (state?: CapStudioState) => {
-    if (state) {
-      state.loadFromDB();
-    }
-  },
 });
 
 export const CapStudioStore = create<CapStudioState>()(
@@ -65,8 +45,6 @@ export const CapStudioStore = create<CapStudioState>()(
           localCaps: [...state.localCaps, newCap],
         }));
 
-        // Save to IndexedDB asynchronously
-        get().saveToDB();
         return newCap;
       },
 
@@ -76,24 +54,12 @@ export const CapStudioStore = create<CapStudioState>()(
             cap.id === id ? { ...cap, ...updates, updatedAt: Date.now() } : cap,
           ),
         }));
-
-        get().saveToDB();
       },
 
       deleteCap: (id) => {
         set((state) => ({
           localCaps: state.localCaps.filter((cap) => cap.id !== id),
         }));
-
-        // Delete from IndexedDB asynchronously
-        const deleteFromDB = async () => {
-          try {
-            await capStudioDB.capStudio.delete(id);
-          } catch (error) {
-            console.error('Failed to delete cap from DB:', error);
-          }
-        };
-        deleteFromDB();
       },
 
       getCapById: (id) => {
@@ -110,65 +76,6 @@ export const CapStudioStore = create<CapStudioState>()(
         set({
           localCaps: [],
         });
-
-        // Clear IndexedDB
-        const clearDB = async () => {
-          try {
-            const currentDID = await getCurrentDID();
-            if (!currentDID) return;
-
-            await capStudioDB.capStudio
-              .where('did')
-              .equals(currentDID)
-              .delete();
-          } catch (error) {
-            console.error('Failed to clear caps from DB:', error);
-          }
-        };
-        clearDB();
-      },
-
-      // Data persistence methods
-      loadFromDB: async () => {
-        if (typeof window === 'undefined') return;
-
-        try {
-          const currentDID = await getCurrentDID();
-          if (!currentDID) return;
-
-          const caps = await capStudioDB.capStudio
-            .where('did')
-            .equals(currentDID)
-            .toArray();
-
-          const sortedCaps = caps.sort(
-            (a: LocalCap, b: LocalCap) => b.updatedAt - a.updatedAt,
-          );
-
-          set({
-            localCaps: sortedCaps,
-          });
-        } catch (error) {
-          console.error('Failed to load caps from DB:', error);
-        }
-      },
-
-      saveToDB: async () => {
-        if (typeof window === 'undefined') return;
-
-        try {
-          const currentDID = await getCurrentDID();
-          if (!currentDID) return;
-
-          const { localCaps } = get();
-          const capsToSave = localCaps.map((cap) => ({
-            ...cap,
-            did: currentDID,
-          }));
-          await capStudioDB.capStudio.bulkPut(capsToSave);
-        } catch (error) {
-          console.error('Failed to save caps to DB:', error);
-        }
       },
     }),
     persistConfig,

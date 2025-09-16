@@ -1,15 +1,20 @@
-import type { UseChatHelpers } from '@ai-sdk/react';
+import { useChat } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { Button } from '@/shared/components/ui';
-import { useSuggestedActions } from '../hooks/use-suggested-actions';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import { useChatContext } from '../contexts';
 
-interface SuggestedActionsProps {
-  append: UseChatHelpers['append'];
-}
+function PureSuggestedActions() {
+  const { chat } = useChatContext();
+  const { sendMessage } = useChat({ chat });
+  const { currentCap: cap } = CurrentCapStore();
 
-function PureSuggestedActions({ append }: SuggestedActionsProps) {
-  const suggestedActions = useSuggestedActions();
+  const suggestedActions =
+    cap?.core.prompt.suggestions?.map((suggestion) => ({
+      title: suggestion,
+      action: suggestion,
+    })) || [];
 
   return (
     <div
@@ -27,10 +32,7 @@ function PureSuggestedActions({ append }: SuggestedActionsProps) {
           <Button
             variant="ghost"
             onClick={async () => {
-              append({
-                role: 'user',
-                content: suggestedAction.action,
-              });
+              sendMessage({ text: suggestedAction.action });
             }}
             className="text-xs whitespace-nowrap border rounded-xl px-3 py-2 flex-shrink-0"
           >

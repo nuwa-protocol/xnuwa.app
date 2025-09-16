@@ -2,15 +2,17 @@ import {
   IdentityKitWeb,
   type UseIdentityKitOptions,
 } from '@nuwa-ai/identity-kit-web';
+import { cadopConfig } from '../config/cadop';
 import { capKitConfig } from '../config/capkit';
 import { cleanupPaymentClientsOnLogout } from './payment-clients';
 
 export const NuwaIdentityKit = (options: UseIdentityKitOptions = {}) => {
   const identityKit = IdentityKitWeb.init({
-    appName: 'Nuwa Client',
-    storage: 'local',
+    ...cadopConfig,
     ...options,
   });
+
+  const isConnected = identityKit.then((identityKit) => identityKit);
 
   const getKeyManager = async () => {
     return await identityKit.then((identityKit) => identityKit.getKeyManager());
@@ -51,6 +53,7 @@ export const NuwaIdentityKit = (options: UseIdentityKitOptions = {}) => {
   };
 
   return {
+    isConnected,
     connect,
     logout,
     handleCallback,

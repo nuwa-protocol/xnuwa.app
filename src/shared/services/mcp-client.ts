@@ -1,11 +1,8 @@
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
-import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { DIDAuth } from '@nuwa-ai/identity-kit';
 import { IdentityKitWeb } from '@nuwa-ai/identity-kit-web';
 import { experimental_createMCPClient as createMCPClient } from 'ai';
 import {
   MCPError,
-  type McpTransportType,
   type NuwaMCPClient,
   type PromptDefinition,
   PromptMessagesResultSchema,
@@ -15,7 +12,7 @@ import {
   type ResourceTemplateDefinition,
   ResourceTemplateSchema,
 } from '../types/mcp-client';
-import { createDidAuthSigner, SignedSSEClientTransport } from './mcp-transport';
+import { createDidAuthSigner, createTransport } from './mcp-transport';
 
 // Note: Client caching is now handled by GlobalMCPManager at a higher level
 // This allows for better lifecycle management and Cap-based organization
@@ -26,11 +23,19 @@ import { createDidAuthSigner, SignedSSEClientTransport } from './mcp-transport';
  *
  * @param url The MCP server URL
  * @param transportType Optional transport type, auto-detected if not specified
+ * @param postMessageOptions Required when using postMessage transport
  * @returns A Promise resolving to a NuwaMCPClient instance
  */
 export async function createNuwaMCPClient(
   url: string,
-  transportType?: McpTransportType,
+  transportType: 'httpStream' | 'postMessage' = 'httpStream',
+  postMessageOptions?: {
+    targetWindow: Window;
+    targetOrigin?: string;
+    allowedOrigins?: string[];
+    debug?: boolean;
+    timeout?: number;
+  },
 ): Promise<NuwaMCPClient> {
   // Create a new client instance (caching is handled by GlobalMCPManager)
   return (async () => {
@@ -38,38 +43,14 @@ export async function createNuwaMCPClient(
     const signer = await createDidAuthSigner(url);
     const initialHeader = await signer({});
 
-    const buildTransport = async (): Promise<any> => {
-      if (transportType === 'httpStream') {
-        return new StreamableHTTPClientTransport(new URL(url), {
-          requestInit: { headers: { Authorization: initialHeader } },
-        } as any);
-      }
-      if (transportType === 'sse') {
-        return new SignedSSEClientTransport(
-          new URL(url),
-          signer,
-          initialHeader,
-        );
-      }
-      // auto-detect
-      try {
-        await fetch(url, {
-          method: 'HEAD',
-          headers: { Authorization: initialHeader },
-        });
-        return new StreamableHTTPClientTransport(new URL(url), {
-          requestInit: { headers: { Authorization: initialHeader } },
-        } as any);
-      } catch {
-        return new SignedSSEClientTransport(
-          new URL(url),
-          signer,
-          initialHeader,
-        );
-      }
-    };
-
-    const finalTransport = await buildTransport();
+    // 2. Create transport based on type
+    const finalTransport = await createTransport(
+      transportType,
+      url,
+      signer,
+      initialHeader,
+      postMessageOptions,
+    );
 
     // 3. Create the base client instance
     const rawClient = await createMCPClient({ transport: finalTransport });
@@ -266,8 +247,8 @@ export async function createNuwaMCPClient(
       },
     };
 
-    // Add execute() methods to prompts for easier access
-    await enhancePromptsWithExecute(client);
+    // Deprecated: Add execute() methods to prompts for easier access
+    // await enhancePromptsWithExecute(client);
 
     return client;
   })();
@@ -284,6 +265,7 @@ export async function closeNuwaMCPClient(url: string): Promise<void> {
 }
 
 /**
+ * @deprecated
  * Enhances the client by adding execute() methods to each prompt
  * for more convenient access.
  */
@@ -298,7 +280,7 @@ async function enhancePromptsWithExecute(client: NuwaMCPClient): Promise<void> {
         const freshMap = await prompts();
 
         // Add execute() methods to each prompt
-        for (const [name, prompt] of Object.entries(freshMap)) {
+        for (const [name] of Object.entries(freshMap)) {
           if (!freshMap[name].execute) {
             freshMap[name].execute = async (args?: Record<string, unknown>) => {
               return client.getPrompt(name, args);
@@ -339,56 +321,4 @@ export async function createDidAuthHeader(url: string): Promise<string> {
   } as const;
   const sigObj = await sdk.sign(payload);
   return DIDAuth.v1.toAuthorizationHeader(sigObj);
-}
-
-/**
- * Resolves the appropriate transport based on the URL and explicit type
- */
-export async function resolveTransport(
-  url: string,
-  authHeader: string,
-  explicitType?: McpTransportType,
-): Promise<any> {
-  const createHttpTransport = async () => {
-    return new StreamableHTTPClientTransport(new URL(url), {
-      requestInit: { headers: { Authorization: authHeader } },
-    } as any);
-  };
-
-  const createSseTransport = async () => {
-    return new SSEClientTransport(new URL(url), {
-      requestInit: { headers: { Authorization: authHeader } },
-    } as any);
-  };
-
-  // Explicit type requested by caller
-  if (explicitType === 'httpStream') {
-    return createHttpTransport();
-  }
-  if (explicitType === 'sse') {
-    return createSseTransport();
-  }
-
-  // Auto-detect: try HTTP streaming then fallback to SSE
-  // First try HTTP streaming
-  try {
-    // Quick HEAD probe – skip CORS preflight for same-origin
-    const _headResp = await fetch(url, {
-      method: 'HEAD',
-      headers: {
-        Authorization: authHeader,
-      },
-    });
-    // Even if the server responds 4xx to HEAD, it may still support
-    // streaming GET requests (FastMCP behaves this way). Any successful
-    // fetch response indicates the endpoint is reachable, so we assume
-    // HTTP streaming is available unless the request itself fails.
-    return createHttpTransport();
-  } catch (_) {
-    // Ignore probe errors – we'll fall back to SSE
-    console.debug('Failed to probe HTTP streaming, falling back to SSE');
-  }
-
-  // Fallback SSE transport (works for HTTP streaming servers too, but less efficient).
-  return createSseTransport();
 }

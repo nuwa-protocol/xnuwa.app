@@ -1,4 +1,6 @@
-import { AlertCircle, ChevronDown, Loader2, Store } from 'lucide-react';
+import { AlertCircle, ChevronDown, Loader2, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   Button,
   DropdownMenu,
@@ -11,15 +13,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui';
-import { useCurrentCap } from '@/shared/hooks';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
-import { useCapStore } from '../hooks/use-cap-store';
+import { useCapStore } from '../stores';
+import type { RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
-import { CapStoreModal } from './cap-store-modal';
-import {
-  CapStoreModalProvider,
-} from './cap-store-modal-context';
-import type { InstalledCap, RemoteCap } from '../types';
 
 const CapInfo = ({ cap }: { cap: Cap }) => (
   <>
@@ -27,39 +25,32 @@ const CapInfo = ({ cap }: { cap: Cap }) => (
       capName={cap.metadata.displayName}
       capThumbnail={cap.metadata.thumbnail}
       size="sm"
+      className='rounded-md'
     />
     <span className="text-sm font-normal">{cap.metadata.displayName}</span>
   </>
 );
 
-function CapSelectorButton() {
-  const {
-    currentCap,
-    isCurrentCapMCPInitialized,
-    isCurrentCapMCPError,
-    errorMessage,
-  } = useCurrentCap();
-  // const { openModal } = useCapStoreModal();
-  const { getFavoriteCaps, runCap } = useCapStore();
-
-  const favoriteCaps = getFavoriteCaps();
-
-  const handleCapSelect = async (cap: RemoteCap | InstalledCap) => {
-    const id = 'metadata' in cap ? cap.id : cap.capData.id;
+export function CapSelector() {
+  const { currentCap, isInitialized, isError, errorMessage } =
+    CurrentCapStore();
+  const { favoriteCaps, downloadCapByIDWithCache } = useCapStore();
+  const { setCurrentCap } = CurrentCapStore();
+  const navigate = useNavigate();
+  const handleCapSelect = async (cap: RemoteCap) => {
+    const id = cap.id;
     try {
-      await runCap(id, {
-        version: cap.version, 
-        capCid: cap.cid,
-        stats: cap.stats
+      toast.promise(async () => {
+        const cap = await downloadCapByIDWithCache(id);
+        setCurrentCap(cap);
+      }, {
+        loading: 'Loading cap...',
+        success: 'Cap is ready to use!',
+        error: 'Failed to load cap',
       });
     } catch (error) {
       console.error('Failed to select cap:', error);
     }
-  };
-
-  const handleOpenStore = (event: React.MouseEvent) => {
-    event.preventDefault();
-    // openModal();
   };
 
   // If no favorite caps, open store directly on click
@@ -69,18 +60,18 @@ function CapSelectorButton() {
         <Button
           variant="outline"
           size="sm"
-          onClick={handleOpenStore}
+          onClick={() => navigate('/explore')}
           className="rounded-lg"
           type="button"
         >
           <div className="flex items-center gap-2">
             <CapInfo cap={currentCap} />
-            {!isCurrentCapMCPInitialized && (
+            {!isInitialized && (
               <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
             )}
           </div>
         </Button>
-        {isCurrentCapMCPError && (
+        {isError && (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <AlertCircle className="w-3 h-3 text-destructive cursor-default" />
@@ -100,7 +91,7 @@ function CapSelectorButton() {
   return (
     <TooltipProvider>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger asChild className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
           <Button
             variant="outline"
             size="sm"
@@ -109,7 +100,7 @@ function CapSelectorButton() {
           >
             <div className="flex items-center gap-2">
               <CapInfo cap={currentCap} />
-              {!isCurrentCapMCPInitialized && (
+              {!isInitialized && (
                 <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
               )}
               <ChevronDown className="w-3 h-3 text-muted-foreground" />
@@ -119,31 +110,31 @@ function CapSelectorButton() {
         <DropdownMenuContent align="start" className="min-w-[200px]">
           {favoriteCaps.map((cap) => (
             <DropdownMenuItem
-              key={cap.capData.id}
+              key={cap.id}
               className="cursor-pointer"
               onSelect={() => handleCapSelect(cap)}
             >
               <div className="flex items-center gap-2">
                 <CapAvatar
-                  capName={cap.capData.metadata.displayName}
-                  capThumbnail={cap.capData.metadata.thumbnail}
+                  capName={cap.metadata.displayName}
+                  capThumbnail={cap.metadata.thumbnail}
                   size="sm"
                 />
-                <span className="text-sm">{cap.capData.metadata.displayName}</span>
+                <span className="text-sm">{cap.metadata.displayName}</span>
               </div>
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
-            onSelect={() => console.log('hahah')}
+            onSelect={() => navigate('/explore')}
           >
-            <Store className="w-4 h-4 mr-2" />
-            <span>Browse All Caps</span>
+            <Sparkles className="w-4 h-4 mr-2" />
+            <span>Explore More</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {isCurrentCapMCPError && (
+      {isError && (
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <AlertCircle className="w-3 h-3 text-destructive cursor-default" />
@@ -157,14 +148,5 @@ function CapSelectorButton() {
         </Tooltip>
       )}
     </TooltipProvider>
-  );
-}
-
-export function CapSelector() {
-  return (
-    <CapStoreModalProvider>
-      <CapSelectorButton />
-      <CapStoreModal />
-    </CapStoreModalProvider>
   );
 }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="scrollbar-width: none; -ms-overflow-style: none;">
   <head>
     <meta charset="UTF-8" />
     <link rel="apple-touch-icon" sizes="180x180" href="/src/assets/favicon_io/apple-touch-icon.png">
@@ -34,8 +34,81 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    
+    <!-- Priority loading Loading styles -->
+    <link rel="stylesheet" href="/src/assets/initial-loading.css">
+    
+    <!-- Hide scrollbars -->
+    <style>
+      html, body {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      html::-webkit-scrollbar,
+      body::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+    
+    <!-- Initialize theme class before React loads -->
+    <script>
+      // Get stored theme or system preference
+      const storedTheme = localStorage.getItem('nuwa-ui-theme');
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      let theme = 'light';
+      if (storedTheme === 'dark' || (storedTheme === 'system' && systemDark) || (!storedTheme && systemDark)) {
+        theme = 'dark';
+      }
+      
+      // Add theme class immediately
+      document.documentElement.classList.add(theme);
+
+      // Progress bar update function
+      window.updateLoadingProgress = function(percentage, text = null) {
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const loadingText = document.querySelector('.loading-text');
+        
+        if (progressFill) {
+          progressFill.style.width = Math.min(100, Math.max(0, percentage)) + '%';
+        }
+        if (progressText) {
+          progressText.textContent = Math.round(percentage) + '%';
+        }
+        if (text && loadingText) {
+          loadingText.textContent = text;
+        }
+      };
+
+      // Hide loading screen function
+      window.hideLoadingScreen = function() {
+        const loadingScreen = document.getElementById('initial-loading');
+        if (loadingScreen) {
+          loadingScreen.classList.add('hidden');
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+          }, 300);
+        }
+      };
+    </script>
   </head>
-  <body>
+  <body style="scrollbar-width: none; -ms-overflow-style: none;" class="hide-scrollbar">
+    <!-- Priority loading Loading interface -->
+    <div id="initial-loading">
+      <div class="loading-content">
+        <h2 class="loading-text">Loading...</h2>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-text" id="progress-text">0%</div>
+        </div>
+        <p class="loading-subtext">Please check your network connection if this takes too long</p>
+      </div>
+    </div>
+    
+    <!-- React App -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,46 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { useAuth } from '@/shared/hooks';
-import type { CapMcpServerConfig, CapThumbnail } from '@/shared/types/cap';
+import {
+  CapCoreSchema,
+  CapIDNameSchema,
+  CapMetadataSchema,
+} from '@/shared/types';
+import { CapStudioStore } from '../stores';
 import type { LocalCap } from '../types';
-import { useLocalCapsHandler } from './use-local-caps-handler';
-import { useSelectedModel } from './use-selected-model';
 
-const capSchema = z.object({
-  idName: z
-    .string()
-    .min(6, 'Name must be at least 6 characters')
-    .max(20, 'Name must be at most 20 characters')
-    .regex(
-      /^[a-zA-Z0-9_]+$/,
-      'Name must contain only letters, numbers, and underscores',
-    ),
-  displayName: z
-    .string()
-    .min(1, 'Display name is required')
-    .max(50, 'Display name too long'),
-  description: z
-    .string()
-    .min(20, 'Description must be at least 10 characters')
-    .max(500, 'Description too long'),
-  tags: z.array(z.string()),
-  prompt: z.object({
-    value: z.string(),
-    suggestions: z.array(z.string()).optional(),
-  }),
-  homepage: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  repository: z
-    .string()
-    .url('Must be a valid URL')
-    .optional()
-    .or(z.literal('')),
+const CapFormDataSchema = z.object({
+  idName: CapIDNameSchema,
+  core: CapCoreSchema,
+  metadata: CapMetadataSchema,
 });
 
-type CapFormData = z.infer<typeof capSchema>;
+type CapFormData = z.input<typeof CapFormDataSchema>;
 
 interface UseEditFormProps {
   editingCap?: LocalCap;
@@ -49,142 +28,88 @@ interface UseEditFormProps {
 export const useEditForm = ({ editingCap }: UseEditFormProps) => {
   const navigate = useNavigate();
   const { did } = useAuth();
-  const { createCap, updateCap } = useLocalCapsHandler();
-  const { selectedModel, setSelectedModel } = useSelectedModel();
+  const { createCap, updateCap } = CapStudioStore();
   const [isSaving, setIsSaving] = useState(false);
-  const [mcpServers, setMcpServers] = useState<
-    Record<string, CapMcpServerConfig>
-  >({});
 
   const form = useForm<CapFormData>({
-    resolver: zodResolver(capSchema),
+    resolver: zodResolver(CapFormDataSchema),
     mode: 'onChange',
     defaultValues: {
       idName: editingCap?.capData.idName || '',
-      displayName: editingCap?.capData.metadata.displayName || '',
-      description: editingCap?.capData.metadata.description || '',
-      tags: editingCap?.capData.metadata.tags || [],
-      prompt: {
-        value:
-          typeof editingCap?.capData.core.prompt === 'string'
-            ? editingCap.capData.core.prompt
-            : editingCap?.capData.core.prompt?.value || '',
-        suggestions:
-          typeof editingCap?.capData.core.prompt === 'object'
-            ? editingCap.capData.core.prompt.suggestions
-            : [],
+      metadata: {
+        displayName: editingCap?.capData.metadata.displayName || '',
+        description: editingCap?.capData.metadata.description || '',
+        tags: editingCap?.capData.metadata.tags || [],
+        thumbnail: editingCap?.capData.metadata.thumbnail || undefined,
+        homepage: editingCap?.capData.metadata.homepage || undefined,
+        repository: editingCap?.capData.metadata.repository || undefined,
       },
-      homepage: editingCap?.capData.metadata.homepage || '',
-      repository: editingCap?.capData.metadata.repository || '',
+      core: {
+        prompt: {
+          value: editingCap?.capData.core.prompt.value || '',
+          suggestions: editingCap?.capData.core.prompt.suggestions || [],
+        },
+        model: {
+          customGatewayUrl:
+            editingCap?.capData.core.model.customGatewayUrl || undefined,
+          modelId: editingCap?.capData.core.model.modelId || '',
+          parameters: editingCap?.capData.core.model.parameters || {},
+          supportedInputs: editingCap?.capData.core.model.supportedInputs || [
+            'text',
+          ],
+          modelType:
+            editingCap?.capData.core.model.modelType ?? 'Language Model',
+        },
+        mcpServers: editingCap?.capData.core.mcpServers || {},
+      },
     },
   });
 
-  useEffect(() => {
-    if (editingCap) {
-      setMcpServers(editingCap.capData.core.mcpServers || {});
-      // Set the selected model to the cap's configured model
-      if (editingCap.capData.core.model) {
-        setSelectedModel(editingCap.capData.core.model);
-      }
-    }
-  }, [editingCap, setSelectedModel]);
-
-  const handleUpdateMcpServers = (
-    servers: Record<string, CapMcpServerConfig>,
-  ) => {
-    setMcpServers(servers);
-  };
-
-  const handleUpdateCap = async (
-    editingCap: LocalCap,
-    data: CapFormData,
-    thumbnail?: CapThumbnail,
-  ) => {
+  const handleUpdateCap = async (editingCap: LocalCap, data: CapFormData) => {
     // Update existing cap
     updateCap(editingCap.id, {
       capData: {
         id: `${did}:${data.idName}`,
         authorDID: did || '',
-        idName: data.idName,
-        metadata: {
-          displayName: data.displayName,
-          description: data.description,
-          tags: data.tags,
-          submittedAt: 0,
-          thumbnail:
-            thumbnail !== undefined
-              ? thumbnail
-              : editingCap.capData.metadata.thumbnail || null,
-          homepage: data.homepage || undefined,
-          repository: data.repository || undefined,
-        },
-        core: {
-          prompt: data.prompt,
-          model: selectedModel,
-          mcpServers,
-        },
+        ...data,
       },
     });
 
-    toast.success(`${data.displayName} has been updated successfully`);
+    toast.success(`${data.metadata.displayName} has been updated successfully`);
 
     navigate('/cap-studio');
   };
 
-  const handleCreateCap = async (
-    data: CapFormData,
-    thumbnail?: CapThumbnail,
-  ) => {
+  const handleCreateCap = async (data: CapFormData) => {
     // Create new cap
     createCap({
       id: `${did}:${data.idName}`,
       authorDID: did || '',
-      idName: data.idName,
-      metadata: {
-        displayName: data.displayName,
-        description: data.description,
-        tags: data.tags,
-        submittedAt: 0,
-        thumbnail: thumbnail || null,
-        homepage: data.homepage || undefined,
-        repository: data.repository || undefined,
-      },
-      core: {
-        prompt: data.prompt,
-        model: selectedModel,
-        mcpServers,
-      },
+      ...data,
     });
 
-    toast.success(`${data.displayName} has been created successfully`);
+    toast.success(`${data.metadata.displayName} has been created successfully`);
 
     navigate('/cap-studio');
   };
 
-  const handleFormSave = async (
-    data: CapFormData,
-    thumbnail?: CapThumbnail,
-  ) => {
-    // Trigger validation for all fields
-    const isValid = await form.trigger();
-
-    if (!isValid) {
-      toast.warning('Please fix all validation errors before saving');
-      return;
-    }
-
-    if (!selectedModel) {
-      toast.warning('Please select a model for this cap');
-      return;
-    }
-
-    setIsSaving(true);
+  const handleFormSave = async (data: CapFormData) => {
     try {
+      // Trigger validation for all fields
+      const isValid = await form.trigger();
+
+      if (!isValid) {
+        toast.warning('Please fix all validation errors before saving');
+        return;
+      }
+
+      setIsSaving(true);
+
       if (editingCap) {
         // Update existing cap
-        handleUpdateCap(editingCap, data, thumbnail);
+        handleUpdateCap(editingCap, data);
       } else {
-        handleCreateCap(data, thumbnail);
+        handleCreateCap(data);
       }
     } catch (error) {
       toast.error('Failed to save cap. Please try again.');
@@ -201,9 +126,6 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
     form,
     handleFormSave,
     handleFormCancel,
-    handleUpdateMcpServers,
-    selectedModel,
-    mcpServers,
     isSaving,
   };
 };

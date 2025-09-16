@@ -111,7 +111,7 @@ export function SearchModal({ children }: { children: React.ReactNode }) {
                   type="button"
                   className="w-full px-1 py-3 hover:bg-muted rounded flex items-center justify-between border-none"
                   onClick={() => {
-                    navigate(`/chat?cid=${session.id}`);
+                    navigate(`/chat?chat_id=${session.id}`);
                   }}
                 >
                   <div className="flex items-center gap-2 min-w-0">

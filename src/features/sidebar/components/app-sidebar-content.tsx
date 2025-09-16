@@ -1,9 +1,13 @@
-import { Settings2, Wrench } from 'lucide-react';
-import React from 'react';
+import {
+  File,
+  Loader2,
+  Settings2,
+  SparklesIcon,
+  WalletIcon,
+  Wrench,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarCapStoreCard } from '@/features/cap-store/components/sidebar-cap-store-card';
-import { useSidebarFloating } from '@/features/sidebar/hooks/use-sidebar-floating';
-import { SidebarWalletCard } from '@/features/wallet/components/sidebar-wallet-card';
+import { WalletStore } from '@/features/wallet/stores';
 import { Logo } from '@/shared/components';
 import {
   Sidebar,
@@ -11,55 +15,34 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  useSidebar,
 } from '@/shared/components/ui';
 import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { cn } from '@/shared/utils';
+import { useSidebarStore } from '../stores';
 import { useAppSidebar } from './app-sidebar';
 import { SidebarButton } from './sidebar-button';
 import { SidebarHistory } from './sidebar-history';
+import { SidebarNewButton } from './sidebar-new-button';
 import { SidebarToggle } from './sidebar-toggle';
 
 export function AppSidebarContent() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { setOpenMobile } = useSidebar();
-  const { mode: sidebarMode } = useSidebarFloating();
+  const { mode: sidebarMode } = useSidebarStore();
   const floatingContext = useAppSidebar();
   const sidebarVariant = sidebarMode === 'floating' ? 'floating' : 'sidebar';
   const isDevMode = useDevMode();
 
-  const handleNewChat = () => {
-    setOpenMobile(false);
-    navigate('/chat');
-  };
+  const { usdAmount, balanceLoading, balanceError } = WalletStore();
 
-  // Add keyboard shortcut for new chat using manual event listener (similar to sidebar toggle)
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Try Cmd+K/Ctrl+K first
-      if (
-        event.key === 'k' &&
-        (event.metaKey || event.ctrlKey) &&
-        !event.shiftKey &&
-        !event.altKey
-      ) {
-        event.preventDefault();
-        handleNewChat();
-        return;
-      }
-    };
+  const usdValue = balanceLoading
+    ? `$${usdAmount} ${<Loader2 className="size-2 animate-spin" />}`
+    : balanceError
+      ? 'Failed to load balance'
+      : `$${usdAmount} USD`;
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleNewChat]);
-
-  // Get the appropriate keyboard shortcut display based on platform
-  const getShortcutDisplay = () => {
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    return isMac ? '⌘K' : 'Ctrl+K';
-  };
+  // New Chat keyboard shortcut handled inside SidebarNewButton
 
   const handleMouseEnter = () => {
     if (sidebarMode === 'floating' && floatingContext) {
@@ -73,14 +56,16 @@ export function AppSidebarContent() {
     }
   };
 
+  // Dropdown sizing handled inside SidebarNewButton
+
   return (
     <Sidebar
       className={cn(
-        'group-data-[side=left]:border-r-0',
+        'shadow-lg',
         // Add smooth transition animations
         'transition-all duration-300 ease-in-out',
         // Custom padding for floating mode
-        sidebarMode === 'floating' && '[&>div:last-child]:ml-2',
+        sidebarMode === 'floating' && '[&>div:last-child]:ml-2 shadow-none',
       )}
       variant={sidebarVariant}
       onMouseEnter={handleMouseEnter}
@@ -89,27 +74,45 @@ export function AppSidebarContent() {
       <SidebarHeader>
         <SidebarMenu>
           <div className="flex flex-col gap-2">
+            {/* Sidebar Header */}
             <div className="flex justify-between items-center">
               <Logo
                 size="md"
-                variant="app-brand"
+                variant="basic"
                 onClick={() => navigate('/chat')}
                 className="rounded-md hover:bg-sidebar-accent"
               />
               <SidebarToggle />
             </div>
 
+            {/* New Chat Split Button with Dropdown */}
+            <SidebarNewButton />
+
+            {/* Wallet Button */}
             <SidebarButton
-              text={t('nav.sidebar.new')}
-              href="/chat"
-              variant="primary"
-              className="my-2"
-              shortcut={getShortcutDisplay()}
+              text={t('nav.sidebar.wallet')}
+              icon={WalletIcon}
+              href="/wallet"
+              variant="secondary"
+              endContent={<span className="text-md font-bold">{usdValue}</span>}
             />
 
-            <SidebarWalletCard className="mb-2" />
+            {/* Cap Store Button */}
+            <SidebarButton
+              text={'Explore'}
+              icon={SparklesIcon}
+              href="/explore"
+              variant="secondary"
+            />
 
-            <SidebarCapStoreCard />
+            {isDevMode && (
+              <SidebarButton
+                icon={File}
+                text={'Artifacts'}
+                href="/artifacts"
+                variant="secondary"
+              />
+            )}
 
             {isDevMode && (
               <SidebarButton

@@ -37,7 +37,7 @@ import {
 } from '@/shared/components/ui';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import { APP_URL } from '@/shared/config/app';
-import { useLocalCapsHandler } from '../../hooks/use-local-caps-handler';
+import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
 
 interface CapCardProps {
@@ -63,7 +63,7 @@ export function CapCard({
   onToggleSelect,
   onEnterMultiSelectMode,
 }: CapCardProps) {
-  const { deleteCap } = useLocalCapsHandler();
+  const { deleteCap } = CapStudioStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -78,7 +78,7 @@ export function CapCard({
       await navigator.clipboard.writeText(cap.cid);
       toast.success(`Published CID copied: ${cap.cid}`);
     }
-  }
+  };
 
   const handleSelectClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -140,13 +140,7 @@ export function CapCard({
           <div className="flex items-start space-x-4 flex-1 min-w-0">
             <div className="w-12 h-12 flex items-center justify-center shrink-0">
               <Avatar className="rounded-lg">
-                <AvatarImage
-                  src={
-                    cap.capData.metadata.thumbnail?.type === 'file'
-                      ? cap.capData.metadata.thumbnail.file
-                      : cap.capData.metadata.thumbnail?.url
-                  }
-                />
+                <AvatarImage src={cap.capData.metadata.thumbnail} />
                 <AvatarFallback>
                   {cap.capData.metadata.displayName.charAt(0)}
                 </AvatarFallback>
@@ -167,7 +161,7 @@ export function CapCard({
               <div className="flex items-center space-x-4 text-xs text-muted-foreground flex-wrap">
                 <div className="flex items-center">
                   <Bot className="h-3 w-3 mr-1" />
-                  {cap.capData.core.model.name}
+                  {cap.capData.core.model.modelId}
                 </div>
                 <div className="flex items-center">
                   <Server className="h-3 w-3 mr-1" />
@@ -248,29 +242,28 @@ export function CapCard({
                       <Share className="h-4 w-4 mr-2" />
                       Share
                     </DropdownMenuItem>
-
-
                   )}
 
                   {cap.status === 'submitted' && cap.cid && (
-                    <DropdownMenuItem onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopyCid();
-                    }}>
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopyCid();
+                      }}
+                    >
                       <Copy className="h-4 w-4 mr-2" />
                       Copy Published CID
                     </DropdownMenuItem>
-
                   )}
 
-                  {cap.status === 'submitted' && (
-                    <DropdownMenuSeparator />
-                  )}
+                  {cap.status === 'submitted' && <DropdownMenuSeparator />}
 
-                  <DropdownMenuItem onClick={(e) => {
-                    e.stopPropagation();
-                    onTest?.();
-                  }}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTest?.();
+                    }}
+                  >
                     <Bug className="h-4 w-4 mr-2" />
                     Test Cap
                   </DropdownMenuItem>

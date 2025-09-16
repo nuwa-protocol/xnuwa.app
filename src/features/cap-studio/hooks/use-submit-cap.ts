@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { useCapKit } from '@/shared/hooks/use-capkit';
-import type { Cap } from '@/shared/types/cap';
+import { capKitService } from '@/shared/services/capkit-service';
+import type { Cap } from '@/shared/types';
 import type { LocalCap } from '../types';
 
 interface CapSubmitResponse {
@@ -19,7 +19,6 @@ interface BulkSubmitProgress {
 }
 
 export const useSubmitCap = () => {
-  const { capKit } = useCapKit();
   const [bulkProgress, setBulkProgress] = useState<BulkSubmitProgress>({
     total: 0,
     completed: 0,
@@ -30,10 +29,7 @@ export const useSubmitCap = () => {
   const submitCap = useCallback(
     async (capData: Cap): Promise<CapSubmitResponse> => {
       try {
-        if (!capKit) {
-          throw new Error('Failed to initialize CapKit');
-        }
-
+        const capKit = await capKitService.getCapKit();
         // Register the capability using CapKit
         const cid = await capKit.registerCap(capData);
 
@@ -54,14 +50,12 @@ export const useSubmitCap = () => {
         };
       }
     },
-    [capKit],
+    [],
   );
 
   const bulkSubmitCaps = useCallback(
     async (caps: LocalCap[]): Promise<void> => {
-      if (!capKit) {
-        throw new Error('Failed to initialize CapKit');
-      }
+      const capKit = await capKitService.getCapKit();
 
       setBulkProgress({
         total: caps.length,
@@ -82,6 +76,7 @@ export const useSubmitCap = () => {
         }));
 
         try {
+          // Register the capability using CapKit
           await capKit.registerCap(cap.capData);
           setBulkProgress((prev) => ({
             ...prev,
@@ -110,7 +105,7 @@ export const useSubmitCap = () => {
         currentCap: undefined,
       }));
     },
-    [capKit],
+    [],
   );
 
   return {

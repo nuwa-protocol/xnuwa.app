@@ -1,163 +1,109 @@
-import type { UseChatHelpers } from '@ai-sdk/react';
-import type { Attachment, UIMessage } from 'ai';
+import { type UseChatHelpers, useChat } from '@ai-sdk/react';
+import type { UIMessage } from 'ai';
 import cx from 'classnames';
-import equal from 'fast-deep-equal';
-import { AnimatePresence, motion } from 'framer-motion';
-import {
-  ArrowDown,
-  ArrowUpIcon,
-  PaperclipIcon,
-  StopCircleIcon,
-} from 'lucide-react';
+import { ArrowUpIcon, StopCircleIcon, TextSelect, X } from 'lucide-react';
 import type React from 'react';
-import {
-  type Dispatch,
-  memo,
-  type SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
-import { useScrollToBottom } from '@/features/chat/hooks/use-scroll-to-bottom';
+import { Badge } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
-import { useCurrentCap } from '@/shared/hooks/use-current-cap';
-import { useDevMode } from '@/shared/hooks/use-dev-mode';
-import type { Cap } from '@/shared/types/cap';
-import { useUpdateMessages } from '../hooks/use-update-messages';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import type { Cap } from '@/shared/types';
+import { useChatContext } from '../contexts/chat-context';
+import { usePersistentInput } from '../hooks/use-persistent-input';
+import { ChatSessionsStore } from '../stores';
+import { type AttachmentData, AttachmentInput } from './attachment-input';
+import { PreviewAttachment } from './preview-attachment';
 import { SuggestedActions } from './suggested-actions';
 
-function PureMultimodalInput({
-  chatId,
-  input,
-  setInput,
-  status,
-  stop,
-  messages,
-  setMessages,
-  append,
-  handleSubmit,
-  className,
-}: {
-  chatId: string;
-  input: UseChatHelpers['input'];
-  setInput: UseChatHelpers['setInput'];
-  status: UseChatHelpers['status'];
-  stop: () => void;
-  attachments: Array<Attachment>;
-  setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
-  messages: Array<UIMessage>;
-  setMessages: UseChatHelpers['setMessages'];
-  append: UseChatHelpers['append'];
-  handleSubmit: UseChatHelpers['handleSubmit'];
-  className?: string;
-}) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+function PureMultimodalInput({ className }: { className?: string }) {
+  const { chat } = useChatContext();
+  const { messages, status, stop, setMessages, sendMessage } = useChat({
+    chat,
+  });
+  const { input, setInput, textareaRef, clearInput } = usePersistentInput();
   const { width } = useWindowSize();
-  const isDevMode = useDevMode();
-  const { currentCap, isCurrentCapMCPInitialized, isCurrentCapMCPError } =
-    useCurrentCap();
+  const { currentCap, isInitialized, isError } = CurrentCapStore();
+  const [attachments, setAttachments] = useState<AttachmentData[]>([]);
+  const { chatSessions, removeSelectionFromChatSession } = ChatSessionsStore();
+  const selections = chatSessions[chat.id]?.selections;
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [localStorageInput, setLocalStorageInput] = useLocalStorage(
-    'input',
-    '',
-  );
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      const domValue = textareaRef.current.value;
-      // Prefer DOM value over localStorage to handle hydration
-      const finalValue = domValue || localStorageInput || '';
-      setInput(finalValue);
-    }
-    // Only run once after hydration
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Remove attachment
+  const removeAttachment = useCallback((index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   }, []);
-
-  useEffect(() => {
-    setLocalStorageInput(input);
-  }, [input, setLocalStorageInput]);
 
   // Auto focus when chat ID changes (page navigation)
   useEffect(() => {
     if (textareaRef.current && width && width > 768) {
       textareaRef.current.focus();
     }
-  }, [chatId, width]);
+  }, [chat.id, width]);
 
-  const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(event.target.value);
-  };
+  const handleSend = async () => {
+    if (status === 'streaming' || status === 'submitted') {
+      toast.warning(
+        'Waiting for the model to finish processing the previous message...',
+      );
+      return;
+    }
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
-
-  const submitForm = useCallback(() => {
     // Check if Cap has MCP servers and if they are initialized
     const hasMCPServers =
       currentCap?.core?.mcpServers &&
       Object.keys(currentCap.core.mcpServers).length > 0;
 
-    if (hasMCPServers && !isCurrentCapMCPInitialized) {
+    if (hasMCPServers && !isInitialized) {
       toast.warning('Cap MCP is initializing, please try again later');
       return;
     }
 
-    handleSubmit(undefined);
+    // TODO: how to send the selections?
+    if (input.trim() || attachments.length > 0) {
+      sendMessage({
+        text: input,
+        files: attachments.length > 0 ? attachments : undefined,
+      });
 
-    setLocalStorageInput('');
+      clearInput();
+      setAttachments([]);
+
+      const currentUrlCid = searchParams.get('chat_id');
+      if (currentUrlCid !== chat.id) {
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.set('chat_id', chat.id);
+        setSearchParams(newSearchParams);
+      }
+    }
 
     if (width && width > 768) {
       textareaRef.current?.focus();
     }
-  }, [
-    handleSubmit,
-    setLocalStorageInput,
-    width,
-    currentCap,
-    isCurrentCapMCPInitialized,
-    isCurrentCapMCPError,
-  ]);
-
-  const { isAtBottom, scrollToBottom } = useScrollToBottom();
-
-  useEffect(() => {
-    if (status === 'submitted') {
-      scrollToBottom();
-    }
-  }, [status, scrollToBottom]);
+  };
 
   return (
     <div className="relative w-full flex flex-col gap-4">
-      <AnimatePresence>
-        {messages.length > 0 && !isAtBottom && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="absolute left-1/2 bottom-28 -translate-x-1/2 z-50"
-          >
-            <Button
-              data-testid="scroll-to-bottom-button"
-              className="rounded-full"
-              size="icon"
-              variant="outline"
-              onClick={(event) => {
-                event.preventDefault();
-                scrollToBottom();
-              }}
-            >
-              <ArrowDown />
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {messages.length === 0 && <SuggestedActions />}
 
-      {messages.length === 0 && <SuggestedActions append={append} />}
+      {attachments.length > 0 && (
+        <div className="flex flex-wrap gap-2 p-2">
+          {attachments.map((attachment, index) => (
+            <PreviewAttachment
+              key={`${attachment.filename || 'file'}-${index}`}
+              attachment={{
+                name: attachment.filename || 'Unknown file',
+                url: attachment.url,
+                contentType: attachment.mediaType,
+              }}
+              onRemove={() => removeAttachment(index)}
+            />
+          ))}
+        </div>
+      )}
 
       <div
         className={cx(
@@ -165,12 +111,33 @@ function PureMultimodalInput({
           className,
         )}
       >
+        {/* Selections */}
+        {selections && selections.length > 0 && (
+          <div className="flex flex-row flex-wrap gap-2 p-2 mx-2">
+            {selections?.map((selection) => (
+              <Badge
+                key={selection.label}
+                variant="default"
+                className="group cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors duration-200 flex items-center gap-1 shrink-0"
+                onClick={() =>
+                  removeSelectionFromChatSession(chat.id, selection.id)
+                }
+              >
+                <TextSelect size={12} className="group-hover:hidden" />
+                <X size={12} className="hidden group-hover:block" />
+                {selection.label}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {/*  Input Textarea */}
         <textarea
           data-testid="multimodal-input"
           ref={textareaRef}
           placeholder="Send a message..."
           value={input}
-          onChange={handleInput}
+          onChange={(event) => setInput(event.target.value)}
           className="flex-1 min-h-[50px] max-h-[calc(25dvh-48px)] overflow-auto hide-scrollbar resize-none text-base bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none pt-3 px-3 pb-0"
           rows={2}
           autoFocus
@@ -194,34 +161,37 @@ function PureMultimodalInput({
                 );
               }
 
-              submitForm();
+              handleSend();
             }
           }}
         />
 
+        {/* Cap Selector and Send Button */}
         <div className="flex justify-between items-center p-2">
           <div className="flex items-center gap-2">
             <CapSelector />
           </div>
 
-          <div className="flex items-center">
-            {/* {isDevMode && (
-              <AttachmentsButton fileInputRef={fileInputRef} status={status} />
-            )} */}
+          <div className="flex items-center gap-2">
+            <AttachmentInput
+              attachments={attachments}
+              onAttachmentsChange={setAttachments}
+            />
+
             {status === 'submitted' || status === 'streaming' ? (
               <StopButton
                 stop={stop}
                 setMessages={setMessages}
-                chatId={chatId}
+                chatId={chat.id}
               />
             ) : (
               <SendButton
                 input={input}
-                submitForm={submitForm}
-                uploadQueue={uploadQueue}
+                attachments={attachments}
+                submitForm={handleSend}
                 currentCap={currentCap}
-                isCurrentCapMCPInitialized={isCurrentCapMCPInitialized}
-                isCurrentCapMCPError={isCurrentCapMCPError}
+                isCurrentCapMCPInitialized={isInitialized}
+                isCurrentCapMCPError={isError}
               />
             )}
           </div>
@@ -231,41 +201,7 @@ function PureMultimodalInput({
   );
 }
 
-export const MultimodalInput = memo(
-  PureMultimodalInput,
-  (prevProps, nextProps) => {
-    if (prevProps.input !== nextProps.input) return false;
-    if (prevProps.status !== nextProps.status) return false;
-    if (!equal(prevProps.attachments, nextProps.attachments)) return false;
-    if (!equal(prevProps.messages, nextProps.messages)) return false;
-    return true;
-  },
-);
-
-function PureAttachmentsButton({
-  fileInputRef,
-  status,
-}: {
-  fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
-  status: UseChatHelpers['status'];
-}) {
-  return (
-    <Button
-      data-testid="attachments-button"
-      className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
-      onClick={(event) => {
-        event.preventDefault();
-        fileInputRef.current?.click();
-      }}
-      disabled={status !== 'ready'}
-      variant="ghost"
-    >
-      <PaperclipIcon size={14} />
-    </Button>
-  );
-}
-
-const AttachmentsButton = memo(PureAttachmentsButton);
+export const MultimodalInput = PureMultimodalInput;
 
 function PureStopButton({
   stop,
@@ -273,10 +209,10 @@ function PureStopButton({
   chatId,
 }: {
   stop: () => void;
-  setMessages: UseChatHelpers['setMessages'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
   chatId: string;
 }) {
-  const updateMessages = useUpdateMessages();
+  const { updateMessages } = ChatSessionsStore();
   return (
     <Button
       data-testid="stop-button"
@@ -300,14 +236,14 @@ const StopButton = memo(PureStopButton);
 function PureSendButton({
   submitForm,
   input,
-  uploadQueue,
+  attachments,
   currentCap,
   isCurrentCapMCPInitialized,
   isCurrentCapMCPError,
 }: {
   submitForm: () => void;
   input: string;
-  uploadQueue: Array<string>;
+  attachments: AttachmentData[];
   currentCap: Cap;
   isCurrentCapMCPInitialized: boolean;
   isCurrentCapMCPError: boolean;
@@ -316,6 +252,8 @@ function PureSendButton({
   const hasMCPServers =
     currentCap?.core?.mcpServers &&
     Object.keys(currentCap.core.mcpServers).length > 0;
+
+  const hasContent = input.trim().length > 0 || attachments.length > 0;
 
   return (
     <Button
@@ -326,8 +264,7 @@ function PureSendButton({
         submitForm();
       }}
       disabled={
-        input.length === 0 ||
-        uploadQueue.length > 0 ||
+        !hasContent ||
         (hasMCPServers && (!isCurrentCapMCPInitialized || isCurrentCapMCPError))
       }
     >
@@ -337,8 +274,8 @@ function PureSendButton({
 }
 
 const SendButton = memo(PureSendButton, (prevProps, nextProps) => {
-  if (prevProps.uploadQueue.length !== nextProps.uploadQueue.length)
-    return false;
   if (prevProps.input !== nextProps.input) return false;
+  if (prevProps.attachments.length !== nextProps.attachments.length)
+    return false;
   return true;
 });

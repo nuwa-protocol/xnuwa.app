@@ -36,3 +36,11 @@ declare module '*.webp' {
 }
 
 declare const __APP_VERSION__: string;
+
+// Global loading progress functions
+declare global {
+  interface Window {
+    updateLoadingProgress?: (percentage: number, text?: string) => void;
+    hideLoadingScreen?: () => void;
+  }
+}

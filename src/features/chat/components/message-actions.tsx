@@ -1,8 +1,7 @@
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import { CopyIcon } from 'lucide-react';
 import { memo } from 'react';
 import { toast } from 'sonner';
-import { useCopyToClipboard } from 'usehooks-ts';
 import { Button } from '@/shared/components/ui/button';
 import {
   Tooltip,
@@ -10,15 +9,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
+import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 
 export function PureMessageActions({
   message,
   isStreaming,
 }: {
-  message: Message;
+  message: UIMessage;
   isStreaming: boolean;
 }) {
-  const [_, copyToClipboard] = useCopyToClipboard();
+  const [copy] = useCopyToClipboard();
 
   if (isStreaming) return null;
   if (message.role === 'user') return null;
@@ -43,7 +43,7 @@ export function PureMessageActions({
                   return;
                 }
 
-                await copyToClipboard(textFromParts);
+                await copy(textFromParts);
                 toast.success('Copied to clipboard!');
               }}
             >

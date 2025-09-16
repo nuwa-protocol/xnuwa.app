@@ -1,5 +1,5 @@
-import type { Message } from 'ai';
-import type { Cap } from '@/shared/types/cap';
+import type { UIMessage } from 'ai';
+import type { Cap } from '@/shared/types';
 
 export type ChatPaymentType = 'generate-title' | 'chat-message';
 
@@ -10,17 +10,23 @@ export interface ChatPayment {
   timestamp: number;
 }
 
+export interface ChatSelection {
+  id: string;
+  label: string;
+  message: string;
+}
+
 // client chat interface
 export interface ChatSession {
   id: string;
   title: string;
   createdAt: number;
   updatedAt: number;
-  messages: Message[];
+  messages: UIMessage[];
   payments: ChatPayment[];
   caps: Cap[];
+  selections?: ChatSelection[];
   pinned?: boolean;
-  did?: string; // Added for IndexedDB storage
 }
 
 export interface UrlMetadata {

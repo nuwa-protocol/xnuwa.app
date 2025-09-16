@@ -7,40 +7,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui';
-import type { CapThumbnail } from '@/shared/types/cap';
-import { useSubmitForm } from '../../hooks/use-submit-form';
+import { useSubmitForm } from '../../hooks';
 import type { LocalCap } from '../../types';
-import { ProviderAvatar } from '../model-selector/provider-avatar';
-import { getModelName, getProviderName } from '../../utils';
 
 interface CapSubmitFormProps {
   cap: LocalCap;
-  thumbnail?: CapThumbnail;
-  homepage?: string;
-  repository?: string;
 }
 
-export function CapSubmitForm({
-  cap,
-  thumbnail,
-  homepage,
-  repository,
-}: CapSubmitFormProps) {
+export function CapSubmitForm({ cap }: CapSubmitFormProps) {
   const { handleCancel, handleDirectSubmit, isSubmitting } = useSubmitForm({
     cap,
   });
-
-  const getThumbnailSrc = () => {
-    if (thumbnail?.type === 'file' && thumbnail.file) {
-      return thumbnail.file;
-    }
-    if (thumbnail?.type === 'url' && thumbnail.url) {
-      return thumbnail.url;
-    }
-    return null;
-  };
-
-  const thumbnailSrc = getThumbnailSrc();
 
   return (
     <div className="space-y-6">
@@ -105,7 +82,7 @@ export function CapSubmitForm({
               <div className="text-sm font-medium text-muted-foreground">
                 Model
               </div>
-              <div className="flex items-center gap-2 mt-1">
+              {/* <div className="flex items-center gap-2 mt-1">
                 <ProviderAvatar
                   provider={cap.capData.core.model.providerName}
                   size="sm"
@@ -118,11 +95,11 @@ export function CapSubmitForm({
                     {getProviderName(cap.capData.core.model)}
                   </p>
                 </div>
-              </div>
+              </div> */}
             </div>
             <div>
               <div className="text-sm font-medium text-muted-foreground">
-                MCP Servers
+                Remote MCP
               </div>
               <p className="text-sm">
                 {Object.keys(cap.capData.core.mcpServers).length > 0
@@ -146,13 +123,17 @@ export function CapSubmitForm({
               <div className="text-sm font-medium text-muted-foreground">
                 Homepage
               </div>
-              <p className="text-sm">{homepage || 'Not provided'}</p>
+              <p className="text-sm">
+                {cap.capData.metadata.homepage || 'Not provided'}
+              </p>
             </div>
             <div>
               <div className="text-sm font-medium text-muted-foreground">
                 Repository
               </div>
-              <p className="text-sm">{repository || 'Not provided'}</p>
+              <p className="text-sm">
+                {cap.capData.metadata.repository || 'Not provided'}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -167,9 +148,9 @@ export function CapSubmitForm({
         <CardContent>
           <div className="flex items-center gap-4">
             <div className="w-32 h-32 rounded-xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm bg-white dark:bg-slate-800 flex items-center justify-center">
-              {thumbnailSrc ? (
+              {cap.capData.metadata.thumbnail ? (
                 <img
-                  src={thumbnailSrc}
+                  src={cap.capData.metadata.thumbnail}
                   alt="Thumbnail Preview"
                   className="w-full h-full object-cover"
                 />
@@ -181,7 +162,7 @@ export function CapSubmitForm({
               )}
             </div>
             <div className="text-sm text-muted-foreground">
-              {thumbnailSrc
+              {cap.capData.metadata.thumbnail
                 ? 'Thumbnail ready for submission'
                 : 'No thumbnail provided'}
             </div>
@@ -207,9 +188,7 @@ export function CapSubmitForm({
                 Cancel
               </Button>
               <Button
-                onClick={() =>
-                  handleDirectSubmit(thumbnail, homepage, repository)
-                }
+                onClick={() => handleDirectSubmit()}
                 disabled={isSubmitting}
                 size="lg"
               >

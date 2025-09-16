@@ -1,12 +1,11 @@
-import { useCallback } from 'react';
+import { handleError } from '@/shared/utils/handl-error';
 import { generateTitleFromUserMessage } from '../services';
-import { ChatStateStore } from '../stores';
-import { getErrorMessage, processErrorMessage } from '../utils';
+import { ChatSessionsStore } from '../stores';
 
-export const useUpdateChatTitle = (chatId: string) => {
-  const store = ChatStateStore();
+export const useUpdateChatTitle = () => {
+  const store = ChatSessionsStore();
 
-  const updateTitle = useCallback(async () => {
+  const updateTitle = async (chatId: string) => {
     const session = store.getChatSession(chatId);
     if (!session) return;
 
@@ -22,9 +21,9 @@ export const useUpdateChatTitle = (chatId: string) => {
 
       await store.updateSession(chatId, { title: title });
     } catch (error) {
-      processErrorMessage(getErrorMessage(error));
+      handleError(error as Error);
     }
-  }, [chatId]);
+  };
 
   return {
     updateTitle,

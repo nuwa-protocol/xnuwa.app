@@ -1,22 +1,16 @@
+import { motion } from 'framer-motion';
 import { Chat } from '@/features/chat/components';
-import { useChatPage } from '@/features/chat/hooks/use-chat-page';
-import Loading from '@/shared/components/loading';
 
 export default function ChatPage() {
-  const { chatSession, isLoading, initialMessages } = useChatPage();
-
-  if (isLoading || !chatSession) {
-    return <Loading />;
-  }
-
   return (
-    <div className="h-full relative">
-      <Chat
-        key={chatSession.id} // Force re-mount when chat changes
-        id={chatSession.id}
-        initialMessages={initialMessages}
-        isReadonly={false}
-      />
-    </div>
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      className="h-full"
+    >
+      <Chat isReadonly={false} />
+    </motion.div>
   );
 }

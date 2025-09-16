@@ -1,4 +1,4 @@
-import type { Cap, CapID, CapMetadata, CapStats } from '@/shared/types/cap';
+import type { CapID, CapMetadata, CapStats } from '@/shared/types';
 
 export type RemoteCap = CapID & {
   cid: string;
@@ -7,17 +7,8 @@ export type RemoteCap = CapID & {
   stats: CapStats;
 };
 
-export type InstalledCap = {
-  cid: string;
-  capData: Cap;
-  version: string;
-  isFavorite: boolean;
-  stats: CapStats;
-  lastUsedAt: number | null;
-};
-
-export type CapStoreSidebarSection = {
+export type CapStoreSection = {
   id: string;
   label: string;
-  type: 'section' | 'tag' | 'divider';
+  type: 'section' | 'tag';
 };

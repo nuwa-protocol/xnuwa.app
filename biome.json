@@ -6,11 +6,11 @@
       "**/*",
       "!**/pnpm-lock.yaml",
       "!lib/editor/react-renderer.tsx",
-      "!node_modules/**",
-      "!.next/**",
-      "!src/shared/components/ui/**",
-      "!public/**",
-      "!.vercel/**"
+      "!node_modules",
+      "!.next",
+      "!src/shared/components/ui",
+      "!public",
+      "!.vercel"
     ]
   },
   "vcs": {
@@ -33,13 +33,17 @@
     "rules": {
       "recommended": true,
       "a11y": {
+        "noStaticElementInteractions": "off",
         "useHtmlLang": "warn",
         "noHeaderScope": "warn",
         "useValidAriaRole": {
           "level": "warn",
           "options": {
             "ignoreNonDom": false,
-            "allowInvalidRoles": ["none", "text"]
+            "allowInvalidRoles": [
+              "none",
+              "text"
+            ]
           }
         },
         "useSemanticElements": "off",
@@ -115,7 +119,9 @@
   },
   "overrides": [
     {
-      "includes": ["playwright/**"],
+      "includes": [
+        "playwright/**"
+      ],
       "linter": {
         "rules": {
           "correctness": {

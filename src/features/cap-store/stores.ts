@@ -1,11 +1,8 @@
-// cap-store.ts
-// Store for managing capability (Cap) states
-import { create, type StateCreator } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { defaultCap } from '@/shared/constants/cap';
-import { NuwaIdentityKit } from '@/shared/services/identity-kit';
-import { createPersistConfig, db } from '@/shared/storage';
-import type { InstalledCap, RemoteCap } from './types';
+import type { Cap, Page, Result, ResultCap } from '@nuwa-ai/cap-kit';
+import { create } from 'zustand';
+import { capKitService } from '@/shared/services/capkit-service';
+import type { CapStoreSection, RemoteCap } from './types';
+import { mapResultsToRemoteCaps } from './utils';
 
 // Search parameters interface
 export interface UseRemoteCapParams {
@@ -13,16 +10,25 @@ export interface UseRemoteCapParams {
   tags?: string[];
   page?: number;
   size?: number;
-  sortBy?: 'average_rating' | 'downloads' | 'favorites' | 'rating_count' | 'updated_at',
-  sortOrder?: 'asc' | 'desc'
+  sortBy?:
+    | 'average_rating'
+    | 'downloads'
+    | 'favorites'
+    | 'rating_count'
+    | 'updated_at';
+  sortOrder?: 'asc' | 'desc';
 }
 
-// ================= Interfaces ================= //
+// Home data structure
+export interface HomeData {
+  topRated: RemoteCap[];
+  trending: RemoteCap[];
+  latest: RemoteCap[];
+}
 
-// Cap store state interface - handles both installed and remote caps
 interface CapStoreState {
-  // Installed cap management use capId as key
-  installedCaps: Record<string, InstalledCap>;
+  // UI State (from context)
+  isInitialized: boolean;
 
   // Remote cap management
   remoteCaps: RemoteCap[];
@@ -33,238 +39,272 @@ interface CapStoreState {
   currentPage: number;
   lastSearchParams: UseRemoteCapParams;
 
-  // Installed Cap management
-  addInstalledCap: (cap: InstalledCap) => void;
-  updateInstalledCap: (
-    id: string,
-    updates: Partial<Omit<InstalledCap, 'capData'>>,
-  ) => void;
-  clearAllInstalledCaps: () => void;
+  // Home data management
+  homeData: HomeData;
+  isLoadingHome: boolean;
+  homeError: string | null;
 
-  // Remote cap management
-  setRemoteCaps: (caps: RemoteCap[]) => void;
-  setIsFetching: (fetching: boolean) => void;
-  setIsLoadingMore: (loading: boolean) => void;
-  setError: (error: string | null) => void;
-  setHasMoreData: (hasMore: boolean) => void;
-  setCurrentPage: (page: number) => void;
-  setLastSearchParams: (params: UseRemoteCapParams) => void;
+  // Favorite caps management
+  favoriteCaps: RemoteCap[];
+  isFetchingFavoriteCaps: boolean;
+  favoriteCapsError: string | null;
 
-  // Data persistence
-  loadFromDB: () => Promise<void>;
-  saveToDB: () => Promise<void>;
+  //downloaded caps management
+  downloadedCaps: Record<string, Cap>;
+
+  // UI Actions (from context)
+  initialize: () => Promise<void>;
+
+  // Main actions
+  fetchCaps: (
+    params?: UseRemoteCapParams,
+    append?: boolean,
+  ) => Promise<Result<Page<ResultCap>>>;
+  refetch: () => void;
+  loadMore: () => Promise<any> | undefined;
+  goToPage: (newPage: number) => Promise<any>;
+  fetchHome: () => Promise<HomeData | null>;
+  fetchFavoriteCaps: () => Promise<RemoteCap[]>;
+  downloadCapByIDWithCache: (id: string) => Promise<Cap>;
 }
 
-// ================= Constants ================= //
-
-// get current DID
-const getCurrentDID = async () => {
-  const { getDid } = await NuwaIdentityKit();
-  return await getDid();
+const initialActiveSection: CapStoreSection = {
+  id: 'home',
+  label: 'Home',
+  type: 'section' as const,
 };
 
-// Database reference
-const capDB = db;
+const initialState = {
+  // UI State
+  activeSection: initialActiveSection,
+  selectedCap: null,
+  isInitialized: false,
 
-// ================= Persist Configuration ================= //
+  // Remote cap management
+  remoteCaps: [],
+  isFetching: false,
+  isLoadingMore: false,
+  error: null,
+  hasMoreData: true,
+  currentPage: 1,
+  lastSearchParams: {},
 
-const persistConfig = createPersistConfig<CapStoreState>({
-  name: 'cap-storage',
-  getCurrentDID: getCurrentDID,
-  partialize: (state) => ({
-    installedCaps: state.installedCaps,
-  }),
-  onRehydrateStorage: () => (state?: CapStoreState) => {
-    if (state) {
-      state.loadFromDB();
-    }
+  // Home data
+  homeData: {
+    topRated: [],
+    trending: [],
+    latest: [],
   },
-});
 
-// ================= Store Definition ================= //
+  // Favorites
+  favoriteCaps: [],
+  isFetchingFavoriteCaps: false,
+  favoriteCapsError: null,
+  isLoadingHome: false,
+  homeError: null,
 
-export const CapStateStore = create<CapStoreState>(
-  persist(
-    (set, get) => ({
-      // Store state
-      installedCaps: {
-        [defaultCap.id]: {
-          cid: defaultCap.id,
-          capData: defaultCap,
-          isFavorite: false,
-          version: '0',
-          stats: {
-            capId: defaultCap.id,
-            downloads: 0,
-            ratingCount: 0,
-            averageRating: 0,
-            favorites: 0,
-          },
-          lastUsedAt: null,
-        },
-      },
+  //downloaded caps management
+  downloadedCaps: {},
+};
 
-      remoteCaps: [],
-      isFetching: false,
-      isLoadingMore: false,
-      error: null,
-      hasMoreData: true,
-      currentPage: 0,
-      lastSearchParams: {},
+export const useCapStore = create<CapStoreState>()((set, get) => {
+  // Auto-initialize when store is created
+  const initialize = async () => {
+    const { isInitialized, fetchCaps, fetchFavoriteCaps, fetchHome } = get();
+    if (isInitialized) return;
 
-      // Installation management
-      addInstalledCap: (cap: InstalledCap) => {
-        const { installedCaps } = get();
+    const capKit = await capKitService.getCapKit();
+    if (!capKit) return;
 
-        // Don't install if already installed
-        if (installedCaps[cap.capData.id]) {
-          return;
-        }
+    set({ isInitialized: true });
 
-        set((state) => ({
-          installedCaps: {
-            ...state.installedCaps,
-            [cap.capData.id]: {
-              cid: cap.cid,
-              capData: cap.capData,
-              isFavorite: cap.isFavorite,
-              lastUsedAt: cap.lastUsedAt,
-              version: cap.version,
-              stats: cap.stats,
-            },
-          },
-        }));
+    // Initial data fetching
+    await Promise.all([fetchCaps(), fetchFavoriteCaps(), fetchHome()]);
+  };
 
-        // Save to IndexedDB asynchronously
-        get().saveToDB();
-      },
+  // Call initialize immediately when store is created
+  setTimeout(() => initialize(), 0);
 
-      // Data management
-      updateInstalledCap: (
-        id: string,
-        updates: Partial<Omit<InstalledCap, 'capData'>>,
-      ) => {
-        const { installedCaps } = get();
-        const installedCap = installedCaps[id];
+  return {
+    ...initialState,
 
-        if (!installedCap) return;
+    // Initialize method (can still be called manually if needed)
+    initialize,
 
-        set((state) => ({
-          installedCaps: {
-            ...state.installedCaps,
-            [id]: {
-              ...installedCap,
-              ...updates,
-            },
-          },
-        }));
+    // Main fetch functions
+    fetchCaps: async (
+      params: UseRemoteCapParams = {},
+      append = false,
+    ): Promise<Result<Page<ResultCap>>> => {
+      const capKit = await capKitService.getCapKit();
 
-        get().saveToDB();
-      },
+      const {
+        searchQuery: queryString = '',
+        page: pageNum = 0,
+        size: sizeNum = 45,
+        tags: tagsArray = [],
+        sortBy: sortByParam = 'downloads',
+        sortOrder: sortOrderParam = 'desc',
+      } = params;
 
-      clearAllInstalledCaps: () => {
-        set({
-          installedCaps: {},
+      if (append) {
+        set({ isLoadingMore: true });
+      } else {
+        set({ currentPage: 0, isFetching: true, hasMoreData: true });
+      }
+      set({ error: null, lastSearchParams: params });
+
+      try {
+        const response = await capKit.queryByName(queryString, {
+          tags: tagsArray,
+          page: pageNum,
+          size: sizeNum,
+          sortBy: sortByParam,
+          sortOrder: sortOrderParam,
         });
 
-        // Clear IndexedDB
-        const clearDB = async () => {
-          try {
-            const currentDID = await getCurrentDID();
-            if (!currentDID) return;
+        const newRemoteCaps: RemoteCap[] = mapResultsToRemoteCaps(response);
 
-            await capDB.capStore.where('did').equals(currentDID).delete();
-          } catch (error) {
-            console.error('Failed to clear caps from DB:', error);
-          }
-        };
-        clearDB();
-      },
+        const totalItems = response.data?.items?.length || 0;
+        const { remoteCaps } = get();
 
-      // Remote cap management
-      setRemoteCaps: (caps: RemoteCap[]) => {
-        set((state) => ({
-          remoteCaps: [...state.remoteCaps, ...caps]
-        }));
-      },
+        set({
+          hasMoreData: totalItems === sizeNum,
+          remoteCaps: append
+            ? [...remoteCaps, ...newRemoteCaps]
+            : newRemoteCaps,
+          currentPage: pageNum,
+          isFetching: false,
+          isLoadingMore: false,
+        });
 
-      setIsFetching: (fetching: boolean) => {
-        set({ isFetching: fetching });
-      },
+        return response;
+      } catch (err) {
+        console.error('Error fetching caps:', err);
+        set({
+          error: 'Please check your network connection and try again.',
+          isFetching: false,
+          isLoadingMore: false,
+        });
+        throw err;
+      }
+    },
 
-      setIsLoadingMore: (loading: boolean) => {
-        set({ isLoadingMore: loading });
-      },
+    refetch: () => {
+      const { lastSearchParams, fetchCaps } = get();
+      fetchCaps(lastSearchParams);
+    },
 
-      setError: (error: string | null) => {
-        set({ error });
-      },
+    loadMore: () => {
+      const {
+        hasMoreData,
+        isLoadingMore,
+        currentPage,
+        lastSearchParams,
+        fetchCaps,
+      } = get();
+      if (!hasMoreData || isLoadingMore) return;
 
-      setHasMoreData: (hasMore: boolean) => {
-        set({ hasMoreData: hasMore });
-      },
+      const nextPage = currentPage + 1;
+      return fetchCaps(
+        {
+          ...lastSearchParams,
+          page: nextPage,
+        },
+        true,
+      );
+    },
 
-      setCurrentPage: (page: number) => {
-        set({ currentPage: page });
-      },
+    goToPage: (newPage: number) => {
+      const { fetchCaps } = get();
+      return fetchCaps({
+        searchQuery: '',
+        page: newPage,
+      });
+    },
 
-      setLastSearchParams: (params: UseRemoteCapParams) => {
-        set({ lastSearchParams: params });
-      },
+    fetchHome: async (): Promise<HomeData | null> => {
+      const { fetchCaps } = get();
 
-      // Data persistence methods
-      loadFromDB: async () => {
-        if (typeof window === 'undefined') return;
+      set({ isLoadingHome: true, homeError: null });
 
-        try {
-          const currentDID = await getCurrentDID();
-          if (!currentDID) return;
-
-          const installedCaps = await capDB.capStore
-            .where('did')
-            .equals(currentDID)
-            .toArray();
-
-          const installedCapsMap: Record<string, InstalledCap> = {};
-
-          installedCaps.forEach((installedCap: InstalledCap) => {
-            installedCapsMap[installedCap.capData.id] = {
-              cid: installedCap.cid,
-              capData: installedCap.capData,
-              isFavorite: installedCap.isFavorite,
-              lastUsedAt: installedCap.lastUsedAt,
-              version: installedCap.version,
-              stats: installedCap.stats,
-            };
+      try {
+        const [topRatedResponse, trendingResponse, latestResponse] =
+          await Promise.all([
+            fetchCaps({
+              searchQuery: '',
+              sortBy: 'average_rating',
+              sortOrder: 'desc',
+              page: 0,
+              size: 6,
+            }) as Promise<Result<Page<ResultCap>>>,
+            fetchCaps({
+              searchQuery: '',
+              sortBy: 'downloads',
+              sortOrder: 'desc',
+              page: 0,
+              size: 6,
+            }) as Promise<Result<Page<ResultCap>>>,
+            fetchCaps({
+              searchQuery: '',
+              sortBy: 'updated_at',
+              sortOrder: 'desc',
+              page: 0,
+              size: 6,
+            }) as Promise<Result<Page<ResultCap>>>,
+          ]).catch((e) => {
+            throw e;
           });
+        const homeData: HomeData = {
+          topRated: mapResultsToRemoteCaps(topRatedResponse),
+          trending: mapResultsToRemoteCaps(trendingResponse),
+          latest: mapResultsToRemoteCaps(latestResponse),
+        };
 
-          set((state) => ({
-            installedCaps: { ...state.installedCaps, ...installedCapsMap },
-          }));
-        } catch (error) {
-          console.error('Failed to load caps from DB:', error);
-        }
-      },
+        set({ homeData, isLoadingHome: false });
+        return homeData;
+      } catch (err) {
+        console.error('Error fetching home data:', err);
+        set({
+          homeError: 'Failed to load home data. Please try again.',
+          isLoadingHome: false,
+        });
+        throw err;
+      }
+    },
 
-      saveToDB: async () => {
-        if (typeof window === 'undefined') return;
+    fetchFavoriteCaps: async (): Promise<RemoteCap[]> => {
+      const capKit = await capKitService.getCapKit();
+      if (!capKit) {
+        return [];
+      }
 
-        try {
-          const currentDID = await getCurrentDID();
-          if (!currentDID) return;
+      set({ isFetchingFavoriteCaps: true, favoriteCapsError: null });
 
-          const { installedCaps } = get();
-          const capsToSave = Object.entries(installedCaps).map(([id, cap]) => ({
-            id,
-            ...cap,
-            did: currentDID,
-          }));
-          await capDB.capStore.bulkPut(capsToSave);
-        } catch (error) {
-          console.error('Failed to save caps to DB:', error);
-        }
-      },
-    }),
-    persistConfig,
-  ) as StateCreator<CapStoreState>,
-);
+      try {
+        const response = await capKit.queryMyFavorite();
+        const newFavoriteCaps: RemoteCap[] = mapResultsToRemoteCaps(response);
+        set({ favoriteCaps: newFavoriteCaps, isFetchingFavoriteCaps: false });
+        return newFavoriteCaps;
+      } catch (err) {
+        console.error('Error fetching favorite caps:', err);
+        set({
+          favoriteCapsError: 'Failed to fetch favorite caps. Please try again.',
+          isFetchingFavoriteCaps: false,
+        });
+        throw err;
+      }
+    },
+
+    downloadCapByIDWithCache: async (id: string): Promise<Cap> => {
+      const cachedCap = get().downloadedCaps[id];
+      if (cachedCap) {
+        return cachedCap;
+      }
+      const capKit = await capKitService.getCapKit();
+      const cap = await capKit.downloadByID(id);
+      set({ downloadedCaps: { ...get().downloadedCaps, [id]: cap } });
+      return cap;
+    },
+  };
+});

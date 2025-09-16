@@ -1,37 +1,37 @@
 import { create } from 'zustand';
 import { defaultCap } from '@/shared/constants/cap';
-import { GlobalMCPManager } from '@/shared/services/global-mcp-manager';
+import { RemoteMCPManager } from '@/shared/services/global-mcp-manager';
 import type { Cap } from '@/shared/types';
 
 interface CurrentCapState {
   currentCap: Cap;
-  isCurrentCapMCPInitialized: boolean;
-  isCurrentCapMCPError: boolean;
+  isInitialized: boolean;
+  isError: boolean;
   errorMessage: string | null;
   setCurrentCap: (cap: Cap) => void;
 }
 
 export const CurrentCapStore = create<CurrentCapState>()((set) => ({
   currentCap: defaultCap,
-  isCurrentCapMCPInitialized: true,
-  isCurrentCapMCPError: false,
+  isInitialized: true,
+  isError: false,
   errorMessage: null,
 
   setCurrentCap: (cap: Cap) => {
     set({
       currentCap: cap,
-      isCurrentCapMCPInitialized: false,
-      isCurrentCapMCPError: false,
+      isInitialized: false,
+      isError: false,
       errorMessage: null,
     });
 
     // Initialize MCP for the new cap or cleanup if cap has no MCP servers
-    const mcpManager = GlobalMCPManager.getInstance();
+    const remoteMCPManager = RemoteMCPManager.getInstance();
     const mcpServers = cap.core.mcpServers || {};
-    const hasMCPServers = Object.keys(mcpServers).length > 0;
+    const hasRemoteMcps = Object.keys(mcpServers).length > 0;
 
-    if (hasMCPServers) {
-      mcpManager
+    if (hasRemoteMcps) {
+      remoteMCPManager
         .initializeForCap(cap)
         .catch((error) => {
           const errorMessage =
@@ -40,7 +40,7 @@ export const CurrentCapStore = create<CurrentCapState>()((set) => ({
               : 'MCP Server Initialization Failed, Please Check Configuration or Network Connection';
 
           set({
-            isCurrentCapMCPError: true,
+            isError: true,
             errorMessage: errorMessage,
           });
           console.error(
@@ -50,11 +50,11 @@ export const CurrentCapStore = create<CurrentCapState>()((set) => ({
           );
         })
         .finally(() => {
-          set({ isCurrentCapMCPInitialized: true });
+          set({ isInitialized: true });
         });
     } else {
-      set({ isCurrentCapMCPInitialized: true });
-      mcpManager.cleanup().catch((error) => {
+      set({ isInitialized: true });
+      remoteMCPManager.cleanup().catch((error) => {
         console.warn('Failed to cleanup previous MCP servers:', error);
       });
     }

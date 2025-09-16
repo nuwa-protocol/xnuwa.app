@@ -3,11 +3,7 @@ import { Skeleton } from '@/shared/components/ui/skeleton';
 import type { UrlMetadata } from '../types';
 
 interface SourceCardProps {
-  source: {
-    id?: string;
-    title?: string;
-    url?: string;
-  };
+  source: string;
   metadata: UrlMetadata | null;
   loading: boolean;
   index: number;
@@ -21,15 +17,11 @@ export const SourceCard = ({
   index,
   onClick,
 }: SourceCardProps) => {
-  const url = source.url || '';
+  const url = source || '';
   const isExternalUrl = url.startsWith('http');
 
   // Extract best data from metadata
-  const title =
-    metadata?.['og:title'] ||
-    metadata?.title ||
-    source.title ||
-    'Untitled Source';
+  const title = metadata?.['og:title'] || metadata?.title || 'Untitled Source';
   const description = metadata?.['og:description'] || metadata?.description;
   const image = metadata?.['og:image'] || metadata?.image;
   const siteName = metadata?.['og:site_name'];

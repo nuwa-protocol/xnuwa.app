@@ -5,11 +5,7 @@ import { cn } from '@/shared/utils';
 import { MessageSourceSidebar } from './message-source-sidebar';
 
 interface MessageSourceProps {
-  sources: Array<{
-    id?: string;
-    title?: string;
-    url?: string;
-  }>;
+  sources: string[];
   className?: string;
 }
 

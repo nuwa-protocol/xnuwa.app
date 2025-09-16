@@ -17,9 +17,9 @@ import {
 } from '@/shared/components/ui/tooltip';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { cn } from '@/shared/utils';
-import { useChatSessions } from '../hooks';
-import { Response } from './message-ai';
+import { useDeleteMessagesAfterId } from '../hooks';
 import { MessageEditor } from './message-editor';
+import { AssistantResponse } from './response';
 
 const MAX_MESSAGE_LENGTH = 150;
 
@@ -29,8 +29,8 @@ interface MessageTextProps {
   part: { type: 'text'; text: string };
   index: number;
   isReadonly: boolean;
-  setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  regenerate: UseChatHelpers<UIMessage>['regenerate'];
   onModeChange: (mode: 'view' | 'edit') => void;
 }
 
@@ -41,13 +41,13 @@ export const MessageText = ({
   index,
   isReadonly,
   setMessages,
-  reload,
+  regenerate,
   onModeChange,
 }: MessageTextProps) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [isExpanded, setIsExpanded] = useState(false);
   const [copyToClipboard, isCopied] = useCopyToClipboard();
-  const { deleteMessagesAfterId } = useChatSessions();
+  const { deleteMessagesAfterId } = useDeleteMessagesAfterId();
 
   const key = `message-${message.id}-part-${index}`;
 
@@ -57,10 +57,19 @@ export const MessageText = ({
   };
 
   const handleResend = async () => {
-    // Delete trailing messages using client store
+    // Keep this message and delete all messages after it
+    setMessages((messages) => {
+      const index = messages.findIndex((m) => m.id === message.id);
+      if (index !== -1) {
+        return messages.slice(0, index + 1);
+      }
+      return messages;
+    });
+
+    // Update database to keep messages up to and including this message
     await deleteMessagesAfterId(chatId, message.id);
 
-    reload();
+    regenerate();
   };
 
   const handleCopy = () => {
@@ -81,14 +90,20 @@ export const MessageText = ({
       <div key={key} className="flex flex-col gap-2 items-end">
         <div
           data-testid="message-content"
-          className={cn('flex flex-col', {
-            'bg-purple-200 dark:bg-purple-700 px-3 py-2 rounded-xl':
-              message.role === 'user',
-          }, {
-            'w-full': message.role === 'assistant'
-          })}
+          className={cn(
+            'flex flex-col',
+            {
+              'bg-purple-200 dark:bg-purple-700 px-3 py-2 rounded-xl':
+                message.role === 'user',
+            },
+            {
+              'w-full': message.role === 'assistant',
+            },
+          )}
         >
-          <Response parseIncompleteMarkdown={true}>{displayText}</Response>
+          <AssistantResponse parseIncompleteMarkdown={true}>
+            {displayText}
+          </AssistantResponse>
 
           {isUserMessageLong && (
             <Button
@@ -179,7 +194,7 @@ export const MessageText = ({
             }
           }}
           setMessages={setMessages}
-          reload={reload}
+          regenerate={regenerate}
         />
       </div>
     );

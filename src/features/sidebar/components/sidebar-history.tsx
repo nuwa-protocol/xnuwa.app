@@ -1,6 +1,6 @@
 import { SearchIcon } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useChatSessions } from '@/features/chat/hooks/use-chat-sessions';
+import { ChatSessionsStore } from '@/features/chat/stores';
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -16,18 +16,18 @@ import { ChatItem } from './sidebar-history-item';
 
 export function SidebarHistory() {
   const { setOpenMobile } = useSidebar();
-  const { sessionsMap, deleteSession, updateSession } = useChatSessions();
+  const { chatSessions, deleteSession, updateSession } = ChatSessionsStore();
   const navigate = useNavigate();
   const { t } = useLanguage();
 
   const [searchParams] = useSearchParams();
-  const chatSessionId = searchParams.get('cid');
+  const chatSessionId = searchParams.get('chat_id');
 
   // get all sessions with messages
   const now = Date.now();
   const fiveDaysAgo = now - 5 * 24 * 60 * 60 * 1000;
 
-  const allSessionsWithMessages = Object.values(sessionsMap).filter(
+  const allSessionsWithMessages = Object.values(chatSessions).filter(
     (session) => session.messages.length > 0,
   );
 
@@ -74,7 +74,7 @@ export function SidebarHistory() {
   };
 
   const handleTogglePin = (id: string) => {
-    const session = sessionsMap[id];
+    const session = chatSessions[id];
     if (session) {
       updateSession(id, { pinned: !session.pinned });
     }

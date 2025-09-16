@@ -1,12 +1,14 @@
 import { useTheme } from '@/shared/components/theme-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui';
-import type { CapThumbnail } from '@/shared/types/cap';
+import type { CapThumbnail } from '@/shared/types';
 
 const sizeClasses = {
   sm: 'size-6', // 24px
   md: 'size-8', // 32px
   lg: 'size-10', // 40px
-  xl: 'size-16', // 48px
+  xl: 'size-16', // 64px
+  '2xl': 'size-24', // 96px
+  '3xl': 'size-32', // 128px
 } as const;
 
 export function CapAvatar({
@@ -29,17 +31,9 @@ export function CapAvatar({
     <Avatar
       className={`${sizeClass} ${isDark ? 'bg-foreground' : 'bg-background'} ${className}`}
     >
-      <AvatarImage
-        src={
-          capThumbnail?.type === 'file'
-            ? capThumbnail.file
-            : capThumbnail?.url || `https://avatar.vercel.sh/${capName}`
-        }
-        alt={capName}
-        className="object-cover"
-      />
-      <AvatarFallback className="text-xs">
-        {capName.slice(0, 2).toUpperCase()}
+      <AvatarImage src={capThumbnail} alt={capName} className="object-cover" />
+      <AvatarFallback className="text-xs rounded-none">
+        {capName && capName.length > 2 ? capName.slice(0, 2).toUpperCase() : 'Unamed Cap'}
       </AvatarFallback>
     </Avatar>
   );

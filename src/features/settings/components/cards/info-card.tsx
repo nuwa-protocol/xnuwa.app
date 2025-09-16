@@ -1,13 +1,13 @@
 import { CopyIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { useCopyToClipboard } from 'usehooks-ts';
 import {
   Button,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui';
+import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { cn } from '@/shared/utils';
 
 interface InfoCardProps {
@@ -28,7 +28,7 @@ export function InfoCard({
   className,
 }: InfoCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
-  const [_, copyToClipboard] = useCopyToClipboard();
+  const [copy] = useCopyToClipboard();
 
   const MAX_INFO_LENGTH = 20;
   const truncatedInfo =
@@ -55,7 +55,7 @@ export function InfoCard({
               size="sm"
               className="flex items-center gap-2 font-mono"
               onClick={async () => {
-                await copyToClipboard(info);
+                await copy(info);
                 setCopyState('copied');
                 toast.success(copiedLabel || 'Copied!');
                 setTimeout(() => setCopyState('idle'), 1200);

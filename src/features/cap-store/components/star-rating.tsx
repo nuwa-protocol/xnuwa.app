@@ -1,5 +1,7 @@
 import { Star } from 'lucide-react';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
+import { generateUUID } from '@/shared/utils';
 
 interface StarRatingProps {
   averageRating: number;
@@ -39,7 +41,9 @@ export const StarRating: React.FC<StarRatingProps> = ({
     }
   };
 
-  const ratingValue = isInteractive ? hoverRating ?? userRating ?? averageRating : averageRating;
+  const ratingValue = isInteractive
+    ? (hoverRating ?? userRating ?? averageRating)
+    : averageRating;
   const ratingColor =
     isInteractive && (hoverRating !== null || userRating !== undefined)
       ? 'text-blue-500'
@@ -48,6 +52,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
   return (
     <div className="flex items-center gap-1.5">
       <div
+        role="button"
         className="flex"
         onMouseLeave={() => isInteractive && setHoverRating(null)}
       >
@@ -63,7 +68,8 @@ export const StarRating: React.FC<StarRatingProps> = ({
 
           return (
             <div
-              key={`star-${i}`}
+              key={`star-${generateUUID()}`}
+              role="button"
               className="relative"
               style={{
                 width: size,
@@ -98,7 +104,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
       )}
       {ratingCount > 0 && (
         <span className="text-xs text-muted-foreground">
-          ({formatRatingCount(5)})
+          ({formatRatingCount(ratingCount)})
         </span>
       )}
     </div>

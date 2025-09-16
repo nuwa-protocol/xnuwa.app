@@ -8,14 +8,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Help me plan an enterprise-level project roadmap",
           "Create a comprehensive business analysis report",
@@ -23,7 +20,14 @@
           "Design a customer onboarding workflow"
         ]
       },
-      "modelId": "openai/gpt-5-chat",
+      "model": {
+        "modelId": "openai/gpt-5-chat",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -37,14 +41,11 @@
         "Coding",
         "Content Writing"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Debug this complex Python algorithm step by step",
           "Write a technical blog post about AI advancements",
@@ -52,7 +53,14 @@
           "Create a full-stack web application architecture"
         ]
       },
-      "modelId": "openai/gpt-5",
+      "model": {
+        "modelId": "openai/gpt-5",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -65,14 +73,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Explain this concept in simple terms",
           "Help me organize my daily tasks",
@@ -80,7 +85,14 @@
           "Provide a brief summary of this document"
         ]
       },
-      "modelId": "openai/gpt-5-mini",
+      "model": {
+        "modelId": "openai/gpt-5-mini",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -93,14 +105,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Quick code completion for this function",
           "Classify this text into categories",
@@ -108,7 +117,14 @@
           "Provide instant responses to user queries"
         ]
       },
-      "modelId": "openai/gpt-5-nano",
+      "model": {
+        "modelId": "openai/gpt-5-nano",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -121,14 +137,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Use tools to research and analyze market trends",
           "Create a function to process large datasets",
@@ -136,7 +149,14 @@
           "Generate structured JSON output for API responses"
         ]
       },
-      "modelId": "openai/gpt-oss-120b",
+      "model": {
+        "modelId": "openai/gpt-oss-120b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -149,14 +169,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Use function calling to integrate with APIs",
           "Generate code with tool-assisted development",
@@ -164,7 +181,14 @@
           "Build an automated workflow with tools"
         ]
       },
-      "modelId": "openai/gpt-oss-20b",
+      "model": {
+        "modelId": "openai/gpt-oss-20b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -179,14 +203,11 @@
         "Research",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Refactor this codebase to improve performance",
           "Research the latest developments in AI",
@@ -194,7 +215,14 @@
           "Analyze data patterns in this dataset"
         ]
       },
-      "modelId": "anthropic/claude-opus-4.1",
+      "model": {
+        "modelId": "anthropic/claude-opus-4.1",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -209,14 +237,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Write a technical blog post in multiple languages",
           "Create a React component with TypeScript",
@@ -224,7 +249,14 @@
           "Build a function that handles API requests"
         ]
       },
-      "modelId": "qwen/qwen3-30b-a3b-instruct-2507",
+      "model": {
+        "modelId": "qwen/qwen3-30b-a3b-instruct-2507",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -238,14 +270,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.62.0/files/light/zai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.62.0/files/light/zai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Design an AI agent for complex reasoning",
           "Create a Python script for data analysis",
@@ -253,7 +282,14 @@
           "Build a multi-step workflow application"
         ]
       },
-      "modelId": "z-ai/glm-4.5",
+      "model": {
+        "modelId": "z-ai/glm-4.5",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -266,14 +302,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.62.0/files/light/zai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.62.0/files/light/zai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create a lightweight chatbot with tools",
           "Generate quick responses with function calls",
@@ -281,7 +314,14 @@
           "Process real-time data streams"
         ]
       },
-      "modelId": "z-ai/glm-4.5-air",
+      "model": {
+        "modelId": "z-ai/glm-4.5-air",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -295,14 +335,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve this complex mathematical theorem",
           "Analyze scientific research papers",
@@ -310,7 +347,14 @@
           "Generate code for algorithmic problems"
         ]
       },
-      "modelId": "qwen/qwen3-235b-a22b-thinking-2507",
+      "model": {
+        "modelId": "qwen/qwen3-235b-a22b-thinking-2507",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -324,14 +368,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.62.0/files/light/zai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.62.0/files/light/zai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build a web scraping tool with Python",
           "Search online for market research data",
@@ -339,7 +380,14 @@
           "Optimize this database query performance"
         ]
       },
-      "modelId": "z-ai/glm-4-32b",
+      "model": {
+        "modelId": "z-ai/glm-4-32b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -353,14 +401,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Refactor this entire codebase architecture",
           "Create an advanced machine learning pipeline",
@@ -368,7 +413,14 @@
           "Use tools to analyze repository patterns"
         ]
       },
-      "modelId": "qwen/qwen3-coder",
+      "model": {
+        "modelId": "qwen/qwen3-coder",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -381,14 +433,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create a fast API endpoint with caching",
           "Build a real-time chat application",
@@ -396,7 +445,14 @@
           "Optimize this code for performance"
         ]
       },
-      "modelId": "google/gemini-2.5-flash-lite",
+      "model": {
+        "modelId": "google/gemini-2.5-flash-lite",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -411,14 +467,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Write a comprehensive technical report",
           "Create a multilingual content strategy",
@@ -426,7 +479,14 @@
           "Generate structured documentation with tools"
         ]
       },
-      "modelId": "qwen/qwen3-235b-a22b-2507",
+      "model": {
+        "modelId": "qwen/qwen3-235b-a22b-2507",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -440,14 +500,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/moonshot.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/moonshot.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Code a complex algorithm with optimization",
           "Build an advanced AI agent system",
@@ -455,7 +512,14 @@
           "Design scalable software architecture"
         ]
       },
-      "modelId": "moonshotai/kimi-k2",
+      "model": {
+        "modelId": "moonshotai/kimi-k2",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -468,14 +532,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/grok.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/grok.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Analyze complex data with parallel processing",
           "Create structured outputs for API integration",
@@ -483,7 +544,14 @@
           "Generate comprehensive technical reports"
         ]
       },
-      "modelId": "x-ai/grok-4",
+      "model": {
+        "modelId": "x-ai/grok-4",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -496,14 +564,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create a high-speed data processing tool",
           "Build a real-time analytics dashboard",
@@ -511,7 +576,14 @@
           "Optimize this function for low latency"
         ]
       },
-      "modelId": "google/gemini-2.5-flash-lite-preview-06-17",
+      "model": {
+        "modelId": "google/gemini-2.5-flash-lite-preview-06-17",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -525,14 +597,11 @@
         "Coding",
         "Research"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve advanced mathematical problems",
           "Research cutting-edge scientific topics",
@@ -540,7 +609,14 @@
           "Create detailed technical documentation"
         ]
       },
-      "modelId": "google/gemini-2.5-flash",
+      "model": {
+        "modelId": "google/gemini-2.5-flash",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -554,14 +630,11 @@
         "Coding",
         "Research"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Conduct comprehensive literature review",
           "Analyze complex scientific datasets",
@@ -569,7 +642,14 @@
           "Create advanced coding solutions"
         ]
       },
-      "modelId": "google/gemini-2.5-pro",
+      "model": {
+        "modelId": "google/gemini-2.5-pro",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -582,14 +662,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/grok.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/grok.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve this logic puzzle step-by-step",
           "Explain complex concepts clearly",
@@ -597,7 +674,14 @@
           "Help with quick decision-making"
         ]
       },
-      "modelId": "x-ai/grok-3-mini",
+      "model": {
+        "modelId": "x-ai/grok-3-mini",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -610,14 +694,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/grok.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/grok.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Extract structured data from documents",
           "Create advanced coding solutions",
@@ -625,7 +706,14 @@
           "Analyze healthcare or legal documents"
         ]
       },
-      "modelId": "x-ai/grok-3",
+      "model": {
+        "modelId": "x-ai/grok-3",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -638,14 +726,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve advanced programming challenges",
           "Debug mathematical algorithms",
@@ -653,7 +738,14 @@
           "Create efficient data structures"
         ]
       },
-      "modelId": "deepseek/deepseek-r1-0528-qwen3-8b",
+      "model": {
+        "modelId": "deepseek/deepseek-r1-0528-qwen3-8b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -666,14 +758,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Think through complex reasoning problems",
           "Analyze philosophical questions deeply",
@@ -681,7 +770,14 @@
           "Provide detailed explanations of concepts"
         ]
       },
-      "modelId": "deepseek/deepseek-r1-0528",
+      "model": {
+        "modelId": "deepseek/deepseek-r1-0528",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -695,14 +791,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build enterprise-level software solutions",
           "Create complex agentic workflows",
@@ -710,7 +803,14 @@
           "Design scalable system architectures"
         ]
       },
-      "modelId": "anthropic/claude-opus-4",
+      "model": {
+        "modelId": "anthropic/claude-opus-4",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -724,14 +824,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Develop production-ready applications",
           "Create automated testing suites",
@@ -739,7 +836,14 @@
           "Design robust software systems"
         ]
       },
-      "modelId": "anthropic/claude-sonnet-4",
+      "model": {
+        "modelId": "anthropic/claude-sonnet-4",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -753,14 +857,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Classify content for safety compliance",
           "Moderate user-generated content",
@@ -768,7 +869,14 @@
           "Analyze text and image safety"
         ]
       },
-      "modelId": "meta-llama/llama-guard-4-12b",
+      "model": {
+        "modelId": "meta-llama/llama-guard-4-12b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -783,14 +891,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Write creative technical documentation",
           "Build intelligent coding assistants",
@@ -798,7 +903,14 @@
           "Generate multi-purpose content"
         ]
       },
-      "modelId": "qwen/qwen3-30b-a3b",
+      "model": {
+        "modelId": "qwen/qwen3-30b-a3b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -813,14 +925,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create interactive dialogue systems",
           "Build math problem-solving tools",
@@ -828,7 +937,14 @@
           "Generate code for reasoning tasks"
         ]
       },
-      "modelId": "qwen/qwen3-8b",
+      "model": {
+        "modelId": "qwen/qwen3-8b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -843,14 +959,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve complex programming challenges",
           "Create detailed technical content",
@@ -858,7 +971,14 @@
           "Generate long-form analytical reports"
         ]
       },
-      "modelId": "qwen/qwen3-14b",
+      "model": {
+        "modelId": "qwen/qwen3-14b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -873,14 +993,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Develop sophisticated applications",
           "Write comprehensive content strategies",
@@ -888,7 +1005,14 @@
           "Create intelligent automation tools"
         ]
       },
-      "modelId": "qwen/qwen3-32b",
+      "model": {
+        "modelId": "qwen/qwen3-32b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -902,14 +1026,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build enterprise-scale applications",
           "Create advanced coding solutions",
@@ -917,7 +1038,14 @@
           "Generate complex technical documentation"
         ]
       },
-      "modelId": "qwen/qwen3-235b-a22b",
+      "model": {
+        "modelId": "qwen/qwen3-235b-a22b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -931,14 +1059,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve advanced mathematical problems",
           "Create optimized coding solutions",
@@ -946,7 +1071,14 @@
           "Generate automated test frameworks"
         ]
       },
-      "modelId": "openai/o4-mini-high",
+      "model": {
+        "modelId": "openai/o4-mini-high",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -960,14 +1092,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve STEM problems with high accuracy",
           "Create efficient coding solutions",
@@ -975,7 +1104,14 @@
           "Generate automated testing tools"
         ]
       },
-      "modelId": "openai/o4-mini",
+      "model": {
+        "modelId": "openai/o4-mini",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -989,14 +1125,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build enterprise software solutions",
           "Create advanced coding frameworks",
@@ -1004,7 +1137,14 @@
           "Develop large-scale applications"
         ]
       },
-      "modelId": "openai/gpt-4.1",
+      "model": {
+        "modelId": "openai/gpt-4.1",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1017,14 +1157,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create interactive coding assistants",
           "Build responsive web applications",
@@ -1032,7 +1169,14 @@
           "Develop efficient automation scripts"
         ]
       },
-      "modelId": "openai/gpt-4.1-mini",
+      "model": {
+        "modelId": "openai/gpt-4.1-mini",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1045,14 +1189,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create rapid code completions",
           "Build fast classification systems",
@@ -1060,7 +1201,14 @@
           "Develop real-time processing tools"
         ]
       },
-      "modelId": "openai/gpt-4.1-nano",
+      "model": {
+        "modelId": "openai/gpt-4.1-nano",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1074,14 +1222,11 @@
         "Coding",
         "Research"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create multimodal research applications",
           "Build advanced coding solutions",
@@ -1089,7 +1234,14 @@
           "Develop high-capacity AI systems"
         ]
       },
-      "modelId": "meta-llama/llama-4-maverick",
+      "model": {
+        "modelId": "meta-llama/llama-4-maverick",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1102,14 +1254,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build visual reasoning applications",
           "Create multimodal coding assistants",
@@ -1117,7 +1266,14 @@
           "Generate assistant-style interactions"
         ]
       },
-      "modelId": "meta-llama/llama-4-scout",
+      "model": {
+        "modelId": "meta-llama/llama-4-scout",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1131,14 +1287,11 @@
         "Coding",
         "Research"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Analyze visual data and images",
           "Research scientific image content",
@@ -1146,7 +1299,14 @@
           "Generate insights from visual media"
         ]
       },
-      "modelId": "qwen/qwen2.5-vl-32b-instruct",
+      "model": {
+        "modelId": "qwen/qwen2.5-vl-32b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1159,14 +1319,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Engage in general conversation",
           "Explain complex topics simply",
@@ -1174,7 +1331,14 @@
           "Provide thoughtful analysis"
         ]
       },
-      "modelId": "deepseek/deepseek-chat-v3-0324",
+      "model": {
+        "modelId": "deepseek/deepseek-chat-v3-0324",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1187,14 +1351,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create multimodal applications with vision",
           "Build function calling systems",
@@ -1202,7 +1363,14 @@
           "Develop multilingual tools"
         ]
       },
-      "modelId": "google/gemma-3-4b-it",
+      "model": {
+        "modelId": "google/gemma-3-4b-it",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1215,14 +1383,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create advanced multimodal tools",
           "Build function calling applications",
@@ -1230,7 +1395,14 @@
           "Develop complex reasoning systems"
         ]
       },
-      "modelId": "google/gemma-3-12b-it",
+      "model": {
+        "modelId": "google/gemma-3-12b-it",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1243,14 +1415,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build sophisticated multimodal applications",
           "Create advanced function calling systems",
@@ -1258,7 +1427,14 @@
           "Develop enterprise-grade AI tools"
         ]
       },
-      "modelId": "google/gemma-3-27b-it",
+      "model": {
+        "modelId": "google/gemma-3-27b-it",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1271,14 +1447,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/perplexity-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/perplexity-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Research complex topics with web search",
           "Create intelligent automation tools",
@@ -1286,7 +1459,14 @@
           "Build advanced query systems"
         ]
       },
-      "modelId": "perplexity/sonar-pro",
+      "model": {
+        "modelId": "perplexity/sonar-pro",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1299,14 +1479,11 @@
         "AI Model",
         "Research"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/perplexity-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/perplexity-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Conduct comprehensive market research",
           "Analyze financial technology trends",
@@ -1314,7 +1491,14 @@
           "Generate detailed industry reports"
         ]
       },
-      "modelId": "perplexity/sonar-deep-research",
+      "model": {
+        "modelId": "perplexity/sonar-deep-research",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1327,14 +1511,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve challenging reasoning puzzles",
           "Think through complex problems step-by-step",
@@ -1342,7 +1523,14 @@
           "Generate structured arguments"
         ]
       },
-      "modelId": "qwen/qwq-32b",
+      "model": {
+        "modelId": "qwen/qwq-32b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1355,14 +1543,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create fast, efficient applications",
           "Build lightweight AI tools",
@@ -1370,7 +1555,14 @@
           "Develop economical solutions"
         ]
       },
-      "modelId": "google/gemini-2.0-flash-lite-001",
+      "model": {
+        "modelId": "google/gemini-2.0-flash-lite-001",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1384,14 +1576,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build advanced coding applications",
           "Create intelligent automation tools",
@@ -1399,7 +1588,14 @@
           "Generate comprehensive solutions"
         ]
       },
-      "modelId": "anthropic/claude-3.7-sonnet",
+      "model": {
+        "modelId": "anthropic/claude-3.7-sonnet",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1413,14 +1609,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Think through complex coding problems",
           "Build sophisticated automation tools",
@@ -1428,7 +1621,14 @@
           "Develop step-by-step workflows"
         ]
       },
-      "modelId": "anthropic/claude-3.7-sonnet:thinking",
+      "model": {
+        "modelId": "anthropic/claude-3.7-sonnet:thinking",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1442,14 +1642,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build multimodal coding applications",
           "Create intelligent automation systems",
@@ -1457,7 +1654,14 @@
           "Develop advanced AI agents"
         ]
       },
-      "modelId": "google/gemini-2.0-flash-001",
+      "model": {
+        "modelId": "google/gemini-2.0-flash-001",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1470,14 +1674,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Analyze visual content and objects",
           "Create image-based applications",
@@ -1485,7 +1686,14 @@
           "Build visual reasoning tools"
         ]
       },
-      "modelId": "qwen/qwen2.5-vl-72b-instruct",
+      "model": {
+        "modelId": "qwen/qwen2.5-vl-72b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1499,14 +1707,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve complex STEM problems efficiently",
           "Create advanced coding tools",
@@ -1514,7 +1719,14 @@
           "Generate mathematical solutions"
         ]
       },
-      "modelId": "openai/o3-mini",
+      "model": {
+        "modelId": "openai/o3-mini",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1527,14 +1739,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve advanced mathematical challenges",
           "Create high-performance coding solutions",
@@ -1542,7 +1751,14 @@
           "Generate optimized system architectures"
         ]
       },
-      "modelId": "deepseek/deepseek-r1-distill-qwen-32b",
+      "model": {
+        "modelId": "deepseek/deepseek-r1-distill-qwen-32b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1555,14 +1771,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/perplexity-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/perplexity-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Answer quick questions with sources",
           "Search for current information",
@@ -1570,7 +1783,14 @@
           "Generate fast, cited responses"
         ]
       },
-      "modelId": "perplexity/sonar",
+      "model": {
+        "modelId": "perplexity/sonar",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1583,14 +1803,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/liquid.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/liquid.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create multilingual conversations",
           "Build efficient dialogue systems",
@@ -1598,7 +1815,14 @@
           "Develop fast response applications"
         ]
       },
-      "modelId": "liquid/lfm-7b",
+      "model": {
+        "modelId": "liquid/lfm-7b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1611,14 +1835,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/liquid.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/liquid.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build lightweight mobile applications",
           "Create efficient edge computing tools",
@@ -1626,7 +1847,14 @@
           "Develop compact AI solutions"
         ]
       },
-      "modelId": "liquid/lfm-3b",
+      "model": {
+        "modelId": "liquid/lfm-3b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1639,14 +1867,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve advanced mathematical problems",
           "Create high-performance coding solutions",
@@ -1654,7 +1879,14 @@
           "Generate optimized data structures"
         ]
       },
-      "modelId": "deepseek/deepseek-r1-distill-llama-70b",
+      "model": {
+        "modelId": "deepseek/deepseek-r1-distill-llama-70b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1667,14 +1899,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Reason through complex problems openly",
           "Create advanced AI tools with transparency",
@@ -1682,7 +1911,14 @@
           "Generate detailed problem-solving steps"
         ]
       },
-      "modelId": "deepseek/deepseek-r1",
+      "model": {
+        "modelId": "deepseek/deepseek-r1",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1695,14 +1931,11 @@
         "AI Model",
         "Content Writing"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/minimax-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/minimax-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create innovative content with unique voice",
           "Write compelling marketing campaigns",
@@ -1710,7 +1943,14 @@
           "Build engaging storytelling tools"
         ]
       },
-      "modelId": "minimax/minimax-01",
+      "model": {
+        "modelId": "minimax/minimax-01",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1723,14 +1963,11 @@
         "AI Model",
         "Research"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/microsoft-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/microsoft-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Solve complex reasoning problems",
           "Research academic topics thoroughly",
@@ -1738,7 +1975,14 @@
           "Build efficient memory-based systems"
         ]
       },
-      "modelId": "microsoft/phi-4",
+      "model": {
+        "modelId": "microsoft/phi-4",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1752,14 +1996,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/deepseek-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build advanced coding applications",
           "Create intelligent automation tools",
@@ -1767,7 +2008,14 @@
           "Generate structured technical solutions"
         ]
       },
-      "modelId": "deepseek/deepseek-chat",
+      "model": {
+        "modelId": "deepseek/deepseek-chat",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1780,14 +2028,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Engage in multilingual conversations",
           "Create diverse dialogue interactions",
@@ -1795,7 +2040,14 @@
           "Build conversational applications"
         ]
       },
-      "modelId": "meta-llama/llama-3.3-70b-instruct",
+      "model": {
+        "modelId": "meta-llama/llama-3.3-70b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1808,14 +2060,11 @@
         "AI Model",
         "Content Writing"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Write engaging creative content",
           "Create detailed narratives",
@@ -1823,7 +2072,14 @@
           "Build content creation tools"
         ]
       },
-      "modelId": "openai/gpt-4o-2024-11-20",
+      "model": {
+        "modelId": "openai/gpt-4o-2024-11-20",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1837,14 +2093,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build comprehensive coding tools",
           "Create intelligent code agents",
@@ -1852,7 +2105,14 @@
           "Fix complex programming bugs"
         ]
       },
-      "modelId": "qwen/qwen-2.5-coder-32b-instruct",
+      "model": {
+        "modelId": "qwen/qwen-2.5-coder-32b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1866,14 +2126,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build fast coding applications",
           "Create real-time AI assistants",
@@ -1881,7 +2138,14 @@
           "Develop efficient development tools"
         ]
       },
-      "modelId": "anthropic/claude-3.5-haiku",
+      "model": {
+        "modelId": "anthropic/claude-3.5-haiku",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1896,14 +2160,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create rapid coding solutions",
           "Build real-time chatbots",
@@ -1911,7 +2172,14 @@
           "Write efficient technical content"
         ]
       },
-      "modelId": "anthropic/claude-3.5-haiku-20241022",
+      "model": {
+        "modelId": "anthropic/claude-3.5-haiku-20241022",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1925,14 +2193,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build advanced coding solutions",
           "Create intelligent automation tools",
@@ -1940,7 +2205,14 @@
           "Develop sophisticated AI agents"
         ]
       },
-      "modelId": "anthropic/claude-3.5-sonnet",
+      "model": {
+        "modelId": "anthropic/claude-3.5-sonnet",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1953,14 +2225,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create multilingual coding applications",
           "Build structured data processing tools",
@@ -1968,7 +2237,14 @@
           "Develop comprehensive AI assistants"
         ]
       },
-      "modelId": "qwen/qwen-2.5-7b-instruct",
+      "model": {
+        "modelId": "qwen/qwen-2.5-7b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -1981,14 +2257,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create fast, efficient applications",
           "Build real-time chat systems",
@@ -1996,7 +2269,14 @@
           "Develop lightweight AI tools"
         ]
       },
-      "modelId": "google/gemini-flash-1.5-8b",
+      "model": {
+        "modelId": "google/gemini-flash-1.5-8b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2010,14 +2290,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create multilingual content",
           "Generate comprehensive summaries",
@@ -2025,7 +2302,14 @@
           "Use tools for enhanced interactions"
         ]
       },
-      "modelId": "meta-llama/llama-3.2-3b-instruct",
+      "model": {
+        "modelId": "meta-llama/llama-3.2-3b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2038,14 +2322,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/qwen-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build large-scale coding applications",
           "Create multilingual content systems",
@@ -2053,7 +2334,14 @@
           "Develop comprehensive AI solutions"
         ]
       },
-      "modelId": "qwen/qwen-2.5-72b-instruct",
+      "model": {
+        "modelId": "qwen/qwen-2.5-72b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2068,14 +2356,11 @@
         "Research",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/nousresearch.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/nousresearch.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build advanced coding applications",
           "Research complex technical topics",
@@ -2083,7 +2368,14 @@
           "Generate structured function calls"
         ]
       },
-      "modelId": "nousresearch/hermes-3-llama-3.1-70b",
+      "model": {
+        "modelId": "nousresearch/hermes-3-llama-3.1-70b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2097,14 +2389,11 @@
         "Coding",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/nousresearch.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/nousresearch.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build enterprise-level AI systems",
           "Create advanced coding solutions",
@@ -2112,7 +2401,14 @@
           "Develop sophisticated AI agents"
         ]
       },
-      "modelId": "nousresearch/hermes-3-llama-3.1-405b",
+      "model": {
+        "modelId": "nousresearch/hermes-3-llama-3.1-405b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2126,14 +2422,11 @@
         "Research",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Research cutting-edge topics",
           "Create comprehensive analysis tools",
@@ -2141,7 +2434,14 @@
           "Build advanced reasoning systems"
         ]
       },
-      "modelId": "openai/chatgpt-4o-latest",
+      "model": {
+        "modelId": "openai/chatgpt-4o-latest",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2154,14 +2454,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/sao10k-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/sao10k-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create versatile applications",
           "Generate balanced creative content",
@@ -2169,7 +2466,14 @@
           "Develop general-purpose AI tools"
         ]
       },
-      "modelId": "sao10k/l3-lunaris-8b",
+      "model": {
+        "modelId": "sao10k/l3-lunaris-8b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2182,14 +2486,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Generate structured JSON outputs",
           "Create intelligent automation tools",
@@ -2197,7 +2498,14 @@
           "Develop multimodal applications"
         ]
       },
-      "modelId": "openai/gpt-4o-2024-08-06",
+      "model": {
+        "modelId": "openai/gpt-4o-2024-08-06",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2210,14 +2518,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create efficient dialogue systems",
           "Generate helpful responses",
@@ -2225,7 +2530,14 @@
           "Develop conversational AI tools"
         ]
       },
-      "modelId": "meta-llama/llama-3.1-8b-instruct",
+      "model": {
+        "modelId": "meta-llama/llama-3.1-8b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2238,14 +2550,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build large-scale AI applications",
           "Create advanced reasoning systems",
@@ -2253,7 +2562,14 @@
           "Develop enterprise-grade tools"
         ]
       },
-      "modelId": "meta-llama/llama-3.1-405b-instruct",
+      "model": {
+        "modelId": "meta-llama/llama-3.1-405b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2266,14 +2582,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create high-quality dialogue systems",
           "Build comprehensive AI applications",
@@ -2281,7 +2594,14 @@
           "Develop advanced conversation tools"
         ]
       },
-      "modelId": "meta-llama/llama-3.1-70b-instruct",
+      "model": {
+        "modelId": "meta-llama/llama-3.1-70b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2294,14 +2614,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create affordable AI applications",
           "Generate quick intelligent responses",
@@ -2309,7 +2626,14 @@
           "Develop efficient chat systems"
         ]
       },
-      "modelId": "openai/gpt-4o-mini",
+      "model": {
+        "modelId": "openai/gpt-4o-mini",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2322,14 +2646,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create efficient AI applications",
           "Generate cost-effective solutions",
@@ -2337,7 +2658,14 @@
           "Develop multimodal tools"
         ]
       },
-      "modelId": "openai/gpt-4o-mini-2024-07-18",
+      "model": {
+        "modelId": "openai/gpt-4o-mini-2024-07-18",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2350,14 +2678,11 @@
         "AI Model",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/nousresearch.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/nousresearch.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create function calling systems",
           "Build JSON mode applications",
@@ -2365,7 +2690,14 @@
           "Develop intelligent automation tools"
         ]
       },
-      "modelId": "nousresearch/hermes-2-pro-llama-3-8b",
+      "model": {
+        "modelId": "nousresearch/hermes-2-pro-llama-3-8b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2378,14 +2710,11 @@
         "AI Model",
         "Content Writing"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create engaging content with visuals",
           "Write compelling narratives",
@@ -2393,7 +2722,14 @@
           "Build multimodal content systems"
         ]
       },
-      "modelId": "google/gemini-flash-1.5",
+      "model": {
+        "modelId": "google/gemini-flash-1.5",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2406,14 +2742,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create intelligent applications",
           "Generate helpful responses",
@@ -2421,7 +2754,14 @@
           "Develop multimodal solutions"
         ]
       },
-      "modelId": "openai/gpt-4o",
+      "model": {
+        "modelId": "openai/gpt-4o",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2434,14 +2774,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/metaai-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create dialogue systems",
           "Generate helpful responses",
@@ -2449,7 +2786,14 @@
           "Develop interactive AI tools"
         ]
       },
-      "modelId": "meta-llama/llama-3-8b-instruct",
+      "model": {
+        "modelId": "meta-llama/llama-3-8b-instruct",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2462,14 +2806,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/microsoft-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/microsoft-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create comprehensive AI solutions",
           "Generate competitive analyses",
@@ -2477,7 +2818,14 @@
           "Develop enterprise applications"
         ]
       },
-      "modelId": "microsoft/wizardlm-2-8x22b",
+      "model": {
+        "modelId": "microsoft/wizardlm-2-8x22b",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2492,14 +2840,11 @@
         "Content Writing",
         "Tools"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/1.61.0/files/light/google-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Build comprehensive coding solutions",
           "Create content generation tools",
@@ -2507,7 +2852,14 @@
           "Develop intelligent AI agents"
         ]
       },
-      "modelId": "google/gemini-pro-1.5",
+      "model": {
+        "modelId": "google/gemini-pro-1.5",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2520,14 +2872,11 @@
         "AI Model",
         "Others"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/claude-color.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create fast responsive applications",
           "Generate quick helpful responses",
@@ -2535,7 +2884,14 @@
           "Develop compact AI solutions"
         ]
       },
-      "modelId": "anthropic/claude-3-haiku",
+      "model": {
+        "modelId": "anthropic/claude-3-haiku",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   },
@@ -2548,14 +2904,11 @@
         "AI Model",
         "Coding"
       ],
-      "thumbnail": {
-        "type": "url",
-        "url": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
-      }
+      "thumbnail": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png"
     },
     "core": {
       "prompt": {
-        "value": "",
+        "value": "You are a helpful AI assistant",
         "suggestions": [
           "Create fast coding solutions",
           "Generate natural language responses",
@@ -2563,7 +2916,14 @@
           "Develop cost-effective AI tools"
         ]
       },
-      "modelId": "openai/gpt-3.5-turbo",
+      "model": {
+        "modelId": "openai/gpt-3.5-turbo",
+        "parameters": {},
+        "supportedInputs": [
+          "text"
+        ],
+        "modelType": "Language Model"
+      },
       "mcpServers": {}
     }
   }

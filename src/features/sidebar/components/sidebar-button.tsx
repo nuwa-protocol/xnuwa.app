@@ -10,6 +10,7 @@ interface SidebarButtonProps {
   className?: string;
   variant?: 'primary' | 'secondary';
   shortcut?: string;
+  endContent?: React.ReactNode;
 }
 
 export function SidebarButton({
@@ -19,12 +20,13 @@ export function SidebarButton({
   className,
   variant = 'secondary',
   shortcut,
+  endContent,
 }: SidebarButtonProps) {
   const navigate = useNavigate();
   const isPrimary = variant === 'primary';
   const pathname = useLocation().pathname;
   const isActive = useMemo(() => {
-    return pathname === href;
+    return pathname.split('/')[1] === href.split('/')[1];
   }, [pathname, href]);
 
   return (
@@ -47,8 +49,8 @@ export function SidebarButton({
           'transition-all duration-150 ease-out',
         ],
         isActive &&
-          !isPrimary &&
-          'bg-sidebar-accent text-sidebar-primary font-medium',
+        !isPrimary &&
+        'bg-sidebar-accent text-sidebar-primary font-medium',
         className,
       )}
     >
@@ -60,6 +62,11 @@ export function SidebarButton({
       >
         {text}
       </span>
+      {endContent && (
+        <span className={cn('ml-auto', isPrimary && 'mr-2')}>
+          {endContent}
+        </span>
+      )}
       {shortcut && (
         <kbd
           className={cn(
@@ -67,6 +74,7 @@ export function SidebarButton({
             isPrimary
               ? 'absolute right-2 text-white/90 bg-white/20 border-white/20 backdrop-blur-sm'
               : 'ml-auto text-sidebar-foreground/60 bg-theme-subtle border-theme-muted',
+            endContent && !isPrimary && 'ml-2'
           )}
         >
           {shortcut}

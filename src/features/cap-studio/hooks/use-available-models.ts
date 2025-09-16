@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ModelStateStore } from '../stores/model-stores';
 
-export function useAvailableModels() {
+export function useAvailableModels(gatewayUrl: string) {
   const models = ModelStateStore((state) => state.availableModels);
   const loading = ModelStateStore((state) => state.isLoadingModels);
   const error = ModelStateStore((state) => state.modelsError);
@@ -11,7 +11,7 @@ export function useAvailableModels() {
   const reloadModels = ModelStateStore((state) => state.reloadModels);
 
   useEffect(() => {
-    fetchAvailableModels();
+    fetchAvailableModels(gatewayUrl);
   }, [fetchAvailableModels]);
 
   return {

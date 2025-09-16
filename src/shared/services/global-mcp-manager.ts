@@ -2,38 +2,41 @@ import { createNuwaMCPClient } from '@/shared/services/mcp-client';
 import { createPaymentMcpClient } from '@/shared/services/payment-mcp-client';
 import type { Cap } from '@/shared/types/cap';
 
-interface MCPInstance {
+interface RemoteMCPInstance {
   clients: Map<string, any>;
   tools: Record<string, any>;
   initialized: boolean;
 }
 
-class GlobalMCPManager {
-  private static instance: GlobalMCPManager;
-  private currentMCPInstance: MCPInstance | null = null;
+class RemoteMCPManager {
+  private static instance: RemoteMCPManager;
+  private currentInstance: RemoteMCPInstance | null = null;
   private currentCapId: string | null = null;
 
   private constructor() {}
 
-  static getInstance(): GlobalMCPManager {
-    if (!GlobalMCPManager.instance) {
-      GlobalMCPManager.instance = new GlobalMCPManager();
+  static getInstance(): RemoteMCPManager {
+    if (!RemoteMCPManager.instance) {
+      RemoteMCPManager.instance = new RemoteMCPManager();
     }
-    return GlobalMCPManager.instance;
+    return RemoteMCPManager.instance;
   }
 
-  async initializeForCap(cap: Cap, usePaymentClient: boolean = true): Promise<Record<string, any>> {
+  async initializeForCap(
+    cap: Cap,
+    usePaymentClient: boolean = true,
+  ): Promise<Record<string, any>> {
     // If already initialized for this cap, return existing tools
     if (
-      this.currentMCPInstance &&
+      this.currentInstance &&
       this.currentCapId === cap.id &&
-      this.currentMCPInstance.initialized
+      this.currentInstance.initialized
     ) {
-      return this.currentMCPInstance.tools;
+      return this.currentInstance.tools;
     }
 
     // Clean up existing instance if switching caps
-    if (this.currentMCPInstance && this.currentCapId !== cap.id) {
+    if (this.currentInstance && this.currentCapId !== cap.id) {
       await this.cleanup();
     }
 
@@ -42,23 +45,20 @@ class GlobalMCPManager {
     const mcpServers = cap.core.mcpServers || {};
 
     // Initialize all MCP clients
-    for (const [serverName, serverConfig] of Object.entries(mcpServers)) {
+    for (const [serverName, server] of Object.entries(mcpServers)) {
       try {
-        let client;
+        let client: any;
         if (usePaymentClient) {
           // Use payment-enabled MCP client
-          client = await createPaymentMcpClient(serverConfig.url);
+          client = await createPaymentMcpClient(server);
         } else {
           // Use standard MCP client
-          client = await createNuwaMCPClient(
-            serverConfig.url,
-            serverConfig.transport,
-          );
+          client = await createNuwaMCPClient(server);
         }
         clients.set(serverName, client);
       } catch (error) {
         throw new Error(
-          `Failed to connect to MCP server ${serverName} at ${serverConfig.url}: ${error}`,
+          `Failed to connect to MCP server ${serverName} at ${server}: ${error}`,
         );
       }
     }
@@ -84,7 +84,7 @@ class GlobalMCPManager {
       }
     }
 
-    this.currentMCPInstance = {
+    this.currentInstance = {
       clients,
       tools: allTools,
       initialized: true,
@@ -95,12 +95,12 @@ class GlobalMCPManager {
   }
 
   async cleanup(): Promise<void> {
-    if (this.currentMCPInstance?.initialized) {
+    if (this.currentInstance?.initialized) {
       try {
         for (const [
           serverName,
           client,
-        ] of this.currentMCPInstance.clients.entries()) {
+        ] of this.currentInstance.clients.entries()) {
           try {
             await client.close();
           } catch (error) {
@@ -114,17 +114,17 @@ class GlobalMCPManager {
       }
     }
 
-    this.currentMCPInstance = null;
+    this.currentInstance = null;
     this.currentCapId = null;
   }
 
   getCurrentTools(): Record<string, any> {
-    return this.currentMCPInstance?.tools || {};
+    return this.currentInstance?.tools || {};
   }
 
   isInitialized(): boolean {
-    return this.currentMCPInstance?.initialized || false;
+    return this.currentInstance?.initialized || false;
   }
 }
 
-export { GlobalMCPManager };
+export { RemoteMCPManager };
