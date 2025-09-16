@@ -6,39 +6,26 @@ import { toast } from 'sonner';
 import { useChatContext } from '@/features/chat/contexts/chat-context';
 import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
 import type { ChildStreamMethods } from '@/shared/hooks/use-cap-ui-render';
+import { useDebounceCallback } from '@/shared/hooks/use-debounce-callback';
 import { CurrentArtifactMCPToolsStore } from '@/shared/stores/current-artifact-store';
 import { generateUUID } from '@/shared/utils';
 import { ChatErrorCode, handleError } from '@/shared/utils/handl-error';
 import { CreateAIStream } from '../services';
 import { useArtifactsStore } from '../stores';
-import { useDebounceCallback } from '@/shared/hooks/use-debounce-callback';
 
 // Saving status for artifact state persistence
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 export const useArtifact = (artifactId: string) => {
+  const navigate = useNavigate();
   const { addSelectionToChatSession } = ChatSessionsStore();
   const { chat } = useChatContext();
   const { sendMessage, status } = useChat({ chat });
   const { getArtifact, updateArtifact } = useArtifactsStore();
   const { setTools, clearTools } = CurrentArtifactMCPToolsStore();
   const [hasConnectionError, setHasConnectionError] = useState<boolean>(false);
-  const [isProcessingAIRequest, setIsProcessingAIRequest] =
-    useState<boolean>(false);
-  const navigate = useNavigate();
-  // Track active streams' abort flags
-  const streamAbortMap = useRef(new Map<string, { aborted: boolean }>());
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
-  // Debounced persist function to avoid excessive writes
-  const debouncedPersist = useDebounceCallback((state: any) => {
-    try {
-      updateArtifact(artifactId, { state });
-      setSaveStatus('saved');
-    } catch (e) {
-      console.error('Failed to save artifact state', e);
-      setSaveStatus('error');
-    }
-  }, 600);
+  const streamMap = useRef(new Map<string, { aborted: boolean }>()); // track streams
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle'); // track saving status
 
   const handleSendPrompt = useCallback(
     (prompt: string) => {
@@ -64,6 +51,16 @@ export const useArtifact = (artifactId: string) => {
     [chat, addSelectionToChatSession],
   );
 
+  // Debounced persist function to avoid excessive writes
+  const debouncedPersist = useDebounceCallback((state: any) => {
+    try {
+      updateArtifact(artifactId, { state });
+      setSaveStatus('saved');
+    } catch (e) {
+      console.error('Failed to save artifact state', e);
+      setSaveStatus('error');
+    }
+  }, 600);
   // Save state to store with debounce and expose a save status
   const handleSaveState = useCallback(
     (state: any) => {
@@ -114,9 +111,7 @@ export const useArtifact = (artifactId: string) => {
       streamId: string,
       child: ChildStreamMethods,
     ) => {
-      setIsProcessingAIRequest(true);
-      const token = { aborted: false };
-      streamAbortMap.current.set(streamId, token);
+      streamMap.current.set(streamId, { aborted: false });
       try {
         if (request.schema) {
           // TODO: Implement schema stream
@@ -137,15 +132,17 @@ export const useArtifact = (artifactId: string) => {
             request,
           });
           for await (const textPart of textStream as AsyncIterable<string>) {
-            if (token.aborted) return;
+            if (streamMap.current.get(streamId)?.aborted) return;
             child.pushStreamChunk(streamId, {
               type: 'content',
               content: textPart,
             });
           }
         }
-        if (!token.aborted) child.completeStream(streamId);
+        if (!streamMap.current.get(streamId)?.aborted)
+          child.completeStream(streamId);
       } catch (error) {
+        child.errorStream(streamId, error as Error);
         const errorCode = handleError(error as Error);
         switch (errorCode) {
           case ChatErrorCode.IGNORED_ERROR:
@@ -173,8 +170,7 @@ export const useArtifact = (artifactId: string) => {
             });
         }
       } finally {
-        streamAbortMap.current.delete(streamId);
-        setIsProcessingAIRequest(false);
+        streamMap.current.delete(streamId);
       }
     },
     [artifactId],
@@ -182,9 +178,8 @@ export const useArtifact = (artifactId: string) => {
 
   // Handle abort stream
   const handleAbortStream = useCallback((streamId: string) => {
-    const t = streamAbortMap.current.get(streamId);
+    const t = streamMap.current.get(streamId);
     if (t) t.aborted = true;
-    setIsProcessingAIRequest(false);
   }, []);
 
   // Clear tools on unmount to avoid leaking session-scoped UI tools
@@ -201,7 +196,7 @@ export const useArtifact = (artifactId: string) => {
   return {
     artifact,
     hasConnectionError,
-    isProcessingAIRequest,
+    isProcessingAIRequest: streamMap.current.size > 0,
     saveStatus,
     handleSendPrompt,
     handleAddSelection,
