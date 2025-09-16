@@ -30,6 +30,7 @@ export const useArtifactPage = () => {
         state: null,
         createdAt: Date.now(),
         updatedAt: Date.now(),
+        payments: [],
       };
       addArtifact(newArtifact);
       const newSearchParams = new URLSearchParams(searchParams);
