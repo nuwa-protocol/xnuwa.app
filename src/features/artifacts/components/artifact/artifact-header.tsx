@@ -1,17 +1,25 @@
-import { AlertTriangle, Loader2, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Loader2, X, XCircle } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components';
+import {
+  Badge,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/components';
 import { Title } from '@/shared/components/title';
 import { Button } from '@/shared/components/ui/button';
+import type { SaveStatus } from '../../hooks/use-artifact';
 
 export const ArtifactHeader = ({
   title,
   hasConnectionError,
   isProcessingAIRequest,
+  saveStatus,
 }: {
   title: string;
   hasConnectionError: boolean;
   isProcessingAIRequest: boolean;
+  saveStatus: SaveStatus;
 }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -35,12 +43,11 @@ export const ArtifactHeader = ({
           <X className="h-4 w-4" />
         </Button>
       </div>
-      {/* Center: Title (editable) */}
+      {/* Center: Title (editable) + Save status */}
       <div className="flex flex-row justify-center items-center min-w-0 max-w-[min(70vw,700px)]">
-
         <div className="flex flex-row justify-center items-center gap-2">
-          <Title title={title} onCommit={() => { }} />
-
+          <Title title={title} onCommit={() => {}} />
+          {saveStatus !== 'idle' && <SaveStatusBadge status={saveStatus} />}
         </div>
       </div>
       {/* Right: Placeholder to balance center */}
@@ -61,8 +68,8 @@ export const ArtifactHeader = ({
                 Connection Failed
               </h3>
               <p className="text-muted-foreground max-w-xs">
-                Artifact might not respond to AI functions.
-                Please try refreshing the page.
+                Artifact might not respond to AI functions. Please try
+                refreshing the page.
               </p>
             </TooltipContent>
           </Tooltip>
@@ -70,4 +77,38 @@ export const ArtifactHeader = ({
       </div>
     </div>
   );
+};
+
+const SaveStatusBadge = ({ status }: { status: SaveStatus }) => {
+  if (status === 'saving') {
+    return (
+      <Badge
+        className="gap-1.5 rounded-full text-xs border-0 bg-muted/50 text-muted-foreground/80"
+        variant="secondary"
+      >
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        Saving…
+      </Badge>
+    );
+  }
+  if (status === 'saved') {
+    return (
+      <Badge
+        className="gap-1.5 rounded-full text-xs border-0 bg-muted/50 text-muted-foreground/80"
+        variant="secondary"
+      >
+        <CheckCircle className="h-3.5 w-3.5 text-green-600" />
+        Saved
+      </Badge>
+    );
+  }
+  if (status === 'error') {
+    return (
+      <Badge className="gap-1.5 rounded-full text-xs" variant="destructive">
+        <XCircle className="h-3.5 w-3.5" />
+        Save Failed
+      </Badge>
+    );
+  }
+  return null;
 };

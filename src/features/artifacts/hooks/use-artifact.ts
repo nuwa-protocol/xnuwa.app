@@ -11,6 +11,10 @@ import { generateUUID } from '@/shared/utils';
 import { ChatErrorCode, handleError } from '@/shared/utils/handl-error';
 import { CreateAIStream } from '../services';
 import { useArtifactsStore } from '../stores';
+import { useDebounceCallback } from '@/shared/hooks/use-debounce-callback';
+
+// Saving status for artifact state persistence
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 export const useArtifact = (artifactId: string) => {
   const { addSelectionToChatSession } = ChatSessionsStore();
@@ -24,6 +28,17 @@ export const useArtifact = (artifactId: string) => {
   const navigate = useNavigate();
   // Track active streams' abort flags
   const streamAbortMap = useRef(new Map<string, { aborted: boolean }>());
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  // Debounced persist function to avoid excessive writes
+  const debouncedPersist = useDebounceCallback((state: any) => {
+    try {
+      updateArtifact(artifactId, { state });
+      setSaveStatus('saved');
+    } catch (e) {
+      console.error('Failed to save artifact state', e);
+      setSaveStatus('error');
+    }
+  }, 600);
 
   const handleSendPrompt = useCallback(
     (prompt: string) => {
@@ -49,12 +64,14 @@ export const useArtifact = (artifactId: string) => {
     [chat, addSelectionToChatSession],
   );
 
-  // Save state to store instead of localStorage
+  // Save state to store with debounce and expose a save status
   const handleSaveState = useCallback(
     (state: any) => {
-      updateArtifact(artifactId, { state });
+      // Any incoming change indicates a pending save
+      setSaveStatus('saving');
+      debouncedPersist(state);
     },
-    [artifactId, updateArtifact],
+    [debouncedPersist],
   );
 
   // Get state from store instead of localStorage
@@ -174,6 +191,7 @@ export const useArtifact = (artifactId: string) => {
   useEffect(() => {
     return () => {
       clearTools();
+      // No need to cancel debounce explicitly - handled in hook
     };
   }, []);
 
@@ -184,6 +202,7 @@ export const useArtifact = (artifactId: string) => {
     artifact,
     hasConnectionError,
     isProcessingAIRequest,
+    saveStatus,
     handleSendPrompt,
     handleAddSelection,
     handleSaveState,
