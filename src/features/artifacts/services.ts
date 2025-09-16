@@ -1,5 +1,7 @@
+import type { Cap } from '@nuwa-ai/cap-kit';
 import type { StreamAIRequest } from '@nuwa-ai/ui-kit';
 import { stepCountIs, streamObject, streamText } from 'ai';
+import { defaultCap } from '@/shared/constants/cap';
 import { CapResolve } from '@/shared/services/cap-resolve';
 import { llmProvider } from '@/shared/services/llm-providers';
 import { generateUUID } from '@/shared/utils';
@@ -14,10 +16,14 @@ export const CreateAIStream = async ({
   artifactId: string;
   request: StreamAIRequest;
 }) => {
+  let cap: Cap;
+  if (request.capId) {
+    cap = await useCapStore.getState().downloadCapByIDWithCache(request.capId);
+  } else {
+    cap = defaultCap;
+  }
   // Resolve cap configuration
-  const cap = await useCapStore
-    .getState()
-    .downloadCapByIDWithCache(request.capId);
+
   const capResolve = new CapResolve(cap);
   const { prompt, model, tools } = await capResolve.getResolvedConfig();
 

@@ -7,7 +7,7 @@ import {
 } from '@blocknote/react';
 import {
   type StreamChunk,
-  type StreamController,
+  type StreamHandle,
   useNuwaClient,
 } from '@nuwa-ai/ui-kit';
 import { useNoteMCP } from '../hooks/use-note-mcp';
@@ -17,8 +17,9 @@ import { AddSelectionButton, ImproveWithAIButton } from '@/components/AIButton';
 
 export default function NotePage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [streamController, setStreamController] =
-    useState<StreamController | null>(null);
+  const [streamHandle, setStreamHandle] = useState<StreamHandle | null>(
+    null,
+  );
 
   // create blocknote editor
   const editor = useCreateBlockNote({
@@ -54,7 +55,7 @@ export default function NotePage() {
   });
 
   // start MCP server for Nuwa Client to connect
-  useNoteMCP(editor);
+  useNoteMCP(editor, nuwaClient);
 
   const handleImproveWithAI = async () => {
     try {
@@ -91,18 +92,17 @@ export default function NotePage() {
   };
 
   const handleTestStream = async () => {
-    const streamController = await nuwaClient.streamAI(
-      {
-        capId:
-          'did::rooch:rooch1p97qa8yzw75ffrhnlxfueaepyxr3c4nap3jdqzcyv7306qw3003s6w45we:gpt_4o_mini',
-        prompt:
-          'Please write a simple paragraph about AI. Around 100 words. Anything would be fine.',
-      },
-      (chunk: StreamChunk<string>) => {
+    const stream = nuwaClient.createAIStream({
+      prompt:
+        'Please write a simple paragraph about AI. Around 100 words. Anything would be fine.',
+    });
+    setStreamHandle(stream);
+    const { result } = await stream.execute({
+      onChunk: (chunk: StreamChunk<string>) => {
         editor.insertInlineContent(chunk.content ?? '');
       },
-    );
-    setStreamController(streamController);
+    });
+    setStreamHandle(null);
   };
 
   if (isLoading) {
@@ -123,13 +123,13 @@ export default function NotePage() {
         >
           Test Stream
         </button>
-        {streamController && (
+        {streamHandle && (
           <button
             type="button"
             className="bg-blue-500 text-white px-4 py-2 rounded-md"
             onClick={() => {
-              streamController?.abort();
-              setStreamController(null);
+              streamHandle?.abort();
+              setStreamHandle(null);
             }}
           >
             Abort Stream

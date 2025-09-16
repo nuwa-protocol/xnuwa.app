@@ -139,8 +139,7 @@ export const useArtifact = (artifactId: string) => {
             });
           }
         }
-        if (!streamMap.current.get(streamId)?.aborted)
-          child.completeStream(streamId);
+        child.completeStream(streamId);
       } catch (error) {
         child.pushStreamChunk(streamId, {
           type: 'content',

@@ -1,6 +1,6 @@
 import type { BlockNoteEditor } from '@blocknote/core';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { PostMessageMCPTransport } from '@nuwa-ai/ui-kit';
+import { type NuwaClient, PostMessageMCPTransport } from '@nuwa-ai/ui-kit';
 import { useEffect } from 'react';
 import { z } from 'zod';
 
@@ -9,7 +9,7 @@ import { z } from 'zod';
  * @param editor The BlockNote editor instance
  * @returns Object containing the MCP server and transport
  */
-const createNoteMCP = (editor: BlockNoteEditor) => {
+const createNoteMCP = (editor: BlockNoteEditor, nuwaClient: NuwaClient) => {
   const transport = new PostMessageMCPTransport({
     targetWindow: window.parent,
     targetOrigin: '*',
@@ -26,17 +26,25 @@ const createNoteMCP = (editor: BlockNoteEditor) => {
 
   // Register tool for editing content in the BlockNote editor
   server.registerTool(
-    'edit_content',
+    'add_content',
     {
-      title: 'Add some content to the editor',
-      description: 'Add some content to the editor',
+      title: 'Add some content to the editor with AI stream',
+      description: 'Add some content to the editor with AI stream',
       inputSchema: {
-        content: z.string().describe('The content to add to the editor'),
+        prompt: z
+          .string()
+          .describe('The prompt for AI to generate the content'),
       },
     },
-    ({ content }) => {
-      // Insert content into the BlockNote editor
-      editor.insertInlineContent(content);
+    async ({ prompt }) => {
+      let content = '';
+      const stream = nuwaClient.createAIStream({ prompt });
+      await stream.execute({
+        onChunk: (chunk) => {
+          editor.insertInlineContent(chunk.content ?? '');
+          content += chunk.content ?? '';
+        },
+      });
       return {
         content: [
           {
@@ -51,10 +59,10 @@ const createNoteMCP = (editor: BlockNoteEditor) => {
   return { server, transport };
 };
 
-export const useNoteMCP = (editor: BlockNoteEditor) => {
+export const useNoteMCP = (editor: BlockNoteEditor, nuwaClient: NuwaClient) => {
   // Initialize MCP server
   useEffect(() => {
-    const { server, transport } = createNoteMCP(editor);
+    const { server, transport } = createNoteMCP(editor, nuwaClient);
     try {
       // Connect server to transport
       server.connect(transport);
