@@ -333,10 +333,6 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         message: `🔧 Calling tool: ${toolName}`,
       });
 
-      if (!client) {
-        throw new Error('MCP client not connected');
-      }
-
       // Get parameters from RJSF form data and clean them
       const rawArgs = toolParams[toolName] || {};
 
@@ -354,18 +350,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         copyable: true,
       });
 
-      // Use the same pattern as in mcp-client.ts for calling tools
-      const passThroughSchema = { parse: (v: any) => v } as const;
-      const result = await (client.raw as any).request({
-        request: {
-          method: 'tools/call',
-          params: {
-            name: toolName,
-            arguments: args,
-          },
-        },
-        resultSchema: passThroughSchema,
-      });
+      const result = await tools[toolName].execute(args);
 
       pushLog({
         type: 'result',
@@ -660,8 +645,11 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                   </p>
                 ) : (
                   filteredTools.map(([toolName, tool]) => {
-                    const toolSchema =
-                      tool.inputSchema?.jsonSchema?.properties || {};
+
+                    const toolSchema = mcpType === 'Remote MCP'
+                      ? tool.parameters.properties || {}
+                      : tool.inputSchema.jsonSchema.properties || {}
+
                     const hasParams = Object.keys(toolSchema).length > 0;
 
                     return (
@@ -692,7 +680,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                                 Parameters
                               </div>
                               <Form
-                                schema={tool.inputSchema.jsonSchema}
+                                schema={mcpType === 'Remote MCP' ? tool.parameters : tool.inputSchema.jsonSchema}
                                 validator={validator}
                                 formData={toolParams[toolName] || {}}
                                 onChange={(e) =>
