@@ -142,6 +142,10 @@ export const useArtifact = (artifactId: string) => {
         if (!streamMap.current.get(streamId)?.aborted)
           child.completeStream(streamId);
       } catch (error) {
+        child.pushStreamChunk(streamId, {
+          type: 'content',
+          content: `AI Stream Error: ${error}`,
+        });
         child.errorStream(streamId, error as Error);
         const errorCode = handleError(error as Error);
         switch (errorCode) {
