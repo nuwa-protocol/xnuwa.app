@@ -9,6 +9,8 @@ import {
 import { Rating, RatingButton } from '@/shared/components/ui/shadcn-io/rating';
 import { generateUUID } from '@/shared/utils';
 import type { RemoteCap } from '../../types';
+import { useCapRatingDistribution } from '../../hooks/use-cap-rating-distribution';
+import { RatingDistribution } from '@nuwa-ai/cap-kit';
 
 interface CapDetailsRatingProps {
   capQueryData: RemoteCap;
@@ -19,24 +21,25 @@ export function CapDetailsRating({
   capQueryData,
   onRate,
 }: CapDetailsRatingProps) {
-  const getRatingDistribution = () => {
-    console.log('capQueryData', capQueryData);
+  const { distribution, isLoading: isLoadingDistribution, error } = useCapRatingDistribution(capQueryData.id);
+  
+  // Fallback to mock data if there's an error or no data
+  const getFallbackDistribution = () => {
     const total = capQueryData.stats.ratingCount || 0;
-
-    // Mock distribution for now - you can replace with actual data if available
-    const distribution = [
-      { stars: 5, count: Math.round(total * 0.6) },
-      { stars: 4, count: Math.round(total * 0.25) },
-      { stars: 3, count: Math.round(total * 0.1) },
-      { stars: 2, count: Math.round(total * 0.03) },
-      { stars: 1, count: Math.round(total * 0.02) },
-    ];
-
-    return distribution;
+    return [
+      { rating: 5, count: Math.round(total * 0.6) },
+      { rating: 4, count: Math.round(total * 0.25) },
+      { rating: 3, count: Math.round(total * 0.1) },
+      { rating: 2, count: Math.round(total * 0.03) },
+      { rating: 1, count: Math.round(total * 0.02) },
+    ] as RatingDistribution[];
   };
 
-  const distribution = getRatingDistribution();
-  const maxCount = Math.max(...distribution.map((d) => d.count), 1);
+  const displayDistribution = error || distribution.length === 0 
+    ? getFallbackDistribution() 
+    : distribution;
+  
+  const maxCount = Math.max(...displayDistribution.map((d) => d.count), 1);
 
   return (
     <Card>
@@ -73,23 +76,50 @@ export function CapDetailsRating({
 
           {/* Distribution */}
           <div className="space-y-2">
-            {distribution.map((d) => (
-              <div key={d.stars} className="flex items-center gap-3">
-                <div className="flex items-center gap-1 w-16">
-                  <span className="text-sm font-medium w-4 text-right">
-                    {d.stars}
-                  </span>
-                  <Star
-                    className="h-3.5 w-3.5 text-yellow-500"
-                    fill="currentColor"
-                  />
-                </div>
-                <Progress value={(d.count / maxCount) * 100} className="h-2" />
-                <span className="text-xs text-muted-foreground w-10 text-right">
-                  {d.count}
-                </span>
+            {isLoadingDistribution ? (
+              <div className="space-y-2">
+                {[...Array(5)].map((_, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <div className="flex items-center gap-0.5 min-w-[80px]">
+                      {Array.from({ length: 5 - index }).map((_, starIndex) => (
+                        <Star
+                          key={starIndex}
+                          className="h-3.5 w-3.5 text-yellow-500"
+                          fill="currentColor"
+                        />
+                      ))}
+                    </div>
+                    <div className="h-2 bg-muted rounded-full flex-1 animate-pulse" />
+                    <span className="text-xs text-muted-foreground w-10 text-right">
+                      -
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              displayDistribution.map((d) => (
+                <div key={d.rating} className="flex items-center gap-3">
+                  <div className="flex items-center gap-0.5 min-w-[80px]">
+                    {Array.from({ length: d.rating }).map((_, starIndex) => (
+                      <Star
+                        key={starIndex}
+                        className="h-3.5 w-3.5 text-yellow-500"
+                        fill="currentColor"
+                      />
+                    ))}
+                  </div>
+                  <Progress value={(d.count / maxCount) * 100} className="h-2" />
+                  <span className="text-xs text-muted-foreground w-10 text-right">
+                    {d.count}
+                  </span>
+                </div>
+              ))
+            )}
+            {error && (
+              <p className="text-xs text-amber-600 mt-2">
+                Note: Using estimated distribution due to loading error
+              </p>
+            )}
           </div>
         </div>
 
