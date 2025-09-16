@@ -6,12 +6,12 @@ import { Button } from '@/shared/components/ui/button';
 
 export const ArtifactHeader = ({
   title,
-  connectionError,
-  processingAIRequest,
+  hasConnectionError,
+  isProcessingAIRequest,
 }: {
   title: string;
-  connectionError: boolean;
-  processingAIRequest: boolean;
+  hasConnectionError: boolean;
+  isProcessingAIRequest: boolean;
 }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -45,13 +45,13 @@ export const ArtifactHeader = ({
       </div>
       {/* Right: Placeholder to balance center */}
       <div className="justify-self-end">
-        {processingAIRequest && (
+        {isProcessingAIRequest && (
           <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
             <Loader2 className="h-3 w-3 animate-spin" />
             <span>AI Processing</span>
           </div>
         )}
-        {connectionError && (
+        {hasConnectionError && (
           <Tooltip>
             <TooltipTrigger>
               <AlertTriangle className="h-4 w-4 text-destructive" />

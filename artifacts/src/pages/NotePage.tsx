@@ -5,7 +5,11 @@ import {
   getFormattingToolbarItems,
   useCreateBlockNote,
 } from '@blocknote/react';
-import { type StreamChunk, useNuwaClient } from '@nuwa-ai/ui-kit';
+import {
+  type StreamChunk,
+  type StreamController,
+  useNuwaClient,
+} from '@nuwa-ai/ui-kit';
 import { useNoteMCP } from '../hooks/use-note-mcp';
 import '@blocknote/mantine/style.css';
 import { useState } from 'react';
@@ -13,6 +17,8 @@ import { AddSelectionButton, ImproveWithAIButton } from '@/components/AIButton';
 
 export default function NotePage() {
   const [isLoading, setIsLoading] = useState(true);
+  const [streamController, setStreamController] =
+    useState<StreamController | null>(null);
 
   // create blocknote editor
   const editor = useCreateBlockNote({
@@ -44,7 +50,7 @@ export default function NotePage() {
         console.error('Failed to load saved content:', error);
       }
     },
-    debug: false
+    debug: false,
   });
 
   // start MCP server for Nuwa Client to connect
@@ -85,15 +91,18 @@ export default function NotePage() {
   };
 
   const handleTestStream = async () => {
-    await nuwaClient.streamAI(
+    const streamController = await nuwaClient.streamAI(
       {
-        capId: 'did::rooch:rooch1p97qa8yzw75ffrhnlxfueaepyxr3c4nap3jdqzcyv7306qw3003s6w45we:gpt_4o_mini',
-        prompt: 'Please write a simple paragraph about AI. Around 100 words. Anything would be fine.',
+        capId:
+          'did::rooch:rooch1p97qa8yzw75ffrhnlxfueaepyxr3c4nap3jdqzcyv7306qw3003s6w45we:gpt_4o_mini',
+        prompt:
+          'Please write a simple paragraph about AI. Around 100 words. Anything would be fine.',
       },
       (chunk: StreamChunk<string>) => {
         editor.insertInlineContent(chunk.content ?? '');
       },
     );
+    setStreamController(streamController);
   };
 
   if (isLoading) {
@@ -106,7 +115,7 @@ export default function NotePage() {
 
   return (
     <div className="h-screen w-screen flex flex-col max-w-5xl mx-auto bg-white">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2 p-4">
         <button
           type="button"
           className="bg-blue-500 text-white px-4 py-2 rounded-md"
@@ -114,6 +123,18 @@ export default function NotePage() {
         >
           Test Stream
         </button>
+        {streamController && (
+          <button
+            type="button"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+            onClick={() => {
+              streamController?.abort();
+              setStreamController(null);
+            }}
+          >
+            Abort Stream
+          </button>
+        )}
       </div>
       {/* Editor */}
       <div className="flex-1 py-10 px-6 bg-white">
