@@ -1,6 +1,6 @@
 import type { Cap } from '@nuwa-ai/cap-kit';
 import type { StreamAIRequest } from '@nuwa-ai/ui-kit';
-import { stepCountIs, streamObject, streamText } from 'ai';
+import { stepCountIs, streamText } from 'ai';
 import { defaultCap } from '@/shared/constants/cap';
 import { CapResolve } from '@/shared/services/cap-resolve';
 import { llmProvider } from '@/shared/services/llm-providers';
@@ -40,21 +40,6 @@ export const CreateAIStream = async ({
     message: request.prompt,
     timestamp: Date.now(),
   });
-
-  if (request.schema) {
-    return streamObject({
-      model: llmProvider.chat(model),
-      system: prompt,
-      prompt: request.prompt,
-      schema: request.schema,
-      // tools: tools, Tools are not supported by object generation
-      maxRetries: 3,
-      headers,
-      onError: (error: any) => {
-        throw new Error(error);
-      },
-    });
-  }
 
   return streamText({
     model: llmProvider.chat(model),

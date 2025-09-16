@@ -60,7 +60,7 @@ export const useArtifact = (artifactId: string) => {
       console.error('Failed to save artifact state', e);
       setSaveStatus('error');
     }
-  }, 1000);
+  }, 2000);
   // Save state to store with debounce and expose a save status
   const handleSaveState = useCallback(
     (state: any) => {
@@ -113,31 +113,16 @@ export const useArtifact = (artifactId: string) => {
     ) => {
       streamMap.current.set(streamId, { aborted: false });
       try {
-        if (request.schema) {
-          // TODO: Implement schema stream
-          // const { partialObjectStream } = await CreateAIStream({
-          //     artifactId,
-          //     request,
-          // });
-          // for await (const partial of partialObjectStream as AsyncIterable<any>) {
-          //     if (token.aborted) return;
-          //     child.pushStreamChunk(streamId, {
-          //         type: 'content',
-          //         content: partial,
-          //     });
-          // }
-        } else {
-          const { textStream } = await CreateAIStream({
-            artifactId,
-            request,
+        const { textStream } = await CreateAIStream({
+          artifactId,
+          request,
+        });
+        for await (const textPart of textStream as AsyncIterable<string>) {
+          if (streamMap.current.get(streamId)?.aborted) return;
+          child.pushStreamChunk(streamId, {
+            type: 'content',
+            content: textPart,
           });
-          for await (const textPart of textStream as AsyncIterable<string>) {
-            if (streamMap.current.get(streamId)?.aborted) return;
-            child.pushStreamChunk(streamId, {
-              type: 'content',
-              content: textPart,
-            });
-          }
         }
         child.completeStream(streamId);
       } catch (error) {
@@ -189,7 +174,6 @@ export const useArtifact = (artifactId: string) => {
   useEffect(() => {
     return () => {
       clearTools();
-      // No need to cancel debounce explicitly - handled in hook
     };
   }, []);
 
