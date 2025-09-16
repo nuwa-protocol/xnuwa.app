@@ -1,14 +1,13 @@
 import { type UseChatHelpers, useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import cx from 'classnames';
-import { ArrowUpIcon, StopCircleIcon, TextSelect, X } from 'lucide-react';
+import { ArrowUpIcon, StopCircleIcon } from 'lucide-react';
 import type React from 'react';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWindowSize } from 'usehooks-ts';
 import { CapSelector } from '@/features/cap-store/components';
-import { Badge } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
@@ -16,6 +15,7 @@ import { useChatContext } from '../contexts/chat-context';
 import { usePersistentInput } from '../hooks/use-persistent-input';
 import { ChatSessionsStore } from '../stores';
 import { type AttachmentData, AttachmentInput } from './attachment-input';
+import { InputSelections } from './input-selections';
 import { PreviewAttachment } from './preview-attachment';
 import { SuggestedActions } from './suggested-actions';
 
@@ -28,8 +28,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
   const { width } = useWindowSize();
   const { currentCap, isInitialized, isError } = CurrentCapStore();
   const [attachments, setAttachments] = useState<AttachmentData[]>([]);
-  const { chatSessions, removeSelectionFromChatSession } = ChatSessionsStore();
-  const selections = chatSessions[chat.id]?.selections;
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Remove attachment
@@ -112,24 +110,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
         )}
       >
         {/* Selections */}
-        {selections && selections.length > 0 && (
-          <div className="flex flex-row flex-wrap gap-2 p-2 mx-2">
-            {selections?.map((selection) => (
-              <Badge
-                key={selection.label}
-                variant="default"
-                className="group cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors duration-200 flex items-center gap-1 shrink-0"
-                onClick={() =>
-                  removeSelectionFromChatSession(chat.id, selection.id)
-                }
-              >
-                <TextSelect size={12} className="group-hover:hidden" />
-                <X size={12} className="hidden group-hover:block" />
-                {selection.label}
-              </Badge>
-            ))}
-          </div>
-        )}
+        <InputSelections />
 
         {/*  Input Textarea */}
         <textarea
