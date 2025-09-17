@@ -4,8 +4,8 @@ import { generateUUID } from '@/shared/utils';
 import { useArtifactsStore } from '../stores';
 
 const mock_artifact_source_id = '123';
-const mock_artifact_source_url = 'http://localhost:3000/note';
-const mock_artifact_title = 'Note';
+const mock_artifact_source_url = 'http://localhost:3000/editor';
+const mock_artifact_title = 'Note Editor';
 
 export const useArtifactPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
