@@ -98,10 +98,11 @@ export default function NotePage() {
     });
     setStreamHandle(stream);
     const { result } = await stream.execute({
-      onChunk: (chunk: StreamChunk<string>) => {
+      onChunk: (chunk: StreamChunk) => {
         editor.insertInlineContent(chunk.content ?? '');
       },
     });
+    console.log(result);
     setStreamHandle(null);
   };
 
