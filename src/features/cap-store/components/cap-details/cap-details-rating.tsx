@@ -10,7 +10,7 @@ import { Rating, RatingButton } from '@/shared/components/ui/shadcn-io/rating';
 import { generateUUID } from '@/shared/utils';
 import type { RemoteCap } from '../../types';
 import { useCapRatingDistribution } from '../../hooks/use-cap-rating-distribution';
-import { RatingDistribution } from '@nuwa-ai/cap-kit';
+import type { RatingDistribution } from '@nuwa-ai/cap-kit';
 
 interface CapDetailsRatingProps {
   capQueryData: RemoteCap;
@@ -79,11 +79,11 @@ export function CapDetailsRating({
             {isLoadingDistribution ? (
               <div className="space-y-2">
                 {[...Array(5)].map((_, index) => (
-                  <div key={index} className="flex items-center gap-3">
+                  <div key={`loading-${5 - index}-stars`} className="flex items-center gap-3">
                     <div className="flex items-center gap-0.5 min-w-[80px]">
                       {Array.from({ length: 5 - index }).map((_, starIndex) => (
                         <Star
-                          key={starIndex}
+                          key={`loading-star-${5 - index}-${starIndex + 1}`}
                           className="h-3.5 w-3.5 text-yellow-500"
                           fill="currentColor"
                         />
@@ -102,7 +102,7 @@ export function CapDetailsRating({
                   <div className="flex items-center gap-0.5 min-w-[80px]">
                     {Array.from({ length: d.rating }).map((_, starIndex) => (
                       <Star
-                        key={starIndex}
+                        key={`star-${d.rating}-${starIndex + 1}`}
                         className="h-3.5 w-3.5 text-yellow-500"
                         fill="currentColor"
                       />
@@ -139,7 +139,7 @@ export function CapDetailsRating({
                 defaultValue={capQueryData.stats.userRating ?? 0}
                 onValueChange={onRate}
               >
-                {Array.from({ length: 5 }).map((_, index) => (
+                {Array.from({ length: 5 }).map(() => (
                   <RatingButton
                     key={generateUUID()}
                     size={28}
