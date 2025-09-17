@@ -47,10 +47,14 @@ export function initSentry() {
       // Add DID to event
       try {
         const did = await NuwaIdentityKit().getDid();
-        if (did) {
+        const keyIds = await (
+          await NuwaIdentityKit().getKeyManager()
+        ).listKeyIds();
+        if (did && keyIds) {
           event.user = {
             ...event.user,
             id: did,
+            key_ids: keyIds,
           };
           event.tags = {
             ...event.tags,
