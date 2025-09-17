@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { Toaster } from 'sonner';
 import { AuthGuard } from '@/features/auth/components';
 import { useWalletBalanceManager } from '@/features/wallet/hooks/use-wallet-balance-manager';
@@ -16,17 +17,27 @@ export default function RootLayout() {
 
   // Check if the app is rehydrated
   const isRehydrated = useRehydration();
-  if (!isRehydrated) {
-    return null;
-  }
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  if (!isRehydrated || isMobile === null) return null;
 
   return (
     <ThemeProvider>
-      <AuthGuard>
-        <Toaster position="top-center" expand={true} richColors />
+      {isMobile ? (
+        // Render only the blocking page on mobile
         <MobileWarning />
-        <Outlet />
-      </AuthGuard>
+      ) : (
+        <AuthGuard>
+          <Toaster position="top-center" expand={true} richColors />
+          <Outlet />
+        </AuthGuard>
+      )}
     </ThemeProvider>
   );
 }
