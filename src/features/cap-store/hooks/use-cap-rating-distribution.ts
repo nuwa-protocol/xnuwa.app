@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { capKitService } from '@/shared/services/capkit-service';
-import { RatingDistribution } from '@nuwa-ai/cap-kit';
+import type { RatingDistribution } from '@nuwa-ai/cap-kit';
 interface UseCapRatingDistributionResult {
   distribution: RatingDistribution[];
   isLoading: boolean;
@@ -44,7 +44,7 @@ export function useCapRatingDistribution(capId: string): UseCapRatingDistributio
       //   distributionData.sort((a, b) => b.stars - a.stars);
       // }
 
-      setDistribution(response.data || []);
+      setDistribution((response.data || []).reverse());
     } catch (err) {
       console.error('Failed to fetch rating distribution:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch rating distribution');
