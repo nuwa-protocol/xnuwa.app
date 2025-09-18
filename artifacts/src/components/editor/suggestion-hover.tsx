@@ -14,7 +14,6 @@ type HoverData = {
 export default function SuggestionHoverMenu() {
   const editor = useEditor() as any
   const [hover, setHover] = useState<HoverData | null>(null)
-  const keepAlive = useRef<number | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -22,33 +21,55 @@ export default function SuggestionHoverMenu() {
     const view: any = editor.view
     const root = view?.dom as HTMLElement
     if (!root) return
-    // Simpler rect: the element box is good enough here
+
+    // Helper to compute an anchor rect
     const computeRect = (el: HTMLElement): DOMRect => el.getBoundingClientRect()
 
-    const onOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
+    // Show menu when user clicks inside a suggestion mark. Hide otherwise.
+    const onClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null
       if (!target) return
+      // Keep open when clicking inside the menu itself
+      if (target.closest('.sg-hover-menu')) return
+
       const span = target.closest('span.sg-insert, span.sg-delete') as HTMLElement | null
-      if (!span) return
+      if (!span) {
+        setHover(null)
+        return
+      }
       const typeFromSpan: 'insert' | 'delete' = span.classList.contains('sg-insert') ? 'insert' : 'delete'
       const id = span.getAttribute('data-id') || ''
       if (!id) return
       const reason = span.getAttribute('data-reason') || undefined
-      // Detect replacement pairs (both insert and delete exist for the same id)
       const hasInsert = !!root.querySelector(`span.sg-insert[data-id="${id}"]`)
       const hasDelete = !!root.querySelector(`span.sg-delete[data-id="${id}"]`)
       const type: HoverData['type'] = hasInsert && hasDelete ? 'replace' : typeFromSpan
       setHover({ id, reason, type, rect: computeRect(span), anchor: span })
     }
 
-    const onOut = (e: MouseEvent) => {
-      const related = e.relatedTarget as HTMLElement | null
-      if (related && (related.closest('.sg-hover-menu') || related.closest('span.sg-insert, span.sg-delete'))) {
-        return
-      }
-      // Delay hide a bit to allow moving to the menu
-      if (keepAlive.current) window.clearTimeout(keepAlive.current)
-      keepAlive.current = window.setTimeout(() => setHover(null), 150)
+    // Keep menu in sync with caret moves: if selection leaves the current
+    // suggestion, hide; if it stays inside, update anchor/position.
+    const onSelectionChange = () => {
+      setHover((prev) => {
+        if (!prev) return null
+        const sel = document.getSelection()
+        if (!sel) return null
+        // Ignore selections outside the editor
+        if (!root.contains(sel.anchorNode)) return null
+        // Find spans for this id and check containment
+        const spans = root.querySelectorAll(
+          `span.sg-insert[data-id="${prev.id}"], span.sg-delete[data-id="${prev.id}"]`,
+        )
+        let containing: HTMLElement | null = null
+        for (const n of spans) {
+          if (n.contains(sel.anchorNode)) {
+            containing = n as HTMLElement
+            break
+          }
+        }
+        if (!containing) return null
+        return { ...prev, anchor: containing, rect: computeRect(containing) }
+      })
     }
 
     const onScrollOrResize = () => {
@@ -59,13 +80,13 @@ export default function SuggestionHoverMenu() {
       })
     }
 
-    root.addEventListener('mouseover', onOver)
-    root.addEventListener('mouseout', onOut)
+    root.addEventListener('click', onClick)
+    document.addEventListener('selectionchange', onSelectionChange)
     window.addEventListener('scroll', onScrollOrResize, true)
     window.addEventListener('resize', onScrollOrResize)
     return () => {
-      root.removeEventListener('mouseover', onOver)
-      root.removeEventListener('mouseout', onOut)
+      root.removeEventListener('click', onClick)
+      document.removeEventListener('selectionchange', onSelectionChange)
       window.removeEventListener('scroll', onScrollOrResize, true)
       window.removeEventListener('resize', onScrollOrResize)
     }
@@ -90,13 +111,6 @@ export default function SuggestionHoverMenu() {
       className="sg-hover-menu fixed z-30"
       style={{ top: `${baseTop}px`, left: `${centerX}px`, transform }}
       ref={menuRef}
-      onMouseEnter={() => {
-        if (keepAlive.current) window.clearTimeout(keepAlive.current)
-      }}
-      onMouseLeave={() => {
-        if (keepAlive.current) window.clearTimeout(keepAlive.current)
-        keepAlive.current = window.setTimeout(() => setHover(null), 100)
-      }}
     >
       <div className="sg-fade-in relative flex flex-col gap-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50 shadow-lg px-3 py-2 text-sm max-w-sm">
         {/* Arrow pointer */}
@@ -129,14 +143,22 @@ export default function SuggestionHoverMenu() {
           <button
             type="button"
             className="inline-flex items-center gap-1 rounded-md bg-emerald-600 text-white px-2.5 py-1.5 text-xs hover:bg-emerald-700"
-            onClick={() => editor.exec(acceptSuggestionById(hover.id))}
+            onClick={() => {
+              editor.exec(acceptSuggestionById(hover.id))
+              setHover(null)
+              editor.focus()
+            }}
           >
             <Check className="size-4" /> Accept
           </button>
           <button
             type="button"
             className="inline-flex items-center gap-1 rounded-md bg-rose-600 text-white px-2.5 py-1.5 text-xs hover:bg-rose-700"
-            onClick={() => editor.exec(rejectSuggestionById(hover.id))}
+            onClick={() => {
+              editor.exec(rejectSuggestionById(hover.id))
+              setHover(null)
+              editor.focus()
+            }}
           >
             <X className="size-4" /> Reject
           </button>
