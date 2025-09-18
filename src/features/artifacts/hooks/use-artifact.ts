@@ -60,7 +60,7 @@ export const useArtifact = (artifactId: string) => {
       console.error('Failed to save artifact state', e);
       setSaveStatus('error');
     }
-  }, 2000);
+  }, 1000);
   // Save state to store with debounce and expose a save status
   const handleSaveState = useCallback(
     (state: any) => {
