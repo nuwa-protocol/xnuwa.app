@@ -1,5 +1,4 @@
 import { Package } from 'lucide-react';
-import { useEffect } from 'react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useCapStore } from '../stores';
@@ -14,10 +13,6 @@ export function CapStoreFavoritesContent() {
         isFetchingFavoriteCaps,
         fetchFavoriteCaps,
     } = useCapStore();
-
-    useEffect(() => {
-        fetchFavoriteCaps();
-    }, []);
 
     const caps = favoriteCaps;
 

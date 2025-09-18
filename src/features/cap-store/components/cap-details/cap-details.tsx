@@ -33,7 +33,7 @@ export function CapDetails({ capId }: { capId: string }) {
   const [capQueryData, setCapQueryData] = useState<RemoteCap | null>(null);
   const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<boolean>(false);
-  const { downloadCapByIDWithCache } = useCapStore();
+  const { downloadCapByIDWithCache, fetchFavoriteCaps } = useCapStore();
 
   // Fetch full cap data when selectedCap changes
   useEffect(() => {
@@ -122,8 +122,10 @@ export function CapDetails({ capId }: { capId: string }) {
     if (isCapFavorite) {
       toast.promise(capKit.favorite(capId, 'remove'), {
         loading: 'Removing from favorites...',
-        success: () => {
+        success: async () => {
           setIsCapFavorite(false);
+          // Refresh cached favorites after successful removal
+          try { await fetchFavoriteCaps(); } catch { /* noop */ }
           return `Removed ${capQueryData.metadata.displayName} from favorites`;
         },
         error: (error) => {
@@ -137,8 +139,10 @@ export function CapDetails({ capId }: { capId: string }) {
     } else {
       toast.promise(capKit.favorite(capId, 'add'), {
         loading: 'Adding to favorites...',
-        success: () => {
+        success: async () => {
           setIsCapFavorite(true);
+          // Refresh cached favorites after successful addition
+          try { await fetchFavoriteCaps(); } catch { /* noop */ }
           return `Added ${capQueryData.metadata.displayName} to favorites`;
         },
         error: (error) => {

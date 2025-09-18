@@ -119,6 +119,7 @@ export function CapSelector() {
                   capName={cap.metadata.displayName}
                   capThumbnail={cap.metadata.thumbnail}
                   size="sm"
+                  className='rounded-md'
                 />
                 <span className="text-sm">{cap.metadata.displayName}</span>
               </div>
