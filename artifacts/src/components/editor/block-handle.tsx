@@ -1,9 +1,9 @@
+import { GripVertical, Plus } from 'lucide-react';
 import {
   BlockHandleAdd,
   BlockHandleDraggable,
   BlockHandlePopover,
-} from 'prosekit/react/block-handle'
-import { GripVertical, Plus } from 'lucide-react'
+} from 'prosekit/react/block-handle';
 
 export default function BlockHandle() {
   return (
@@ -15,5 +15,5 @@ export default function BlockHandle() {
         <GripVertical className="size-5 block" />
       </BlockHandleDraggable>
     </BlockHandlePopover>
-  )
+  );
 }

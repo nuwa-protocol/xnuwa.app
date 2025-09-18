@@ -98,7 +98,7 @@ export default function SuggestionHoverMenu() {
         keepAlive.current = window.setTimeout(() => setHover(null), 100)
       }}
     >
-      <div className="sg-fade-in relative flex flex-col gap-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg px-3 py-2 text-sm max-w-sm">
+      <div className="sg-fade-in relative flex flex-col gap-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50 shadow-lg px-3 py-2 text-sm max-w-sm">
         {/* Arrow pointer */}
         <div
           className={

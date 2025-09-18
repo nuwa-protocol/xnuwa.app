@@ -93,6 +93,22 @@
   box-shadow: 0 0 0 1px rgba(220, 85, 85, 0.4) inset;
 }
 
+/* Dark mode adjustments for suggestion marks */
+.dark .sg-insert {
+  /* Softer, translucent green on dark surfaces */
+  background: rgba(16, 185, 129, 0.15); /* emerald-500 @ 15% */
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.35) inset; /* subtle border */
+  text-decoration-color: #34d399; /* emerald-400 */
+}
+
+.dark .sg-delete {
+  /* Lighter red text for contrast on dark */
+  color: #fca5a5; /* rose-300 */
+  background: rgba(244, 63, 94, 0.15); /* rose-500 @ 15% */
+  box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.35) inset;
+  text-decoration-color: #fb7185; /* rose-400 */
+}
+
 /* Fade-in animation for suggestion hover menu */
 .sg-fade-in {
   animation: sg-fade-in 120ms ease-out;

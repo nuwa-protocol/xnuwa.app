@@ -3,7 +3,7 @@ import 'prosekit/basic/style.css';
 import 'prosekit/basic/typography.css';
 import { useNuwaClient } from '@nuwa-ai/ui-kit';
 import { createEditor } from 'prosekit/core';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { defineExtension } from '@/components/editor/extension';
 import {
     htmlFromMarkdown,
@@ -14,6 +14,19 @@ import { useNoteMCP } from '../hooks/use-note-mcp';
 
 export default function EditorPage() {
     const [isLoading, setIsLoading] = useState(true);
+    // Follow the user's OS theme. We don't render any toggle UI.
+    const [isDark, setIsDark] = useState(false);
+
+    // Keep a local `dark` class wrapper in sync with system preference so all
+    // Tailwind `dark:` styles in subcomponents Just Work without a global toggle.
+    useEffect(() => {
+        const mq = window.matchMedia?.('(prefers-color-scheme: dark)');
+        if (!mq) return;
+        const apply = () => setIsDark(mq.matches);
+        apply();
+        mq.addEventListener('change', apply);
+        return () => mq.removeEventListener('change', apply);
+    }, []);
 
     // Create a single ProseKit editor instance
     const editor = useMemo(() => {
@@ -61,15 +74,19 @@ export default function EditorPage() {
 
     if (isLoading) {
         return (
-            <div className="h-screen w-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+            <div className={isDark ? 'dark' : ''}>
+                <div className="h-screen w-screen flex items-center justify-center bg-white dark:bg-gray-950 text-black dark:text-white">
+                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900 dark:border-gray-100"></div>
+                </div>
             </div>
         );
     }
 
     return (
-        <NuwaClientProvider nuwaClient={nuwaClient}>
-            <Editor editor={editor} onDocChange={handleOnChange} />
-        </NuwaClientProvider>
+        <div className={isDark ? 'dark' : ''}>
+            <NuwaClientProvider nuwaClient={nuwaClient}>
+                <Editor editor={editor} onDocChange={handleOnChange} />
+            </NuwaClientProvider>
+        </div>
     );
 }

@@ -58,13 +58,17 @@ export function ArtifactChat() {
             <div className="text-center max-w-md mx-auto p-5 rounded-2xl border bg-muted/30 shadow-sm">
               <div className="flex items-center justify-center gap-2 text-primary mb-2">
                 <Sparkles className="h-5 w-5" />
+                {/* TODO: here should show some metadata about the Artifact */}
                 <span className="text-sm font-medium">AI Artifact</span>
               </div>
+              {/* TODO: here should be the Artifact Name */}
               <h2 className="text-lg font-semibold mb-1">About Artifact</h2>
+              {/* TODO: Here should be artifact guideline */}
               <p className="text-muted-foreground text-sm mb-3">
                 Ask a question or describe what you want to do.
               </p>
               <div className="mt-4 text-left">
+                {/* TODO: here should be the recommended caps */}
                 <div className="text-xs font-medium text-muted-foreground mb-2">
                   Recommended Caps
                 </div>

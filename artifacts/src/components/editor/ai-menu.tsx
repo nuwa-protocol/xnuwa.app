@@ -184,7 +184,7 @@ export default function AiMenu({
         open={aiMenuOpen}
         onOpenChange={(open) => onOpenChange(open)}
         data-testid="inline-menu-ai"
-        className="z-10 box-border border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-lg [&:not([data-state])]:hidden relative flex flex-col w-sm rounded-lg p-4 gap-y-3 items-stretch min-w-72 max-w-md"
+        className="z-10 box-border border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 shadow-lg [&:not([data-state])]:hidden relative flex flex-col w-sm rounded-lg p-4 gap-y-3 items-stretch min-w-72 max-w-md"
       >
         {aiMenuOpen && (
           <div className="flex flex-col gap-3">
@@ -192,13 +192,13 @@ export default function AiMenu({
             {(aiError || aiResult || isStreaming) && (
               <div className="flex flex-col gap-2">
                 {aiError && (
-                  <div className="text-xs text-red-600">{aiError}</div>
+                  <div className="text-xs text-red-600 dark:text-red-400">{aiError}</div>
                 )}
                 {(aiResult || isStreaming) && (
-                  <div className="max-h-48 overflow-auto text-sm whitespace-pre-wrap border border-gray-100 dark:border-gray-800 rounded-md p-2 bg-gray-50 dark:bg-gray-900">
+                  <div className="max-h-48 overflow-auto text-sm whitespace-pre-wrap border border-gray-100 dark:border-gray-800 rounded-md p-2 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
                     {aiResult}
                     {isStreaming && (
-                      <span className="ml-1 text-gray-400 animate-pulse">▍</span>
+                      <span className="ml-1 text-gray-400 dark:text-gray-400 animate-pulse">▍</span>
                     )}
                   </div>
                 )}
@@ -250,7 +250,7 @@ export default function AiMenu({
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => runAI(s.instruction)}
-                    className="flex w-full items-center justify-between rounded-md border border-gray-200 dark:border-gray-800 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-900"
+                    className="flex w-full items-center justify-between rounded-md border border-gray-200 dark:border-gray-800 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-900 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50"
                   >
                     <div className="flex items-center gap-2">
                       {s.icon}
