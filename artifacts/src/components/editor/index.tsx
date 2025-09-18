@@ -1,6 +1,6 @@
 import 'prosekit/basic/style.css';
 import 'prosekit/basic/typography.css';
-import 'prosemirror-suggestion-mode/style/suggestion-mode.css';
+// Custom suggestion styling is in src/index.css
 
 import type { Editor as ProseKitEditor } from 'prosekit/core';
 import { ProseKit, useDocChange } from 'prosekit/react';
@@ -10,6 +10,8 @@ import InlineMenu from './inline-menu';
 import SlashMenu from './slash-menu';
 import TableHandle from './table-handle';
 import Toolbar from './toolbar';
+import SuggestionDock from './suggestion-dock';
+import SuggestionHoverMenu from './suggestion-hover';
 
 export default function Editor({
   editor,
@@ -34,6 +36,8 @@ export default function Editor({
           <BlockHandle />
           <TableHandle />
           <DropIndicator />
+          <SuggestionDock />
+          <SuggestionHoverMenu />
         </div>
       </div>
     </ProseKit>

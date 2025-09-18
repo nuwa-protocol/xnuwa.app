@@ -70,3 +70,35 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* Suggestion styling */
+/* More prominent suggestion UI with underline for both */
+.sg-insert {
+  background: #e6ffec; /* light green */
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px #b7ebc3 inset;
+  text-decoration-line: underline;
+  text-decoration-thickness: 3px; /* thicker underline */
+  text-decoration-color: #22c55e; /* green underline */
+  text-underline-offset: 2px;
+}
+.sg-delete {
+  color: #a11; /* stronger red */
+  text-decoration-line: line-through underline; /* both strike and underline */
+  text-decoration-thickness: 3px; /* thicker underline */
+  text-decoration-color: #ef4444; /* red underline */
+  text-underline-offset: 2px;
+  background: rgba(255, 226, 226, 0.6);
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(220, 85, 85, 0.4) inset;
+}
+
+/* Fade-in animation for suggestion hover menu */
+.sg-fade-in {
+  animation: sg-fade-in 120ms ease-out;
+  transform-origin: bottom center;
+}
+@keyframes sg-fade-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}

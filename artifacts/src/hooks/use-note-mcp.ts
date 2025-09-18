@@ -2,7 +2,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { type NuwaClient, PostMessageMCPTransport } from '@nuwa-ai/ui-kit';
 import type { Editor } from 'prosekit/core';
-import { applySuggestion } from 'prosemirror-suggestion-mode';
+import { applySuggestion } from '@/components/editor/suggestions';
 import { useEffect } from 'react';
 import { z } from 'zod';
 import type { EditorExtension } from '@/components/editor/extension';
@@ -56,7 +56,7 @@ const createNoteMCP = (
     {
       title: 'Edit Content (Suggestions)',
       description:
-        'Propose edits as suggestion marks so the user can accept or reject them. Applies one or more text suggestions.',
+        'Propose edits as suggestion marks so the user can accept or reject them. Use empty strings to express pure insert/delete: set textToReplace="" with anchors to insert only, or set textReplacement="" to delete only. Applies one or more text suggestions.',
       inputSchema: {
         suggestions: z
           .array(
@@ -64,11 +64,11 @@ const createNoteMCP = (
               textToReplace: z
                 .string()
                 .describe(
-                  'The exact text to replace (plaintext, not markdown). Optionally use textBefore/textAfter to disambiguate.',
+                  'Plaintext to replace. For pure insert, set to empty string and provide textBefore or textAfter as an anchor.',
                 ),
               textReplacement: z
                 .string()
-                .describe('The new text to insert in place of textToReplace.'),
+                .describe('The new text to insert. For pure delete, set to empty string.'),
               reason: z
                 .string()
                 .describe('Optional reason/annotation for the suggestion.'),
