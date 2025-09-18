@@ -71,17 +71,14 @@ const createNoteMCP = (
                 .describe('The new text to insert in place of textToReplace.'),
               reason: z
                 .string()
-                .optional()
                 .describe('Optional reason/annotation for the suggestion.'),
               textBefore: z
                 .string()
-                .optional()
                 .describe(
                   'Optional context that must appear immediately before textToReplace to qualify as a match.',
                 ),
               textAfter: z
                 .string()
-                .optional()
                 .describe(
                   'Optional context that must appear immediately after textToReplace to qualify as a match.',
                 ),
@@ -141,9 +138,14 @@ const createNoteMCP = (
         'Stream AI-generated content and append it to the end of the document',
       inputSchema: {
         prompt: z.string().describe('Prompt for AI to generate content'),
+        replaceExistingContent: z
+          .boolean()
+          .describe(
+            'Replace existing content with new content. False means adding new content to the end of the document.',
+          ),
       },
     },
-    async ({ prompt }) => {
+    async ({ prompt, replaceExistingContent }) => {
       const stream = nuwaClient.createAIStream({ prompt });
 
       // Maintain a growing markdown buffer and an initial document HTML snapshot
@@ -164,7 +166,11 @@ const createNoteMCP = (
           // formats correctly once closed by later chunks.
           const streamedHTML = htmlFromMarkdown(mdBuffer);
           const nextHTML = `${initialHTML}${streamedHTML}`;
-          editor.setContent(nextHTML, 'end');
+          if (replaceExistingContent) {
+            editor.setContent(nextHTML, 'start');
+          } else {
+            editor.setContent(nextHTML, 'end');
+          }
         },
         onError: (error) => {
           return {

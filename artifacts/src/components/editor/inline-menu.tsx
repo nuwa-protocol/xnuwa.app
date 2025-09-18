@@ -1,13 +1,13 @@
-import type { Editor } from 'prosekit/core'
-import type { LinkAttrs } from 'prosekit/extensions/link'
-import type { EditorState } from 'prosekit/pm/state'
-import { useEditor, useEditorDerivedValue } from 'prosekit/react'
-import { InlinePopover } from 'prosekit/react/inline-popover'
-import { useState } from 'react'
-
-import Button from './button'
-import type { EditorExtension } from './extension'
-import { Bold, Code, Italic, Link as LinkIcon, Strikethrough, Underline } from 'lucide-react'
+import { Bold, Code, Italic, Link as LinkIcon, Sparkles, Strikethrough, Underline } from 'lucide-react';
+import type { Editor } from 'prosekit/core';
+import type { LinkAttrs } from 'prosekit/extensions/link';
+import type { EditorState } from 'prosekit/pm/state';
+import { useEditor, useEditorDerivedValue } from 'prosekit/react';
+import { InlinePopover } from 'prosekit/react/inline-popover';
+import { useState } from 'react';
+import Button from './button';
+import type { EditorExtension } from './extension';
+import AiMenu from './ai-menu';
 
 function getInlineMenuItems(editor: Editor<EditorExtension>) {
   return {
@@ -42,48 +42,55 @@ function getInlineMenuItems(editor: Editor<EditorExtension>) {
       command: () => editor.commands.expandLink(),
       currentLink: getCurrentLink(editor.state),
     },
-  }
+  };
 }
 
 function getCurrentLink(state: EditorState): string | undefined {
-  const { $from } = state.selection
-  const marks = $from.marksAcross($from)
+  const { $from } = state.selection;
+  const marks = $from.marksAcross($from);
   if (!marks) {
-    return
+    return;
   }
   for (const mark of marks) {
     if (mark.type.name === 'link') {
-      return (mark.attrs as LinkAttrs).href
+      return (mark.attrs as LinkAttrs).href;
     }
   }
 }
 
 export default function InlineMenu() {
-  const editor = useEditor<EditorExtension>()
-  const items = useEditorDerivedValue(getInlineMenuItems)
+  const editor = useEditor<EditorExtension>();
+  const items = useEditorDerivedValue(getInlineMenuItems);
 
-  const [linkMenuOpen, setLinkMenuOpen] = useState(false)
-  const toggleLinkMenuOpen = () => setLinkMenuOpen((open) => !open)
+  const [linkMenuOpen, setLinkMenuOpen] = useState(false);
+  const toggleLinkMenuOpen = () => setLinkMenuOpen((open) => !open);
+  // Track parent popover open state to notify child menus
+  const [parentOpen, setParentOpen] = useState(true);
+  // Hide main inline menu when AI menu opens to avoid double-popover
+  const [mainHidden, setMainHidden] = useState(false);
+  const [aiMenuOpen, setAiMenuOpen] = useState(false);
 
   const handleLinkUpdate = (href?: string) => {
     if (href) {
-      editor.commands.addLink({ href })
+      editor.commands.addLink({ href });
     } else {
-      editor.commands.removeLink()
+      editor.commands.removeLink();
     }
 
-    setLinkMenuOpen(false)
-    editor.focus()
-  }
+    setLinkMenuOpen(false);
+    editor.focus();
+  };
 
   return (
     <>
       <InlinePopover
         data-testid="inline-menu-main"
-        className="z-10 box-border border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-lg [&:not([data-state])]:hidden relative flex min-w-32 space-x-1 overflow-auto whitespace-nowrap rounded-md p-1"
+        className={`z-10 box-border border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-lg [&:not([data-state])]:hidden relative flex min-w-32 space-x-1 overflow-auto whitespace-nowrap rounded-md p-1 ${mainHidden ? 'hidden' : ''}`}
         onOpenChange={(open) => {
+          setParentOpen(open);
           if (!open) {
-            setLinkMenuOpen(false)
+            setLinkMenuOpen(false);
+            setMainHidden(false); // ensure we can show again when it re-opens
           }
         }}
       >
@@ -136,14 +143,28 @@ export default function InlineMenu() {
           <Button
             pressed={items.link.isActive}
             onClick={() => {
-              items.link.command()
-              toggleLinkMenuOpen()
+              items.link.command();
+              toggleLinkMenuOpen();
             }}
             tooltip="Link"
           >
             <LinkIcon className="size-5 block" />
           </Button>
         )}
+
+        {/* AI toggle button (opens AI menu and hides this popover) */}
+        <Button
+          pressed={aiMenuOpen}
+          onClick={() => {
+            const next = !aiMenuOpen;
+            setAiMenuOpen(next);
+            setMainHidden(next);
+            if (next) setLinkMenuOpen(false);
+          }}
+          tooltip="AI Assistant"
+        >
+          <Sparkles className="size-5 block" />
+        </Button>
       </InlinePopover>
 
       <InlinePopover
@@ -157,10 +178,10 @@ export default function InlineMenu() {
         {linkMenuOpen && (
           <form
             onSubmit={(event) => {
-              event.preventDefault()
-              const target = event.target as HTMLFormElement | null
-              const href = target?.querySelector('input')?.value?.trim()
-              handleLinkUpdate(href)
+              event.preventDefault();
+              const target = event.target as HTMLFormElement | null;
+              const href = target?.querySelector('input')?.value?.trim();
+              handleLinkUpdate(href);
             }}
           >
             <input
@@ -181,6 +202,16 @@ export default function InlineMenu() {
           </button>
         )}
       </InlinePopover>
+
+      {/* AI menu popover mounted outside of the main inline toolbar */}
+      <AiMenu
+        open={aiMenuOpen}
+        onOpenChange={(open) => {
+          setAiMenuOpen(open);
+          setMainHidden(open);
+        }}
+        parentOpen={parentOpen}
+      />
     </>
-  )
+  );
 }

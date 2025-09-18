@@ -1,4 +1,12 @@
-import { AlertTriangle, CheckCircle, Loader2, X, XCircle } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  Loader2,
+  Sparkles,
+  X,
+  XCircle,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Badge,
@@ -24,6 +32,21 @@ export const ArtifactHeader = ({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const chatId = searchParams.get('chat_id');
+  // Show the "Saved" badge briefly, then hide it automatically
+  const [showTransientSaved, setShowTransientSaved] = useState(false);
+
+  // When we enter the saved state, show the badge for a short time
+  // Hide it while saving again or when AI is processing
+  useEffect(() => {
+    if (saveStatus === 'saved') {
+      setShowTransientSaved(true);
+      const t = setTimeout(() => setShowTransientSaved(false), 2000);
+      return () => clearTimeout(t);
+    }
+    if (saveStatus === 'saving' || saveStatus === 'idle') {
+      setShowTransientSaved(false);
+    }
+  }, [saveStatus]);
   const handleClose = () => {
     navigate(`/chat${chatId ? `?chat_id=${chatId}` : ''}`);
   };
@@ -43,21 +66,27 @@ export const ArtifactHeader = ({
           <X className="h-4 w-4" />
         </Button>
       </div>
-      {/* Center: Title (editable) + Save status */}
+      {/* Center: Title (editable) + Status area (AI or Save) */}
       <div className="flex flex-row justify-center items-center min-w-0 max-w-[min(70vw,700px)]">
         <div className="flex flex-row justify-center items-center gap-2">
-          <Title title={title} onCommit={() => {}} />
-          {saveStatus !== 'idle' && <SaveStatusBadge status={saveStatus} />}
+          <Title title={title} onCommit={() => { }} />
+          {/* Status area shares the same spot: prefer AI processing over save status */}
+          {isProcessingAIRequest ? (
+            <AIProcessingBadge />
+          ) : (
+            (() => {
+              const shouldShowSaveBadge =
+                saveStatus !== 'idle' &&
+                (saveStatus !== 'saved' || showTransientSaved);
+              return shouldShowSaveBadge ? (
+                <SaveStatusBadge status={saveStatus} />
+              ) : null;
+            })()
+          )}
         </div>
       </div>
-      {/* Right: Placeholder to balance center */}
+      {/* Right: Connection status only (AI indicator moved next to title) */}
       <div className="justify-self-end">
-        {isProcessingAIRequest && (
-          <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            <span>AI Processing</span>
-          </div>
-        )}
         {hasConnectionError && (
           <Tooltip>
             <TooltipTrigger>
@@ -111,4 +140,19 @@ const SaveStatusBadge = ({ status }: { status: SaveStatus }) => {
     );
   }
   return null;
+};
+
+// Subtle, clearer processing badge UI that matches badge visuals
+const AIProcessingBadge = () => {
+  return (
+    <Badge
+      variant="outline"
+      className="relative gap-1.5 rounded-full text-xs border-theme-primary/40 text-theme-primary pr-2 pl-1 animate-pulse"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <Sparkles className="size-4" />
+      <span className="font-medium">AI Processing…</span>
+    </Badge>
+  );
 };
