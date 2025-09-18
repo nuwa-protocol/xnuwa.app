@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect } from 'react';
-import { ChatContent } from '@/features/chat/components/chat-content';
+import { ArtifactChat } from './artifact-chat';
 import { useSidebarStore } from '@/features/sidebar/stores';
 import {
     ResizableHandle,
@@ -22,7 +22,7 @@ export const ArtifactMain = () => {
         <div className="flex w-full h-full">
             <ResizablePanelGroup direction="horizontal">
                 <ResizablePanel defaultSize={35} minSize={20}>
-                    <ChatContent isReadonly={false} />
+                    <ArtifactChat />
                 </ResizablePanel>
                 <ResizableHandle withHandle className="h-4 my-auto" />
                 <ResizablePanel
