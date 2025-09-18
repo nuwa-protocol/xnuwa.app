@@ -5,10 +5,12 @@ import {
   TextQuote,
   Wand2,
   Square,
+  List as ListIcon,
 } from 'lucide-react';
 import { useEditor } from 'prosekit/react';
 import { InlinePopover } from 'prosekit/react/inline-popover';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNuwa } from '@/contexts/NuwaClientContext';
 import type { EditorExtension } from './extension';
 
@@ -18,6 +20,8 @@ type AiMenuProps = {
   onOpenChange: (open: boolean) => void;
   // When the parent inline toolbar closes, we also close the AI popover.
   parentOpen?: boolean;
+  // Variant: transform selection (default) or generate new content (for slash menu)
+  variant?: 'transform' | 'generate';
 };
 
 /**
@@ -29,6 +33,7 @@ export default function AiMenu({
   open,
   onOpenChange,
   parentOpen = true,
+  variant = 'transform',
 }: AiMenuProps) {
   const editor = useEditor<EditorExtension>();
   const { nuwaClient } = useNuwa();
@@ -43,6 +48,9 @@ export default function AiMenu({
   const lastResultRef = useRef<string>('');
   const streamAbortRef = useRef<() => void>(() => { });
   const promptInputRef = useRef<HTMLInputElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null); // for generate-mode click-outside
+  const [anchor, setAnchor] = useState<{ left: number; top: number } | null>(null);
+  const [isDark, setIsDark] = useState(false);
   // Tone controls removed per UX decision
   // Copy feedback state
   const [copied, setCopied] = useState(false);
@@ -82,6 +90,72 @@ export default function AiMenu({
     }
   }, [aiMenuOpen]);
 
+  // Focus prompt when menu opens
+  useEffect(() => {
+    if (!aiMenuOpen) return;
+    const id = window.setTimeout(() => {
+      try { promptInputRef.current?.focus(); } catch {}
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [aiMenuOpen]);
+
+  // In generate mode, close when clicking outside of the floating panel
+  useEffect(() => {
+    if (variant !== 'generate' || !aiMenuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      const el = containerRef.current;
+      if (el && e.target instanceof Node && !el.contains(e.target)) {
+        onOpenChange(false);
+      }
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [variant, aiMenuOpen, onOpenChange]);
+
+  // Detect if the editor is inside a `.dark` container; if so, mirror it onto the portal root
+  useEffect(() => {
+    if (!aiMenuOpen) return;
+    try {
+      let el: HTMLElement | null = editor.view.dom as HTMLElement;
+      let dark = false;
+      while (el) {
+        if (el.classList && el.classList.contains('dark')) { dark = true; break; }
+        el = el.parentElement;
+      }
+      setIsDark(dark);
+    } catch {
+      setIsDark(false);
+    }
+  }, [aiMenuOpen, editor]);
+
+  // In generate mode, follow caret by polling with rAF (robust against custom scroll containers)
+  useEffect(() => {
+    if (variant !== 'generate' || !aiMenuOpen) return;
+    let raf = 0;
+    const measure = () => {
+      try {
+        const { state, view } = editor;
+        const sel = state.selection;
+        const rect = view.coordsAtPos(sel.from);
+        const width = 640; // match w-[640px]
+        const centerX = (rect.left + rect.right) / 2;
+        const left = Math.round(Math.min(window.innerWidth - 16 - width, Math.max(16, centerX - width / 2)));
+        let top = rect.bottom + 8; // prefer below caret
+        // Simple flip when near bottom; place above if there isn't ~240px space below
+        const approxHeight = 260;
+        if (window.innerHeight - rect.bottom < approxHeight + 16) {
+          top = Math.max(16, rect.top - approxHeight - 8);
+        }
+        setAnchor((prev) => (prev && prev.left === left && prev.top === top ? prev : { left, top }));
+      } catch {
+        // ignore
+      }
+      raf = window.requestAnimationFrame(measure);
+    };
+    raf = window.requestAnimationFrame(measure);
+    return () => window.cancelAnimationFrame(raf);
+  }, [variant, aiMenuOpen, editor]);
+
   // Reset copy UI on result/stream changes
   useEffect(() => {
     setCopied(false);
@@ -112,12 +186,18 @@ export default function AiMenu({
   // Build a prompt that targets provided base text.
   const buildPrompt = (action: string, extra: string | undefined, baseText: string) => {
     const instruction = extra ? `${action}. ${extra}` : action;
-    return [
-      'You are a concise writing assistant. Return ONLY the transformed text without commentary, code fences, or backticks.',
-      `Task: ${instruction}`,
-      'Selection:',
-      baseText || '(no selection)',
-    ].join('\n\n');
+    const header =
+      variant === 'generate'
+        ? 'You are a concise writing assistant. Return ONLY the generated text without commentary, code fences, or backticks.'
+        : 'You are a concise writing assistant. Return ONLY the transformed text without commentary, code fences, or backticks.';
+    const parts = [header, `Task: ${instruction}`];
+    // For transform, include selection; for generate, include prior generated text for iterative updates
+    if (variant === 'transform') {
+      parts.push('Selection:', baseText || '(no selection)');
+    } else if (variant === 'generate' && baseText) {
+      parts.push('Current draft:', baseText);
+    }
+    return parts.join('\n\n');
   };
 
   //
@@ -178,8 +258,8 @@ export default function AiMenu({
     }
   };
 
-  // Suggested actions rendered as a vertical list with descriptions
-  const suggestions: Array<{
+  // Suggested actions rendered as a compact, horizontally scrollable list
+  const transformSuggestions: Array<{
     key: string;
     label: string;
     description: string;
@@ -223,19 +303,54 @@ export default function AiMenu({
       },
     ];
 
-  return (
-    <>
-      {/* AI popover (rendered outside of the main inline toolbar) */}
-      <InlinePopover
-        placement="bottom"
-        defaultOpen={false}
-        open={aiMenuOpen}
-        onOpenChange={(open) => onOpenChange(open)}
-        data-testid="inline-menu-ai"
-        className="z-10 box-border border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 shadow-lg [&:not([data-state])]:hidden relative flex flex-col rounded-lg p-4 gap-y-3 items-stretch min-w-[560px] max-w-[720px] w-[640px]"
-      >
-        {aiMenuOpen && (
-          <div className="flex flex-col gap-3">
+  const generateSuggestions: Array<{
+    key: string;
+    label: string;
+    description: string;
+    instruction: string;
+    icon: React.ReactNode;
+  }> = [
+      {
+        key: 'paragraph',
+        label: 'Paragraph',
+        description: 'Write a concise paragraph about a topic.',
+        instruction: 'Write a concise paragraph about this topic',
+        icon: <FileText className="size-4 shrink-0" />,
+      },
+      {
+        key: 'outline',
+        label: 'Outline',
+        description: 'Create a short outline with bullet points.',
+        instruction: 'Create a 5-bullet outline for this topic',
+        icon: <PencilLine className="size-4 shrink-0" />,
+      },
+      {
+        key: 'list',
+        label: 'List',
+        description: 'List key points as bullets.',
+        instruction: 'List key points as bullets about this topic',
+        icon: <ListIcon className="size-4 shrink-0" />,
+      },
+      {
+        key: 'title',
+        label: 'Title',
+        description: 'Suggest 3-5 title options.',
+        instruction: 'Suggest 5 concise, compelling titles for this topic',
+        icon: <TextQuote className="size-4 shrink-0" />,
+      },
+      {
+        key: 'brainstorm',
+        label: 'Brainstorm',
+        description: 'Brainstorm ideas for a topic.',
+        instruction: 'Brainstorm 8 ideas about this topic',
+        icon: <Wand2 className="size-4 shrink-0" />,
+      },
+    ];
+
+  const suggestions = variant === 'generate' ? generateSuggestions : transformSuggestions;
+
+  const body = (
+    <div className="flex flex-col gap-3">
             {/* Result area first */}
             {(aiError || aiResult || isStreaming) && (
               <div className="flex flex-col gap-2">
@@ -369,7 +484,11 @@ export default function AiMenu({
                   }
                 }}
                 placeholder={
-                  aiResult ? 'Provide feedback about the generated content…' : 'Ask AI about the selection…'
+                  aiResult
+                    ? 'Provide feedback about the generated content…'
+                    : variant === 'generate'
+                      ? 'Describe what to generate…'
+                      : 'Ask AI about the selection…'
                 }
                 className="flex h-9 rounded-md w-full bg-white dark:bg-gray-950 pl-3 pr-28 py-2 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-500 transition border box-border border-gray-200 dark:border-gray-800 border-solid ring-0 ring-transparent focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-0 outline-hidden focus-visible:outline-hidden file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={isStreaming}
@@ -395,8 +514,38 @@ export default function AiMenu({
                 )}
               </div>
             </div>
-          </div>
-        )}
+    </div>
+  );
+
+  const panelBaseClass =
+    'box-border border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 shadow-lg flex flex-col rounded-lg p-4 gap-y-3 items-stretch min-w-[560px] max-w-[720px] w-[640px]';
+
+  if (variant === 'generate') {
+    if (!aiMenuOpen || !anchor) return null;
+    return createPortal(
+      <div
+        ref={containerRef}
+        style={{ left: anchor.left, top: anchor.top, position: 'fixed' }}
+        className={`${isDark ? 'dark ' : ''}z-[1000] ${panelBaseClass}`}
+      >
+        {body}
+      </div>,
+      document.body,
+    );
+  }
+
+  return (
+    <>
+      {/* AI popover (transform mode; anchored to selection) */}
+      <InlinePopover
+        placement="bottom"
+        defaultOpen={false}
+        open={aiMenuOpen}
+        onOpenChange={(open) => onOpenChange(open)}
+        data-testid="inline-menu-ai"
+        className={`z-10 [&:not([data-state])]:hidden relative ${panelBaseClass}`}
+      >
+        {aiMenuOpen && body}
       </InlinePopover>
     </>
   );

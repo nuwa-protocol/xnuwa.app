@@ -1,13 +1,21 @@
-import { Bold, Code, Italic, Link as LinkIcon, Sparkles, Strikethrough, Underline } from 'lucide-react';
+import {
+  Bold,
+  Code,
+  Italic,
+  Link as LinkIcon,
+  Sparkles,
+  Strikethrough,
+  Underline,
+} from 'lucide-react';
 import type { Editor } from 'prosekit/core';
 import type { LinkAttrs } from 'prosekit/extensions/link';
 import type { EditorState } from 'prosekit/pm/state';
 import { useEditor, useEditorDerivedValue } from 'prosekit/react';
 import { InlinePopover } from 'prosekit/react/inline-popover';
 import { useState } from 'react';
+import AiMenu from './ai-menu';
 import Button from './button';
 import type { EditorExtension } from './extension';
-import AiMenu from './ai-menu';
 
 function getInlineMenuItems(editor: Editor<EditorExtension>) {
   return {
@@ -163,7 +171,10 @@ export default function InlineMenu() {
           }}
           tooltip="AI Assistant"
         >
-          <Sparkles className="size-5 block" />
+          <div className="flex items-center gap-2 text-md">
+            <Sparkles className="size-5 block" />
+            AI
+          </div>
         </Button>
       </InlinePopover>
 
