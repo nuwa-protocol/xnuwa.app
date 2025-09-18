@@ -1,15 +1,25 @@
-import type { BlockNoteEditor } from '@blocknote/core';
+// Note: suggestion plugin integration only; cursor helpers removed
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { type NuwaClient, PostMessageMCPTransport } from '@nuwa-ai/ui-kit';
+import type { Editor } from 'prosekit/core';
+import { applySuggestion } from 'prosemirror-suggestion-mode';
 import { useEffect } from 'react';
 import { z } from 'zod';
+import type { EditorExtension } from '@/components/editor/extension';
+import {
+  htmlFromMarkdown,
+  markdownFromHTML,
+} from '@/components/editor/markdown';
 
 /**
- * Creates an MCP server for BlockNote editor integration
- * @param editor The BlockNote editor instance
+ * Creates an MCP server for ProseKit editor integration
+ * @param editor The ProseKit editor instance
  * @returns Object containing the MCP server and transport
  */
-const createNoteMCP = (editor: BlockNoteEditor, nuwaClient: NuwaClient) => {
+const createNoteMCP = (
+  editor: Editor<EditorExtension>,
+  nuwaClient: NuwaClient,
+) => {
   const transport = new PostMessageMCPTransport({
     targetWindow: window.parent,
     targetOrigin: '*',
@@ -21,37 +31,165 @@ const createNoteMCP = (editor: BlockNoteEditor, nuwaClient: NuwaClient) => {
   // Initialize MCP server
   const server = new McpServer({
     name: 'note-editor-mcp',
-    version: '1.0.0',
+    version: '2.0.0',
   });
 
-  // Register tool for editing content in the BlockNote editor
+  // Tool 1: Get Markdown Content
   server.registerTool(
-    'add_content',
+    'get_markdown_content',
     {
-      title: 'Add some content to the editor with AI stream',
-      description: 'Add some content to the editor with AI stream',
+      title: 'Get Markdown Content',
+      description: 'Serialize the current document to Markdown',
+      inputSchema: {},
+    },
+    async () => {
+      const html = editor.getDocHTML();
+      const md = markdownFromHTML(html);
+      return { content: [{ type: 'text', text: md }] };
+    },
+  );
+
+  // Tool 2: Edit Content (Suggestions)
+  // Accepts an array of suggestions only.
+  server.registerTool(
+    'edit_content',
+    {
+      title: 'Edit Content (Suggestions)',
+      description:
+        'Propose edits as suggestion marks so the user can accept or reject them. Applies one or more text suggestions.',
       inputSchema: {
-        prompt: z
-          .string()
-          .describe('The prompt for AI to generate the content'),
+        suggestions: z
+          .array(
+            z.object({
+              textToReplace: z
+                .string()
+                .describe(
+                  'The exact text to replace (plaintext, not markdown). Optionally use textBefore/textAfter to disambiguate.',
+                ),
+              textReplacement: z
+                .string()
+                .describe('The new text to insert in place of textToReplace.'),
+              reason: z
+                .string()
+                .optional()
+                .describe('Optional reason/annotation for the suggestion.'),
+              textBefore: z
+                .string()
+                .optional()
+                .describe(
+                  'Optional context that must appear immediately before textToReplace to qualify as a match.',
+                ),
+              textAfter: z
+                .string()
+                .optional()
+                .describe(
+                  'Optional context that must appear immediately after textToReplace to qualify as a match.',
+                ),
+            }),
+          )
+          .describe(
+            'List of text suggestions to apply; each becomes a suggestion mark that the user can accept or reject.',
+          )
+          .optional(),
+      },
+    },
+    async ({ suggestions }) => {
+      const view = editor.view;
+      const list = [] as Array<{
+        textToReplace: string;
+        textReplacement: string;
+        reason?: string;
+        textBefore?: string;
+        textAfter?: string;
+      }>;
+      if (Array.isArray(suggestions)) list.push(...suggestions);
+
+      if (list.length === 0) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: false,
+                applied: 0,
+                reason: 'No suggestions provided',
+              }),
+            },
+          ],
+        };
+      }
+
+      let applied = 0;
+      for (const s of list) {
+        const ok = applySuggestion(view, s, 'AI');
+        if (ok) applied += 1;
+      }
+      const success = applied > 0;
+      const message = success
+        ? { success, applied }
+        : { success, applied, reason: 'No suggestions applied' };
+      return { content: [{ type: 'text', text: JSON.stringify(message) }] };
+    },
+  );
+
+  // Tool 3: Generate AI Content At End (Stream)
+  server.registerTool(
+    'generate_ai_content',
+    {
+      title: 'Generate AI Content (Append to End)',
+      description:
+        'Stream AI-generated content and append it to the end of the document',
+      inputSchema: {
+        prompt: z.string().describe('Prompt for AI to generate content'),
       },
     },
     async ({ prompt }) => {
-      let content = '';
       const stream = nuwaClient.createAIStream({ prompt });
-      await stream.execute({
+
+      // Maintain a growing markdown buffer and an initial document HTML snapshot
+      // taken at the start of streaming. We re-render doc = initial + parsed(md)
+      // on each chunk so markdown structure is always accurate.
+      let mdBuffer = '';
+      const initialHTML = editor.getDocHTML();
+
+      const { result } = await stream.execute({
         onChunk: (chunk) => {
-          editor.insertInlineContent(chunk.content ?? '');
-          content += chunk.content ?? '';
+          // Accumulate stream into markdown buffer
+          const delta = chunk.content ?? '';
+          if (!delta) return;
+          mdBuffer += delta;
+
+          // Convert markdown -> html and re-render the full doc as
+          // initialHTML + streamedHTML. This ensures partially-closed markdown
+          // formats correctly once closed by later chunks.
+          const streamedHTML = htmlFromMarkdown(mdBuffer);
+          const nextHTML = `${initialHTML}${streamedHTML}`;
+          editor.setContent(nextHTML, 'end');
+        },
+        onError: (error) => {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: false,
+                  reason: `Error generating AI content: ${error}`,
+                }),
+              },
+            ],
+            isError: true,
+          };
         },
       });
+      // Done streaming, return success
       return {
         content: [
           {
             type: 'text',
-            text: `Content added: ${content}`,
+            text: `content added: ${result}`,
           },
         ],
+        isError: false,
       };
     },
   );
@@ -59,7 +197,10 @@ const createNoteMCP = (editor: BlockNoteEditor, nuwaClient: NuwaClient) => {
   return { server, transport };
 };
 
-export const useNoteMCP = (editor: BlockNoteEditor, nuwaClient: NuwaClient) => {
+export const useNoteMCP = (
+  editor: Editor<EditorExtension>,
+  nuwaClient: NuwaClient,
+) => {
   // Initialize MCP server
   useEffect(() => {
     const { server, transport } = createNoteMCP(editor, nuwaClient);

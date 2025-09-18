@@ -15,6 +15,7 @@
     "@tailwindcss/vite": "^4.1.13",
     "lucide-react": "^0.544.0",
     "prosekit": "^0.15.5",
+    "prosemirror-suggestion-mode": "^1.0.79",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.8.2",

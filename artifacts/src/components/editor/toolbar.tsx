@@ -1,5 +1,6 @@
 import {
   Bold,
+  CheckCheck,
   Code,
   Heading1,
   Heading2,
@@ -16,14 +17,58 @@ import {
   Strikethrough,
   Underline,
   Undo2,
+  X,
 } from 'lucide-react';
 import type { Editor } from 'prosekit/core';
 import { useEditorDerivedValue } from 'prosekit/react';
+import {
+  acceptAllSuggestions,
+  rejectAllSuggestions,
+} from 'prosemirror-suggestion-mode';
 import Button from './button';
 import type { EditorExtension } from './extension';
 import { ImageUploadPopover } from './image-upload-popover';
 
+function hasSuggestions(editor: Editor<EditorExtension>) {
+  let found = false;
+  editor.state.doc.descendants((node) => {
+    if (
+      node.marks.some(
+        (m) =>
+          m.type.name === 'suggestion_insert' ||
+          m.type.name === 'suggestion_delete',
+      )
+    ) {
+      found = true;
+      return false;
+    }
+    return true;
+  });
+  return found;
+}
+
 function getToolbarItems(editor: Editor<EditorExtension>) {
+  // Remove stray placeholder characters possibly left by suggestion operations
+  const cleanupPlaceholders = () => {
+    const { state, view } = editor;
+    const ranges: Array<{ from: number; to: number }> = [];
+    state.doc.descendants((node, pos) => {
+      if (node.isText && node.text) {
+        for (let i = 0; i < node.text.length; i++) {
+          const ch = node.text[i];
+          if (ch === '¶' || ch === '\u200B') {
+            ranges.push({ from: pos + i, to: pos + i + 1 });
+          }
+        }
+      }
+    });
+    if (ranges.length === 0) return;
+    let tr = state.tr;
+    for (let i = ranges.length - 1; i >= 0; i--) {
+      tr = tr.delete(ranges[i].from, ranges[i].to);
+    }
+    view.dispatch(tr);
+  };
   return {
     undo: {
       isActive: false,
@@ -111,6 +156,24 @@ function getToolbarItems(editor: Editor<EditorExtension>) {
     insertImage: {
       isActive: false,
       canExec: editor.commands.insertImage.canExec(),
+    },
+    acceptAll: {
+      isActive: false,
+      visible: hasSuggestions(editor),
+      canExec: hasSuggestions(editor),
+      command: () => {
+        editor.exec(acceptAllSuggestions);
+        cleanupPlaceholders();
+      },
+    },
+    rejectAll: {
+      isActive: false,
+      visible: hasSuggestions(editor),
+      canExec: hasSuggestions(editor),
+      command: () => {
+        editor.exec(rejectAllSuggestions);
+        cleanupPlaceholders();
+      },
     },
   };
 }
@@ -270,6 +333,30 @@ export default function Toolbar() {
       >
         <ImageIcon className="size-5 block" />
       </ImageUploadPopover>
+
+      {items.acceptAll.visible && (
+        <Button
+          pressed={items.acceptAll.isActive}
+          disabled={!items.acceptAll.canExec}
+          onClick={items.acceptAll.command}
+          tooltip="Accept All Suggestions"
+        >
+          <CheckCheck className="size-5 block" />
+          Accept All
+        </Button>
+      )}
+
+      {items.rejectAll.visible && (
+        <Button
+          pressed={items.rejectAll.isActive}
+          disabled={!items.rejectAll.canExec}
+          onClick={items.rejectAll.command}
+          tooltip="Reject All Suggestions"
+        >
+          <X className="size-5 block" />
+          Reject All
+        </Button>
+      )}
     </div>
   );
 }

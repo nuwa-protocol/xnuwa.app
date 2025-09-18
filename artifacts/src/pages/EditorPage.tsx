@@ -1,24 +1,22 @@
 import Editor from '../components/editor';
 import 'prosekit/basic/style.css';
 import 'prosekit/basic/typography.css';
-import {
-    type StreamChunk,
-    type StreamHandle,
-    useNuwaClient,
-} from '@nuwa-ai/ui-kit';
+import { useNuwaClient } from '@nuwa-ai/ui-kit';
 import { createEditor } from 'prosekit/core';
+import {
+    applySuggestion,
+    type TextSuggestion,
+} from 'prosemirror-suggestion-mode';
 import { useMemo, useState } from 'react';
 import { defineExtension } from '@/components/editor/extension';
 import {
     htmlFromMarkdown,
     markdownFromHTML,
 } from '@/components/editor/markdown';
-// NOTE: BlockNote-specific MCP hook is not compatible with ProseMirror/ProseKit
-// import { useNoteMCP } from '../hooks/use-note-mcp';
+import { useNoteMCP } from '../hooks/use-note-mcp';
 
 export default function EditorPage() {
     const [isLoading, setIsLoading] = useState(true);
-    const [streamHandle, setStreamHandle] = useState<StreamHandle | null>(null);
 
     // Create a single ProseKit editor instance
     const editor = useMemo(() => {
@@ -50,8 +48,8 @@ export default function EditorPage() {
         debug: false,
     });
 
-    // TODO: Provide a ProseKit-compatible MCP hook if needed
-    // useNoteMCP(editor as any, nuwaClient);
+    // Start MCP server for Nuwa Client to connect (ProseKit-compatible)
+    useNoteMCP(editor, nuwaClient);
 
     // Get selected plain text from the document
     const getSelectedText = () => {
@@ -92,25 +90,30 @@ export default function EditorPage() {
         }
     };
 
-    const handleTestStream = async () => {
-        const stream = nuwaClient.createAIStream({
-            prompt:
-                'Please write a simple paragraph about AI. Around 100 words. Anything would be fine.',
-        });
-        setStreamHandle(stream);
-        const { result } = await stream.execute({
-            onChunk: (chunk: StreamChunk) => {
-                const text = chunk.content ?? '';
-                if (!text) return;
-                // Insert text at current selection using ProseMirror transaction
-                const { state, view } = editor;
-                const { from, to } = state.selection;
-                const tr = state.tr.insertText(text, from, to);
-                view.dispatch(tr);
+    const handleLoadMockContent = () => {
+        const md = `# ProseMirror Suggestion Demo\n\nThis editor demonstrates suggestion mode features.\nWe will replace certain words and phrases to show how suggestions work.\nYou can accept or reject the changes using the toolbar buttons.\n\n- Cats are wonderful pets.\n- The quick brown fox jumps over the lazy dog.\n- JavaScript is a fun language.`;
+        const html = htmlFromMarkdown(md);
+        editor.setContent(html, 'end');
+    };
+
+    const handleApplyMockSuggestions = () => {
+        const suggestions: TextSuggestion[] = [
+
+            {
+                textToReplace: 'wonderful ',
+                textReplacement: ' ',
+                reason: 'Remove adjective',
             },
-        });
-        console.log(result);
-        setStreamHandle(null);
+            {
+                textToReplace: 'JavaScript',
+                textReplacement: 'TypeScript',
+                reason: 'Use TypeScript',
+            },
+        ] as const;
+
+        for (const s of suggestions) {
+            applySuggestion(editor.view, s as any, 'AI');
+        }
     };
 
     if (isLoading) {
@@ -121,5 +124,27 @@ export default function EditorPage() {
         );
     }
 
-    return <Editor editor={editor} onDocChange={handleOnChange} />;
+    return (
+        <div className="h-screen w-screen flex flex-col max-w-5xl mx-auto bg-white">
+            <div className="flex justify-end gap-2 p-4">
+                <button
+                    type="button"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-2 rounded-md border"
+                    onClick={handleLoadMockContent}
+                >
+                    Load Mock Content
+                </button>
+                <button
+                    type="button"
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                    onClick={handleApplyMockSuggestions}
+                >
+                    Apply Mock Suggestions
+                </button>
+            </div>
+            <div className="flex-1 py-4 px-4">
+                <Editor editor={editor} onDocChange={handleOnChange} />
+            </div>
+        </div>
+    );
 }

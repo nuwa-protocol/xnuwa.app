@@ -1,5 +1,5 @@
 import { defineBasicExtension } from 'prosekit/basic'
-import { union } from 'prosekit/core'
+import { defineMarkSpec, definePlugin, union } from 'prosekit/core'
 import {
   defineCodeBlock,
   defineCodeBlockShiki,
@@ -15,6 +15,11 @@ import {
 import CodeBlockView from './code-block-view'
 import ImageView from './image-view'
 import { defineImageFileHandlers } from './upload-file'
+// Suggestion mode plugin for accept/reject suggestions
+import {
+  suggestionModePlugin,
+  suggestionMarks,
+} from 'prosemirror-suggestion-mode'
 
 export function defineExtension() {
   return union(
@@ -34,6 +39,14 @@ export function defineExtension() {
       component: ImageView satisfies ReactNodeViewComponent,
     }),
     defineImageFileHandlers(),
+    // Add suggestion marks to the schema (spread the spec into top-level fields)
+    defineMarkSpec({ name: 'suggestion_insert', ...(suggestionMarks.suggestion_insert as any) }),
+    defineMarkSpec({ name: 'suggestion_delete', ...(suggestionMarks.suggestion_delete as any) }),
+    // Register suggestion mode plugin (hover menu enabled by default)
+    definePlugin(() => suggestionModePlugin({
+      inSuggestionMode: false, // default off; MCP tools toggle it when needed
+      username: 'AI',
+    })),
   )
 }
 
