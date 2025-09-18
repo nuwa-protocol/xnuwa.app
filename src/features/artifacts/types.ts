@@ -1,6 +1,11 @@
 export type ArtifactSource = {
   id: string;
   url: string;
+  name: string;
+  authorDID: string;
+  description: string;
+  guideline: string;
+  recommendedCapIds: string[];
 };
 
 export type ArtifactPaymentType = 'stream-request' | 'tool-call';

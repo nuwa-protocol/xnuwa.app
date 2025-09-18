@@ -4,6 +4,7 @@ import {
   PencilLine,
   TextQuote,
   Wand2,
+  Square,
 } from 'lucide-react';
 import { useEditor } from 'prosekit/react';
 import { InlinePopover } from 'prosekit/react/inline-popover';
@@ -38,8 +39,14 @@ export default function AiMenu({
   const [aiResult, setAiResult] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  // Keep a reference to the previous complete result so we can restore it on abort
+  const lastResultRef = useRef<string>('');
   const streamAbortRef = useRef<() => void>(() => { });
+  const promptInputRef = useRef<HTMLInputElement | null>(null);
   // Tone controls removed per UX decision
+  // Copy feedback state
+  const [copied, setCopied] = useState(false);
+  const copyTimeoutRef = useRef<number | undefined>(undefined);
 
   // Parent popover closed → close AI popover too
   useEffect(() => {
@@ -62,9 +69,27 @@ export default function AiMenu({
       } catch { }
       setIsStreaming(false);
       setAiError(null);
-      //
+      // Reset to initial state whenever the AI menu is closed by any means
+      setAiResult('');
+      setAiPrompt('');
+      lastResultRef.current = '';
+      // Clear copy feedback
+      if (copyTimeoutRef.current) {
+        window.clearTimeout(copyTimeoutRef.current);
+        copyTimeoutRef.current = undefined;
+      }
+      setCopied(false);
     }
   }, [aiMenuOpen]);
+
+  // Reset copy UI on result/stream changes
+  useEffect(() => {
+    setCopied(false);
+    if (copyTimeoutRef.current) {
+      window.clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = undefined;
+    }
+  }, [aiResult, isStreaming]);
 
   // Utilities for current selection
   const getSelectedText = () => {
@@ -84,29 +109,40 @@ export default function AiMenu({
 
 
   // Build a prompt that targets the current selection
-  const buildPrompt = (action: string, extra?: string) => {
-    const selection = getSelectedText();
+  // Build a prompt that targets provided base text.
+  const buildPrompt = (action: string, extra: string | undefined, baseText: string) => {
     const instruction = extra ? `${action}. ${extra}` : action;
     return [
       'You are a concise writing assistant. Return ONLY the transformed text without commentary, code fences, or backticks.',
       `Task: ${instruction}`,
       'Selection:',
-      selection || '(no selection)',
+      baseText || '(no selection)',
     ].join('\n\n');
   };
 
   //
 
   const runAI = async (instruction: string) => {
+    // Determine the base text: subsequent runs should use the generated content
+    const baseText = aiResult || getSelectedText();
+    lastResultRef.current = aiResult; // snapshot for abort restore
+
     setAiError(null);
     setAiResult('');
     setIsStreaming(true);
-    const prompt = buildPrompt(instruction, aiPrompt.trim());
+
+    // Track local abort intent to avoid surfacing errors and to restore snapshot
+    let aborted = false;
+    const userExtra = aiPrompt.trim();
+    // Clear input immediately so it's ready for next feedback
+    setAiPrompt('');
+    const prompt = buildPrompt(instruction, userExtra, baseText);
 
     try {
       const stream = nuwaClient.createAIStream({ prompt });
       // expose abort if available
       streamAbortRef.current = () => {
+        aborted = true;
         try {
           stream.abort?.();
         } catch { }
@@ -118,15 +154,27 @@ export default function AiMenu({
           setAiResult((prev) => prev + delta);
         },
         onError: (err) => {
+          if (aborted) {
+            // Silently ignore abort errors; we'll restore the snapshot in finally
+            return { content: [], isError: true };
+          }
           setAiError(String(err ?? 'Unknown AI error'));
           setIsStreaming(false);
           return { content: [], isError: true };
         },
       });
     } catch (err) {
-      setAiError(String(err));
+      // Only show when not aborted
+      if (!/aborted/i.test(String(err))) {
+        setAiError(String(err));
+      }
     } finally {
       setIsStreaming(false);
+      // If aborted, return to the last step (restore snapshot, clear error)
+      if (aborted) {
+        setAiError(null);
+        setAiResult(lastResultRef.current);
+      }
     }
   };
 
@@ -161,16 +209,16 @@ export default function AiMenu({
       },
       {
         key: 'expand',
-        label: 'Expand',
+        label: 'Longer',
         description: 'Add helpful detail while keeping the original tone.',
-        instruction: 'Expand with more detail while keeping the style',
+        instruction: 'Make it longer with more detail while keeping the style',
         icon: <PencilLine className="size-4 shrink-0" />,
       },
       {
         key: 'summarize',
-        label: 'Summarize',
+        label: 'Shorter',
         description: 'Produce a short, useful summary of the selection.',
-        instruction: 'Summarize the selection concisely',
+        instruction: 'Shorten the selection while preserving meaning',
         icon: <FileText className="size-4 shrink-0" />,
       },
     ];
@@ -184,7 +232,7 @@ export default function AiMenu({
         open={aiMenuOpen}
         onOpenChange={(open) => onOpenChange(open)}
         data-testid="inline-menu-ai"
-        className="z-10 box-border border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 shadow-lg [&:not([data-state])]:hidden relative flex flex-col w-sm rounded-lg p-4 gap-y-3 items-stretch min-w-72 max-w-md"
+        className="z-10 box-border border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 shadow-lg [&:not([data-state])]:hidden relative flex flex-col rounded-lg p-4 gap-y-3 items-stretch min-w-[560px] max-w-[720px] w-[640px]"
       >
         {aiMenuOpen && (
           <div className="flex flex-col gap-3">
@@ -206,13 +254,19 @@ export default function AiMenu({
             )}
 
             {/* Suggested actions OR post-generation actions */}
-            {aiResult ? (
+            {aiResult && !isStreaming ? (
               <div className="flex flex-wrap gap-2 items-center">
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     replaceSelectionWithText(aiResult);
+                    // Reset state and close; editor now contains the content
+                    setAiPrompt('');
+                    setAiResult('');
+                    setAiError(null);
+                    setIsStreaming(false);
+                    lastResultRef.current = '';
                     onOpenChange(false);
                   }}
                   className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white dark:ring-offset-gray-950 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 bg-green-600 text-white hover:bg-green-700 h-9 px-3"
@@ -223,8 +277,13 @@ export default function AiMenu({
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
+                    // Reset to initial state without applying changes
+                    setAiPrompt('');
                     setAiResult('');
                     setAiError(null);
+                    setIsStreaming(false);
+                    lastResultRef.current = '';
+                    onOpenChange(false);
                   }}
                   className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white dark:ring-offset-gray-950 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 hover:bg-gray-50 dark:hover:bg-gray-900 h-9 px-3"
                 >
@@ -233,34 +292,60 @@ export default function AiMenu({
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => {
-                    navigator.clipboard?.writeText(aiResult).catch(() => { });
+                  onClick={async () => {
+                    // Try modern clipboard API
+                    let ok = false;
+                    try {
+                      await navigator.clipboard.writeText(aiResult);
+                      ok = true;
+                    } catch {
+                      // Fallback to a hidden textarea and execCommand
+                      try {
+                        const ta = document.createElement('textarea');
+                        ta.value = aiResult;
+                        ta.style.position = 'fixed';
+                        ta.style.opacity = '0';
+                        ta.style.pointerEvents = 'none';
+                        document.body.appendChild(ta);
+                        ta.focus();
+                        ta.select();
+                        ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                      } catch {
+                        ok = false;
+                      }
+                    }
+                    if (ok) {
+                      setCopied(true);
+                      if (copyTimeoutRef.current) window.clearTimeout(copyTimeoutRef.current);
+                      copyTimeoutRef.current = window.setTimeout(() => setCopied(false), 1200);
+                    }
                   }}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white dark:ring-offset-gray-950 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 hover:bg-gray-50 dark:hover:bg-gray-900 h-9 px-3"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white dark:ring-offset-gray-950 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 hover:bg-gray-50 dark:hover:bg-gray-900 h-9 px-3 ml-auto"
                   title="Copy to clipboard"
                 >
-                  <ClipboardCheck className="size-4 mr-1" /> Copy
+                  <ClipboardCheck className="size-4 mr-1" /> {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
+              // Compact quick actions; roll horizontally; hidden after first generation
+              <div className="flex items-center gap-2 overflow-x-auto pb-1">
                 {suggestions.map((s) => (
                   <button
                     key={s.key}
                     type="button"
+                    disabled={isStreaming}
                     onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => runAI(s.instruction)}
-                    className="flex w-full items-center justify-between rounded-md border border-gray-200 dark:border-gray-800 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-900 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50"
+                    onClick={() => {
+                      setAiPrompt(s.instruction);
+                      // Focus input so the user can tweak and hit Enter
+                      try { promptInputRef.current?.focus(); } catch {}
+                    }}
+                    className="inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 hover:bg-gray-50 dark:hover:bg-gray-900 h-8 px-2 text-xs disabled:opacity-50"
+                    title={s.description}
                   >
-                    <div className="flex items-center gap-2">
-                      {s.icon}
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">{s.label}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {s.description}
-                        </span>
-                      </div>
-                    </div>
+                    {s.icon}
+                    <span>{s.label}</span>
                   </button>
                 ))}
               </div>
@@ -276,33 +361,39 @@ export default function AiMenu({
                     e.preventDefault();
                     if (!isStreaming) {
                       runAI(
-                        'Follow the instruction to transform the selection',
+                        aiResult
+                          ? 'Update the generated text based on this instruction'
+                          : 'Follow the instruction to transform the selection',
                       );
                     }
                   }
                 }}
-                placeholder="Ask AI about the selection…"
+                placeholder={
+                  aiResult ? 'Provide feedback about the generated content…' : 'Ask AI about the selection…'
+                }
                 className="flex h-9 rounded-md w-full bg-white dark:bg-gray-950 pl-3 pr-28 py-2 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-500 transition border box-border border-gray-200 dark:border-gray-800 border-solid ring-0 ring-transparent focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-0 outline-hidden focus-visible:outline-hidden file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={isStreaming}
+                ref={promptInputRef}
               />
-              <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500 dark:text-gray-400">
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                 {isStreaming ? (
-                  <span>Generating…</span>
+                  <>
+                    <span>Generating…</span>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => streamAbortRef.current?.()}
+                      className="inline-flex items-center gap-1 rounded border border-gray-300 dark:border-gray-700 px-2 py-0.5 hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300"
+                    >
+                      <Square className="size-3" /> Abort
+                    </button>
+                  </>
                 ) : (
                   <span>
                     Press <kbd className="rounded border border-gray-300 dark:border-gray-700 px-1">Enter</kbd>
                   </span>
                 )}
               </div>
-              {isStreaming && (
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => streamAbortRef.current?.()}
-                  className="absolute right-2 -bottom-8 text-xs text-gray-600 dark:text-gray-300 hover:underline"
-                >
-                  Stop
-                </button>
-              )}
             </div>
           </div>
         )}
