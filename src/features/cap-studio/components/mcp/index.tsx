@@ -8,7 +8,7 @@ export function MCPDebug() {
   const mcpUIUrl = searchParams.get('mcpui');
 
   return (
-    <DashboardLayout className="max-w-full">
+    <DashboardLayout className="max-w-full p-0">
       <Mcp mcpServerUrl={mcpServerUrl} mcpUIUrl={mcpUIUrl} />
     </DashboardLayout>
   );

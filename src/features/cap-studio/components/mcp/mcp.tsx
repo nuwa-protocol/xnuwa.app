@@ -70,6 +70,15 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   const [isCallingTool, setIsCallingTool] = useState(false);
   const [showUIPreview, setShowUIPreview] = useState(false);
   const [penpalConnected, setPenpalConnected] = useState(false);
+  // Hold the latest tool execution result for quick inspection
+  const [lastToolResult, setLastToolResult] = useState<
+    | {
+        tool: string;
+        result: any;
+        timestamp: number;
+      }
+    | null
+  >(null);
 
   const pushLog = useCallback((entry: Omit<LogEntry, 'id' | 'timestamp'>) => {
     setLogs((prev) =>
@@ -296,6 +305,8 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
       // Clear logs
       setLogs([]);
+      // Clear last tool result
+      setLastToolResult(null);
 
       pushLog({
         type: 'info',
@@ -359,6 +370,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
         copyable: true,
       });
 
+      // Save the last tool result for dedicated display panel
+      setLastToolResult({ tool: toolName, result, timestamp: Date.now() });
+
       pushLog({
         type: 'success',
         message: `✅ Tool ${toolName} executed successfully`,
@@ -419,11 +433,32 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
     }
   };
 
+  const copyLastResult = async () => {
+    if (!lastToolResult) return;
+    try {
+      const text = JSON.stringify(lastToolResult.result, null, 2);
+      await navigator.clipboard.writeText(text);
+      toast.success('Tool result copied to clipboard');
+    } catch (error) {
+      toast.error('Failed to copy tool result to clipboard');
+    }
+  };
+
+  const clearLastResult = () => setLastToolResult(null);
+
   return (
     <div
-      className={`flex gap-6 ${mcpType === 'Artifact MCP' ? '' : 'max-w-3xl mx-auto'}`}
+      className={`flex gap-6 ${
+        // In Artifact MCP mode, lock the layout to the viewport height so only the left pane scrolls
+        mcpType === 'Artifact MCP' ? 'h-screen' : 'max-w-3xl mx-auto'
+        }`}
     >
-      <div className="flex-1 space-y-6">
+      <div
+        className={`flex-1 space-y-6 p-8 ${
+          // Make the left pane the only scroll container in Artifact MCP mode
+          mcpType === 'Artifact MCP' ? 'overflow-y-auto min-h-0 pr-2' : ''
+          }`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -717,6 +752,42 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
           </Card>
         )}
 
+        {/* Tool Execution Result */}
+        {connected && lastToolResult && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base flex items-center">
+                    <Terminal className="h-4 w-4 mr-2" />
+                    Tool Result
+                  </CardTitle>
+                  <CardDescription>
+                    Last execution: {lastToolResult.tool} ·{' '}
+                    {new Date(lastToolResult.timestamp).toLocaleTimeString()}
+                  </CardDescription>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button variant="ghost" size="sm" onClick={copyLastResult}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={clearLastResult}>
+                    <BrushCleaning className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Use a simple div so both axes can scroll without touching shared ScrollArea */}
+              <div className="h-64 w-full rounded-md border bg-muted/30 p-4 overflow-auto">
+                <pre className="text-xs font-mono whitespace-pre leading-snug">
+                  {JSON.stringify(lastToolResult.result, null, 2)}
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Debug Logs */}
         <Card>
           <CardHeader>
@@ -794,13 +865,16 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                           {new Date(log.timestamp).toLocaleTimeString()}
                         </span>
                         <span className="mt-0.5">{getLogIcon(log.type)}</span>
-                        <div className="flex-1 flex items-start justify-between">
-                          <span
-                            className={`${getLogColor(log.type)} flex-1 break-words ${log.type === 'result' ? 'font-mono text-xs' : ''
-                              }`}
-                          >
-                            {log.message}
-                          </span>
+                        <div className="flex-1 min-w-0 flex items-start justify-between gap-2">
+                          {/* Wrap long logs automatically across lines */}
+                          <div className="flex-1 min-w-0">
+                            <span
+                              className={`${getLogColor(log.type)} ${log.type === 'result' ? 'font-mono text-xs' : ''
+                                } whitespace-pre-wrap break-words leading-snug`}
+                            >
+                              {log.message}
+                            </span>
+                          </div>
                           {log.copyable && (
                             <Button
                               variant="ghost"
@@ -824,12 +898,12 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
       {/* UI Preview - Right Side Panel */}
       {mcpType === 'Artifact MCP' && (
-        <div className="w-2/3">
+        <div className="w-1/2 h-screen sticky top-0 self-start">
           <Card className="h-full border-none shadow-none">
             <CardHeader>
               <CardTitle className="sr-only">UI Preview</CardTitle>
             </CardHeader>
-            <CardContent className="w-full h-full max-h-screen bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden">
+            <CardContent className="flex-1 min-h-0 w-full bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden">
               {url && showUIPreview ? (
                 <CapUIRenderer
                   srcUrl={url}
