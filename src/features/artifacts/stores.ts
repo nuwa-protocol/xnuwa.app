@@ -1,47 +1,49 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createArtifactsPersistConfig } from '@/shared/storage/indexeddb-config';
-import type { Artifact, ArtifactPayment } from './types';
+import type { ArtifactPayment, ArtifactSession } from './types';
 
 interface ArtifactsState {
-  artifacts: Record<string, Artifact>;
+  artifactSessions: Record<string, ArtifactSession>;
 
   // Actions
-  addArtifact: (artifact: Artifact) => void;
-  updateArtifact: (id: string, updates: Partial<Artifact>) => void;
-  removeArtifact: (id: string) => void;
-  getArtifact: (id: string) => Artifact | undefined;
-  getArtifactsBySource: (sourceId: string) => Artifact[];
-  getAllArtifacts: () => Artifact[];
-  clearArtifacts: () => void;
+  addArtifactSession: (artifactSession: ArtifactSession) => void;
+  updateArtifactSession: (
+    id: string,
+    updates: Partial<ArtifactSession>,
+  ) => void;
+  removeArtifactSession: (id: string) => void;
+  getArtifactSession: (id: string) => ArtifactSession | undefined;
+  getAllArtifactSessions: () => ArtifactSession[];
+  clearArtifactSessions: () => void;
   addPaymentCtxIdToArtifactSession: (
     id: string,
     payment: ArtifactPayment,
   ) => void;
 }
 
-export const useArtifactsStore = create<ArtifactsState>()(
+export const ArtifactSessionsStore = create<ArtifactsState>()(
   persist(
     (set, get) => ({
-      artifacts: {},
+      artifactSessions: {},
 
-      addArtifact: (artifact) => {
+      addArtifactSession: (artifactSession) => {
         set((state) => ({
-          artifacts: {
-            ...state.artifacts,
-            [artifact.id]: artifact,
+          artifactSessions: {
+            ...state.artifactSessions,
+            [artifactSession.id]: artifactSession,
           },
         }));
       },
 
-      updateArtifact: (id, updates) => {
+      updateArtifactSession: (id, updates) => {
         set((state) => {
-          const existingArtifact = state.artifacts[id];
+          const existingArtifact = state.artifactSessions[id];
           if (!existingArtifact) return state;
 
           return {
-            artifacts: {
-              ...state.artifacts,
+            artifactSessions: {
+              ...state.artifactSessions,
               [id]: {
                 ...existingArtifact,
                 ...updates,
@@ -52,48 +54,44 @@ export const useArtifactsStore = create<ArtifactsState>()(
         });
       },
 
-      removeArtifact: (id) => {
+      removeArtifactSession: (id) => {
         set((state) => {
-          const { [id]: removed, ...rest } = state.artifacts;
-          return { artifacts: rest };
+          const { [id]: removed, ...rest } = state.artifactSessions;
+          return { artifactSessions: rest };
         });
       },
 
-      getArtifact: (id) => {
-        return get().artifacts[id];
+      getArtifactSession: (id) => {
+        return get().artifactSessions[id];
       },
 
-      getArtifactsBySource: (sourceId) => {
-        const artifacts = get().artifacts;
-        return Object.values(artifacts).filter(
-          (artifact) => artifact.source.id === sourceId,
-        );
-      },
-
-      getAllArtifacts: () => {
-        return Object.values(get().artifacts);
+      getAllArtifactSessions: () => {
+        return Object.values(get().artifactSessions);
       },
 
       addPaymentCtxIdToArtifactSession: (id, payment) => {
         set((state) => {
-          const artifact = state.artifacts[id];
-          if (!artifact) return state;
+          const artifactSession = state.artifactSessions[id];
+          if (!artifactSession) return state;
           return {
-            artifacts: {
-              ...state.artifacts,
-              [id]: { ...artifact, payments: [...artifact.payments, payment] },
+            artifactSessions: {
+              ...state.artifactSessions,
+              [id]: {
+                ...artifactSession,
+                payments: [...artifactSession.payments, payment],
+              },
             },
           };
         });
       },
 
-      clearArtifacts: () => {
-        set({ artifacts: {} });
+      clearArtifactSessions: () => {
+        set({ artifactSessions: {} });
       },
     }),
     createArtifactsPersistConfig({
       name: 'artifacts-store',
-      partialize: (state) => ({ artifacts: state.artifacts }),
+      partialize: (state) => ({ artifactSessions: state.artifactSessions }),
     }),
   ),
 );

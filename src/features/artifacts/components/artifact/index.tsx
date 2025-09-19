@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { useEffect } from 'react';
-import { ArtifactChat } from './artifact-chat';
 import { useSidebarStore } from '@/features/sidebar/stores';
 import {
     ResizableHandle,
@@ -9,6 +8,7 @@ import {
 } from '@/shared/components/ui/resizable';
 import { useArtifactPage } from '../../hooks/use-artifact-page';
 import { Artifact } from './artifact';
+import { ArtifactChat } from './artifact-chat';
 
 export const ArtifactMain = () => {
     const { setMode } = useSidebarStore();
@@ -18,11 +18,15 @@ export const ArtifactMain = () => {
         setMode('floating');
     }, [setMode]);
 
+    if (!artifactId) {
+        return <div>Initializing artifact...</div>;
+    }
+
     return (
         <div className="flex w-full h-full">
             <ResizablePanelGroup direction="horizontal">
                 <ResizablePanel defaultSize={35} minSize={20}>
-                    <ArtifactChat />
+                    <ArtifactChat artifactId={artifactId} />
                 </ResizablePanel>
                 <ResizableHandle withHandle className="h-4 my-auto" />
                 <ResizablePanel

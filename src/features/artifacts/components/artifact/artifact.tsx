@@ -8,7 +8,7 @@ type ArtifactProps = {
 
 export const Artifact = ({ artifactId }: ArtifactProps) => {
   const {
-    artifact,
+    artifactSession,
     hasConnectionError,
     isProcessingAIRequest,
     saveStatus,
@@ -23,14 +23,14 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
     handleAbortStream,
   } = useArtifact(artifactId);
 
-  if (!artifact) {
+  if (!artifactSession) {
     return <div>Artifact not found</div>;
   }
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       {/* Header */}
       <ArtifactHeader
-        title={artifact.title}
+        title={artifactSession.title}
         hasConnectionError={hasConnectionError}
         isProcessingAIRequest={isProcessingAIRequest}
         saveStatus={saveStatus}
@@ -38,8 +38,8 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
       <div className="min-h-0 flex-1 overflow-hidden">
         <CapUIRenderer
           key={artifactId}
-          srcUrl={artifact.source.url}
-          title={artifact.title}
+          srcUrl={artifactSession.artifact.core.source}
+          title={artifactSession.title}
           artifact={true}
           onSendPrompt={handleSendPrompt}
           onAddSelection={handleAddSelection}

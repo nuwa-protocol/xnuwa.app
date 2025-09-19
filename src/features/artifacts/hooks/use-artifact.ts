@@ -11,7 +11,7 @@ import { CurrentArtifactMCPToolsStore } from '@/shared/stores/current-artifact-s
 import { generateUUID } from '@/shared/utils';
 import { ChatErrorCode, handleError } from '@/shared/utils/handl-error';
 import { CreateAIStream } from '../services';
-import { useArtifactsStore } from '../stores';
+import { ArtifactSessionsStore } from '../stores';
 
 // Saving status for artifact state persistence
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -21,7 +21,7 @@ export const useArtifact = (artifactId: string) => {
   const { addSelectionToChatSession } = ChatSessionsStore();
   const { chat } = useChatContext();
   const { sendMessage, status } = useChat({ chat });
-  const { getArtifact, updateArtifact } = useArtifactsStore();
+  const { getArtifactSession, updateArtifactSession } = ArtifactSessionsStore();
   const { setTools, clearTools } = CurrentArtifactMCPToolsStore();
   const [hasConnectionError, setHasConnectionError] = useState<boolean>(false);
   const streamMap = useRef(new Map<string, { aborted: boolean }>()); // track streams
@@ -54,7 +54,7 @@ export const useArtifact = (artifactId: string) => {
   // Debounced persist function to avoid excessive writes
   const debouncedPersist = useDebounceCallback((state: any) => {
     try {
-      updateArtifact(artifactId, { state });
+      updateArtifactSession(artifactId, { state });
       setSaveStatus('saved');
     } catch (e) {
       console.error('Failed to save artifact state', e);
@@ -73,9 +73,9 @@ export const useArtifact = (artifactId: string) => {
 
   // Get state from store instead of localStorage
   const handleGetState = useCallback(() => {
-    const currentArtifact = getArtifact(artifactId);
+    const currentArtifact = getArtifactSession(artifactId);
     return currentArtifact?.state || null;
-  }, [artifactId, getArtifact]);
+  }, [artifactId, getArtifactSession]);
 
   // Set artifact mcp tools to the global store
   const handleMCPConnected = useCallback(
@@ -178,10 +178,10 @@ export const useArtifact = (artifactId: string) => {
   }, []);
 
   // Get artifact from store
-  const artifact = getArtifact(artifactId);
+  const artifactSession = getArtifactSession(artifactId);
 
   return {
-    artifact,
+    artifactSession,
     hasConnectionError,
     isProcessingAIRequest: streamMap.current.size > 0,
     saveStatus,

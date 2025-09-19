@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useArtifactsStore } from '@/features/artifacts/stores';
+import { ArtifactSessionsStore } from '@/features/artifacts/stores';
 import { Button } from '@/shared/components/ui/button';
 import {
   Card,
@@ -48,14 +48,14 @@ function getHostname(url: string): string {
 
 export default function Artifacts() {
   const navigate = useNavigate();
-  const { getAllArtifacts } = useArtifactsStore();
+  const { getAllArtifactSessions } = ArtifactSessionsStore();
 
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortKey>('updatedAt');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const artifacts = useMemo(() => {
-    const list = getAllArtifacts();
+    const list = getAllArtifactSessions();
     const filtered = query
       ? list.filter((a) => a.title.toLowerCase().includes(query.toLowerCase()))
       : list;
@@ -69,7 +69,7 @@ export default function Artifacts() {
       return sortOrder === 'asc' ? cmp : -cmp;
     });
     return sorted;
-  }, [getAllArtifacts, query, sortBy, sortOrder]);
+  }, [getAllArtifactSessions, query, sortBy, sortOrder]);
 
   const handleOpen = (id: string) => {
     navigate(`/artifact?artifact_id=${id}`);
@@ -168,7 +168,7 @@ export default function Artifacts() {
                     </CardTitle>
                     <CardDescription className="flex items-center gap-2">
                       <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs">
-                        {getHostname(a.source.url)}
+                        {getHostname(a.artifact.core.source)}
                       </span>
                       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock className="size-3" /> Updated{' '}

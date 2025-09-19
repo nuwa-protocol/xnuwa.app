@@ -6,7 +6,7 @@ import { CapResolve } from '@/shared/services/cap-resolve';
 import { llmProvider } from '@/shared/services/llm-providers';
 import { generateUUID } from '@/shared/utils';
 import { useCapStore } from '../cap-store/stores';
-import { useArtifactsStore } from './stores';
+import { ArtifactSessionsStore } from './stores';
 
 // Handle AI request from artifact
 export const CreateAIStream = async ({
@@ -33,7 +33,7 @@ export const CreateAIStream = async ({
     'X-Client-Tx-Ref': paymentCtxId,
   };
 
-  const { addPaymentCtxIdToArtifactSession } = useArtifactsStore.getState();
+  const { addPaymentCtxIdToArtifactSession } = ArtifactSessionsStore.getState();
   await addPaymentCtxIdToArtifactSession(artifactId, {
     type: 'stream-request',
     ctxId: paymentCtxId,

@@ -1,38 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { generateUUID } from '@/shared/utils';
-import { useArtifactsStore } from '../stores';
-
-const mock_artifact_source_id = '123';
-const mock_artifact_source_url = 'http://localhost:3000/editor';
-const mock_artifact_title = 'Note Editor';
+import { NoteArtifact } from '../mock-artifact';
+import { ArtifactSessionsStore } from '../stores';
 
 export const useArtifactPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { getArtifact, addArtifact } = useArtifactsStore();
+  const { getArtifactSession, addArtifactSession } = ArtifactSessionsStore();
   const [artifactId, setArtifactId] = useState<string | null>(null);
 
   useEffect(() => {
     const artifactUrlId = searchParams.get('artifact_id');
     // if the url contains artifact_id, check if it exists in the store
-    if (artifactUrlId && getArtifact(artifactUrlId)) {
+    if (artifactUrlId && getArtifactSession(artifactUrlId)) {
       setArtifactId(artifactUrlId);
     } else {
       // otherwise create a new artifact
       const newArtifactId = generateUUID();
-      const newArtifact = {
+      const newArtifactSession = {
         id: newArtifactId,
-        title: mock_artifact_title,
-        source: {
-          id: mock_artifact_source_id,
-          url: mock_artifact_source_url,
-        },
+        title: 'Untitled Note',
+        artifact: NoteArtifact,
         state: null,
         createdAt: Date.now(),
         updatedAt: Date.now(),
         payments: [],
       };
-      addArtifact(newArtifact);
+      addArtifactSession(newArtifactSession);
       const newSearchParams = new URLSearchParams(searchParams);
       newSearchParams.set('artifact_id', newArtifactId);
       setSearchParams(newSearchParams);
