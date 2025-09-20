@@ -73,10 +73,10 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   // Hold the latest tool execution result for quick inspection
   const [lastToolResult, setLastToolResult] = useState<
     | {
-        tool: string;
-        result: any;
-        timestamp: number;
-      }
+      tool: string;
+      result: any;
+      timestamp: number;
+    }
     | null
   >(null);
 
@@ -903,7 +903,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
             <CardHeader>
               <CardTitle className="sr-only">UI Preview</CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 min-h-0 w-full bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden">
+            <CardContent className="flex-1 min-h-0 w-full bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden p-0">
               {url && showUIPreview ? (
                 <CapUIRenderer
                   srcUrl={url}
