@@ -188,15 +188,15 @@ export class ArtifactsStorage implements StateStorage {
 
       if (records.length === 0) return null;
 
-      // Convert records back to artifacts format (id -> artifact map)
-      const artifacts: Record<string, any> = {};
+      // Convert records back to artifactSessions format expected by the zustand store
+      const artifactSessions: Record<string, any> = {};
       records.forEach((record) => {
-        artifacts[record.id] = record.data;
+        artifactSessions[record.id] = record.data;
       });
 
-      // Return in zustand persist format: { state: { artifacts: ... }, version: 0 }
+      // Return in zustand persist format: { state: { artifactSessions: ... }, version: 0 }
       return JSON.stringify({
-        state: { artifacts },
+        state: { artifactSessions },
         version: 0,
       });
     } catch (error) {
@@ -214,18 +214,20 @@ export class ArtifactsStorage implements StateStorage {
 
       const parsedData = JSON.parse(value);
 
-      // Handle zustand persist wrapper format: { state: { artifacts: ... }, version: 0 }
-      const artifacts = parsedData.state?.artifacts || parsedData.artifacts;
+      // Handle zustand persist wrapper format: { state: { artifactSessions: ... }, version: 0 }
+      // Note: fall back to top-level as a safeguard during migrations
+      const artifactSessions =
+        parsedData.state?.artifactSessions || parsedData.artifactSessions;
 
-      if (!artifacts || Object.keys(artifacts).length === 0) {
+      if (!artifactSessions || Object.keys(artifactSessions).length === 0) {
         return;
       }
 
       // Clear existing artifacts for this DID
       await db.artifacts.where('did').equals(did).delete();
 
-      // Save each artifact as a separate record
-      const records: ArtifactRecord[] = Object.entries(artifacts).map(
+      // Save each artifact session as a separate record (still stored in the `artifacts` table)
+      const records: ArtifactRecord[] = Object.entries(artifactSessions).map(
         ([id, data]) => ({
           id,
           did,
