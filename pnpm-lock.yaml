@@ -42,8 +42,8 @@ importers:
         specifier: ^0.5.16
         version: 0.5.16(express@5.1.0)(react@19.1.1)(typescript@5.8.3)
       '@nuwa-ai/ui-kit':
-        specifier: ^0.5.7
-        version: 0.5.7(react@19.1.1)
+        specifier: /Users/haichao/code/nuwa/nuwa-kit/typescript/packages/ui-kit
+        version: link:../nuwa/nuwa-kit/typescript/packages/ui-kit
       '@openrouter/ai-sdk-provider':
         specifier: ^1.2.0
         version: 1.2.0(ai@5.0.44(zod@3.25.76))(zod@3.25.76)
@@ -1194,11 +1194,6 @@ packages:
         optional: true
       pg:
         optional: true
-
-  '@nuwa-ai/ui-kit@0.5.7':
-    resolution: {integrity: sha512-nrpVhvqYciBOlR+uNCeAVEWfXdIq7d7e7Q8zD+S83Zp8jkihHTlViKWUlVX1Os2jNeGk9/2nx6yP2S96aN0Q8w==}
-    peerDependencies:
-      react: '>=16.8.0'
 
   '@openrouter/ai-sdk-provider@1.2.0':
     resolution: {integrity: sha512-stuIwq7Yb7DNmk3GuCtz+oS3nZOY4TXEV3V5KsknDGQN7Fpu3KRMQVWRc1J073xKdf0FC9EHOctSyzsACmp5Ag==}
@@ -8891,14 +8886,6 @@ snapshots:
       - supports-color
       - sury
       - typescript
-
-  '@nuwa-ai/ui-kit@0.5.7(react@19.1.1)':
-    dependencies:
-      '@modelcontextprotocol/sdk': 1.18.0
-      penpal: 7.0.4
-      react: 19.1.1
-    transitivePeerDependencies:
-      - supports-color
 
   '@openrouter/ai-sdk-provider@1.2.0(ai@5.0.44(zod@3.25.76))(zod@3.25.76)':
     dependencies:

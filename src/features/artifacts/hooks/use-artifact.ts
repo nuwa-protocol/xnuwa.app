@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useChatContext } from '@/features/chat/contexts/chat-context';
 import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
-import type { ChildStreamMethods } from '@/shared/hooks/use-cap-ui-render';
+import type { ChildMethods } from '@/shared/hooks/use-cap-ui-render';
 import { useDebounceCallback } from '@/shared/hooks/use-debounce-callback';
 import { CurrentArtifactMCPToolsStore } from '@/shared/stores/current-artifact-store';
 import { generateUUID } from '@/shared/utils';
@@ -106,11 +106,7 @@ export const useArtifact = (artifactId: string) => {
 
   // Handle stream request
   const handleStreamRequest = useCallback(
-    async (
-      request: StreamAIRequest,
-      streamId: string,
-      child: ChildStreamMethods,
-    ) => {
+    async (request: StreamAIRequest, streamId: string, child: ChildMethods) => {
       streamMap.current.set(streamId, { aborted: false });
       try {
         const { textStream } = await CreateAIStream({

@@ -3,7 +3,7 @@ import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { TextShimmer } from '@/shared/components/ui/text-shimmer';
 import {
-  type ChildStreamMethods,
+  type ChildMethods,
   useCapUIRender,
 } from '@/shared/hooks/use-cap-ui-render';
 
@@ -89,7 +89,7 @@ export type CapUIRendererProps = {
   onStreamRequest?: (
     request: StreamAIRequest,
     streamId: string,
-    child: ChildStreamMethods,
+    child: ChildMethods,
   ) => void;
   onAbortStream?: (streamId: string) => void;
   onPenpalConnected?: () => void;
