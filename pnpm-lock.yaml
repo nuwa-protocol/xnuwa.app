@@ -42,8 +42,8 @@ importers:
         specifier: ^0.5.16
         version: 0.5.16(express@5.1.0)(react@19.1.1)(typescript@5.8.3)
       '@nuwa-ai/ui-kit':
-        specifier: /Users/haichao/code/nuwa/nuwa-kit/typescript/packages/ui-kit
-        version: link:../nuwa/nuwa-kit/typescript/packages/ui-kit
+        specifier: ^0.5.8
+        version: 0.5.8(react@19.1.1)
       '@openrouter/ai-sdk-provider':
         specifier: ^1.2.0
         version: 1.2.0(ai@5.0.44(zod@3.25.76))(zod@3.25.76)
@@ -1096,6 +1096,10 @@ packages:
     resolution: {integrity: sha512-JvKyB6YwS3quM+88JPR0axeRgvdDu3Pv6mdZUy+w4qVkCzGgumb9bXG/TmtDRQv+671yaofVfXSQmFLlWU5qPQ==}
     engines: {node: '>=18'}
 
+  '@modelcontextprotocol/sdk@1.18.1':
+    resolution: {integrity: sha512-d//GE8/Yh7aC3e7p+kZG8JqqEAwwDUmAfvH1quogtbk+ksS6E0RR6toKKESPYYZVre0meqkJb27zb+dhqE9Sgw==}
+    engines: {node: '>=18'}
+
   '@msgpack/msgpack@3.1.2':
     resolution: {integrity: sha512-JEW4DEtBzfe8HvUYecLU9e6+XJnKDlUAIve8FvPzF3Kzs6Xo/KuZkZJsDH0wJXl/qEZbeeE7edxDNY3kMs39hQ==}
     engines: {node: '>= 18'}
@@ -1194,6 +1198,11 @@ packages:
         optional: true
       pg:
         optional: true
+
+  '@nuwa-ai/ui-kit@0.5.8':
+    resolution: {integrity: sha512-i1aIlCLrUzmFzXpQrO1Ch+S6Y6L6RLW5C+EfSeOl8m9yHxLmAKQ08zG0y58RpApwrajonyEHLKrKWW8LcPTZEQ==}
+    peerDependencies:
+      react: '>=16.8.0'
 
   '@openrouter/ai-sdk-provider@1.2.0':
     resolution: {integrity: sha512-stuIwq7Yb7DNmk3GuCtz+oS3nZOY4TXEV3V5KsknDGQN7Fpu3KRMQVWRc1J073xKdf0FC9EHOctSyzsACmp5Ag==}
@@ -8766,6 +8775,23 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@modelcontextprotocol/sdk@1.18.1':
+    dependencies:
+      ajv: 6.12.6
+      content-type: 1.0.5
+      cors: 2.8.5
+      cross-spawn: 7.0.6
+      eventsource: 3.0.7
+      eventsource-parser: 3.0.6
+      express: 5.1.0
+      express-rate-limit: 7.5.1(express@5.1.0)
+      pkce-challenge: 5.0.0
+      raw-body: 3.0.1
+      zod: 3.25.76
+      zod-to-json-schema: 3.24.6(zod@3.25.76)
+    transitivePeerDependencies:
+      - supports-color
+
   '@msgpack/msgpack@3.1.2': {}
 
   '@mysten/bcs@1.0.4':
@@ -8886,6 +8912,14 @@ snapshots:
       - supports-color
       - sury
       - typescript
+
+  '@nuwa-ai/ui-kit@0.5.8(react@19.1.1)':
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.18.1
+      penpal: 7.0.4
+      react: 19.1.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@openrouter/ai-sdk-provider@1.2.0(ai@5.0.44(zod@3.25.76))(zod@3.25.76)':
     dependencies:
