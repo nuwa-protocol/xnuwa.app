@@ -24,7 +24,7 @@ export interface ChatSession {
   updatedAt: number;
   messages: UIMessage[];
   payments: ChatPayment[];
-  caps: Cap[];
+  cap: Cap;
   selections?: ChatSelection[];
   pinned?: boolean;
 }

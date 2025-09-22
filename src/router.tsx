@@ -3,7 +3,6 @@ import ChatLayout from './layout/chat-layout';
 import MainLayout from './layout/main-layout';
 import RootLayout from './layout/root-layout';
 import ArtifactPage from './pages/artifact';
-import ArtifactsPage from './pages/artifacts';
 import CallbackPage from './pages/callback';
 import CapStudioPage from './pages/cap-studio';
 import CapStudioBatchCreatePage from './pages/cap-studio-batch-create';
@@ -36,7 +35,6 @@ const router = createBrowserRouter([
               { path: 'artifact', element: <ArtifactPage /> },
             ],
           },
-          { path: 'artifacts', element: <ArtifactsPage /> },
           { path: 'wallet', element: <WalletPage /> },
           { path: 'settings', element: <SettingsPage /> },
           { path: 'explore/*', element: <ExplorePage /> },

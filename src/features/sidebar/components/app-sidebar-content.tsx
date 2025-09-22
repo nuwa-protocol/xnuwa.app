@@ -1,11 +1,4 @@
-import {
-  File,
-  Loader2,
-  Settings2,
-  SparklesIcon,
-  WalletIcon,
-  Wrench,
-} from 'lucide-react';
+import { Loader2, Settings2, SparklesIcon, WalletIcon, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WalletStore } from '@/features/wallet/stores';
 import { Logo } from '@/shared/components';
@@ -104,15 +97,6 @@ export function AppSidebarContent() {
               href="/explore"
               variant="secondary"
             />
-
-            {isDevMode && (
-              <SidebarButton
-                icon={File}
-                text={'Artifacts'}
-                href="/artifacts"
-                variant="secondary"
-              />
-            )}
 
             {isDevMode && (
               <SidebarButton
