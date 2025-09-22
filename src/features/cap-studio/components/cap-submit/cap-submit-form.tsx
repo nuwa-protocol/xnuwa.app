@@ -1,4 +1,9 @@
-import { Image as ImageIcon, Loader2, Upload } from 'lucide-react';
+import {
+  ExternalLink,
+  Image as ImageIcon,
+  Loader2,
+  Upload,
+} from 'lucide-react';
 import {
   Button,
   Card,
@@ -9,6 +14,7 @@ import {
 } from '@/shared/components/ui';
 import { useSubmitForm } from '../../hooks';
 import type { LocalCap } from '../../types';
+import { Markdown } from '@/shared/components/markdown';
 
 interface CapSubmitFormProps {
   cap: LocalCap;
@@ -58,12 +64,6 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
           </div>
           <div>
             <div className="text-sm font-medium text-muted-foreground">
-              Description
-            </div>
-            <p className="text-sm">{cap.capData.metadata.description}</p>
-          </div>
-          <div>
-            <div className="text-sm font-medium text-muted-foreground">
               Tags
             </div>
             <div className="flex flex-wrap gap-1 mt-1">
@@ -99,7 +99,7 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
             </div>
             <div>
               <div className="text-sm font-medium text-muted-foreground">
-                Remote MCP
+                MCP Servers
               </div>
               <p className="text-sm">
                 {Object.keys(cap.capData.core.mcpServers).length > 0
@@ -108,6 +108,60 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
               </p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Readme - Description moved to its own section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Readme</CardTitle>
+          <CardDescription>Details and usage of your cap</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {(cap.capData.metadata.description ?? '').trim().length > 0 ? (
+            <div className="prose dark:prose-invert max-w-none">
+              <Markdown>{cap.capData.metadata.description}</Markdown>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No description</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Artifact - Read Only */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Artifact</CardTitle>
+          <CardDescription>
+            This artifact provides interactive UI for your cap
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {cap.capData.core.artifact?.srcUrl ? (
+            <div className="flex items-center justify-between">
+              <div className="text-sm">
+                <div className="text-muted-foreground">Source URL</div>
+                <a
+                  href={cap.capData.core.artifact.srcUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary hover:underline break-all"
+                >
+                  {cap.capData.core.artifact.srcUrl}
+                </a>
+              </div>
+              <a
+                href={cap.capData.core.artifact.srcUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center text-sm text-primary hover:underline"
+              >
+                <ExternalLink className="h-4 w-4 mr-1" /> Visit
+              </a>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No artifact provided</p>
+          )}
         </CardContent>
       </Card>
 
