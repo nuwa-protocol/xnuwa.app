@@ -62,7 +62,7 @@ export function Title({
       ) : (
         <button
           type="button"
-          className={cn("w-full truncate text-center text-sm px-2 py-1 rounded-lg font-medium text-foreground/90 hover:bg-accent md:text-base", className)}
+          className={cn("w-full  text-center text-sm px-2 py-1 rounded-lg font-medium text-foreground/90 hover:bg-accent md:text-base", className)}
           onClick={() => {
             setSnapshot(localTitle);
             setIsEditing(true);
@@ -70,7 +70,9 @@ export function Title({
           title="Click to edit title"
           aria-label="Title. Click to edit."
         >
-          {localTitle}
+          <span className='line-clamp-1'>
+            {localTitle}
+          </span>
         </button>)}
     </div>
   );

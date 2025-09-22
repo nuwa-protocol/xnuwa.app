@@ -1,13 +1,7 @@
-import { ChevronDown, EditIcon, FilePlusIcon } from 'lucide-react';
+import { EditIcon } from 'lucide-react';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  useSidebar,
-} from '@/shared/components/ui';
+import { useSidebar } from '@/shared/components/ui';
 import { useDevMode } from '@/shared/hooks';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { cn } from '@/shared/utils';
@@ -114,7 +108,7 @@ export function SidebarNewButton() {
 
       {/* Dropdown trigger (right segment) */}
 
-      {isDevMode && (
+      {/* {isDevMode && (
         <DropdownMenu
           modal={true}
           open={menuOpen}
@@ -157,7 +151,7 @@ export function SidebarNewButton() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )}
+      )} */}
     </div>
   );
 }

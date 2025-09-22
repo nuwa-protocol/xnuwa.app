@@ -5,18 +5,23 @@ import type { UIMessage } from 'ai';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createChatSessionsPersistConfig } from '@/shared/storage';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import type { Cap } from '@/shared/types';
 import type { ChatPayment, ChatSelection, ChatSession } from '../types';
 
 // ================= Constants ================= //
-export const createInitialChatSession = (chatId: string): ChatSession => ({
-  id: chatId,
-  title: 'New Chat',
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-  caps: [],
-  messages: [],
-  payments: [],
-});
+export const createInitialChatSession = (chatId: string): ChatSession => {
+  const { currentCap } = CurrentCapStore.getState();
+  return {
+    id: chatId,
+    title: 'New Chat',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    messages: [],
+    payments: [],
+    cap: currentCap,
+  };
+};
 
 // chat store state interface
 interface ChatSessionsStoreState {
@@ -25,6 +30,14 @@ interface ChatSessionsStoreState {
   // session CRUD operations
   getChatSession: (id: string) => ChatSession | null;
   getChatSessionsSortedByUpdatedAt: () => ChatSession[];
+  // Safely update a session; create it first if it doesn't exist.
+  // The updater returns a partial to merge or a full session object.
+  upsertSession: (
+    id: string,
+    updater: (
+      prev: ChatSession,
+    ) => Partial<Omit<ChatSession, 'id'>> | ChatSession,
+  ) => void;
   updateSession: (
     id: string,
     updates: Partial<Omit<ChatSession, 'id'>>,
@@ -32,6 +45,9 @@ interface ChatSessionsStoreState {
   addSelectionToChatSession: (id: string, selection: ChatSelection) => void;
   removeSelectionFromChatSession: (id: string, selectionId: string) => void;
   addPaymentCtxIdToChatSession: (id: string, payment: ChatPayment) => void;
+  updateChatSessionArtifactState: (id: string, state: any) => void;
+  getChatSessionArtifactState: (id: string) => any;
+  setChatSessionCap: (id: string, cap: Cap) => void;
   deleteSession: (id: string) => void;
 
   // update messages for a session and create a new session if not founds
@@ -69,138 +85,77 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
         );
       },
 
+      upsertSession: (
+        id: string,
+        updater: (
+          prev: ChatSession,
+        ) => Partial<Omit<ChatSession, 'id'>> | ChatSession,
+      ) => {
+        set((state) => {
+          // Ensure we have a base session to work with
+          const base = state.chatSessions[id] || createInitialChatSession(id);
+          const patch = updater(base) || {};
+
+          // Always preserve the original id and shallow-merge changes
+          const next: ChatSession = {
+            ...base,
+            ...(patch as Partial<Omit<ChatSession, 'id'>>),
+            id: base.id,
+          };
+
+          return {
+            chatSessions: {
+              ...state.chatSessions,
+              [id]: next,
+            },
+          };
+        });
+      },
+
       updateSession: (
         id: string,
         updates: Partial<Omit<ChatSession, 'id'>>,
       ) => {
-        set((state) => {
-          let session = state.chatSessions[id];
-          // if session not found, create new session
-          if (!session) {
-            session = {
-              id: id,
-              title: 'New Chat',
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-              messages: [],
-              payments: [],
-              caps: [],
-            };
-          }
-
-          const updatedSession = {
-            ...session,
-            ...updates,
-            updatedAt: Date.now(),
-          };
-
-          return {
-            chatSessions: {
-              ...state.chatSessions,
-              [id]: updatedSession,
-            },
-          };
-        });
+        get().upsertSession(id, (prev) => ({
+          ...updates,
+          updatedAt: Date.now(),
+        }));
       },
 
       addSelectionToChatSession: (id: string, selection: ChatSelection) => {
-        set((state) => {
-          const session = state.chatSessions[id];
-          if (!session) {
-            const newSession = {
-              id: id,
-              title: 'New Chat',
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-              messages: [],
-              payments: [],
-              selections: [selection],
-              caps: [],
-            };
-
-            return {
-              chatSessions: {
-                ...state.chatSessions,
-                [id]: newSession,
-              },
-            };
-          }
-
-          return {
-            chatSessions: {
-              ...state.chatSessions,
-              [id]: {
-                ...session,
-                selections: [...(session.selections || []), selection],
-              },
-            },
-          };
-        });
+        get().upsertSession(id, (prev) => ({
+          // Preserve existing behavior: do not touch updatedAt here
+          selections: [...(prev.selections || []), selection],
+        }));
       },
 
       removeSelectionFromChatSession: (id: string, selectionId: string) => {
-        set((state) => {
-          const session = state.chatSessions[id];
-          if (!session) {
-            return state;
-          }
+        const session = get().getChatSession(id);
+        if (!session?.selections?.length) {
+          // No-op if the session doesn't exist or has no selections (preserve behavior)
+          return;
+        }
 
-          const selections = session.selections;
-
-          if (!selections) {
-            return state;
-          }
-
-          const updatedSession = {
-            ...session,
-            selections: selections.filter((s) => s.id !== selectionId),
-          };
-
-          return {
-            chatSessions: {
-              ...state.chatSessions,
-              [id]: updatedSession,
-            },
-          };
-        });
+        get().upsertSession(id, (prev) => ({
+          // Preserve existing behavior: do not touch updatedAt here
+          selections: (prev.selections || []).filter(
+            (s) => s.id !== selectionId,
+          ),
+        }));
       },
 
       addPaymentCtxIdToChatSession: (id: string, payment: ChatPayment) => {
-        set((state) => {
-          const session = state.chatSessions[id];
-          // if session not found, create new session
-          if (!session) {
-            const newSession = {
-              id: id,
-              title: 'New Chat',
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-              messages: [],
-              payments: [payment],
-              caps: [],
-            };
+        get().upsertSession(id, (prev) => ({
+          payments: [...prev.payments, payment],
+          updatedAt: Date.now(),
+        }));
+      },
 
-            return {
-              chatSessions: {
-                ...state.chatSessions,
-                [id]: newSession,
-              },
-            };
-          } else {
-            const updatedSession = {
-              ...session,
-              payments: [...session.payments, payment],
-              updatedAt: Date.now(),
-            };
-
-            return {
-              chatSessions: {
-                ...state.chatSessions,
-                [id]: updatedSession,
-              },
-            };
-          }
-        });
+      setChatSessionCap: (id: string, cap: Cap) => {
+        get().upsertSession(id, (prev) => ({
+          cap: cap,
+          updatedAt: Date.now(),
+        }));
       },
 
       deleteSession: (id: string) => {
@@ -213,52 +168,38 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
       },
 
       updateMessages: (chatId: string, messages: UIMessage[]) => {
-        set((state) => {
-          let session = state.chatSessions[chatId];
-          let isNewSession = false;
+        const session = get().getChatSession(chatId);
+        const isNewSession = !session;
 
-          // if session not found, create new session
-          if (!session) {
-            isNewSession = true;
-            session = {
-              id: chatId,
-              title: 'New Chat',
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-              messages: [],
-              payments: [],
-              caps: [],
-            };
-          }
+        // check if there are new messages to add
+        const currentMessageIds = new Set(
+          (session?.messages || []).map((msg) => msg.id),
+        );
+        const hasNewMessages = messages.some(
+          (msg) => !currentMessageIds.has(msg.id),
+        );
 
-          // check if there are new messages to add
-          const currentMessageIds = new Set(
-            session.messages.map((msg) => msg.id),
-          );
-          const hasNewMessages = messages.some(
-            (msg) => !currentMessageIds.has(msg.id),
-          );
+        // only update when there are new messages or when creating a new session
+        if (hasNewMessages || isNewSession) {
+          get().upsertSession(chatId, () => ({
+            messages: [...messages], // completely replace message list
+            updatedAt: Date.now(),
+          }));
+        }
+      },
 
-          // only update when there are new messages
-          if (hasNewMessages || isNewSession) {
-            const updatedSession = {
-              ...session,
-              messages: [...messages], // completely replace message list
-              updatedAt: Date.now(),
-            };
+      updateChatSessionArtifactState: (chatId: string, artifactState: any) => {
+        get().upsertSession(chatId, (prev) => ({
+          // Preserve existing behavior: do not touch session.updatedAt here
+          artifactState: {
+            value: artifactState,
+            updatedAt: Date.now(),
+          },
+        }));
+      },
 
-            const newState = {
-              chatSessions: {
-                ...state.chatSessions,
-                [chatId]: updatedSession,
-              },
-            };
-
-            return newState;
-          }
-
-          return state;
-        });
+      getChatSessionArtifactState: (id: string) => {
+        return get().chatSessions[id]?.artifactState;
       },
 
       clearAllSessions: () => {

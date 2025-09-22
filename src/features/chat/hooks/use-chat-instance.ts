@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
@@ -9,25 +9,12 @@ import { useUpdateChatTitle } from './use-update-chat-title';
 
 export function useChatInstance(chatId: string) {
   const navigate = useNavigate();
-  const { getChatSession, chatSessions, updateSession } = ChatSessionsStore();
+  const { getChatSession, chatSessions, setChatSessionCap } =
+    ChatSessionsStore();
   const { getInstance } = ChatInstanceStore();
   const { updateTitle } = useUpdateChatTitle();
-  const { currentCap } = CurrentCapStore();
   const [searchParams, setSearchParams] = useSearchParams();
-
-  // Add current cap to chat session
-  const addCurrentCapsToChat = useCallback(
-    async (id: string) => {
-      const session = getChatSession(id);
-      if (!session || !currentCap) return;
-      if (session.caps.some((c) => c.id === currentCap.id)) return;
-
-      await updateSession(id, {
-        caps: [...session.caps, currentCap],
-      });
-    },
-    [getChatSession, currentCap, updateSession],
-  );
+  const { currentCap, setCurrentCap } = CurrentCapStore();
 
   // chat error handler
   const handleChatError = useCallback(
@@ -67,7 +54,6 @@ export function useChatInstance(chatId: string) {
     (data: any) => {
       if (data.type === 'data-mark' && data.data === 'onResponse') {
         updateTitle(chatId);
-        addCurrentCapsToChat(chatId);
       }
       if (data.type === 'data-finishReason') {
         const finishReason = data.data.finishReason;
@@ -81,7 +67,7 @@ export function useChatInstance(chatId: string) {
         }
       }
     },
-    [chatId, updateTitle, addCurrentCapsToChat],
+    [chatId, updateTitle],
   );
 
   // chat finish handler
@@ -118,6 +104,13 @@ export function useChatInstance(chatId: string) {
     onFinish: handleOnFinish,
     onData: handleOnData,
   };
+
+  // if current session has a cap, set it to the current cap
+  useEffect(() => {
+    if (chatSessions[chatId]?.cap && chatSessions[chatId]?.cap !== currentCap) {
+      setCurrentCap(chatSessions[chatId]?.cap);
+    }
+  }, [chatSessions[chatId]?.cap, setCurrentCap]);
 
   // return existing instance or create a new one from the store
   return getInstance(chatId, useChatInitConfig.initialMessages, {

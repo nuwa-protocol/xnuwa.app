@@ -1,5 +1,4 @@
 import { Loader2, Save } from 'lucide-react';
-import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Button,
@@ -20,8 +19,7 @@ import { ModelTab } from './model';
 import { PromptTab } from './prompt';
 import { ReadmeTab } from './readme';
 
-export function CapEdit() {
-  const { id } = useParams();
+export function CapEdit({ id }: { id?: string }) {
   const { localCaps } = CapStudioStore();
   const editingCap = id ? localCaps.find((cap) => cap.id === id) : undefined;
 

@@ -7,7 +7,6 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWindowSize } from 'usehooks-ts';
-import { CapSelector } from '@/features/cap-store/components';
 import { Button } from '@/shared/components/ui/button';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
@@ -149,11 +148,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
 
         {/* Cap Selector and Send Button */}
         <div className="flex justify-between items-center p-2">
-          <div className="flex items-center gap-2">
-            <CapSelector />
-          </div>
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-between w-full">
             <AttachmentInput
               attachments={attachments}
               onAttachmentsChange={setAttachments}

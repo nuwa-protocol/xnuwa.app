@@ -1,4 +1,8 @@
+import { motion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { CapStoreLoading } from '@/features/cap-store/components/cap-store-loading';
+import { GridPattern } from '@/shared/components/ui/shadcn-io/grid-pattern';
+import { cn } from '@/shared/utils';
 
 // Lazy-load the Cap Store home content to avoid blocking route transition
 const LazyCapStoreHomeContent = lazy(() =>
@@ -7,32 +11,9 @@ const LazyCapStoreHomeContent = lazy(() =>
     })),
 );
 
-import { CapStoreLoading } from '@/features/cap-store/components/cap-store-loading';
-import { CapStoreHeader } from '@/features/cap-store/components/header';
-import { useSidebarOpenState } from '@/features/sidebar/components/app-sidebar';
-import { GridPattern } from '@/shared/components/ui/shadcn-io/grid-pattern';
-import { cn } from '@/shared/utils';
-import { CenteredWelcome } from './centered-welcome';
-import { MultimodalInput } from './multimodal-input';
-
-export function NewChat() {
-    const [headerOpacity, setHeaderOpacity] = useState(0);
+export function LandingPage() {
     const [squares, setSquares] = useState<Array<[number, number]>>([]);
-    const sidebarOpen = useSidebarOpenState();
     const [showHome, setShowHome] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-
-            // Header starts appearing after 150px scroll, fully visible at 300px
-            const opacity = Math.min((currentScrollY - 250) / 250, 1);
-            setHeaderOpacity(Math.max(opacity, 0));
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     // Generate randomized squares for the grid pattern based on viewport size
     useEffect(() => {
@@ -99,23 +80,27 @@ export function NewChat() {
                 )}
             />
 
-            {/* Sticky Header - appears on scroll and respects sidebar */}
-            <CapStoreHeader
-                style={{
-                    opacity: headerOpacity,
-                    zIndex: 20,
-                }}
-            />
-
             {/* Main Content */}
             <div className="flex flex-col w-full bg-background">
-                {/* Welcome Section with Input - reduced height */}
-                <div className="min-h-[50vh] flex flex-col justify-end py-8 mb-20">
-                    <CenteredWelcome>
-                        <div className="w-full max-w-4xl space-y-6 px-4">
-                            <MultimodalInput />
+                {/* Welcome Section */}
+                <div className="min-h-[40vh] flex flex-col justify-center py-8 mt-10">
+                    <div className="flex flex-col items-center justify-center h-full min-h-0 px-4 z-10">
+                        <div className="flex flex-col items-center gap-8 w-full max-w-4xl">
+                            <motion.div
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="flex flex-col items-center gap-4"
+                            >
+                                <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
+                                    Get Started with every AI You Need
+                                </h1>
+                                <p className="text-muted-foreground text-center max-w-md">
+                                    Start chatting or explore amazing AI capabilities
+                                </p>
+                            </motion.div>
                         </div>
-                    </CenteredWelcome>
+                    </div>
                 </div>
 
                 {/* Cap Store Content Section (lazy) */}

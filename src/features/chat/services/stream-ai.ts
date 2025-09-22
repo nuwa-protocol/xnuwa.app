@@ -8,13 +8,13 @@ import {
 } from 'ai';
 import { CapResolve } from '@/shared/services/cap-resolve';
 import { llmProvider } from '@/shared/services/llm-providers';
-import { CurrentArtifactMCPToolsStore } from '@/shared/stores/current-artifact-store';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { generateUUID } from '@/shared/utils';
 import { handleError } from '@/shared/utils/handl-error';
 import { ChatSessionsStore } from '../stores';
 
 // Handle AI request, entrance of the AI workflow
-export const CreateAIStream = async ({
+export const CreateAIChatStream = async ({
   chatId,
   messages,
   signal,
@@ -34,7 +34,7 @@ export const CreateAIStream = async ({
   } = await capResolve.getResolvedConfig();
 
   // Add artifact tools
-  const artifactTools = CurrentArtifactMCPToolsStore.getState().getTools();
+  const artifactTools = CurrentCapStore.getState().getCurrentCapArtifactTools();
 
   const mergedTools = artifactTools
     ? {
@@ -123,4 +123,48 @@ export const CreateAIStream = async ({
   });
 
   return stream;
+};
+
+// Handle AI request from artifact
+export const CreateAIRequestStream = async ({
+  chatId,
+  prompt,
+  cap,
+}: {
+  chatId: string;
+  prompt: string;
+  cap: Cap;
+}) => {
+  const capResolve = new CapResolve(cap);
+  const {
+    prompt: capPrompt,
+    model,
+    tools,
+  } = await capResolve.getResolvedConfig();
+
+  // create payment CTX id header
+  const paymentCtxId = generateUUID();
+  const headers = {
+    'X-Client-Tx-Ref': paymentCtxId,
+  };
+
+  const { addPaymentCtxIdToChatSession } = ChatSessionsStore.getState();
+  await addPaymentCtxIdToChatSession(chatId, {
+    type: 'ai-request',
+    ctxId: paymentCtxId,
+    timestamp: Date.now(),
+  });
+
+  return streamText({
+    model: llmProvider.chat(model),
+    system: capPrompt,
+    prompt: prompt,
+    tools: tools,
+    maxRetries: 3,
+    stopWhen: stepCountIs(10),
+    headers,
+    onError: (error: any) => {
+      throw new Error(error);
+    },
+  });
 };

@@ -93,7 +93,7 @@ export function CapSelector() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             className="rounded-lg"
             type="button"

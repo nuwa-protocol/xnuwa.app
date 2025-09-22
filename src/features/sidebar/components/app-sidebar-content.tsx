@@ -72,7 +72,7 @@ export function AppSidebarContent() {
               <Logo
                 size="md"
                 variant="basic"
-                onClick={() => navigate('/chat')}
+                onClick={() => navigate('/')}
                 className="rounded-md hover:bg-sidebar-accent"
               />
               <SidebarToggle />

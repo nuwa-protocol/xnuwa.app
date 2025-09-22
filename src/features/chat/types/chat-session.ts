@@ -1,7 +1,7 @@
 import type { UIMessage } from 'ai';
 import type { Cap } from '@/shared/types';
 
-export type ChatPaymentType = 'generate-title' | 'chat-message';
+export type ChatPaymentType = 'generate-title' | 'chat-message' | 'ai-request';
 
 export interface ChatPayment {
   type: ChatPaymentType;
@@ -16,8 +16,8 @@ export interface ChatSelection {
   message: string;
 }
 
-export interface ChatArtifact {
-  state: any;
+export interface ChatArtifactState {
+  value: any;
   updatedAt: number;
 }
 
@@ -30,7 +30,7 @@ export interface ChatSession {
   messages: UIMessage[];
   payments: ChatPayment[];
   cap: Cap;
-  artifact?: ChatArtifact;
+  artifactState?: ChatArtifactState;
   selections?: ChatSelection[];
   pinned?: boolean;
 }

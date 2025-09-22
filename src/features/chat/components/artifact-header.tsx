@@ -14,17 +14,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components';
-import { Title } from '@/shared/components/title';
 import { Button } from '@/shared/components/ui/button';
-import type { SaveStatus } from '../../hooks/use-artifact';
+import type { SaveStatus } from '../hooks/use-artifact';
 
 export const ArtifactHeader = ({
-  title,
   hasConnectionError,
   isProcessingAIRequest,
   saveStatus,
 }: {
-  title: string;
   hasConnectionError: boolean;
   isProcessingAIRequest: boolean;
   saveStatus: SaveStatus;
@@ -66,10 +63,9 @@ export const ArtifactHeader = ({
           <X className="h-4 w-4" />
         </Button>
       </div>
-      {/* Center: Title (editable) + Status area (AI or Save) */}
+      {/* Center: Status area (AI or Save) */}
       <div className="flex flex-row justify-center items-center min-w-0 max-w-[min(70vw,700px)]">
         <div className="flex flex-row justify-center items-center gap-2">
-          <Title title={title} onCommit={() => { }} />
           {/* Status area shares the same spot: prefer AI processing over save status */}
           {isProcessingAIRequest ? (
             <AIProcessingBadge />

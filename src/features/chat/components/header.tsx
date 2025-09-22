@@ -1,7 +1,14 @@
-import { useState } from 'react';
+import { BrushCleaning, MoreHorizontal, Trash } from 'lucide-react';
+import { CapSelector } from '@/features/cap-store/components';
 import { Title } from '@/shared/components/title';
+import { Button } from '@/shared/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/components/ui/dropdown-menu';
 import { ChatSessionsStore } from '../stores';
-import { RenameDialog } from './rename-dialog';
 
 interface HeaderProps {
   chatId: string;
@@ -10,7 +17,6 @@ interface HeaderProps {
 export default function Header({ chatId }: HeaderProps) {
   const { chatSessions, updateSession } = ChatSessionsStore();
   const session = chatSessions[chatId || ''] || null;
-  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
 
   const title = session?.title || 'New Chat';
 
@@ -20,22 +26,54 @@ export default function Header({ chatId }: HeaderProps) {
     }
   };
 
-  return (
-    <>
-      <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2 justify-between">
-        <Title
-          title={title}
-          onCommit={handleRename}
-          className="text-muted-foreground p-2 flex items-center gap-2 group cursor-pointer bg-transparent border-none hover:bg-sidebar-accent/50 rounded transition-colors"
-        />
-      </header>
+  const handleClearConversation = async () => {
+    // TODO: Clear conversation
+  };
 
-      <RenameDialog
-        open={renameDialogOpen}
-        onOpenChange={setRenameDialogOpen}
-        currentName={title}
-        onRename={handleRename}
-      />
-    </>
+  const handleDeleteConversation = async () => {
+    // TODO: Delete conversation
+  };
+
+
+  return (
+    <header
+      className="sticky top-0 z-10 grid grid-cols-3 items-center bg-background/10 px-3 pt-2 backdrop-blur supports-[backdrop-filter]:bg-background/10"
+    >
+      {/* Left: Actions */}
+      <div className="flex items-center gap-1.5">
+        <CapSelector />
+      </div>
+      {/* Center: Status area (AI or Save) */}
+      <div className='flex flex-row justify-center items-center w-full'>
+        <div className='flex flex-row justify-center items-center gap-2'>
+          <Title
+            title={title}
+            onCommit={handleRename}
+            className="text-muted-foreground p-2 flex items-center gap-2 group cursor-pointer bg-transparent border-none hover:bg-sidebar-accent/50 rounded transition-colors"
+          />
+        </div>
+      </div>
+      {/* Right: Connection status only (AI indicator moved next to title) */}
+      <div className="justify-self-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Open Conversation Menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleClearConversation}>
+              <BrushCleaning className="h-4 w-4" />
+              <span>Clear Context</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDeleteConversation} className="font-medium text-destructive">
+              <Trash className="h-4 w-4" />
+              <span >Delete Chat</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
   );
 }

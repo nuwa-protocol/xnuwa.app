@@ -7,25 +7,29 @@ import { useChatContext } from '@/features/chat/contexts/chat-context';
 import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
 import type { ChildMethods } from '@/shared/hooks/use-cap-ui-render';
 import { useDebounceCallback } from '@/shared/hooks/use-debounce-callback';
-import { CurrentArtifactMCPToolsStore } from '@/shared/stores/current-artifact-store';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { generateUUID } from '@/shared/utils';
 import { ChatErrorCode, handleError } from '@/shared/utils/handl-error';
-import { CreateAIStream } from '../services';
-import { ArtifactSessionsStore } from '../stores';
+import { CreateAIRequestStream } from '../services/stream-ai';
 
 // Saving status for artifact state persistence
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
-export const useArtifact = (artifactId: string) => {
+export const useArtifact = () => {
   const navigate = useNavigate();
-  const { addSelectionToChatSession } = ChatSessionsStore();
+  const {
+    addSelectionToChatSession,
+    updateChatSessionArtifactState,
+    getChatSessionArtifactState,
+  } = ChatSessionsStore();
   const { chat } = useChatContext();
   const { sendMessage, status } = useChat({ chat });
-  const { getArtifactSession, updateArtifactSession } = ArtifactSessionsStore();
-  const { setTools, clearTools } = CurrentArtifactMCPToolsStore();
+  const { setCurrentCapArtifactTools, clearCurrentCapArtifactTools } =
+    CurrentCapStore();
   const [hasConnectionError, setHasConnectionError] = useState<boolean>(false);
   const streamMap = useRef(new Map<string, { aborted: boolean }>()); // track streams
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle'); // track saving status
+  const { currentCap } = CurrentCapStore();
 
   const handleSendPrompt = useCallback(
     (prompt: string) => {
@@ -54,7 +58,7 @@ export const useArtifact = (artifactId: string) => {
   // Debounced persist function to avoid excessive writes
   const debouncedPersist = useDebounceCallback((state: any) => {
     try {
-      updateArtifactSession(artifactId, { state });
+      updateChatSessionArtifactState(chat.id, state);
       setSaveStatus('saved');
     } catch (e) {
       console.error('Failed to save artifact state', e);
@@ -73,16 +77,16 @@ export const useArtifact = (artifactId: string) => {
 
   // Get state from store instead of localStorage
   const handleGetState = useCallback(() => {
-    const currentArtifact = getArtifactSession(artifactId);
-    return currentArtifact?.state || null;
-  }, [artifactId, getArtifactSession]);
+    const state = getChatSessionArtifactState(chat.id);
+    return state?.value || null;
+  }, [chat.id, getChatSessionArtifactState]);
 
   // Set artifact mcp tools to the global store
   const handleMCPConnected = useCallback(
     (tools: Record<string, any>) => {
-      setTools(tools);
+      setCurrentCapArtifactTools(tools);
     },
-    [setTools],
+    [setCurrentCapArtifactTools],
   );
 
   // Handle mcp connection error
@@ -90,9 +94,9 @@ export const useArtifact = (artifactId: string) => {
     (error: Error) => {
       console.error('Artifact MCP connection error:', error);
       setHasConnectionError(true);
-      clearTools();
+      clearCurrentCapArtifactTools();
     },
-    [setHasConnectionError, clearTools],
+    [setHasConnectionError, clearCurrentCapArtifactTools],
   );
 
   // Handle penpal connection error
@@ -109,9 +113,10 @@ export const useArtifact = (artifactId: string) => {
     async (request: StreamAIRequest, streamId: string, child: ChildMethods) => {
       streamMap.current.set(streamId, { aborted: false });
       try {
-        const { textStream } = await CreateAIStream({
-          artifactId,
-          request,
+        const { textStream } = await CreateAIRequestStream({
+          chatId: chat.id,
+          prompt: request.prompt,
+          cap: currentCap,
         });
         for await (const textPart of textStream as AsyncIterable<string>) {
           if (streamMap.current.get(streamId)?.aborted) return;
@@ -157,7 +162,7 @@ export const useArtifact = (artifactId: string) => {
         streamMap.current.delete(streamId);
       }
     },
-    [artifactId],
+    [chat.id],
   );
 
   // Handle abort stream
@@ -169,15 +174,11 @@ export const useArtifact = (artifactId: string) => {
   // Clear tools on unmount to avoid leaking session-scoped UI tools
   useEffect(() => {
     return () => {
-      clearTools();
+      clearCurrentCapArtifactTools();
     };
   }, []);
 
-  // Get artifact from store
-  const artifactSession = getArtifactSession(artifactId);
-
   return {
-    artifactSession,
     hasConnectionError,
     isProcessingAIRequest: streamMap.current.size > 0,
     saveStatus,

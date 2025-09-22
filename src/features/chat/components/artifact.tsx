@@ -1,16 +1,18 @@
 import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
-import { useArtifact } from '../../hooks/use-artifact';
-import { ArtifactHeader } from './artifact-header';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import type { CapArtifact } from '@/shared/types';
+import { useChatContext } from '../contexts/chat-context';
+import { useArtifact } from '../hooks/use-artifact';
+import { ArtifactSaveBadge } from './artifact-save-badge';
 
 type ArtifactProps = {
-  artifactId: string;
+  artifact: CapArtifact;
 };
 
-export const Artifact = ({ artifactId }: ArtifactProps) => {
+export const Artifact = ({ artifact }: ArtifactProps) => {
   const {
-    artifactSession,
-    hasConnectionError,
-    isProcessingAIRequest,
+    // hasConnectionError,
+    // isProcessingAIRequest,
     saveStatus,
     handleSendPrompt,
     handleAddSelection,
@@ -21,25 +23,24 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
     handlePenpalConnectionError,
     handleStreamRequest,
     handleAbortStream,
-  } = useArtifact(artifactId);
+  } = useArtifact();
 
-  if (!artifactSession) {
-    return <div>Artifact not found</div>;
-  }
+  const { chat } = useChatContext();
+  const { currentCap } = CurrentCapStore();
+
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden">
+    <div className="relative flex h-full w-full flex-col overflow-hidden">
       {/* Header */}
-      <ArtifactHeader
-        title={artifactSession.title}
+      {/* <ArtifactHeader
         hasConnectionError={hasConnectionError}
         isProcessingAIRequest={isProcessingAIRequest}
         saveStatus={saveStatus}
-      />
+      /> */}
       <div className="min-h-0 flex-1 overflow-hidden">
         <CapUIRenderer
-          key={artifactId}
-          srcUrl={artifactSession.artifact.core.source}
-          title={artifactSession.title}
+          key={`${artifact}-${chat.id}`}
+          srcUrl={artifact.srcUrl}
+          title={currentCap.idName}
           artifact={true}
           onSendPrompt={handleSendPrompt}
           onAddSelection={handleAddSelection}
@@ -52,6 +53,8 @@ export const Artifact = ({ artifactId }: ArtifactProps) => {
           onAbortStream={handleAbortStream}
         />
       </div>
+      {/* Saving badge (bottom-right). Subtle, pops in/out to the right. */}
+      <ArtifactSaveBadge saveStatus={saveStatus} />
     </div>
   );
 };

@@ -2,7 +2,6 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { CapDetails } from '@/features/cap-store/components';
 import { CapStoreCapsContent } from '@/features/cap-store/components/content-caps';
 import { CapStoreFavoritesContent } from '@/features/cap-store/components/content-favorites';
-import { CapStoreHomeContent } from '@/features/cap-store/components/content-home';
 import { CapStoreHeader } from '@/features/cap-store/components/header';
 
 const ExplorePageContent = () => {
@@ -23,7 +22,7 @@ const ExplorePageContent = () => {
   } else if (path === 'favorites') {
     return <CapStoreFavoritesContent />;
   } else {
-    return <CapStoreHomeContent />;
+    return <CapStoreCapsContent tag={tag} sortBy={sortBy} search={search} />;
   }
 };
 
