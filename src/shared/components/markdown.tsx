@@ -159,7 +159,7 @@ function parseIncompleteMarkdown(text: string): string {
 // Create a hardened version of ReactMarkdown
 const HardenedMarkdown = hardenReactMarkdown(ReactMarkdown);
 
-export type ResponseProps = HTMLAttributes<HTMLDivElement> & {
+export type MarkdownProps = HTMLAttributes<HTMLDivElement> & {
   options?: Options;
   children: Options['children'];
   allowedImagePrefixes?: ComponentProps<
@@ -380,7 +380,7 @@ const components: Options['components'] = {
   },
 };
 
-export const ResponseMarkdown = memo(
+export const Markdown = memo(
   ({
     className,
     options,
@@ -390,7 +390,7 @@ export const ResponseMarkdown = memo(
     defaultOrigin,
     parseIncompleteMarkdown: shouldParseIncompleteMarkdown = true,
     ...props
-  }: ResponseProps) => {
+  }: MarkdownProps) => {
     // Parse the children to remove incomplete markdown tokens if enabled
     const parsedChildren =
       typeof children === 'string' && shouldParseIncompleteMarkdown
@@ -421,5 +421,3 @@ export const ResponseMarkdown = memo(
   },
   (prevProps, nextProps) => prevProps.children === nextProps.children,
 );
-
-ResponseMarkdown.displayName = 'ResponseMarkdown';

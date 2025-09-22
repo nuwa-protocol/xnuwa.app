@@ -88,7 +88,6 @@ export function MyCaps({
     }
     clearSelection();
   };
-  console.log('selectedCapIds', selectedCapIds);
 
   const handleBulkPublish = async () => {
     const selectedCaps = allCaps.filter((cap) => selectedCapIds.has(cap.id));

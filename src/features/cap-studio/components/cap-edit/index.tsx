@@ -13,10 +13,12 @@ import { useEditForm } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import { getErrorDescription } from '../../utils';
 import { DashboardLayout } from '../layout/dashboard-layout';
+import { ArtifactTab } from './artifact';
 import { GeneralTab } from './general';
 import { McpTab } from './mcp';
 import { ModelTab } from './model';
 import { PromptTab } from './prompt';
+import { ReadmeTab } from './readme';
 
 export function CapEdit() {
   const { id } = useParams();
@@ -78,16 +80,22 @@ export function CapEdit() {
             className="space-y-6"
           >
             <Tabs defaultValue="general" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="general">General</TabsTrigger>
+                <TabsTrigger value="readme">Readme</TabsTrigger>
                 <TabsTrigger value="model">Model</TabsTrigger>
                 <TabsTrigger value="prompt">Prompt</TabsTrigger>
                 <TabsTrigger value="mcp">MCP</TabsTrigger>
+                <TabsTrigger value="artifact">Artifact</TabsTrigger>
               </TabsList>
 
               {/* General Tab */}
               <TabsContent value="general" className="space-y-6">
                 <GeneralTab form={form} />
+              </TabsContent>
+
+              <TabsContent value="readme" className="space-y-6">
+                <ReadmeTab form={form} />
               </TabsContent>
 
               {/* Model Tab */}
@@ -103,6 +111,11 @@ export function CapEdit() {
               {/* MCP Tab */}
               <TabsContent value="mcp" className="space-y-6">
                 <McpTab form={form} />
+              </TabsContent>
+
+              {/* Artifact Tab */}
+              <TabsContent value="artifact" className="space-y-6">
+                <ArtifactTab form={form} />
               </TabsContent>
             </Tabs>
 

@@ -12,7 +12,6 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Textarea,
 } from '@/shared/components/ui';
 import { DashboardGrid } from '../../layout/dashboard-layout';
 import { CapTags } from './cap-tags';
@@ -66,23 +65,7 @@ export function GeneralTab({ form }: GeneralTabProps) {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="metadata.description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Describe what your cap does..."
-                    rows={3}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
 
           <FormField
             control={form.control}
@@ -104,18 +87,7 @@ export function GeneralTab({ form }: GeneralTabProps) {
               </FormItem>
             )}
           />
-        </CardContent>
-      </Card>
 
-      {/* Author Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Author Information</CardTitle>
-          <CardDescription>
-            Information about the cap author and licensing
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
           <FormField
             control={form.control}
             name="metadata.homepage"
@@ -163,6 +135,8 @@ export function GeneralTab({ form }: GeneralTabProps) {
               </FormItem>
             )}
           />
+
+
         </CardContent>
       </Card>
 
@@ -181,6 +155,10 @@ export function GeneralTab({ form }: GeneralTabProps) {
           </FormItem>
         )}
       />
+
+
+
+
     </DashboardGrid>
   );
 }
