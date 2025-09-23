@@ -4,10 +4,10 @@ import type { UIMessage } from 'ai';
 import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
-import { Separator } from '@/shared/components/ui/separator';
 import { cn } from '@/shared/utils';
 import { useChatContext } from '../contexts/chat-context';
 import { MessageActions } from './message-actions';
+import { ClearContextMessage } from './message-clear-context';
 import { GeneralTool } from './message-general-tool';
 import { MessageImage } from './message-image';
 import { MessageReasoning } from './message-reasoning';
@@ -66,15 +66,7 @@ const PurePreviewMessage = ({
       (part) => part.type === 'data-uimark' && part.data === 'clear-context',
     );
 
-  // TODO: need to add a button to revert the context clear
-  if (isClearContextMessage)
-    return (
-      <div className="max-w-2xl my-8 mx-auto flex items-center justify-center overflow-hidden">
-        <Separator decorative={true} className=" border-t border-2 rounded-full bg-transparent" />
-        <div className="px-4 text-center bg-card text-sm min-w-fit text-muted-foreground">Context Cleared</div>
-        <Separator className="border-t border-2 rounded-full bg-transparent" />
-      </div>
-    );
+  if (isClearContextMessage) return <ClearContextMessage />;
 
   return (
     <AnimatePresence>
@@ -145,7 +137,6 @@ const PurePreviewMessage = ({
                 return 0;
               })
               ?.map((part, index) => {
-
                 const { type } = part;
                 const key = `message-${message.id}-part-${index}`;
 

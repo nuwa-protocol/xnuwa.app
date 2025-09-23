@@ -1,4 +1,5 @@
 import type { LanguageModelUsage } from 'ai';
+import { BrushCleaning } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { PaymentTransaction } from '@/features/wallet/types';
 import { formatUsdCost } from '@/features/wallet/utils';
@@ -16,12 +17,14 @@ interface ContextCostIndicatorProps {
     transactions: PaymentTransaction[];
     totalAmount: bigint;
   } | null;
+  onClearContext?: () => void;
 }
 
 export function ContextCostIndicator({
   contextUsage,
   contextLength,
   paymentInfo,
+  onClearContext,
 }: ContextCostIndicatorProps) {
   const navigate = useNavigate();
 
@@ -130,8 +133,24 @@ export function ContextCostIndicator({
           )}
 
           {/* Separator */}
-          <div className="mt-6 border-t" />
+          {onClearContext && <div className="mt-6 border-t" />}
         </div>
+
+        {/* Clear Context Section */}
+        {onClearContext && (
+          <div className="px-6 py-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClearContext}
+              className="w-full h-10 rounded-lg bg-orange-50 hover:bg-orange-100 border border-orange-200 hover:border-orange-300 text-orange-700 hover:text-orange-800 transition-all duration-200"
+            >
+              <BrushCleaning className="h-4 w-4 mr-2" />
+              <span className="font-medium">Clear Context</span>
+            </Button>
+          </div>
+        )}
+
         {/* Total Cost Section */}
         <Button variant='ghost' className='w-full px-6 my-3' onClick={handleWalletClick}>
           <div

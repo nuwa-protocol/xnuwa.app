@@ -1,22 +1,14 @@
 import { useChat } from '@ai-sdk/react';
-import { BrushCleaning, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CapSelector } from '@/features/cap-store/components';
 import { fetchTransactionsFromChatSession } from '@/features/wallet/service';
 import type { PaymentTransaction } from '@/features/wallet/types';
-import { Button } from '@/shared/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { generateUUID } from '@/shared/utils';
-import { RenameDialog } from '../../../shared/components/rename-dialog';
 import { useChatContext } from '../contexts/chat-context';
 import { ChatSessionsStore } from '../stores';
+import { ChatDropdownMenu } from './chat-dropdown-menu';
 import { ContextCostIndicator } from './context-cost-indicator';
 
 interface HeaderProps {
@@ -27,7 +19,6 @@ export default function Header({ chatId }: HeaderProps) {
   const navigate = useNavigate();
   const { chatSessions, updateSession, deleteSession, updateMessages } =
     ChatSessionsStore();
-  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [paymentInfo, setPaymentInfo] = useState<{
     transactions: PaymentTransaction[];
     totalAmount: bigint;
@@ -38,11 +29,7 @@ export default function Header({ chatId }: HeaderProps) {
   const { setMessages } = useChat({ chat });
   const { currentCap } = CurrentCapStore();
 
-  const handleRename = () => {
-    setRenameDialogOpen(true);
-  };
-
-  const handleRenameConfirm = async (newTitle: string) => {
+  const handleRename = async (newTitle: string) => {
     await updateSession(chatId, { title: newTitle });
   };
 
@@ -80,6 +67,12 @@ export default function Header({ chatId }: HeaderProps) {
     navigate('/chat');
   };
 
+  const handleTogglePin = () => {
+    if (session) {
+      updateSession(chatId, { pinned: !session.pinned });
+    }
+  };
+
   useEffect(() => {
     const getPaymentInfo = async () => {
       const transactions = await fetchTransactionsFromChatSession(session);
@@ -109,35 +102,12 @@ export default function Header({ chatId }: HeaderProps) {
           <p className="text-center text-sm py-1 rounded-lg font-medium text-foreground/90 md:text-base line-clamp-1">
             {title}
           </p>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-4 px-2 text-muted-foreground"
-              >
-                <MoreHorizontal className="h-2 w-4" />
-                <span className="sr-only">Open Conversation Menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuItem onClick={handleRename}>
-                <Pencil className="h-4 w-4" />
-                <span>Rename</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleClearConversation}>
-                <BrushCleaning className="h-4 w-4" />
-                <span>Clear Context</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleDeleteConversation}
-                className="font-medium text-destructive"
-              >
-                <Trash className="h-4 w-4" />
-                <span>Delete Chat</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ChatDropdownMenu
+            session={session}
+            onRename={handleRename}
+            onTogglePin={handleTogglePin}
+            onDelete={handleDeleteConversation}
+          />
         </div>
       </div>
       {/* Right: Context and Cost Indicator */}
@@ -146,14 +116,9 @@ export default function Header({ chatId }: HeaderProps) {
           contextUsage={session?.contextUsage}
           contextLength={contextLength}
           paymentInfo={paymentInfo}
+          onClearContext={handleClearConversation}
         />
       </div>
-      <RenameDialog
-        open={renameDialogOpen}
-        onOpenChange={setRenameDialogOpen}
-        currentName={title}
-        onRename={handleRenameConfirm}
-      />
     </header>
   );
 }
