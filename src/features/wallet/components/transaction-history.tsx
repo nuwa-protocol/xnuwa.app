@@ -5,6 +5,8 @@ import {
   ListFilter,
   SortAsc,
   X,
+  CreditCard,
+  MessageSquare,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
@@ -28,20 +30,26 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { useChatTransactionInfo } from '../hooks/use-chat-transaction-info';
+import { useOrders } from '../hooks/use-orders';
+import { useAuth } from '@/shared/hooks/use-auth';
 import type { PaymentTransaction } from '../types';
 import { ChatItem } from './chat-item';
 import { TransactionDetailsModal } from './transaction-details-modal';
+import { OrdersList } from './orders-list';
 
 type SortOption = 'time-desc' | 'time-asc' | 'amount-desc' | 'amount-asc';
 
 export function TransactionHistory() {
   const { chatRecords, error } = useChatTransactionInfo();
+  const { did } = useAuth();
   const [selectedTransaction, setSelectedTransaction] =
     useState<PaymentTransaction | null>(null);
   const [openChats, setOpenChats] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<SortOption>('time-desc');
   const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState<'chat' | 'orders'>('chat');
 
   const toggleChat = (chatId: string) => {
     const newOpenChats = new Set<string>();
@@ -149,104 +157,134 @@ export function TransactionHistory() {
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader>
           <CardTitle>Payment Transactions</CardTitle>
-          <div className="flex items-center gap-2">
-            {/* Combined filter and sort dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-10">
-                  <ListFilter className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => setSortBy('time-desc')}>
-                  <CalendarArrowDown className="h-4 w-4 mr-2" />
-                  Latest
-                  {sortBy === 'time-desc' && <span className="ml-auto">✓</span>}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('time-asc')}>
-                  <CalendarArrowUp className="h-4 w-4 mr-2" />
-                  Earliest
-                  {sortBy === 'time-asc' && <span className="ml-auto">✓</span>}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('amount-desc')}>
-                  <SortAsc className="h-4 w-4 mr-2" />
-                  Most Cost
-                  {sortBy === 'amount-desc' && (
-                    <span className="ml-auto">✓</span>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('amount-asc')}>
-                  <SortAsc className="h-4 w-4 rotate-180 mr-2" />
-                  Least Cost
-                  {sortBy === 'amount-asc' && (
-                    <span className="ml-auto">✓</span>
-                  )}
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuLabel>Filter by date</DropdownMenuLabel>
-                <div className="px-2 py-1">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {filterDate
-                          ? filterDate.toLocaleDateString()
-                          : 'Pick a date'}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto p-0"
-                      align="end"
-                      side="right"
-                    >
-                      <Calendar
-                        mode="single"
-                        selected={filterDate}
-                        onSelect={setFilterDate}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                {filterDate && (
-                  <DropdownMenuItem onClick={clearDateFilter}>
-                    <X className="h-4 w-4 mr-2" />
-                    Clear date filter
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {filteredAndSortedChatRecords.length === 0 ? (
-              <p className="text-muted-foreground">
-                {filterDate
-                  ? 'No transactions found for selected date'
-                  : 'No transactions found'}
-              </p>
-            ) : (
-              filteredAndSortedChatRecords.map((chatRecord) => (
-                <ChatItem
-                  key={chatRecord.chatId}
-                  chatRecord={chatRecord}
-                  isOpen={openChats.has(chatRecord.chatId)}
-                  onToggle={toggleChat}
-                  onSelectTransaction={setSelectedTransaction}
-                />
-              ))
-            )}
-          </div>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'chat' | 'orders')}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="chat" className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                聊天交易
+              </TabsTrigger>
+              <TabsTrigger value="orders" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                订单记录
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="chat" className="mt-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  {/* Combined filter and sort dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-10">
+                        <ListFilter className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                      <DropdownMenuItem onClick={() => setSortBy('time-desc')}>
+                        <CalendarArrowDown className="h-4 w-4 mr-2" />
+                        Latest
+                        {sortBy === 'time-desc' && <span className="ml-auto">✓</span>}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setSortBy('time-asc')}>
+                        <CalendarArrowUp className="h-4 w-4 mr-2" />
+                        Earliest
+                        {sortBy === 'time-asc' && <span className="ml-auto">✓</span>}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setSortBy('amount-desc')}>
+                        <SortAsc className="h-4 w-4 mr-2" />
+                        Most Cost
+                        {sortBy === 'amount-desc' && (
+                          <span className="ml-auto">✓</span>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setSortBy('amount-asc')}>
+                        <SortAsc className="h-4 w-4 rotate-180 mr-2" />
+                        Least Cost
+                        {sortBy === 'amount-asc' && (
+                          <span className="ml-auto">✓</span>
+                        )}
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuLabel>Filter by date</DropdownMenuLabel>
+                      <div className="px-2 py-1">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start text-left font-normal"
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {filterDate
+                                ? filterDate.toLocaleDateString()
+                                : 'Pick a date'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-auto p-0"
+                            align="end"
+                            side="right"
+                          >
+                            <Calendar
+                              mode="single"
+                              selected={filterDate}
+                              onSelect={setFilterDate}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {filterDate && (
+                        <DropdownMenuItem onClick={clearDateFilter}>
+                          <X className="h-4 w-4 mr-2" />
+                          Clear date filter
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                {error ? (
+                  <p className="text-red-500">Error loading transactions: {error}</p>
+                ) : filteredAndSortedChatRecords.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    {filterDate
+                      ? 'No transactions found for selected date'
+                      : 'No transactions found'}
+                  </p>
+                ) : (
+                  filteredAndSortedChatRecords.map((chatRecord) => (
+                    <ChatItem
+                      key={chatRecord.chatId}
+                      chatRecord={chatRecord}
+                      isOpen={openChats.has(chatRecord.chatId)}
+                      onToggle={toggleChat}
+                      onSelectTransaction={setSelectedTransaction}
+                    />
+                  ))
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="orders" className="mt-6">
+              {did ? (
+                <OrdersList userDid={did} />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">请先登录以查看订单记录</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
