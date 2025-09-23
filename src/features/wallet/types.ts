@@ -13,7 +13,7 @@ export interface PaymentTransaction {
   info: ChatPayment;
 }
 
-export interface ChatRecord {
+export interface ChatSessionTransactionRecords {
   chatId: string;
   chatTitle: string;
   transactions: PaymentTransaction[];

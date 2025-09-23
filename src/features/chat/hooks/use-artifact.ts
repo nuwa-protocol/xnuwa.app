@@ -108,6 +108,8 @@ export const useArtifact = () => {
     [setHasConnectionError],
   );
 
+  // TODO: handle MCP call
+
   // Handle stream request
   const handleStreamRequest = useCallback(
     async (request: StreamAIRequest, streamId: string, child: ChildMethods) => {

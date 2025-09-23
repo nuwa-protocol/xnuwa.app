@@ -1,8 +1,10 @@
 import { useChat } from '@ai-sdk/react';
 import { BrushCleaning, MoreHorizontal, Pencil, Trash } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CapSelector } from '@/features/cap-store/components';
+import { fetchTransactionsFromChatSession } from '@/features/wallet/service';
+import type { PaymentTransaction } from '@/features/wallet/types';
 import { Button } from '@/shared/components/ui/button';
 import {
   DropdownMenu,
@@ -10,10 +12,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { generateUUID } from '@/shared/utils';
 import { RenameDialog } from '../../../shared/components/rename-dialog';
 import { useChatContext } from '../contexts/chat-context';
 import { ChatSessionsStore } from '../stores';
+import { ContextCostIndicator } from './context-cost-indicator';
 
 interface HeaderProps {
   chatId: string;
@@ -24,10 +28,15 @@ export default function Header({ chatId }: HeaderProps) {
   const { chatSessions, updateSession, deleteSession, updateMessages } =
     ChatSessionsStore();
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [paymentInfo, setPaymentInfo] = useState<{
+    transactions: PaymentTransaction[];
+    totalAmount: bigint;
+  } | null>(null);
   const session = chatSessions[chatId || ''] || null;
   const title = session?.title || 'New Chat';
   const { chat } = useChatContext();
   const { setMessages } = useChat({ chat });
+  const { currentCap } = CurrentCapStore();
 
   const handleRename = () => {
     setRenameDialogOpen(true);
@@ -70,6 +79,23 @@ export default function Header({ chatId }: HeaderProps) {
     await deleteSession(chatId);
     navigate('/chat');
   };
+
+  useEffect(() => {
+    const getPaymentInfo = async () => {
+      const transactions = await fetchTransactionsFromChatSession(session);
+      const totalAmount = transactions.reduce(
+        (sum, tx) => sum + (tx.details?.payment?.costUsd || 0n),
+        0n,
+      );
+      setPaymentInfo({
+        transactions,
+        totalAmount,
+      });
+    };
+    getPaymentInfo();
+  }, [session]);
+
+  const contextLength = currentCap.core.model.contextLength;
 
   return (
     <header className="sticky top-0 z-10 grid grid-cols-3 items-center bg-background/10 px-3 pt-2 backdrop-blur supports-[backdrop-filter]:bg-background/10">
@@ -114,8 +140,14 @@ export default function Header({ chatId }: HeaderProps) {
           </DropdownMenu>
         </div>
       </div>
-      {/* Right: TODO: add a context status indicator and cost indicator */}
-      <div className="justify-self-end"></div>
+      {/* Right: Context and Cost Indicator */}
+      <div className="justify-self-end px-2">
+        <ContextCostIndicator
+          contextUsage={session?.contextUsage}
+          contextLength={contextLength}
+          paymentInfo={paymentInfo}
+        />
+      </div>
       <RenameDialog
         open={renameDialogOpen}
         onOpenChange={setRenameDialogOpen}

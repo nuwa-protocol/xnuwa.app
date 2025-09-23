@@ -44,6 +44,7 @@ export function ModelTab({ form }: ModelTabProps) {
   const parameters = form.watch('core.model.parameters') || {};
   const supportedInputs = form.watch('core.model.supportedInputs');
   const modelType = form.watch('core.model.modelType');
+  const contextLength = form.watch('core.model.contextLength');
 
   // Initialize states based on form data
   const initialGatewayType = customGatewayUrl ? 'custom' : 'nuwa';
@@ -78,6 +79,7 @@ export function ModelTab({ form }: ModelTabProps) {
       form.setValue('core.model.modelType', 'Language Model');
       form.setValue('core.model.supportedInputs', ['text']);
       form.setValue('core.model.parameters', {});
+      form.setValue('core.model.contextLength', 0);
       setSelectedModel(null);
     }
     setIsGatewayConfirmed(type === 'nuwa'); // Nuwa gateway is always confirmed
@@ -92,12 +94,10 @@ export function ModelTab({ form }: ModelTabProps) {
         if (isValid) {
           setIsGatewayConfirmed(true);
         } else {
-          // TODO: Show error message to user
           console.error('Gateway validation failed');
         }
       } catch (error) {
         console.error('Gateway validation error:', error);
-        // TODO: Show error message to user
       } finally {
         setIsValidatingGateway(false);
       }
@@ -107,7 +107,6 @@ export function ModelTab({ form }: ModelTabProps) {
     }
   };
 
-  // TODO: Implement custom gateway URL validation
   // This function should validate that the custom gateway URL is accessible
   // and supports the expected API endpoints
   const validateCustomGateway = async (url: string): Promise<boolean> => {
@@ -137,6 +136,7 @@ export function ModelTab({ form }: ModelTabProps) {
       'core.model.supportedInputs',
       model.supported_inputs || ['text'],
     );
+    form.setValue('core.model.contextLength', model.contextLength || 0);
     setSelectedModel(model);
   };
 
@@ -187,27 +187,9 @@ export function ModelTab({ form }: ModelTabProps) {
         setGatewayType('nuwa');
       }
       setIsGatewayConfirmed(true); // Nuwa gateway is always trusted
-      // If we have a modelId but no selectedModel, create a mock model for display
+      // If we have a modelId but no selectedModel, set it to null
       if (modelId && !selectedModel) {
-        const mockModel: ModelDetails = {
-          id: modelId,
-          name: modelId,
-          slug: modelId,
-          providerName: 'Unknown Provider',
-          providerSlug: 'unknown',
-          description: 'Previously configured model',
-          contextLength: 0,
-          pricing: {
-            input_per_million_tokens: 0,
-            output_per_million_tokens: 0,
-            request_per_k_requests: 0,
-            image_per_k_images: 0,
-            web_search_per_k_searches: 0,
-          },
-          supported_inputs: supportedInputs || ['text'],
-          supported_parameters: [],
-        };
-        setSelectedModel(mockModel);
+        setSelectedModel(null);
       }
     }
   }, [
@@ -218,6 +200,7 @@ export function ModelTab({ form }: ModelTabProps) {
     selectedModel,
     gatewayType,
     isGatewayConfirmed,
+    contextLength,
   ]);
 
   // Initialize parameters JSON from form value
@@ -272,16 +255,9 @@ export function ModelTab({ form }: ModelTabProps) {
                           </label>
                         </div>
                       </RadioGroup>
-                      {gatewayType === 'nuwa' && (
-                        <div className="p-3 bg-muted rounded-md">
-                          <p className="text-sm text-muted-foreground">
-                            Using Nuwa's official LLM gateway
-                          </p>
-                        </div>
-                      )}
                       <Input
                         className={`${gatewayType === 'nuwa' ? 'hidden' : ''}`}
-                        placeholder="Enter gateway URL (e.g., https://api.openai.com/v1)"
+                        placeholder="Enter gateway URL (e.g., https://gateway.example.com/v1)"
                         value={field.value || ''}
                         onChange={field.onChange}
                       />
@@ -296,20 +272,23 @@ export function ModelTab({ form }: ModelTabProps) {
             />
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleTestGateway}
-              disabled={
-                gatewayType === 'nuwa' ||
-                !customGatewayUrl?.trim() ||
-                isValidatingGateway
-              }
-            >
-              {isValidatingGateway ? 'Testing...' : 'Test Gateway'}
-            </Button>
-          </div>
+          {
+            gatewayType === 'custom' && (
+              <div className="flex items-center justify-between pt-2 px-6">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleTestGateway}
+                  disabled={
+                    !customGatewayUrl?.trim() ||
+                    isValidatingGateway
+                  }
+                >
+                  {isValidatingGateway ? 'Testing...' : 'Test Gateway'}
+                </Button>
+              </div>
+            )
+          }
         </CardContent>
       </Card>
 
@@ -353,6 +332,12 @@ export function ModelTab({ form }: ModelTabProps) {
                         Model ID
                       </p>
                       <p className="text-sm">{selectedModel.id}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Context Length
+                      </p>
+                      <p className="text-sm">{selectedModel.contextLength}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">
@@ -445,6 +430,28 @@ export function ModelTab({ form }: ModelTabProps) {
                     </FormControl>
                     <FormDescription>
                       Enter the exact model identifier used by your gateway
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="core.model.contextLength"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Context Length</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., 128000"
+                        type="number"
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Enter the context length limit of the model
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

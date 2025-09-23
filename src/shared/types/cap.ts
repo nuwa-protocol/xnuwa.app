@@ -20,6 +20,7 @@ export const CapIDSchema = z
     id: `${data.authorDID}:${data.idName}`,
   }));
 
+// TODO: add context length
 export const CapModelSchema = z.object({
   customGatewayUrl: z.string().url('Must be a valid URL').optional(),
   modelId: z
@@ -39,6 +40,9 @@ export const CapModelSchema = z.object({
     'Transcription Model',
     'Speech Model',
   ]),
+  contextLength: z
+    .number()
+    .refine((num) => num > 0, 'Context length must be greater than 0'),
 });
 
 export const CapPromptSuggestionSchema = z

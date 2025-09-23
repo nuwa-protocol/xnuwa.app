@@ -31,6 +31,7 @@ const CapInfo = ({ cap }: { cap: Cap }) => (
   </>
 );
 
+// TODO: switching cap need to have cache
 export function CapSelector() {
   const { currentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();

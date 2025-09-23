@@ -1,4 +1,3 @@
-import { formatAmount } from '@nuwa-ai/payment-kit';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -6,17 +5,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/shared/components/ui/collapsible';
-import type { ChatRecord, PaymentTransaction } from '../types';
+import type {
+  ChatSessionTransactionRecords,
+  PaymentTransaction,
+} from '../types';
+import { formatUsdCost } from '../utils';
 import { TransactionItem } from './transaction-item';
-
-const formatCost = (cost: bigint | undefined) => {
-  if (!cost) return undefined;
-  if (typeof cost === 'bigint') return `$${formatAmount(cost, 12)}`;
-  if (cost !== undefined && cost !== null) {
-    return `$${formatAmount(BigInt(String(cost)), 12)}`;
-  }
-  return undefined;
-};
 
 const formatDate = (timestamp: number) => {
   return new Date(timestamp).toLocaleString();
@@ -27,11 +21,11 @@ const getTotalCost = (transactions: PaymentTransaction[]) => {
     (sum, tx) => sum + (tx.details?.payment?.costUsd || 0n),
     0n,
   );
-  return formatCost(total);
+  return formatUsdCost(total);
 };
 
 interface ChatHistoryItemProps {
-  chatRecord: ChatRecord;
+  chatRecord: ChatSessionTransactionRecords;
   isOpen: boolean;
   onToggle: (chatId: string) => void;
   onSelectTransaction: (transaction: PaymentTransaction) => void;
@@ -50,8 +44,8 @@ export function ChatItem({
   const chatTime =
     chatRecord.transactions.length > 0
       ? Math.max(
-          ...chatRecord.transactions.map((tx) => tx.details?.timestamp || 0),
-        )
+        ...chatRecord.transactions.map((tx) => tx.details?.timestamp || 0),
+      )
       : 0;
   return (
     <Collapsible open={isOpen} onOpenChange={() => onToggle(chatId)}>

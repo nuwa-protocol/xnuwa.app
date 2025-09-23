@@ -1,7 +1,7 @@
-import type { Cap } from '@nuwa-ai/cap-kit';
 import {
   convertToModelMessages,
   createUIMessageStream,
+  type LanguageModelUsage,
   stepCountIs,
   streamText,
   type UIMessage,
@@ -9,6 +9,7 @@ import {
 import { CapResolve } from '@/shared/services/cap-resolve';
 import { llmProvider } from '@/shared/services/llm-providers';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import type { Cap } from '@/shared/types';
 import { generateUUID } from '@/shared/utils';
 import { handleError } from '@/shared/utils/handl-error';
 import { ChatSessionsStore } from '../stores';
@@ -44,8 +45,11 @@ export const CreateAIChatStream = async ({
     : remoteMCPTools;
 
   // create a new chat session and update the messages
-  const { updateMessages, addPaymentCtxIdToChatSession } =
-    ChatSessionsStore.getState();
+  const {
+    updateMessages,
+    addPaymentCtxIdToChatSession,
+    updateChatSessionContextUsage,
+  } = ChatSessionsStore.getState();
   await updateMessages(chatId, messages);
 
   // create payment CTX id header
@@ -123,6 +127,9 @@ export const CreateAIChatStream = async ({
           },
         }),
       );
+      result.usage.then((usage: LanguageModelUsage) => {
+        updateChatSessionContextUsage(chatId, usage);
+      });
       result.finishReason.then((finishReason) => {
         writer.write({
           type: 'data-finishReason',

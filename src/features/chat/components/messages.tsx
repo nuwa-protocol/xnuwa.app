@@ -18,8 +18,6 @@ function PureMessages({ isReadonly }: MessagesProps) {
   const { messages, status } = useChat({ chat });
   const [userMessagesHeight, setUserMessagesHeight] = useState(0);
 
-  console.log(messages);
-
   // Find the last clear context message index
   const lastClearContextIndex = messages.findLastIndex((message) =>
     message.role === 'system' &&

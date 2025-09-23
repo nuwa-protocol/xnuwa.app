@@ -59,6 +59,7 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
           ],
           modelType:
             editingCap?.capData.core.model.modelType ?? 'Language Model',
+          contextLength: editingCap?.capData.core.model.contextLength || 0,
         },
         mcpServers: editingCap?.capData.core.mcpServers || {},
         artifact: editingCap?.capData.core.artifact || undefined,

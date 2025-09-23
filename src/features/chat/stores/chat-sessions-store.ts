@@ -1,7 +1,7 @@
 // chat-sessions-store.ts
 // Store for managing chat sessions and message history with persisted storage
 
-import type { UIMessage } from 'ai';
+import type { LanguageModelUsage, UIMessage } from 'ai';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createChatSessionsPersistConfig } from '@/shared/storage';
@@ -20,6 +20,13 @@ export const createInitialChatSession = (chatId: string): ChatSession => {
     messages: [],
     payments: [],
     cap: currentCap,
+    contextUsage: {
+      inputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+      reasoningTokens: 0,
+      cachedInputTokens: 0,
+    },
   };
 };
 
@@ -48,6 +55,10 @@ interface ChatSessionsStoreState {
   updateChatSessionArtifactState: (id: string, state: any) => void;
   getChatSessionArtifactState: (id: string) => any;
   setChatSessionCap: (id: string, cap: Cap) => void;
+  updateChatSessionContextUsage: (
+    id: string,
+    usage: LanguageModelUsage,
+  ) => void;
   deleteSession: (id: string) => void;
 
   // update messages for a session and create a new session if not founds
@@ -200,6 +211,29 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
 
       getChatSessionArtifactState: (id: string) => {
         return get().chatSessions[id]?.artifactState;
+      },
+
+      updateChatSessionContextUsage: (
+        id: string,
+        usage: LanguageModelUsage,
+      ) => {
+        get().upsertSession(id, (prev) => ({
+          contextUsage: {
+            inputTokens:
+              (prev.contextUsage.inputTokens || 0) + (usage.inputTokens || 0),
+            outputTokens:
+              (prev.contextUsage.outputTokens || 0) + (usage.outputTokens || 0),
+            totalTokens:
+              (prev.contextUsage.totalTokens || 0) + (usage.totalTokens || 0),
+            reasoningTokens:
+              (prev.contextUsage.reasoningTokens || 0) +
+              (usage.reasoningTokens || 0),
+            cachedInputTokens:
+              (prev.contextUsage.cachedInputTokens || 0) +
+              (usage.cachedInputTokens || 0),
+          },
+          updatedAt: Date.now(),
+        }));
       },
 
       clearAllSessions: () => {
