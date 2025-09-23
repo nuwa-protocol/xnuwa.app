@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import { memo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { RenameDialog } from '@/features/chat/components/rename-dialog';
 import type { ChatSession } from '@/features/chat/types';
+import { RenameDialog } from '@/shared/components/rename-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -129,7 +129,17 @@ const PureChatItem = ({
 
       <RenameDialog
         open={renameDialogOpen}
-        onOpenChange={setRenameDialogOpen}
+        onOpenChange={(open) => {
+          setRenameDialogOpen(open);
+          floatingContext.stayHovering(open);
+          if (!open) {
+            floatingContext.closeSidebar();
+            // Remove focus from the trigger button to eliminate the ring
+            setTimeout(() => {
+              (document.activeElement as HTMLElement)?.blur();
+            }, 0);
+          }
+        }}
         currentName={chat.title}
         onRename={handleRenameConfirm}
       />

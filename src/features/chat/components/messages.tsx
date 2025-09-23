@@ -18,6 +18,16 @@ function PureMessages({ isReadonly }: MessagesProps) {
   const { messages, status } = useChat({ chat });
   const [userMessagesHeight, setUserMessagesHeight] = useState(0);
 
+  console.log(messages);
+
+  // Find the last clear context message index
+  const lastClearContextIndex = messages.findLastIndex((message) =>
+    message.role === 'system' &&
+    message.parts?.some(
+      (part) => part.type === 'data-uimark' && part.data === 'clear-context',
+    )
+  );
+
   // when messages update, recalculate the height of the last user message
   useEffect(() => {
     const calculateLastUserMessageHeight = () => {
@@ -51,14 +61,21 @@ function PureMessages({ isReadonly }: MessagesProps) {
     <Conversation>
       <ConversationContent>
         {messages.map((message, index) => {
+          // Messages before the last clear context should be muted
+          const isBeforeLastClearContext = lastClearContextIndex !== -1 && index < lastClearContextIndex;
+
           return (
-            <PreviewMessage
+            <div
               key={message.id}
-              index={index}
-              message={message}
-              isReadonly={isReadonly}
-              userMessagesHeight={userMessagesHeight}
-            />
+              className={isBeforeLastClearContext ? 'opacity-50' : ''}
+            >
+              <PreviewMessage
+                index={index}
+                message={message}
+                isReadonly={isReadonly}
+                userMessagesHeight={userMessagesHeight}
+              />
+            </div>
           );
         })}
 

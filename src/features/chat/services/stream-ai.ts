@@ -67,6 +67,19 @@ export const CreateAIChatStream = async ({
     timestamp: Date.now(),
   });
 
+  // exclude the messages before the last clear context mark
+  const lastClearContextIndex = messages.findLastIndex(
+    (message) =>
+      message.role === 'system' &&
+      message.parts?.some(
+        (part) => part.type === 'data-uimark' && part.data === 'clear-context',
+      ),
+  );
+  const viableMessages =
+    lastClearContextIndex !== -1
+      ? messages.slice(lastClearContextIndex + 1)
+      : messages;
+
   const stream = createUIMessageStream({
     originalMessages: messages,
     execute: ({ writer }) => {
@@ -74,7 +87,7 @@ export const CreateAIChatStream = async ({
       const result = streamText({
         model: llmProvider.chat(model),
         system: prompt,
-        messages: convertToModelMessages(messages),
+        messages: convertToModelMessages(viableMessages),
         tools: mergedTools,
         abortSignal: signal,
         maxRetries: 3,

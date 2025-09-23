@@ -4,7 +4,7 @@ import type { UIMessage } from 'ai';
 import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
-
+import { Separator } from '@/shared/components/ui/separator';
 import { cn } from '@/shared/utils';
 import { useChatContext } from '../contexts/chat-context';
 import { MessageActions } from './message-actions';
@@ -59,6 +59,22 @@ const PurePreviewMessage = ({
   const shouldPushToTop =
     status === 'submitted' && index === messages.length - 1;
   const minHeight = getMessageMinHeight(shouldPushToTop, message.role);
+
+  const isClearContextMessage =
+    message.role === 'system' &&
+    message.parts?.some(
+      (part) => part.type === 'data-uimark' && part.data === 'clear-context',
+    );
+
+  // TODO: need to add a button to revert the context clear
+  if (isClearContextMessage)
+    return (
+      <div className="max-w-2xl my-8 mx-auto flex items-center justify-center overflow-hidden">
+        <Separator decorative={true} className=" border-t border-2 rounded-full bg-transparent" />
+        <div className="px-4 text-center bg-card text-sm min-w-fit text-muted-foreground">Context Cleared</div>
+        <Separator className="border-t border-2 rounded-full bg-transparent" />
+      </div>
+    );
 
   return (
     <AnimatePresence>
@@ -121,67 +137,72 @@ const PurePreviewMessage = ({
             })()}
 
             {/* render message parts */}
-            {message.parts?.map((part, index) => {
-              // const processedTypes = new Set(['reasoning', 'source']);
-              // if (processedTypes.has(part.type)) return null;
+            {message.parts
+              ?.slice()
+              .sort((a, b) => {
+                if (a.type === 'reasoning' && b.type === 'text') return -1;
+                if (a.type === 'text' && b.type === 'reasoning') return 1;
+                return 0;
+              })
+              ?.map((part, index) => {
 
-              const { type } = part;
-              const key = `message-${message.id}-part-${index}`;
+                const { type } = part;
+                const key = `message-${message.id}-part-${index}`;
 
-              if (type === 'reasoning' && part.text?.trim().length > 0) {
-                return (
-                  <MessageReasoning
-                    key={`reasoning-${message.id}-${index}`}
-                    isStreaming={isStreamingReasoning}
-                    content={part.text}
-                  />
-                );
-              }
+                if (type === 'reasoning' && part.text?.trim().length > 0) {
+                  return (
+                    <MessageReasoning
+                      key={`reasoning-${message.id}-${index}`}
+                      isStreaming={isStreamingReasoning}
+                      content={part.text}
+                    />
+                  );
+                }
 
-              if (type === 'text') {
-                return (
-                  <MessageText
-                    key={key}
-                    chatId={chat.id}
-                    message={message}
-                    part={part}
-                    index={index}
-                    isReadonly={isReadonly}
-                    setMessages={setMessages}
-                    regenerate={regenerate}
-                    onModeChange={setMode}
-                  />
-                );
-              }
+                if (type === 'text') {
+                  return (
+                    <MessageText
+                      key={key}
+                      chatId={chat.id}
+                      message={message}
+                      part={part}
+                      index={index}
+                      isReadonly={isReadonly}
+                      setMessages={setMessages}
+                      regenerate={regenerate}
+                      onModeChange={setMode}
+                    />
+                  );
+                }
 
-              if (type === 'file' && message.role === 'assistant') {
-                return (
-                  <MessageImage
-                    key={key}
-                    imageName={part.filename}
-                    base64={part.url}
-                    mediaType={part.mediaType}
-                    alt={part.filename || 'Generated Image'}
-                  />
-                );
-              }
+                if (type === 'file' && message.role === 'assistant') {
+                  return (
+                    <MessageImage
+                      key={key}
+                      imageName={part.filename}
+                      base64={part.url}
+                      mediaType={part.mediaType}
+                      alt={part.filename || 'Generated Image'}
+                    />
+                  );
+                }
 
-              if (type === 'dynamic-tool') {
-                const { toolCallId, state, input, output, toolName } = part;
-                return (
-                  <GeneralTool
-                    key={toolCallId}
-                    input={input}
-                    output={output}
-                    toolCallId={toolCallId}
-                    toolName={toolName}
-                    state={state}
-                  />
-                );
-              }
+                if (type === 'dynamic-tool') {
+                  const { toolCallId, state, input, output, toolName } = part;
+                  return (
+                    <GeneralTool
+                      key={toolCallId}
+                      input={input}
+                      output={output}
+                      toolCallId={toolCallId}
+                      toolName={toolName}
+                      state={state}
+                    />
+                  );
+                }
 
-              return null;
-            })}
+                return null;
+              })}
 
             {!isReadonly && (
               <MessageActions
