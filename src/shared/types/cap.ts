@@ -20,7 +20,6 @@ export const CapIDSchema = z
     id: `${data.authorDID}:${data.idName}`,
   }));
 
-// TODO: add context length
 export const CapModelSchema = z.object({
   customGatewayUrl: z.string().url('Must be a valid URL').optional(),
   modelId: z

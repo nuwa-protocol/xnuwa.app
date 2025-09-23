@@ -67,23 +67,23 @@ const PureChatItem = ({
     <SidebarMenuItem>
       <SidebarMenuButton isActive={isActive} onClick={handleChatSelect}>
         <span>{chat.title}</span>
-        <ChatDropdownMenu
-          session={chat}
-          onRename={handleRename}
-          onTogglePin={handleTogglePin}
-          onDelete={handleDelete}
-          onMenuOpenChange={handleMenuOpenChange}
-          trigger={
-            <SidebarMenuAction
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground mr-0.5"
-              showOnHover={!isActive}
-            >
-              <MoreHorizontalIcon />
-              <span className="sr-only">More</span>
-            </SidebarMenuAction>
-          }
-        />
       </SidebarMenuButton>
+      <ChatDropdownMenu
+        session={chat}
+        onRename={handleRename}
+        onTogglePin={handleTogglePin}
+        onDelete={handleDelete}
+        onMenuOpenChange={handleMenuOpenChange}
+        trigger={
+          <SidebarMenuAction
+            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground mr-0.5"
+            showOnHover={!isActive}
+          >
+            <MoreHorizontalIcon />
+            <span className="sr-only">More</span>
+          </SidebarMenuAction>
+        }
+      />
     </SidebarMenuItem>
   );
 };
