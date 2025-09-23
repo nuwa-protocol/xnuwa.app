@@ -6,6 +6,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -48,16 +49,19 @@ function VariablesDialog({
           Variables
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className='px-0'>
+        <DialogHeader className='px-6'>
           <DialogTitle>Prompt Variables</DialogTitle>
         </DialogHeader>
-        <div className="space-y-1">
+        <DialogDescription className='px-6'>
+          Use the following variables to make your prompt dynamic. Each variable will be replaced with the actual value before the prompt is sent to LLM.
+        </DialogDescription>
+        <div>
           {promptVariables.map((variable) => (
             <button
               key={variable.name}
               type="button"
-              className="w-full text-left cursor-pointer hover:bg-muted/30 rounded-md p-2 transition-colors"
+              className="w-full text-left cursor-pointer hover:bg-accent rounded-md py-4 transition-colors m-0 px-6 border-t"
               onClick={() => {
                 onVariableSelect(`\n\n${variable.value}\n`);
                 onOpenChange(false);
@@ -71,9 +75,17 @@ function VariablesDialog({
                   {variable.name}
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground pl-1">
+              <p className="text-sm mb-1">
                 {variable.description}
               </p>
+              <div className="flex flex-col items-start">
+                <p className="text-xs font-semibold my-2">
+                  Example Prompt:
+                </p>
+                <pre className="w-full text-xs text-muted-foreground whitespace-pre-wrap font-mono p-2 bg-muted/20 rounded-md border">
+                  {variable.example}
+                </pre>
+              </div>
             </button>
           ))}
         </div>

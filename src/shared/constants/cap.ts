@@ -14,7 +14,15 @@ export const promptVariables = [
   {
     name: '{{user_geo}}',
     description: "The user's location",
+    example: 'Latitude: 33.354514786838998, Longitude: 100.10581180059799',
     value: `The user's location is {{user_geo}}`,
+  },
+  {
+    name: '{{artifact_selections}}',
+    description: 'The current selections from the artifact.',
+    example:
+      '1. Selection Message 1\n2. Selection Message 2\n3. Selection Message 3',
+    value: `Below are the current user selections:\n {{artifact_selections}}`,
   },
 ];
 
@@ -34,6 +42,7 @@ export const defaultCap: Cap = {
       },
       supportedInputs: ['text', 'image'],
       modelType: 'Language Model',
+      contextLength: 128000,
     },
     mcpServers: {},
   },

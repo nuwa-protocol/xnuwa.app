@@ -34,6 +34,7 @@ export default function Header({ chatId }: HeaderProps) {
   };
 
   const handleClearConversation = async () => {
+    // add a clear context message seperator to the conversation messages
     setMessages((messages) => {
       // if already have clear context message, do nothing
       if (
@@ -59,6 +60,17 @@ export default function Header({ chatId }: HeaderProps) {
       const updatedMessages = [...messages, contextSeperatorMessage];
       updateMessages(chatId, updatedMessages);
       return updatedMessages;
+    });
+
+    // clear the context usage
+    updateSession(chatId, {
+      contextUsage: {
+        inputTokens: 0,
+        outputTokens: 0,
+        totalTokens: 0,
+        reasoningTokens: 0,
+        cachedInputTokens: 0,
+      }
     });
   };
 

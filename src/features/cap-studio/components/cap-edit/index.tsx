@@ -13,11 +13,11 @@ import { CapStudioStore } from '../../stores';
 import { getErrorDescription } from '../../utils';
 import { DashboardLayout } from '../layout/dashboard-layout';
 import { ArtifactTab } from './artifact';
+import { DescriptionTab } from './description';
 import { GeneralTab } from './general';
 import { McpTab } from './mcp';
 import { ModelTab } from './model';
 import { PromptTab } from './prompt';
-import { ReadmeTab } from './readme';
 
 export function CapEdit({ id }: { id?: string }) {
   const { localCaps } = CapStudioStore();
@@ -80,7 +80,7 @@ export function CapEdit({ id }: { id?: string }) {
             <Tabs defaultValue="general" className="space-y-6">
               <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="general">General</TabsTrigger>
-                <TabsTrigger value="readme">Readme</TabsTrigger>
+                <TabsTrigger value="description">Description</TabsTrigger>
                 <TabsTrigger value="model">Model</TabsTrigger>
                 <TabsTrigger value="prompt">Prompt</TabsTrigger>
                 <TabsTrigger value="mcp">MCP</TabsTrigger>
@@ -92,8 +92,8 @@ export function CapEdit({ id }: { id?: string }) {
                 <GeneralTab form={form} />
               </TabsContent>
 
-              <TabsContent value="readme" className="space-y-6">
-                <ReadmeTab form={form} />
+              <TabsContent value="description" className="space-y-6">
+                <DescriptionTab form={form} />
               </TabsContent>
 
               {/* Model Tab */}

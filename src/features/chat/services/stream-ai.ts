@@ -27,7 +27,7 @@ export const CreateAIChatStream = async ({
   cap: Cap;
 }) => {
   // Resolve cap configuration
-  const capResolve = new CapResolve(cap);
+  const capResolve = new CapResolve(cap, chatId);
   const {
     prompt,
     model,
@@ -155,7 +155,7 @@ export const CreateAIRequestStream = async ({
   prompt: string;
   cap: Cap;
 }) => {
-  const capResolve = new CapResolve(cap);
+  const capResolve = new CapResolve(cap, chatId);
   const {
     prompt: capPrompt,
     model,

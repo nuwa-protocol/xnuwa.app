@@ -19,18 +19,18 @@ import {
     Textarea,
 } from '@/shared/components/ui';
 
-interface ReadmeTabProps {
+interface DescriptionTabProps {
     form: UseFormReturn<any>;
 }
 
-export function ReadmeTab({ form }: ReadmeTabProps) {
+export function DescriptionTab({ form }: DescriptionTabProps) {
     // Local tab state for Write/Preview
     const [tab, setTab] = useState<'write' | 'preview'>('write');
 
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-base">Cap Readme</CardTitle>
+                <CardTitle className="text-base">Cap Description</CardTitle>
                 <CardDescription>
                     Tell us everything about your cap. Markdown is supported.
                 </CardDescription>

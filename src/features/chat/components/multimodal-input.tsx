@@ -59,7 +59,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
       return;
     }
 
-    // TODO: how to send the selections?
     if (input.trim() || attachments.length > 0) {
       sendMessage({
         text: input,

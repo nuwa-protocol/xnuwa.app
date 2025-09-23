@@ -1,3 +1,4 @@
+import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
 import { RemoteMCPManager } from '@/shared/services/global-mcp-manager';
 import type { Cap } from '@/shared/types';
 
@@ -5,11 +6,13 @@ export class CapResolve {
   private cap: Cap;
   private isCurrentCapMCPError: boolean;
   private hasMCPServers: boolean;
+  private chatId: string;
 
-  constructor(cap: Cap) {
+  constructor(cap: Cap, chatId: string) {
     this.cap = cap;
     this.isCurrentCapMCPError = false;
     this.hasMCPServers = Object.keys(this.cap.core.mcpServers).length > 0;
+    this.chatId = chatId;
   }
 
   private async getUserLocation(): Promise<string> {
@@ -30,12 +33,20 @@ export class CapResolve {
 
       // Use reverse geocoding or return coordinates
       const { latitude, longitude } = position.coords;
-      return `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
+      return `Latitude: ${latitude}, Longitude: ${longitude}`;
     } catch {
       // Fallback to browser language/timezone based location
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return timezone.split('/').pop() || 'Unknown';
     }
+  }
+
+  private getChatSelections(): string[] {
+    const chatSelections =
+      ChatSessionsStore.getState().chatSessions[this.chatId]?.selections?.map(
+        (selection) => selection.message,
+      ) || [];
+    return chatSelections;
   }
 
   private async resolveVariables(prompt: string): Promise<string> {
@@ -47,6 +58,21 @@ export class CapResolve {
       resolvedPrompt = resolvedPrompt.replace(
         /\{\{user_geo\}\}/g,
         userLocation,
+      );
+    }
+
+    // Resolve {{artifact_selections}} variable
+    if (resolvedPrompt.includes('{{artifact_selections}}')) {
+      const chatSelections = this.getChatSelections();
+
+      let promptReplacement = 'No selections from the user';
+      if (chatSelections.length > 0) {
+        promptReplacement = chatSelections.join('\n');
+      }
+
+      resolvedPrompt = resolvedPrompt.replace(
+        /\{\{artifact_selections\}\}/g,
+        promptReplacement,
       );
     }
 
