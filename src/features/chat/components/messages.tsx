@@ -77,7 +77,7 @@ function PureMessages({ isReadonly }: MessagesProps) {
           );
         })}
 
-        {/* Show loader from user message submission until AI outputs meaningful content */}
+        {/* TODO: fix the loader timing */}
         {(() => {
           // Show loader during submission
           if (
