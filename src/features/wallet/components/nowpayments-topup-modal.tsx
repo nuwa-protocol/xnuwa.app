@@ -241,7 +241,7 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
         order_id: orderId,
         order_description: `NUWA Client top-up - ${usdAmount.toFixed(2)} USD`,
         pay_currency: selectedCrypto,
-        ipn_callback_url: `https://dc4749a6dde9.ngrok-free.app/webhook/nowpayments`,
+        ipn_callback_url: `https://nowpayment-service-test.up.railway.app/webhook/nowpayments`,
         payer_did: did || undefined,
       };
 
