@@ -2,10 +2,10 @@ import {
   CalendarArrowDown,
   CalendarArrowUp,
   CalendarIcon,
+  Check,
   ListFilter,
   SortAsc,
   X,
-  Check,
 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Calendar } from '@/shared/components/ui/calendar';
@@ -15,12 +15,16 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/shared/components/ui/popover';
 import type { SortOption } from '../types';
 
 const STATUS_OPTIONS = [
@@ -53,9 +57,12 @@ export function DepositTransactionsFilter({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-10 rounded-md px-3 gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-10 rounded-md px-3 gap-2"
+        >
           <ListFilter className="h-4 w-4" />
-          <span className="hidden sm:inline">Sort & Filter</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
@@ -87,7 +94,10 @@ export function DepositTransactionsFilter({
           <DropdownMenuSubTrigger>Status</DropdownMenuSubTrigger>
           <DropdownMenuSubContent className="w-44">
             {STATUS_OPTIONS.map((opt) => (
-              <DropdownMenuItem key={opt.value} onClick={() => setStatus(opt.value)}>
+              <DropdownMenuItem
+                key={opt.value}
+                onClick={() => setStatus(opt.value)}
+              >
                 {status === opt.value ? (
                   <Check className="h-4 w-4 mr-2" />
                 ) : (
@@ -111,13 +121,21 @@ export function DepositTransactionsFilter({
         <div className="px-2 py-1">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal">
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal"
+              >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {filterDate ? filterDate.toLocaleDateString() : 'Pick a date'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end" side="right">
-              <Calendar mode="single" selected={filterDate} onSelect={setFilterDate} initialFocus />
+              <Calendar
+                mode="single"
+                selected={filterDate}
+                onSelect={setFilterDate}
+                initialFocus
+              />
             </PopoverContent>
           </Popover>
         </div>

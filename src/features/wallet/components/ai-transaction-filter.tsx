@@ -1,11 +1,4 @@
-import {
-  CalendarArrowDown,
-  CalendarArrowUp,
-  CalendarIcon,
-  ListFilter,
-  SortAsc,
-  X,
-} from 'lucide-react';
+import { CalendarArrowDown, CalendarArrowUp, CalendarIcon, ListFilter, SortAsc, X } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Calendar } from '@/shared/components/ui/calendar';
 import {
@@ -42,12 +35,11 @@ export const AITransactionsFilter = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           className="h-10 rounded-md px-3 gap-2"
         >
           <ListFilter className="h-4 w-4" />
-          <span className="hidden sm:inline">Sort & Filter</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">

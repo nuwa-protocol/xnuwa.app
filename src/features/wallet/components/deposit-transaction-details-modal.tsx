@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
 import { Table, TableBody, TableCell, TableRow } from '@/shared/components/ui/table';
 import type { Order } from '../hooks/use-orders';
@@ -75,13 +75,13 @@ export function DepositTransactionDetailsModal({
   if (!order) return null;
 
   const createdAt = order.created_at
-    ? `${new Date(order.created_at).getTime()} (${new Date(order.created_at).toLocaleString()})`
+    ? `${new Date(order.created_at).toLocaleString()}`
     : null;
   const updatedAt = order.updated_at
-    ? `${new Date(order.updated_at).getTime()} (${new Date(order.updated_at).toLocaleString()})`
+    ? `${new Date(order.updated_at).toLocaleString()}`
     : null;
   const fiatFormatted = formatAmount(order.amount_fiat, order.currency_fiat);
-  const ipnRows = useMemo(() => flattenObject(order.ipn_payload ?? undefined), [order.ipn_payload]);
+  const ipnRows = flattenObject(order.ipn_payload ?? undefined);
 
   return (
     <Dialog open={!!order} onOpenChange={onClose}>
@@ -96,7 +96,7 @@ export function DepositTransactionDetailsModal({
                 <TableCell colSpan={2} className="font-semibold text-sm">Identifiers</TableCell>
               </TableRow>
               <Row label="Order ID" value={order.order_id || null} />
-              <Row label="NowPayments Payment ID" value={order.nowpayments_payment_id} />
+              <Row label="Payment ID" value={order.nowpayments_payment_id} />
 
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">Status</TableCell>
@@ -109,7 +109,7 @@ export function DepositTransactionDetailsModal({
                 <TableCell colSpan={2} className="font-semibold text-sm">Amounts</TableCell>
               </TableRow>
               <Row label="Fiat Amount" value={fiatFormatted || order.amount_fiat} />
-              <Row label="Fiat Currency" value={order.currency_fiat} />
+              <Row label="Fiat Unit" value={order.currency_fiat} />
 
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">Transfers</TableCell>
@@ -125,7 +125,7 @@ export function DepositTransactionDetailsModal({
               {ipnRows.length > 0 && (
                 <>
                   <TableRow className="bg-muted/30">
-                    <TableCell colSpan={2} className="font-semibold text-sm">IPN Payload</TableCell>
+                    <TableCell colSpan={2} className="font-semibold text-sm">Payload</TableCell>
                   </TableRow>
                   {ipnRows.map(({ key, value }) => (
                     <Row key={key} label={key} value={value} />

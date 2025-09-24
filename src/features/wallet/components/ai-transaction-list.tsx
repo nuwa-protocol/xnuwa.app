@@ -42,7 +42,7 @@ export function AITransactionList() {
 
     return (
         <div className="flex flex-col w-full">
-            <div className="sticky top-0 z-20 flex flex-row items-center justify-between gap-3 px-4 py-2 bg-background">
+            <div className="sticky top-0 z-20 flex flex-row items-center justify-between gap-3 pl-4 pr-1 py-2 bg-background">
                 <AITransactionSearch
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}

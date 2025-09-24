@@ -42,7 +42,7 @@ export function BalanceCard({ onBuy }: BalanceCardProps) {
         className={cn(
           'relative overflow-hidden border-0 shadow-lg bg-theme-100',
           'bg-gradient-to-br from-theme-100 via-theme-50 to-theme-100',
-          'dark:bg-gradient-to-br from-theme-950 via-theme-800 to-theme-950',
+          'dark:bg-gradient-to-br dark:from-theme-950 dark:via-theme-800 dark:to-theme-950',
         )}
       >
         <CardHeader className="sr-only">Wallet Balance Card</CardHeader>
