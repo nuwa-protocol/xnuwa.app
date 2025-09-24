@@ -103,7 +103,7 @@ export default function Header({ chatId }: HeaderProps) {
   const contextLength = currentCap.core.model.contextLength;
 
   return (
-    <header className="sticky top-0 z-10 grid grid-cols-3 items-center bg-background/10 px-3 pt-2 backdrop-blur supports-[backdrop-filter]:bg-background/10">
+    <header className="sticky top-0 z-10 grid grid-cols-3 items-center px-3 pt-2">
       {/* Left: Actions */}
       <div className="flex items-center gap-1.5">
         <CapSelector />

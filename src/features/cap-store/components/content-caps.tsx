@@ -6,6 +6,7 @@ import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observe
 import { type UseRemoteCapParams, useCapStore } from '../stores';
 import { CapCard } from './cap-card';
 import { CapStoreLoading } from './cap-store-loading';
+import { CapStoreContentHeader } from './content-header';
 
 export function CapStoreCapsContent({
   tag,
@@ -81,6 +82,8 @@ export function CapStoreCapsContent({
 
   return (
     <div className="flex flex-col h-full">
+      <CapStoreContentHeader showSearchAndSort={true} />
+
       {/* Caps Grid Container with ScrollArea */}
       <ScrollArea className="flex-1">
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-6">

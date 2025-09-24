@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
-import { SidebarLayout } from '@/features/sidebar/components';
+import AppSidebar from '@/features/sidebar-new/components';
+import { TooltipProvider } from '@/shared/components/ui/tooltip';
 
 export default function MainLayout() {
   return (
@@ -8,9 +9,11 @@ export default function MainLayout() {
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
         async
       />
-      <SidebarLayout>
-        <Outlet />
-      </SidebarLayout>
+      <TooltipProvider delayDuration={0}>
+        <AppSidebar>
+          <Outlet />
+        </AppSidebar>
+      </TooltipProvider>
     </>
   );
 }

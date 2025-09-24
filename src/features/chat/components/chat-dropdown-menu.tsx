@@ -8,7 +8,6 @@ import {
 import { useState } from 'react';
 import type { ChatSession } from '@/features/chat/types';
 import { RenameDialog } from '@/shared/components/rename-dialog';
-import { Button } from '@/shared/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +25,7 @@ interface ChatDropdownMenuProps {
   onDelete: () => void;
   trigger?: React.ReactNode;
   onMenuOpenChange?: (open: boolean) => void;
+  onDialogOpenChange?: (open: boolean) => void;
 }
 
 export function ChatDropdownMenu({
@@ -35,15 +35,15 @@ export function ChatDropdownMenu({
   onDelete,
   trigger,
   onMenuOpenChange,
+  onDialogOpenChange,
 }: ChatDropdownMenuProps) {
   const { t } = useLanguage();
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleRename = () => {
     setRenameDialogOpen(true);
-    setMenuOpen(false);
+    onDialogOpenChange?.(true);
   };
 
   const handleRenameConfirm = (newTitle: string) => {
@@ -51,13 +51,13 @@ export function ChatDropdownMenu({
   };
 
   const handleTogglePin = () => {
+    onMenuOpenChange?.(false);
     onTogglePin();
-    setMenuOpen(false);
   };
 
   const handleDelete = () => {
     setDeleteDialogOpen(true);
-    setMenuOpen(false);
+    onDialogOpenChange?.(true);
   };
 
   const handleDeleteConfirm = () => {
@@ -65,33 +65,29 @@ export function ChatDropdownMenu({
   };
 
   const handleMenuOpenChange = (open: boolean) => {
-    setMenuOpen(open);
     onMenuOpenChange?.(open);
   };
 
   const handleDialogOpenChange = (open: boolean) => {
-    onMenuOpenChange?.(open);
+    onDialogOpenChange?.(open);
   };
 
   const defaultTrigger = (
-    <Button
-      variant="ghost"
-      size="sm"
-      className="h-4 px-2 text-muted-foreground"
+    <div
+      className="px-2 text-muted-foreground cursor-pointer flex items-center hover:bg-accent"
     >
-      <MoreHorizontal className="h-2 w-4" />
+      <MoreHorizontal className="h-4 w-4" />
       <span className="sr-only">Open Conversation Menu</span>
-    </Button>
+    </div>
   );
 
   return (
     <>
       <DropdownMenu
         modal={true}
-        open={menuOpen}
         onOpenChange={handleMenuOpenChange}
       >
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger onClick={(e) => e.stopPropagation()}>
           {trigger || defaultTrigger}
         </DropdownMenuTrigger>
         <DropdownMenuContent align={'start'}>

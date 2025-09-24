@@ -65,7 +65,7 @@ export function LandingPage() {
     }, []);
 
     return (
-        <div className="flex flex-col relative min-w-0 min-h-screen bg-background  hide-scrollbar">
+        <div className="flex flex-col relative overflow-y-auto hide-scrollbar">
             {/* Grid Pattern Background */}
             <GridPattern
                 width={40}
@@ -81,7 +81,7 @@ export function LandingPage() {
             />
 
             {/* Main Content */}
-            <div className="flex flex-col w-full bg-background">
+            <div className="flex flex-col w-full">
                 {/* Welcome Section */}
                 <div className="min-h-[40vh] flex flex-col justify-center py-8 mt-10">
                     <div className="flex flex-col items-center justify-center h-full min-h-0 px-4 z-10">
@@ -96,7 +96,7 @@ export function LandingPage() {
                                     Get Started with every AI You Need
                                 </h1>
                                 <p className="text-muted-foreground text-center max-w-md">
-                                    Start chatting or explore amazing AI capabilities
+                                    Explore amazing AI capabilities
                                 </p>
                             </motion.div>
                         </div>
@@ -104,7 +104,7 @@ export function LandingPage() {
                 </div>
 
                 {/* Cap Store Content Section (lazy) */}
-                <div className="flex-1 bg-background max-w-7xl mx-auto min-h-screen">
+                <div className="flex-1 bg-background max-w-7xl mx-auto">
                     {showHome ? (
                         <Suspense
                             fallback={

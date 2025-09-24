@@ -7,7 +7,7 @@ export function ChatContent({ isReadonly }: { isReadonly: boolean }) {
     const { chat } = useChatContext();
 
     return (
-        <div className="flex flex-col relative min-w-0 h-screen bg-background">
+        <div className="flex flex-col relative min-w-0 h-full">
             <Header chatId={chat.id} />
             <Messages isReadonly={isReadonly} />
             <div
