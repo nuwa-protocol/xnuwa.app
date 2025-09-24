@@ -1,4 +1,9 @@
-import { BanknoteArrowDown, BanknoteArrowUp, CircleDollarSign, WalletIcon } from 'lucide-react';
+import {
+  BanknoteArrowDown,
+  BanknoteArrowUp,
+  CircleDollarSign,
+  WalletIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -18,10 +23,10 @@ import { WalletStore } from '../stores';
 import { TestnetFaucetDialog } from './testnet-faucet-dialog';
 
 interface BalanceCardProps {
-  onTopUp: () => void;
+  onBuy: () => void;
 }
 
-export function BalanceCard({ onTopUp }: BalanceCardProps) {
+export function BalanceCard({ onBuy }: BalanceCardProps) {
   const { usdAmount, balanceLoading, balanceError } = WalletStore();
   const [showFaucetDialog, setShowFaucetDialog] = useState(false);
 
@@ -49,7 +54,9 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
                 <WalletIcon className="w-5 h-5 text-theme-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold">Credit Balance</CardTitle>
+                <CardTitle className="text-lg font-semibold">
+                  Credit Balance
+                </CardTitle>
               </div>
             </div>
             {/* Balance Display */}
@@ -69,7 +76,7 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
               <Button
                 variant="primary"
                 size="sm"
-                onClick={onTopUp}
+                onClick={onBuy}
                 className="w-full"
               >
                 <BanknoteArrowDown className="w-3.5 h-3.5" />

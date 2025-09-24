@@ -100,15 +100,12 @@ export function CapDetailsHeader({
           {/* Structured metadata below title (compact) */}
           <div className="mt-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-
               {/* Version (next line) */}
               <div className="flex items-center gap-2 min-w-0">
                 <GitBranch className="h-4 w-4 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">Version:</span>
                 <Badge variant="secondary">v{capQueryData.version}</Badge>
               </div>
-
-
 
               {/* CID (next line) */}
               <div className="flex items-center gap-2 min-w-0">
@@ -151,8 +148,6 @@ export function CapDetailsHeader({
                 <Badge className="gap-1">Verified</Badge>
               </div>
 
-
-
               {/* Author */}
               <div className="flex items-center gap-2 min-w-0">
                 <User className="h-4 w-4 text-muted-foreground" />
@@ -186,8 +181,6 @@ export function CapDetailsHeader({
                   </Tooltip>
                 </TooltipProvider>
               </div>
-
-
             </div>
           </div>
 
@@ -212,7 +205,7 @@ export function CapDetailsHeader({
                 ratingCount={capQueryData.stats.ratingCount}
                 size={16}
                 isInteractive={false}
-                onRate={() => { }}
+                onRate={() => {}}
               />
             </div>
           </div>

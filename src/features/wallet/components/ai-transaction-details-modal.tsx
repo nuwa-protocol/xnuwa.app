@@ -57,8 +57,9 @@ function CopyableCell({ value, isNested = false }: CopyableCellProps) {
 
   return (
     <TableCell
-      className={`cursor-pointer hover:bg-muted/50 transition-colors font-mono text-xs break-all ${value === null ? 'text-muted-foreground italic' : ''
-        } ${isNested ? 'pl-8' : ''}`}
+      className={`cursor-pointer hover:bg-muted/50 transition-colors font-mono text-xs break-all ${
+        value === null ? 'text-muted-foreground italic' : ''
+      } ${isNested ? 'pl-8' : ''}`}
       onClick={handleCopy}
       title="Click to copy"
     >

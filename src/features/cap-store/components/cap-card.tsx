@@ -131,8 +131,9 @@ export function CapCard({ cap }: CapCardProps) {
 
       {/* Hover Overlay */}
       <div
-        className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
+        className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${
+          isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
       >
         <Button
           onClick={handleUseCap}

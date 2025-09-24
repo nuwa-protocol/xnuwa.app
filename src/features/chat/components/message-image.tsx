@@ -98,7 +98,7 @@ export const MessageImage = ({
           </button>
         </div>
       </div>
-      
+
       <ImagePreviewDialog
         imageUrl={base64}
         isOpen={isPreviewOpen}

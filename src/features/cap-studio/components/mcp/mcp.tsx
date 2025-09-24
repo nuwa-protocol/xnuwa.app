@@ -71,14 +71,11 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   const [showUIPreview, setShowUIPreview] = useState(false);
   const [penpalConnected, setPenpalConnected] = useState(false);
   // Hold the latest tool execution result for quick inspection
-  const [lastToolResult, setLastToolResult] = useState<
-    | {
-      tool: string;
-      result: any;
-      timestamp: number;
-    }
-    | null
-  >(null);
+  const [lastToolResult, setLastToolResult] = useState<{
+    tool: string;
+    result: any;
+    timestamp: number;
+  } | null>(null);
 
   const pushLog = useCallback((entry: Omit<LogEntry, 'id' | 'timestamp'>) => {
     setLogs((prev) =>
@@ -451,13 +448,13 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       className={`flex gap-6 ${
         // In Artifact MCP mode, lock the layout to the viewport height so only the left pane scrolls
         mcpType === 'Artifact MCP' ? 'h-screen' : 'max-w-3xl mx-auto'
-        }`}
+      }`}
     >
       <div
         className={`flex-1 space-y-6 p-8 ${
           // Make the left pane the only scroll container in Artifact MCP mode
           mcpType === 'Artifact MCP' ? 'overflow-y-auto min-h-0 pr-2' : ''
-          }`}
+        }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -680,10 +677,10 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                   </p>
                 ) : (
                   filteredTools.map(([toolName, tool]) => {
-
-                    const toolSchema = mcpType === 'Remote MCP'
-                      ? tool.parameters.properties || {}
-                      : tool.inputSchema.jsonSchema.properties || {}
+                    const toolSchema =
+                      mcpType === 'Remote MCP'
+                        ? tool.parameters.properties || {}
+                        : tool.inputSchema.jsonSchema.properties || {};
 
                     const hasParams = Object.keys(toolSchema).length > 0;
 
@@ -715,7 +712,11 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                                 Parameters
                               </div>
                               <Form
-                                schema={mcpType === 'Remote MCP' ? tool.parameters : tool.inputSchema.jsonSchema}
+                                schema={
+                                  mcpType === 'Remote MCP'
+                                    ? tool.parameters
+                                    : tool.inputSchema.jsonSchema
+                                }
                                 validator={validator}
                                 formData={toolParams[toolName] || {}}
                                 onChange={(e) =>
@@ -869,8 +870,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                           {/* Wrap long logs automatically across lines */}
                           <div className="flex-1 min-w-0">
                             <span
-                              className={`${getLogColor(log.type)} ${log.type === 'result' ? 'font-mono text-xs' : ''
-                                } whitespace-pre-wrap break-words leading-snug`}
+                              className={`${getLogColor(log.type)} ${
+                                log.type === 'result' ? 'font-mono text-xs' : ''
+                              } whitespace-pre-wrap break-words leading-snug`}
                             >
                               {log.message}
                             </span>

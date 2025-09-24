@@ -51,9 +51,7 @@ export function ModelTab({ form }: ModelTabProps) {
   // For custom gateway, confirm if we have any model configuration (not just modelId)
   const hasModelConfig =
     modelId || modelType || (supportedInputs && supportedInputs.length > 0);
-  const initialIsConfirmed = customGatewayUrl
-    ? !!hasModelConfig
-    : true; // Nuwa gateway is always confirmed
+  const initialIsConfirmed = customGatewayUrl ? !!hasModelConfig : true; // Nuwa gateway is always confirmed
 
   const [isGatewayConfirmed, setIsGatewayConfirmed] =
     useState(initialIsConfirmed);
@@ -272,23 +270,18 @@ export function ModelTab({ form }: ModelTabProps) {
             />
           </div>
 
-          {
-            gatewayType === 'custom' && (
-              <div className="flex items-center justify-between pt-2 px-6">
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleTestGateway}
-                  disabled={
-                    !customGatewayUrl?.trim() ||
-                    isValidatingGateway
-                  }
-                >
-                  {isValidatingGateway ? 'Testing...' : 'Test Gateway'}
-                </Button>
-              </div>
-            )
-          }
+          {gatewayType === 'custom' && (
+            <div className="flex items-center justify-between pt-2 px-6">
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleTestGateway}
+                disabled={!customGatewayUrl?.trim() || isValidatingGateway}
+              >
+                {isValidatingGateway ? 'Testing...' : 'Test Gateway'}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -447,7 +440,9 @@ export function ModelTab({ form }: ModelTabProps) {
                         placeholder="e.g., 128000"
                         type="number"
                         value={field.value || ''}
-                        onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                        onChange={(e) =>
+                          field.onChange(Number(e.target.value) || 0)
+                        }
                       />
                     </FormControl>
                     <FormDescription>

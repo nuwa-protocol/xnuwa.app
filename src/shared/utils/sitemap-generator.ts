@@ -1,19 +1,28 @@
 export interface SitemapUrl {
   loc: string;
   lastmod?: string;
-  changefreq?: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+  changefreq?:
+    | 'always'
+    | 'hourly'
+    | 'daily'
+    | 'weekly'
+    | 'monthly'
+    | 'yearly'
+    | 'never';
   priority?: number;
 }
 
 export function generateSitemap(urls: SitemapUrl[]): string {
-  const urlEntries = urls.map(url => {
-    return `  <url>
+  const urlEntries = urls
+    .map((url) => {
+      return `  <url>
     <loc>${url.loc}</loc>
     ${url.lastmod ? `<lastmod>${url.lastmod}</lastmod>` : ''}
     ${url.changefreq ? `<changefreq>${url.changefreq}</changefreq>` : ''}
     ${url.priority ? `<priority>${url.priority}</priority>` : ''}
   </url>`;
-  }).join('\n');
+    })
+    .join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -54,32 +63,39 @@ export function generateBasicSitemap(baseUrl: string): string {
 
 // Function to generate sitemap with cap pages
 export function generateCapSitemap(
-  baseUrl: string, 
+  baseUrl: string,
   caps: Array<{
     idName: string;
     submittedAt?: number;
-  }>
+  }>,
 ): string {
-  const capUrls: SitemapUrl[] = caps.map(cap => ({
+  const capUrls: SitemapUrl[] = caps.map((cap) => ({
     loc: `${baseUrl}/cap-store/${cap.idName}`,
     changefreq: 'weekly',
     priority: 0.7,
-    lastmod: cap.submittedAt 
+    lastmod: cap.submittedAt
       ? new Date(cap.submittedAt).toISOString().split('T')[0]
       : new Date().toISOString().split('T')[0],
   }));
 
   const staticUrls = generateBasicSitemap(baseUrl);
   const allUrls = [
-    ...JSON.parse(staticUrls.replace(/[\s\S]*<urlset[^>]*>([\s\S]*)<\/urlset>[\s\S]*/, '$1'))
+    ...JSON.parse(
+      staticUrls.replace(
+        /[\s\S]*<urlset[^>]*>([\s\S]*)<\/urlset>[\s\S]*/,
+        '$1',
+      ),
+    )
       .split('</url>')
       .filter((url: string) => url.trim())
       .map((url: string) => {
         const loc = url.match(/<loc>(.*?)<\/loc>/)?.[1] || '';
         const lastmod = url.match(/<lastmod>(.*?)<\/lastmod>/)?.[1];
-        const changefreq = url.match(/<changefreq>(.*?)<\/changefreq>/)?.[1] as any;
+        const changefreq = url.match(
+          /<changefreq>(.*?)<\/changefreq>/,
+        )?.[1] as any;
         const priority = url.match(/<priority>(.*?)<\/priority>/)?.[1];
-        
+
         return {
           loc,
           lastmod,

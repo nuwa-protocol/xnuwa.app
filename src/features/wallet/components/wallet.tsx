@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BalanceCard } from './balance-card';
 import { NowPaymentsTopupModal } from './buy-modal';
-import { TransactionHistory } from './transaction-history';
+import { Transactions } from './transactions';
 
 export function Wallet() {
   const [showNowPaymentsModal, setShowNowPaymentsModal] = useState(false);
@@ -15,9 +15,9 @@ export function Wallet() {
         </p>
       </div>
 
-      <BalanceCard onTopUp={() => setShowNowPaymentsModal(true)} />
+      <BalanceCard onBuy={() => setShowNowPaymentsModal(true)} />
 
-      <TransactionHistory />
+      <Transactions />
 
       <NowPaymentsTopupModal
         open={showNowPaymentsModal}

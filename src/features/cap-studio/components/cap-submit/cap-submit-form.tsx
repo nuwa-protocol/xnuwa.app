@@ -160,7 +160,9 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
               </a>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No artifact provided</p>
+            <p className="text-sm text-muted-foreground">
+              No artifact provided
+            </p>
           )}
         </CardContent>
       </Card>

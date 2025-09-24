@@ -25,19 +25,25 @@ const DEFAULT_SEO: SEOData = {
 export function useSEO(seoData: Partial<SEOData> = {}) {
   useEffect(() => {
     const data = { ...DEFAULT_SEO, ...seoData };
-    
+
     // Update document title
     if (data.title) {
       document.title = data.title;
     }
-    
+
     // Helper function to update or create meta tag
-    const updateMetaTag = (name: string, content: string, isProperty?: boolean) => {
+    const updateMetaTag = (
+      name: string,
+      content: string,
+      isProperty?: boolean,
+    ) => {
       if (!content) return;
-      
-      const selector = isProperty ? `meta[property="${name}"]` : `meta[name="${name}"]`;
+
+      const selector = isProperty
+        ? `meta[property="${name}"]`
+        : `meta[name="${name}"]`;
       let meta = document.querySelector(selector) as HTMLMetaElement;
-      
+
       if (!meta) {
         meta = document.createElement('meta');
         if (isProperty) {
@@ -47,28 +53,30 @@ export function useSEO(seoData: Partial<SEOData> = {}) {
         }
         document.head.appendChild(meta);
       }
-      
+
       meta.setAttribute('content', content);
     };
-    
+
     // Update basic meta tags
     updateMetaTag('description', data.description || '');
     updateMetaTag('keywords', data.keywords?.join(', ') || '');
     updateMetaTag('author', data.author || '');
-    
+
     // Update Open Graph tags
     if (data.title) updateMetaTag('og:title', data.title, true);
-    if (data.description) updateMetaTag('og:description', data.description, true);
+    if (data.description)
+      updateMetaTag('og:description', data.description, true);
     if (data.image) updateMetaTag('og:image', data.image, true);
     updateMetaTag('og:url', data.url || window.location.href, true);
     updateMetaTag('og:type', data.type || 'website', true);
-    
+
     // Update Twitter Card tags
     if (data.title) updateMetaTag('twitter:title', data.title);
-    if (data.description) updateMetaTag('twitter:description', data.description);
+    if (data.description)
+      updateMetaTag('twitter:description', data.description);
     if (data.image) updateMetaTag('twitter:image', data.image);
     updateMetaTag('twitter:card', 'summary_large_image');
-    
+
     // Update article specific tags
     if (data.publishedTime) {
       updateMetaTag('article:published_time', data.publishedTime, true);
@@ -78,18 +86,22 @@ export function useSEO(seoData: Partial<SEOData> = {}) {
     }
     if (data.tags) {
       // Remove existing article:tag meta tags
-      document.querySelectorAll('meta[property="article:tag"]').forEach(tag => {
-        tag.remove();
-      });
+      document
+        .querySelectorAll('meta[property="article:tag"]')
+        .forEach((tag) => {
+          tag.remove();
+        });
       // Add new article:tag meta tags
-      data.tags.forEach(tag => {
+      data.tags.forEach((tag) => {
         updateMetaTag('article:tag', tag, true);
       });
     }
-    
+
     // Update canonical URL
     if (data.canonicalUrl) {
-      let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      let canonical = document.querySelector(
+        'link[rel="canonical"]',
+      ) as HTMLLinkElement;
       if (!canonical) {
         canonical = document.createElement('link');
         canonical.setAttribute('rel', 'canonical');
@@ -97,7 +109,6 @@ export function useSEO(seoData: Partial<SEOData> = {}) {
       }
       canonical.setAttribute('href', data.canonicalUrl);
     }
-    
   }, [seoData]);
 }
 
@@ -108,7 +119,7 @@ export function generateCapSEO(cap: {
       displayName: string;
       description: string;
       tags: string[];
-      thumbnail?: { type: 'file' | 'url'; file?: string; url?: string; } | null;
+      thumbnail?: { type: 'file' | 'url'; file?: string; url?: string } | null;
       submittedAt?: number;
     };
     idName: string;
@@ -122,17 +133,18 @@ export function generateCapSEO(cap: {
 }): SEOData {
   const { capData, stats } = cap;
   const { metadata } = capData;
-  
+
   const title = `${metadata.displayName} - AI Cap | Nuwa AI`;
   const description = `${metadata.description} - Download: ${stats?.downloads || 0}, Rating: ${stats?.averageRating || 0}/5 (${stats?.ratingCount || 0} reviews)`;
-  
+
   // Extract thumbnail URL from the thumbnail object
-  const thumbnailUrl = metadata.thumbnail?.type === 'url' 
-    ? metadata.thumbnail.url 
-    : metadata.thumbnail?.type === 'file' 
-    ? metadata.thumbnail.file 
-    : '/src/assets/og-image.png';
-  
+  const thumbnailUrl =
+    metadata.thumbnail?.type === 'url'
+      ? metadata.thumbnail.url
+      : metadata.thumbnail?.type === 'file'
+        ? metadata.thumbnail.file
+        : '/src/assets/og-image.png';
+
   return {
     title,
     description,
@@ -141,7 +153,9 @@ export function generateCapSEO(cap: {
     url: `${window.location.origin}/cap-store/${capData.idName}`,
     type: 'product',
     author: 'Nuwa AI',
-    publishedTime: metadata.submittedAt ? new Date(metadata.submittedAt).toISOString() : undefined,
+    publishedTime: metadata.submittedAt
+      ? new Date(metadata.submittedAt).toISOString()
+      : undefined,
     tags: metadata.tags,
     canonicalUrl: `${window.location.origin}/cap-store/${capData.idName}`,
   };

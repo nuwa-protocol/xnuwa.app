@@ -36,7 +36,7 @@ class CapKitService {
   private async initializeCapKit(): Promise<CapKit> {
     try {
       this.isInitializing = true;
-      
+
       const keyManager = await NuwaIdentityKit().getKeyManager();
 
       this.capKit = new CapKit({

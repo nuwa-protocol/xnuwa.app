@@ -36,87 +36,109 @@ export const useOrders = (userDid?: string) => {
   const [totalCount, setTotalCount] = useState(0);
   const [currentOffset, setCurrentOffset] = useState(0);
 
-  const fetchOrders = useCallback(async (
-    did: string,
-    filters: OrdersFilters = {}
-  ): Promise<OrdersResponse | null> => {
-    setIsLoading(true);
-    setError(null);
+  const fetchOrders = useCallback(
+    async (
+      did: string,
+      filters: OrdersFilters = {},
+    ): Promise<OrdersResponse | null> => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const config = getConfig();
-      const { status = [], limit = 50, offset = 0 } = filters;
-      
-      // 构建查询参数
-      const params = new URLSearchParams();
-      if (status.length > 0) {
-        params.append('status', status.join(','));
+      try {
+        const config = getConfig();
+        const { status = [], limit = 50, offset = 0 } = filters;
+
+        // 构建查询参数
+        const params = new URLSearchParams();
+        if (status.length > 0) {
+          params.append('status', status.join(','));
+        }
+        params.append('limit', limit.toString());
+        params.append('offset', offset.toString());
+
+        const apiUrl = `${config.appUrl}/api/users/${did}/orders?${params.toString()}`;
+
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+          throw new Error('获取用户订单失败');
+        }
+
+        const data: OrdersResponse = await response.json();
+        return data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : '获取订单时发生未知错误';
+        setError(errorMessage);
+        console.error('Get user orders error:', err);
+        return null;
+      } finally {
+        setIsLoading(false);
       }
-      params.append('limit', limit.toString());
-      params.append('offset', offset.toString());
-      
-      const apiUrl = `${config.appUrl}/api/users/${did}/orders?${params.toString()}`;
-      
-      const response = await fetch(apiUrl);
-      
-      if (!response.ok) {
-        throw new Error('获取用户订单失败');
+    },
+    [],
+  );
+
+  const loadOrders = useCallback(
+    async (filters: OrdersFilters = {}) => {
+      if (!userDid) {
+        setError('用户DID未提供');
+        return;
       }
 
-      const data: OrdersResponse = await response.json();
-      return data;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '获取订单时发生未知错误';
-      setError(errorMessage);
-      console.error('Get user orders error:', err);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+      const result = await fetchOrders(userDid, filters);
+      if (result) {
+        setOrders(result.items);
+        setTotalCount(result.count);
+        setCurrentOffset(result.offset);
+      }
+    },
+    [userDid, fetchOrders],
+  );
 
-  const loadOrders = useCallback(async (filters: OrdersFilters = {}) => {
-    if (!userDid) {
-      setError('用户DID未提供');
-      return;
-    }
+  const loadMoreOrders = useCallback(
+    async (filters: OrdersFilters = {}) => {
+      if (!userDid) {
+        setError('用户DID未提供');
+        return;
+      }
 
-    const result = await fetchOrders(userDid, filters);
-    if (result) {
-      setOrders(result.items);
-      setTotalCount(result.count);
-      setCurrentOffset(result.offset);
-    }
-  }, [userDid, fetchOrders]);
+      const newOffset = currentOffset + (filters.limit || 50);
+      const result = await fetchOrders(userDid, {
+        ...filters,
+        offset: newOffset,
+      });
+      if (result) {
+        setOrders((prev) => [...prev, ...result.items]);
+        setCurrentOffset(result.offset);
+      }
+    },
+    [userDid, currentOffset, fetchOrders],
+  );
 
-  const loadMoreOrders = useCallback(async (filters: OrdersFilters = {}) => {
-    if (!userDid) {
-      setError('用户DID未提供');
-      return;
-    }
+  const refreshOrders = useCallback(
+    async (filters: OrdersFilters = {}) => {
+      if (!userDid) return;
 
-    const newOffset = currentOffset + (filters.limit || 50);
-    const result = await fetchOrders(userDid, { ...filters, offset: newOffset });
-    if (result) {
-      setOrders(prev => [...prev, ...result.items]);
-      setCurrentOffset(result.offset);
-    }
-  }, [userDid, currentOffset, fetchOrders]);
+      setCurrentOffset(0);
+      await loadOrders(filters);
+    },
+    [userDid, loadOrders],
+  );
 
-  const refreshOrders = useCallback(async (filters: OrdersFilters = {}) => {
-    if (!userDid) return;
-    
-    setCurrentOffset(0);
-    await loadOrders(filters);
-  }, [userDid, loadOrders]);
+  const getOrderById = useCallback(
+    (orderId: string): Order | undefined => {
+      return orders.find((order) => order.id === orderId);
+    },
+    [orders],
+  );
 
-  const getOrderById = useCallback((orderId: string): Order | undefined => {
-    return orders.find(order => order.id === orderId);
-  }, [orders]);
-
-  const getOrdersByStatus = useCallback((status: string): Order[] => {
-    return orders.filter(order => order.status === status);
-  }, [orders]);
+  const getOrdersByStatus = useCallback(
+    (status: string): Order[] => {
+      return orders.filter((order) => order.status === status);
+    },
+    [orders],
+  );
 
   const clearError = useCallback(() => {
     setError(null);

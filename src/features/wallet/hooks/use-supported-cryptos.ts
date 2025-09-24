@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getConfig } from "@/shared/config/nowpayments.ts";
+import { getConfig } from '@/shared/config/nowpayments.ts';
 
 export interface CryptoCurrency {
   value: string;
@@ -54,9 +54,9 @@ const createCryptoCurrency = (apiCurrency: ApiCurrency): CryptoCurrency => {
   const iconUrl = generateIconUrl(apiCurrency.logo_url);
   console.log(`处理货币 ${apiCurrency.code}:`, {
     originalLogoUrl: apiCurrency.logo_url,
-    generatedIconUrl: iconUrl
+    generatedIconUrl: iconUrl,
   });
-  
+
   return {
     value: apiCurrency.code.toLowerCase(),
     label: `${apiCurrency.name} (${apiCurrency.code})`,
@@ -80,19 +80,22 @@ const defaultCryptos: CryptoCurrency[] = [];
 // API数据处理函数
 const processApiCurrencies = (currencies: ApiCurrency[]): CryptoCurrency[] => {
   console.log('处理API货币数据:', currencies);
-  
+
   // 过滤启用的货币并按优先级排序
   const enabledCurrencies = currencies
-    .filter(currency => currency.enable)
+    .filter((currency) => currency.enable)
     .sort((a, b) => b.priority - a.priority);
-  
+
   console.log('启用的货币数量:', enabledCurrencies.length);
-  
+
   // 转换为CryptoCurrency格式
   const formattedCryptos = enabledCurrencies.map(createCryptoCurrency);
-  
-  console.log('格式化后的加密货币:', formattedCryptos.map(c => c.value));
-  
+
+  console.log(
+    '格式化后的加密货币:',
+    formattedCryptos.map((c) => c.value),
+  );
+
   return formattedCryptos;
 };
 
@@ -115,7 +118,7 @@ export const useSupportedCryptos = () => {
 
       const data = await response.json();
       console.log('API响应数据:', data);
-      
+
       if (!data.currencies || !Array.isArray(data.currencies)) {
         throw new Error('API返回数据格式错误');
       }
@@ -123,7 +126,10 @@ export const useSupportedCryptos = () => {
       const processedCryptos = processApiCurrencies(data.currencies);
       setCryptos(processedCryptos);
     } catch (err) {
-      console.warn('Failed to fetch supported cryptocurrencies, using default list:', err);
+      console.warn(
+        'Failed to fetch supported cryptocurrencies, using default list:',
+        err,
+      );
       setError(err instanceof Error ? err.message : '获取支持的加密货币失败');
       setCryptos(defaultCryptos);
     } finally {

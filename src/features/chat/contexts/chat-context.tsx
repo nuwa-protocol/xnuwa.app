@@ -37,7 +37,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
     if (newChatIdRef.current) {
       return newChatIdRef.current;
     }
-    newChatIdRef.current = generateUUID()
+    newChatIdRef.current = generateUUID();
     return newChatIdRef.current;
   }, [urlChatId, newChatIdRef]);
 

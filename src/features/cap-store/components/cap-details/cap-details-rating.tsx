@@ -21,8 +21,12 @@ export function CapDetailsRating({
   capQueryData,
   onRate,
 }: CapDetailsRatingProps) {
-  const { distribution, isLoading: isLoadingDistribution, error } = useCapRatingDistribution(capQueryData.id);
-  
+  const {
+    distribution,
+    isLoading: isLoadingDistribution,
+    error,
+  } = useCapRatingDistribution(capQueryData.id);
+
   // Fallback to mock data if there's an error or no data
   const getFallbackDistribution = () => {
     const total = capQueryData.stats.ratingCount || 0;
@@ -35,10 +39,11 @@ export function CapDetailsRating({
     ] as RatingDistribution[];
   };
 
-  const displayDistribution = error || distribution.length === 0 
-    ? getFallbackDistribution() 
-    : distribution;
-  
+  const displayDistribution =
+    error || distribution.length === 0
+      ? getFallbackDistribution()
+      : distribution;
+
   const maxCount = Math.max(...displayDistribution.map((d) => d.count), 1);
 
   return (
@@ -79,7 +84,10 @@ export function CapDetailsRating({
             {isLoadingDistribution ? (
               <div className="space-y-2">
                 {[...Array(5)].map((_, index) => (
-                  <div key={`loading-${5 - index}-stars`} className="flex items-center gap-3">
+                  <div
+                    key={`loading-${5 - index}-stars`}
+                    className="flex items-center gap-3"
+                  >
                     <div className="flex items-center gap-0.5 min-w-[80px]">
                       {Array.from({ length: 5 - index }).map((_, starIndex) => (
                         <Star
@@ -108,7 +116,10 @@ export function CapDetailsRating({
                       />
                     ))}
                   </div>
-                  <Progress value={(d.count / maxCount) * 100} className="h-2" />
+                  <Progress
+                    value={(d.count / maxCount) * 100}
+                    className="h-2"
+                  />
                   <span className="text-xs text-muted-foreground w-10 text-right">
                     {d.count}
                   </span>

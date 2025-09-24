@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import {
   Collapsible,
@@ -44,15 +44,15 @@ export function AITransactionItem({
   const chatTime =
     chatRecord.transactions.length > 0
       ? Math.max(
-        ...chatRecord.transactions.map((tx) => tx.details?.timestamp || 0),
-      )
+          ...chatRecord.transactions.map((tx) => tx.details?.timestamp || 0),
+        )
       : 0;
   return (
     <Collapsible open={isOpen} onOpenChange={() => onToggle(chatId)}>
       <CollapsibleTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full justify-between p-4 h-auto hover:bg-muted/50"
+          className="w-full justify-between py-4 h-auto hover:bg-muted/50"
         >
           <div className="text-left">
             <p className="font-medium truncate max-w-[200px]">
@@ -73,9 +73,9 @@ export function AITransactionItem({
               </p>
             </div>
             {isOpen ? (
-              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              <ChevronUp className="h-3 w-3 text-muted-foreground" />
             ) : (
-              <ChevronRight className="h-3 w-3 text-muted-foreground" />
+              <ChevronDown className="h-3 w-3 text-muted-foreground" />
             )}
           </div>
         </Button>

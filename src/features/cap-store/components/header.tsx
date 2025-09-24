@@ -202,11 +202,12 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                           transition-all duration-200 ease-out relative
                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                           data-[state=open]:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:shadow-sm
-                          ${activeSection.id === 'all' ||
-                          activeSection.type === 'tag'
-                          ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                        }
+                          ${
+                            activeSection.id === 'all' ||
+                            activeSection.type === 'tag'
+                              ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                          }
                         `}
                     >
                       {activeSection.type === 'tag' ? (
@@ -242,10 +243,11 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                               flex items-center gap-3 px-3 py-2.5 rounded-md text-sm
                               transition-all duration-200
                               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                              ${activeSection.id === 'all'
-                              ? 'bg-accent text-accent-foreground font-semibold'
-                              : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                            }
+                              ${
+                                activeSection.id === 'all'
+                                  ? 'bg-accent text-accent-foreground font-semibold'
+                                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                              }
                             `}
                         >
                           <Bot className="size-4 text-muted-foreground" />
@@ -276,10 +278,11 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                                     flex items-center gap-3 px-3 py-2.5 w-full rounded-md text-sm
                                     transition-all duration-200
                                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                                    ${isSelected
-                                    ? 'bg-accent text-accent-foreground font-semibold'
-                                    : 'text-foreground hover:bg-accent/60 hover:text-accent-foreground'
-                                  }
+                                    ${
+                                      isSelected
+                                        ? 'bg-accent text-accent-foreground font-semibold'
+                                        : 'text-foreground hover:bg-accent/60 hover:text-accent-foreground'
+                                    }
                                   `}
                               >
                                 <IconComponent className="size-4 text-muted-foreground" />
@@ -301,10 +304,11 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                             inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md
                             transition-all duration-200 ease-out relative
                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                            ${activeSection.id === 'favorites'
-                          ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                        }
+                            ${
+                              activeSection.id === 'favorites'
+                                ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                            }
                           `}
                     >
                       <Heart className="size-4" />

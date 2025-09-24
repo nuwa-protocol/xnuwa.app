@@ -12,7 +12,6 @@ export function Chat({ isReadonly }: { isReadonly: boolean }) {
   const { currentCap } = CurrentCapStore();
   const artifact = currentCap.core.artifact;
 
-
   if (artifact) {
     return (
       <div className="flex w-full h-full">

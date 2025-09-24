@@ -62,7 +62,8 @@ export function SidebarChats() {
             opacity: open ? 1 : 0,
             borderBottom: open ? '1px solid #e0e0e0' : 'none',
           }}
-          className="mb-4 pb-2">
+          className="mb-4 pb-2"
+        >
           <SidebarLabel label={t('chatHistory.pinnedChats')} open={open} />
           <div className="flex flex-col gap-1 max-h-[200px] overflow-y-auto flex-1 hide-scrollbar">
             {pinnedChats.map((chat) => (
@@ -83,9 +84,9 @@ export function SidebarChats() {
         animate={{
           display: open ? 'block' : 'none',
           opacity: open ? 1 : 0,
-
         }}
       >
+        w
         <SidebarLabel
           label={t('chatHistory.recentChats')}
           open={open}

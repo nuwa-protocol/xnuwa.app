@@ -46,5 +46,6 @@ export const useChatTransactionInfo = () => {
   return {
     chatRecords,
     error,
+    refetch: fetchChatRecords,
   };
 };

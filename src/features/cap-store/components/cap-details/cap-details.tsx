@@ -125,7 +125,11 @@ export function CapDetails({ capId }: { capId: string }) {
         success: async () => {
           setIsCapFavorite(false);
           // Refresh cached favorites after successful removal
-          try { await fetchFavoriteCaps(); } catch { /* noop */ }
+          try {
+            await fetchFavoriteCaps();
+          } catch {
+            /* noop */
+          }
           return `Removed ${capQueryData.metadata.displayName} from favorites`;
         },
         error: (error) => {
@@ -142,7 +146,11 @@ export function CapDetails({ capId }: { capId: string }) {
         success: async () => {
           setIsCapFavorite(true);
           // Refresh cached favorites after successful addition
-          try { await fetchFavoriteCaps(); } catch { /* noop */ }
+          try {
+            await fetchFavoriteCaps();
+          } catch {
+            /* noop */
+          }
           return `Added ${capQueryData.metadata.displayName} to favorites`;
         },
         error: (error) => {

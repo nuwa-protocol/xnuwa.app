@@ -12,7 +12,9 @@ interface NowPaymentsConfig {
 // 获取NowPayments配置（仅前端配置）
 export function getNowPaymentsConfig(): NowPaymentsConfig {
   return {
-    appUrl: import.meta.env.VITE_APP_URL || 'https://nowpayment-service-test.up.railway.app',
+    appUrl:
+      import.meta.env.VITE_APP_URL ||
+      'https://nowpayment-service-test.up.railway.app',
     appName: import.meta.env.VITE_APP_NAME || 'NUWA Client',
     isDevelopment: import.meta.env.MODE === 'development',
   };

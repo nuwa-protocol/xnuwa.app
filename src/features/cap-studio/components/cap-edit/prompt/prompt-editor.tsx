@@ -49,12 +49,14 @@ function VariablesDialog({
           Variables
         </Button>
       </DialogTrigger>
-      <DialogContent className='px-0'>
-        <DialogHeader className='px-6'>
+      <DialogContent className="px-0">
+        <DialogHeader className="px-6">
           <DialogTitle>Prompt Variables</DialogTitle>
         </DialogHeader>
-        <DialogDescription className='px-6'>
-          Use the following variables to make your prompt dynamic. Each variable will be replaced with the actual value before the prompt is sent to LLM.
+        <DialogDescription className="px-6">
+          Use the following variables to make your prompt dynamic. Each variable
+          will be replaced with the actual value before the prompt is sent to
+          LLM.
         </DialogDescription>
         <div>
           {promptVariables.map((variable) => (
@@ -75,13 +77,9 @@ function VariablesDialog({
                   {variable.name}
                 </Badge>
               </div>
-              <p className="text-sm mb-1">
-                {variable.description}
-              </p>
+              <p className="text-sm mb-1">{variable.description}</p>
               <div className="flex flex-col items-start">
-                <p className="text-xs font-semibold my-2">
-                  Example Prompt:
-                </p>
+                <p className="text-xs font-semibold my-2">Example Prompt:</p>
                 <pre className="w-full text-xs text-muted-foreground whitespace-pre-wrap font-mono p-2 bg-muted/20 rounded-md border">
                   {variable.example}
                 </pre>
@@ -137,7 +135,6 @@ export function PromptEditor({
   const insertVariable = (variable: string) => {
     insertText(variable);
   };
-
 
   return (
     <div className={cn('space-y-3', className)}>

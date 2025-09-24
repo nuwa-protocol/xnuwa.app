@@ -437,19 +437,19 @@ export function PaymentModal({
           {['finished', 'confirmed'].includes(
             currentPaymentData.payment_status,
           ) && (
-              <div className="text-center space-y-3">
-                <div className="text-green-600">
-                  <CheckCircle className="h-12 w-12 mx-auto mb-2" />
-                  <p className="text-lg font-medium">支付成功！</p>
-                  <p className="text-sm text-muted-foreground">
-                    您的账户余额已更新
-                  </p>
-                </div>
-                <Button onClick={() => onOpenChange(false)} className="w-full">
-                  关闭窗口
-                </Button>
+            <div className="text-center space-y-3">
+              <div className="text-green-600">
+                <CheckCircle className="h-12 w-12 mx-auto mb-2" />
+                <p className="text-lg font-medium">支付成功！</p>
+                <p className="text-sm text-muted-foreground">
+                  您的账户余额已更新
+                </p>
               </div>
-            )}
+              <Button onClick={() => onOpenChange(false)} className="w-full">
+                关闭窗口
+              </Button>
+            </div>
+          )}
 
           {/* 支付失败 */}
           {currentPaymentData.payment_status === 'failed' && (

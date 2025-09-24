@@ -17,7 +17,6 @@ export function ArtifactEditor({ value, onChange }: ArtifactEditorProps) {
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   const debounceRef = useRef<number | null>(null);
 
-
   // TODO: artifact url test need to be more strict
   // Automatically validate the URL when it changes, with a small debounce.
   useEffect(() => {

@@ -3,24 +3,23 @@ import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
 import { useChatContext } from '../contexts/chat-context';
 
 interface ResponseUIProps {
-    srcUrl: string;
-    title?: string;
+  srcUrl: string;
+  title?: string;
 }
 
 export const ResponseUI = ({ srcUrl, title }: ResponseUIProps) => {
-    const { chat } = useChatContext();
-    const { sendMessage } = useChat({ chat });
+  const { chat } = useChatContext();
+  const { sendMessage } = useChat({ chat });
 
-    const handleSendPrompt = (prompt: string) => {
-        sendMessage({ text: prompt });
-    };
+  const handleSendPrompt = (prompt: string) => {
+    sendMessage({ text: prompt });
+  };
 
-
-    return (
-        <CapUIRenderer
-            srcUrl={srcUrl}
-            title={title}
-            onSendPrompt={handleSendPrompt}
-        />
-    );
+  return (
+    <CapUIRenderer
+      srcUrl={srcUrl}
+      title={title}
+      onSendPrompt={handleSendPrompt}
+    />
+  );
 };

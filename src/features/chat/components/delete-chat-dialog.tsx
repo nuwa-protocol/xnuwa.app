@@ -22,7 +22,6 @@ export function DeleteChatDialog({
   chatTitle,
   onDelete,
 }: DeleteChatDialogProps) {
-
   const handleDelete = () => {
     onDelete();
     onOpenChange(false);
@@ -34,12 +33,16 @@ export function DeleteChatDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Chat</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{chatTitle}"? This action cannot be undone.
+            Are you sure you want to delete "{chatTitle}"? This action cannot be
+            undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+          <AlertDialogAction
+            onClick={handleDelete}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

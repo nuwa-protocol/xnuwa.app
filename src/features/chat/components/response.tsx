@@ -89,11 +89,7 @@ export const AssistantResponse = memo(
           if (part.type === 'capui') {
             const data = part.content as { url: string; title?: string };
             return (
-              <ResponseUI
-                key={data.url}
-                srcUrl={data.url}
-                title={data.title}
-              />
+              <ResponseUI key={data.url} srcUrl={data.url} title={data.title} />
             );
           } else {
             return (

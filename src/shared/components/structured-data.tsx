@@ -5,7 +5,10 @@ export interface StructuredDataProps {
   id?: string;
 }
 
-export function StructuredData({ data, id = 'structured-data' }: StructuredDataProps) {
+export function StructuredData({
+  data,
+  id = 'structured-data',
+}: StructuredDataProps) {
   useEffect(() => {
     // Remove existing structured data script if it exists
     const existingScript = document.getElementById(id);
@@ -40,7 +43,7 @@ export function generateSoftwareApplicationSchema(cap: {
       displayName: string;
       description: string;
       tags: string[];
-      thumbnail?: { type: 'file' | 'url'; file?: string; url?: string; } | null;
+      thumbnail?: { type: 'file' | 'url'; file?: string; url?: string } | null;
       submittedAt?: number;
       homepage?: string;
       repository?: string;
@@ -56,13 +59,14 @@ export function generateSoftwareApplicationSchema(cap: {
 }) {
   const { capData, stats } = cap;
   const { metadata } = capData;
-  
+
   // Extract thumbnail URL from the thumbnail object
-  const thumbnailUrl = metadata.thumbnail?.type === 'url' 
-    ? metadata.thumbnail.url 
-    : metadata.thumbnail?.type === 'file' 
-    ? metadata.thumbnail.file 
-    : '/src/assets/og-image.png';
+  const thumbnailUrl =
+    metadata.thumbnail?.type === 'url'
+      ? metadata.thumbnail.url
+      : metadata.thumbnail?.type === 'file'
+        ? metadata.thumbnail.file
+        : '/src/assets/og-image.png';
 
   return {
     '@context': 'https://schema.org',
@@ -156,7 +160,9 @@ export function generateOrganizationSchema() {
   };
 }
 
-export function generateBreadcrumbSchema(items: { name: string; url: string }[]) {
+export function generateBreadcrumbSchema(
+  items: { name: string; url: string }[],
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

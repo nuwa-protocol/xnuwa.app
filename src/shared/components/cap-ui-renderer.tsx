@@ -136,15 +136,15 @@ export const CapUIRenderer = (props: CapUIRendererProps) => {
         style={
           isLoading
             ? {
-              width: 0,
-              height: 0,
-              position: 'absolute',
-              border: 0,
-            }
+                width: 0,
+                height: 0,
+                position: 'absolute',
+                border: 0,
+              }
             : {
-              width: '100%',
-              height: artifact ? '100%' : height,
-            }
+                width: '100%',
+                height: artifact ? '100%' : height,
+              }
         }
         sandbox={sandbox}
         title={title ?? 'Nuwa Cap UI'}

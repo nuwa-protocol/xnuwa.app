@@ -65,8 +65,6 @@ export function GeneralTab({ form }: GeneralTabProps) {
             )}
           />
 
-
-
           <FormField
             control={form.control}
             name="metadata.tags"
@@ -135,8 +133,6 @@ export function GeneralTab({ form }: GeneralTabProps) {
               </FormItem>
             )}
           />
-
-
         </CardContent>
       </Card>
 
@@ -155,10 +151,6 @@ export function GeneralTab({ form }: GeneralTabProps) {
           </FormItem>
         )}
       />
-
-
-
-
     </DashboardGrid>
   );
 }

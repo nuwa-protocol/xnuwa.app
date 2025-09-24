@@ -25,7 +25,7 @@ const CapInfo = ({ cap }: { cap: Cap }) => (
       capName={cap.metadata.displayName}
       capThumbnail={cap.metadata.thumbnail}
       size="sm"
-      className='rounded-md'
+      className="rounded-md"
     />
     <span className="text-sm font-normal">{cap.metadata.displayName}</span>
   </>
@@ -41,14 +41,17 @@ export function CapSelector() {
   const handleCapSelect = async (cap: RemoteCap) => {
     const id = cap.id;
     try {
-      toast.promise(async () => {
-        const cap = await downloadCapByIDWithCache(id);
-        setCurrentCap(cap);
-      }, {
-        loading: 'Loading cap...',
-        success: 'Cap is ready to use!',
-        error: 'Failed to load cap',
-      });
+      toast.promise(
+        async () => {
+          const cap = await downloadCapByIDWithCache(id);
+          setCurrentCap(cap);
+        },
+        {
+          loading: 'Loading cap...',
+          success: 'Cap is ready to use!',
+          error: 'Failed to load cap',
+        },
+      );
     } catch (error) {
       console.error('Failed to select cap:', error);
     }
@@ -92,7 +95,10 @@ export function CapSelector() {
   return (
     <TooltipProvider>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
+        <DropdownMenuTrigger
+          asChild
+          className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+        >
           <Button
             variant="ghost"
             size="sm"
@@ -120,7 +126,7 @@ export function CapSelector() {
                   capName={cap.metadata.displayName}
                   capThumbnail={cap.metadata.thumbnail}
                   size="sm"
-                  className='rounded-md'
+                  className="rounded-md"
                 />
                 <span className="text-sm">{cap.metadata.displayName}</span>
               </div>

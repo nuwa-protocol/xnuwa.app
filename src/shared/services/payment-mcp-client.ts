@@ -1,6 +1,16 @@
-import { createMcpClient, PaymentChannelMcpClient, type CreateMcpClientOptions } from '@nuwa-ai/payment-kit';
+import {
+  createMcpClient,
+  PaymentChannelMcpClient,
+  type CreateMcpClientOptions,
+} from '@nuwa-ai/payment-kit';
 import { IdentityKitWeb } from '@nuwa-ai/identity-kit-web';
-import type { NuwaMCPClient, PromptDefinition, PromptMessagesResult, ResourceDefinition, ResourceTemplateDefinition } from '../types/mcp-client';
+import type {
+  NuwaMCPClient,
+  PromptDefinition,
+  PromptMessagesResult,
+  ResourceDefinition,
+  ResourceTemplateDefinition,
+} from '../types/mcp-client';
 import { MCPError } from '../types/mcp-client';
 
 /**
@@ -9,9 +19,7 @@ import { MCPError } from '../types/mcp-client';
  * while adding payment capabilities.
  */
 export class PaymentMcpClientAdapter implements NuwaMCPClient {
-  
-  constructor(private paymentClient: PaymentChannelMcpClient) {
-  }
+  constructor(private paymentClient: PaymentChannelMcpClient) {}
 
   get raw() {
     return this.paymentClient;
@@ -33,7 +41,7 @@ export class PaymentMcpClientAdapter implements NuwaMCPClient {
     try {
       const result = await this.paymentClient.listPrompts();
       const promptsMap: Record<string, PromptDefinition> = {};
-      
+
       if (result && Array.isArray(result.prompts)) {
         for (const prompt of result.prompts) {
           if (prompt && prompt.name) {
@@ -45,7 +53,7 @@ export class PaymentMcpClientAdapter implements NuwaMCPClient {
           }
         }
       }
-      
+
       return promptsMap;
     } catch (err: any) {
       throw new MCPError({
@@ -61,10 +69,13 @@ export class PaymentMcpClientAdapter implements NuwaMCPClient {
     return allPrompts[name];
   }
 
-  async getPrompt(name: string, args?: Record<string, unknown>): Promise<PromptMessagesResult> {
+  async getPrompt(
+    name: string,
+    args?: Record<string, unknown>,
+  ): Promise<PromptMessagesResult> {
     try {
       const content = await this.paymentClient.loadPrompt(name, args);
-      
+
       // Convert string content to PromptMessagesResult format
       return {
         messages: [
@@ -86,14 +97,19 @@ export class PaymentMcpClientAdapter implements NuwaMCPClient {
     }
   }
 
-  async resources(): Promise<Record<string, ResourceDefinition | ResourceTemplateDefinition>> {
+  async resources(): Promise<
+    Record<string, ResourceDefinition | ResourceTemplateDefinition>
+  > {
     try {
       const [resources, templates] = await Promise.all([
         this.paymentClient.listResources(),
         this.paymentClient.listResourceTemplates(),
       ]);
 
-      const resourcesMap: Record<string, ResourceDefinition | ResourceTemplateDefinition> = {};
+      const resourcesMap: Record<
+        string,
+        ResourceDefinition | ResourceTemplateDefinition
+      > = {};
 
       // Add static resources
       if (Array.isArray(resources)) {
@@ -150,7 +166,10 @@ export class PaymentMcpClientAdapter implements NuwaMCPClient {
     args: Record<string, unknown>,
   ): Promise<T> {
     try {
-      const result = await this.paymentClient.readResource({ uri: uriTemplate, ...args });
+      const result = await this.paymentClient.readResource({
+        uri: uriTemplate,
+        ...args,
+      });
       return result as T;
     } catch (err: any) {
       throw new MCPError({

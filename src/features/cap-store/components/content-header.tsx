@@ -1,4 +1,13 @@
-import { Calendar, ChevronDown, CloudDownload, Heart, Search, Star, UserRoundPen, X } from 'lucide-react';
+import {
+  Calendar,
+  ChevronDown,
+  CloudDownload,
+  Heart,
+  Search,
+  Star,
+  UserRoundPen,
+  X,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Input } from '@/shared/components/ui';

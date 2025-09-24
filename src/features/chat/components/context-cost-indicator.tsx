@@ -32,7 +32,6 @@ export function ContextCostIndicator({
     ? Math.round((contextUsage.totalTokens / contextLength) * 100)
     : 0;
 
-
   const totalCost = formatUsdCost(paymentInfo?.totalAmount || 0n) || '$0.00';
   const totalCostShort = `${totalCost?.split('.')[0] || '0'}.${totalCost?.split('.')[1]?.slice(0, 2) || '00'}`;
 
@@ -54,21 +53,23 @@ export function ContextCostIndicator({
         >
           {/* Background progress bar */}
           <div
-            className={`absolute inset-0 transition-all duration-300 ${contextPercentage > 80
-              ? 'bg-red-500/20'
-              : contextPercentage > 60
-                ? 'bg-yellow-500/20'
-                : 'bg-green-500/20'
-              }`}
+            className={`absolute inset-0 transition-all duration-300 ${
+              contextPercentage > 80
+                ? 'bg-red-500/20'
+                : contextPercentage > 60
+                  ? 'bg-yellow-500/20'
+                  : 'bg-green-500/20'
+            }`}
           />
           {/* Progress fill */}
           <div
-            className={`absolute left-0 top-0 h-full transition-all duration-300 ${contextPercentage > 80
-              ? 'bg-red-500/40'
-              : contextPercentage > 60
-                ? 'bg-yellow-500/40'
-                : 'bg-green-500/40'
-              }`}
+            className={`absolute left-0 top-0 h-full transition-all duration-300 ${
+              contextPercentage > 80
+                ? 'bg-red-500/40'
+                : contextPercentage > 60
+                  ? 'bg-yellow-500/40'
+                  : 'bg-green-500/40'
+            }`}
             style={{ width: `${Math.min(contextPercentage, 100)}%` }}
           />
           {/* Content */}
@@ -83,21 +84,25 @@ export function ContextCostIndicator({
           {contextUsage && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-foreground">Context Usage</h3>
+                <h3 className="text-sm font-semibold text-foreground">
+                  Context Usage
+                </h3>
                 <div className="text-sm font-medium text-muted-foreground">
-                  {contextUsage.totalTokens?.toLocaleString()} / {contextLength?.toLocaleString()}
+                  {contextUsage.totalTokens?.toLocaleString()} /{' '}
+                  {contextLength?.toLocaleString()}
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-300 ${contextPercentage > 80
-                      ? 'bg-red-500'
-                      : contextPercentage > 60
-                        ? 'bg-yellow-500'
-                        : 'bg-green-500'
-                      }`}
+                    className={`h-full rounded-full transition-all duration-300 ${
+                      contextPercentage > 80
+                        ? 'bg-red-500'
+                        : contextPercentage > 60
+                          ? 'bg-yellow-500'
+                          : 'bg-green-500'
+                    }`}
                     style={{ width: `${Math.min(contextPercentage, 100)}%` }}
                   />
                 </div>
@@ -105,25 +110,33 @@ export function ContextCostIndicator({
 
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="space-y-1">
-                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Input Tokens</div>
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Input Tokens
+                  </div>
                   <div className="text-sm font-semibold">
                     {contextUsage.inputTokens?.toLocaleString() || '0'}
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Output Tokens</div>
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Output Tokens
+                  </div>
                   <div className="text-sm font-semibold">
                     {contextUsage.outputTokens?.toLocaleString() || '0'}
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Reasoning</div>
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Reasoning
+                  </div>
                   <div className="text-sm font-semibold">
                     {contextUsage.reasoningTokens?.toLocaleString() || '0'}
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Cached</div>
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Cached
+                  </div>
                   <div className="text-sm font-semibold">
                     {contextUsage.cachedInputTokens?.toLocaleString() || '0'}
                   </div>
@@ -151,15 +164,17 @@ export function ContextCostIndicator({
           <div className="border-t" />
         </div>
 
-
-
         {/* Total Cost Section */}
-        <Button variant='ghost' className='w-full px-6 my-3' onClick={handleWalletClick}>
-          <div
-            className="w-full justify-between rounded-lg hover:bg-accent/50 transition-colors"
-          >
+        <Button
+          variant="ghost"
+          className="w-full px-6 my-3"
+          onClick={handleWalletClick}
+        >
+          <div className="w-full justify-between rounded-lg hover:bg-accent/50 transition-colors">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-foreground">Total Cost</h3>
+              <h3 className="text-sm font-semibold text-foreground">
+                Total Cost
+              </h3>
               <div className="text-sm font-medium text-muted-foreground">
                 {totalCost}
               </div>

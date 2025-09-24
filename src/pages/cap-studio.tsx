@@ -20,7 +20,8 @@ export default function CapStudioPage() {
   if (path === '/cap-studio') return <CapStudio />;
   if (path.startsWith('/cap-studio/create')) return <CapEdit />;
   if (path.startsWith('/cap-studio/batch-create')) return <BatchCreate />;
-  if (path.startsWith('/cap-studio/edit/')) return <CapEdit id={path.split('/').pop() || ''} />;
+  if (path.startsWith('/cap-studio/edit/'))
+    return <CapEdit id={path.split('/').pop() || ''} />;
   if (path.startsWith('/cap-studio/submit/'))
     return <Submit id={path.split('/').pop() || ''} />;
   if (path.startsWith('/cap-studio/mcp')) return <MCPDebug />;
