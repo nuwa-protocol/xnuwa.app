@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import AppSidebar from '@/features/sidebar-new/components';
+import AppSidebar from '@/features/sidebar/components';
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
 
 export default function MainLayout() {
