@@ -83,7 +83,7 @@ export const PrimarySidebarButton = ({
         'group/sidebar',
         'w-full inline-flex justify-between items-center gap-2',
         // size and spacing
-        'h-10 px-1',
+        open ? 'h-10 px-1' : 'h-7 px-1',
         // appearance
         'rounded-lg text-sm',
         'bg-gradient-to-br from-theme-500 via-theme-500/80 to-theme-500',
