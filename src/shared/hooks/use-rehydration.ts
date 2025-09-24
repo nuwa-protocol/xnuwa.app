@@ -18,9 +18,11 @@ class RehydrationTracker {
 
   isAllRehydrated(): boolean {
     const storeNames = Object.keys(this.stores);
-    return (
-      storeNames.length > 0 && storeNames.every((name) => this.stores[name])
-    );
+    // 如果没有注册任何store，则认为已经完成rehydration
+    if (storeNames.length === 0) {
+      return true;
+    }
+    return storeNames.every((name) => this.stores[name]);
   }
 
   subscribe(callback: () => void) {
