@@ -1,26 +1,31 @@
-import { useEffect, useState, useCallback } from 'react';
+import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Copy,
+  Loader2,
+  Network,
+  RefreshCw,
+  Wallet,
+} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { Badge } from '@/shared/components/ui/badge';
-import { Alert, AlertDescription } from '@/shared/components/ui/alert';
-import { 
-  Loader2, 
-  Copy, 
-  CheckCircle, 
-  Clock, 
-  AlertCircle,
-  Wallet,
-  RefreshCw,
-  Network
-} from 'lucide-react';
-import { useNowPayments } from '../hooks/use-nowpayments';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
+import { useNowPayments } from '../hooks/use-nowpayments';
 
 interface PaymentWindowProps {
   open: boolean;
@@ -43,17 +48,17 @@ interface PaymentWindowProps {
   onPaymentSuccess?: () => void;
 }
 
-export function PaymentWindow({ 
-  open, 
-  onOpenChange, 
-  paymentData, 
-  onPaymentSuccess 
+export function PaymentModal({
+  open,
+  onOpenChange,
+  paymentData,
+  onPaymentSuccess,
 }: PaymentWindowProps) {
   const [currentPaymentData, setCurrentPaymentData] = useState(paymentData);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [statusError, setStatusError] = useState<string | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(1800); // 30分钟
-  
+
   const { checkPaymentStatus } = useNowPayments();
   const [copyToClipboard, isCopied] = useCopyToClipboard();
 
@@ -67,7 +72,7 @@ export function PaymentWindow({
     if (!open || !currentPaymentData) return;
 
     const timer = setInterval(() => {
-      setTimeRemaining(prev => {
+      setTimeRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
           return 0;
@@ -85,21 +90,29 @@ export function PaymentWindow({
 
     const checkStatus = async () => {
       // 如果支付已完成、失败、退款或过期，停止检查
-      if (['finished', 'confirmed', 'failed', 'refunded', 'expired'].includes(currentPaymentData.payment_status)) {
+      if (
+        ['finished', 'confirmed', 'failed', 'refunded', 'expired'].includes(
+          currentPaymentData.payment_status,
+        )
+      ) {
         return;
       }
 
       setIsCheckingStatus(true);
       setStatusError(null);
-      
+
       try {
-        const updatedPaymentData = await checkPaymentStatus(currentPaymentData.payment_id);
+        const updatedPaymentData = await checkPaymentStatus(
+          currentPaymentData.payment_id,
+        );
         if (updatedPaymentData) {
           setCurrentPaymentData(updatedPaymentData);
-          
+
           // 如果支付成功，触发成功回调（但不自动关闭窗口）
-          if (updatedPaymentData.payment_status === 'finished' || 
-              updatedPaymentData.payment_status === 'confirmed') {
+          if (
+            updatedPaymentData.payment_status === 'finished' ||
+            updatedPaymentData.payment_status === 'confirmed'
+          ) {
             // 不再自动调用 onPaymentSuccess，让用户手动关闭
             // onPaymentSuccess?.();
           }
@@ -118,7 +131,12 @@ export function PaymentWindow({
     const interval = setInterval(checkStatus, 10000);
 
     return () => clearInterval(interval);
-  }, [open, currentPaymentData?.payment_id, checkPaymentStatus, onPaymentSuccess]);
+  }, [
+    open,
+    currentPaymentData?.payment_id,
+    checkPaymentStatus,
+    onPaymentSuccess,
+  ]);
 
   // 手动刷新状态
   const handleRefreshStatus = useCallback(async () => {
@@ -126,15 +144,19 @@ export function PaymentWindow({
 
     setIsCheckingStatus(true);
     setStatusError(null);
-    
+
     try {
-      const updatedPaymentData = await checkPaymentStatus(currentPaymentData.payment_id);
+      const updatedPaymentData = await checkPaymentStatus(
+        currentPaymentData.payment_id,
+      );
       if (updatedPaymentData) {
         setCurrentPaymentData(updatedPaymentData);
-        
+
         // 如果支付成功，触发成功回调（但不自动关闭窗口）
-        if (updatedPaymentData.payment_status === 'finished' || 
-            updatedPaymentData.payment_status === 'confirmed') {
+        if (
+          updatedPaymentData.payment_status === 'finished' ||
+          updatedPaymentData.payment_status === 'confirmed'
+        ) {
           // 不再自动调用 onPaymentSuccess，让用户手动关闭
           // onPaymentSuccess?.();
         }
@@ -160,7 +182,7 @@ export function PaymentWindow({
 
   const getStatusInfo = () => {
     const status = currentPaymentData?.payment_status || 'waiting';
-    
+
     switch (status) {
       case 'finished':
         return {
@@ -268,22 +290,28 @@ export function PaymentWindow({
             <CardContent className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">订单ID:</span>
-                <span className="text-sm font-mono">{currentPaymentData.order_id}</span>
+                <span className="text-sm font-mono">
+                  {currentPaymentData.order_id}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">支付金额:</span>
                 <span className="text-sm font-medium">
-                  {currentPaymentData.price_amount} {currentPaymentData.price_currency?.toUpperCase() || ''}
+                  {currentPaymentData.price_amount}{' '}
+                  {currentPaymentData.price_currency?.toUpperCase() || ''}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">支付货币:</span>
-                <Badge variant="outline">{currentPaymentData.pay_currency?.toUpperCase() || ''}</Badge>
+                <Badge variant="outline">
+                  {currentPaymentData.pay_currency?.toUpperCase() || ''}
+                </Badge>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">转账金额:</span>
                 <span className="text-sm font-medium">
-                  {currentPaymentData.pay_amount} {currentPaymentData.pay_currency?.toUpperCase() || ''}
+                  {currentPaymentData.pay_amount}{' '}
+                  {currentPaymentData.pay_currency?.toUpperCase() || ''}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -295,7 +323,11 @@ export function PaymentWindow({
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">状态:</span>
-                <Badge variant={statusInfo.color === 'green' ? 'default' : 'secondary'}>
+                <Badge
+                  variant={
+                    statusInfo.color === 'green' ? 'default' : 'secondary'
+                  }
+                >
                   {statusInfo.title}
                 </Badge>
               </div>
@@ -313,13 +345,15 @@ export function PaymentWindow({
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">请向以下地址转账:</div>
+                  <div className="text-sm text-muted-foreground">
+                    请向以下地址转账:
+                  </div>
                   <div className="p-3 bg-muted rounded-lg border">
                     <div className="font-mono text-sm break-all">
                       {currentPaymentData.pay_address}
                     </div>
                   </div>
-                  <Button 
+                  <Button
                     onClick={handleCopyAddress}
                     className="w-full"
                     variant="outline"
@@ -329,13 +363,20 @@ export function PaymentWindow({
                     {isCopied ? '已复制地址' : '复制收款地址'}
                   </Button>
                 </div>
-                
+
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    请确保转账金额为 <strong>{currentPaymentData.pay_amount} {currentPaymentData.pay_currency?.toUpperCase() || ''}</strong>
+                    请确保转账金额为{' '}
+                    <strong>
+                      {currentPaymentData.pay_amount}{' '}
+                      {currentPaymentData.pay_currency?.toUpperCase() || ''}
+                    </strong>
                     <br />
-                    网络: <strong>{currentPaymentData.network?.toUpperCase() || ''}</strong>
+                    网络:{' '}
+                    <strong>
+                      {currentPaymentData.network?.toUpperCase() || ''}
+                    </strong>
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -377,13 +418,15 @@ export function PaymentWindow({
                 <p className="text-sm text-muted-foreground mb-2">
                   完成转账后，系统将自动检测到账
                 </p>
-                <Button 
+                <Button
                   onClick={handleRefreshStatus}
                   variant="outline"
                   className="w-full"
                   disabled={isCheckingStatus}
                 >
-                  <RefreshCw className={`mr-2 h-4 w-4 ${isCheckingStatus ? 'animate-spin' : ''}`} />
+                  <RefreshCw
+                    className={`mr-2 h-4 w-4 ${isCheckingStatus ? 'animate-spin' : ''}`}
+                  />
                   {isCheckingStatus ? '检查中...' : '手动刷新状态'}
                 </Button>
               </div>
@@ -391,23 +434,22 @@ export function PaymentWindow({
           )}
 
           {/* 支付成功 */}
-          {['finished', 'confirmed'].includes(currentPaymentData.payment_status) && (
-            <div className="text-center space-y-3">
-              <div className="text-green-600">
-                <CheckCircle className="h-12 w-12 mx-auto mb-2" />
-                <p className="text-lg font-medium">支付成功！</p>
-                <p className="text-sm text-muted-foreground">
-                  您的账户余额已更新
-                </p>
+          {['finished', 'confirmed'].includes(
+            currentPaymentData.payment_status,
+          ) && (
+              <div className="text-center space-y-3">
+                <div className="text-green-600">
+                  <CheckCircle className="h-12 w-12 mx-auto mb-2" />
+                  <p className="text-lg font-medium">支付成功！</p>
+                  <p className="text-sm text-muted-foreground">
+                    您的账户余额已更新
+                  </p>
+                </div>
+                <Button onClick={() => onOpenChange(false)} className="w-full">
+                  关闭窗口
+                </Button>
               </div>
-              <Button 
-                onClick={() => onOpenChange(false)}
-                className="w-full"
-              >
-                关闭窗口
-              </Button>
-            </div>
-          )}
+            )}
 
           {/* 支付失败 */}
           {currentPaymentData.payment_status === 'failed' && (
@@ -419,7 +461,7 @@ export function PaymentWindow({
                   支付处理失败，请重试或联系客服
                 </p>
               </div>
-              <Button 
+              <Button
                 onClick={() => onOpenChange(false)}
                 variant="outline"
                 className="w-full"
@@ -439,7 +481,7 @@ export function PaymentWindow({
                   支付已过期，请重新创建支付订单
                 </p>
               </div>
-              <Button 
+              <Button
                 onClick={() => onOpenChange(false)}
                 variant="outline"
                 className="w-full"
@@ -459,7 +501,7 @@ export function PaymentWindow({
                   支付已退款，资金将原路返回
                 </p>
               </div>
-              <Button 
+              <Button
                 onClick={() => onOpenChange(false)}
                 variant="outline"
                 className="w-full"

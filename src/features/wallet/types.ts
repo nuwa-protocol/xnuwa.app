@@ -40,3 +40,9 @@ export interface SpendTransaction {
 }
 
 export type Transaction = DepositTransaction | SpendTransaction;
+
+export type SortOption =
+  | 'time-desc'
+  | 'time-asc'
+  | 'amount-desc'
+  | 'amount-asc';

@@ -1,16 +1,5 @@
-import {
-  CalendarArrowDown,
-  CalendarArrowUp,
-  CalendarIcon,
-  ListFilter,
-  SortAsc,
-  X,
-  CreditCard,
-  MessageSquare,
-} from 'lucide-react';
+import { BanknoteArrowDown, Sparkle } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Button } from '@/shared/components/ui/button';
-import { Calendar } from '@/shared/components/ui/calendar';
 import {
   Card,
   CardContent,
@@ -18,32 +7,21 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/shared/components/ui/popover';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/components/ui/tabs';
 import { useChatTransactionInfo } from '../hooks/use-chat-transaction-info';
-import { useOrders } from '../hooks/use-orders';
-import { useAuth } from '@/shared/hooks/use-auth';
-import type { PaymentTransaction } from '../types';
-import { ChatItem } from './chat-item';
-import { TransactionDetailsModal } from './transaction-details-modal';
+import type { PaymentTransaction, SortOption } from '../types';
+import { filterAndSortChatRecords } from '../utils';
+import { AITransactionDetailsModal } from './ai-transaction-details-modal';
+import { AITransactionsFilter } from './ai-transaction-filter';
+import { AITransactionItem } from './ai-transaction-item';
 import { OrdersList } from './orders-list';
-
-type SortOption = 'time-desc' | 'time-asc' | 'amount-desc' | 'amount-asc';
 
 export function TransactionHistory() {
   const { chatRecords, error } = useChatTransactionInfo();
-  const { did } = useAuth();
   const [selectedTransaction, setSelectedTransaction] =
     useState<PaymentTransaction | null>(null);
   const [openChats, setOpenChats] = useState<Set<string>>(new Set());
@@ -61,85 +39,8 @@ export function TransactionHistory() {
 
   const filteredAndSortedChatRecords = useMemo(() => {
     // Always sort transactions within each chat by time (earliest first)
-    const chatsWithSortedTransactions = chatRecords.map((chatRecord) => ({
-      ...chatRecord,
-      transactions: [...chatRecord.transactions].sort(
-        (a, b) => a.info.timestamp - b.info.timestamp,
-      ),
-    }));
-
-    let filtered = chatsWithSortedTransactions;
-
-    // Filter by date if a date is selected - filter entire chats
-    if (filterDate) {
-      const filterDateStart = new Date(filterDate);
-      filterDateStart.setHours(0, 0, 0, 0);
-      const filterDateEnd = new Date(filterDate);
-      filterDateEnd.setHours(23, 59, 59, 999);
-
-      filtered = chatsWithSortedTransactions.filter((chatRecord) => {
-        // Check if any transaction in the chat falls within the selected date
-        return chatRecord.transactions.some((transaction) => {
-          const transactionDate = new Date(transaction.info.timestamp);
-          return (
-            transactionDate >= filterDateStart &&
-            transactionDate <= filterDateEnd
-          );
-        });
-      });
-    }
-
-    // Sort chats based on selected criteria
-    return filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'time-asc': {
-          const oldestA = a.transactions[0]?.info.timestamp || 0;
-          const oldestB = b.transactions[0]?.info.timestamp || 0;
-          return oldestA - oldestB;
-        }
-        case 'time-desc': {
-          const mostRecentA =
-            a.transactions[a.transactions.length - 1]?.info.timestamp || 0;
-          const mostRecentB =
-            b.transactions[b.transactions.length - 1]?.info.timestamp || 0;
-          return mostRecentB - mostRecentA;
-        }
-        case 'amount-asc': {
-          const totalA = a.transactions.reduce(
-            (sum, t) => sum + Number(t.details?.payment?.costUsd || 0),
-            0,
-          );
-          const totalB = b.transactions.reduce(
-            (sum, t) => sum + Number(t.details?.payment?.costUsd || 0),
-            0,
-          );
-          return totalA - totalB;
-        }
-        case 'amount-desc': {
-          const totalA = a.transactions.reduce(
-            (sum, t) => sum + Number(t.details?.payment?.costUsd || 0),
-            0,
-          );
-          const totalB = b.transactions.reduce(
-            (sum, t) => sum + Number(t.details?.payment?.costUsd || 0),
-            0,
-          );
-          return totalB - totalA;
-        }
-        default: {
-          const mostRecentA =
-            a.transactions[a.transactions.length - 1]?.info.timestamp || 0;
-          const mostRecentB =
-            b.transactions[b.transactions.length - 1]?.info.timestamp || 0;
-          return mostRecentB - mostRecentA;
-        }
-      }
-    });
+    return filterAndSortChatRecords(chatRecords, filterDate, sortBy);
   }, [chatRecords, sortBy, filterDate]);
-
-  const clearDateFilter = () => {
-    setFilterDate(undefined);
-  };
 
   if (error) {
     return (
@@ -157,138 +58,66 @@ export function TransactionHistory() {
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle>Payment Transactions</CardTitle>
+        <CardHeader className="flex flex-row justify-between items-center">
+          <CardTitle>Transactions</CardTitle>
+          <AITransactionsFilter
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            filterDate={filterDate}
+            setFilterDate={setFilterDate}
+          />
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'chat' | 'orders')}>
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value as 'chat' | 'orders')}
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="chat" className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4" />
-                聊天交易
+                <Sparkle className="h-4 w-4" />
+                AI Usage
               </TabsTrigger>
               <TabsTrigger value="orders" className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4" />
-                订单记录
+                <BanknoteArrowDown className="h-4 w-4" />
+                Deposits
               </TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="chat" className="mt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  {/* Combined filter and sort dropdown */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-10">
-                        <ListFilter className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => setSortBy('time-desc')}>
-                        <CalendarArrowDown className="h-4 w-4 mr-2" />
-                        Latest
-                        {sortBy === 'time-desc' && <span className="ml-auto">✓</span>}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setSortBy('time-asc')}>
-                        <CalendarArrowUp className="h-4 w-4 mr-2" />
-                        Earliest
-                        {sortBy === 'time-asc' && <span className="ml-auto">✓</span>}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setSortBy('amount-desc')}>
-                        <SortAsc className="h-4 w-4 mr-2" />
-                        Most Cost
-                        {sortBy === 'amount-desc' && (
-                          <span className="ml-auto">✓</span>
-                        )}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setSortBy('amount-asc')}>
-                        <SortAsc className="h-4 w-4 rotate-180 mr-2" />
-                        Least Cost
-                        {sortBy === 'amount-asc' && (
-                          <span className="ml-auto">✓</span>
-                        )}
-                      </DropdownMenuItem>
 
-                      <DropdownMenuSeparator />
-
-                      <DropdownMenuLabel>Filter by date</DropdownMenuLabel>
-                      <div className="px-2 py-1">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal"
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {filterDate
-                                ? filterDate.toLocaleDateString()
-                                : 'Pick a date'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-auto p-0"
-                            align="end"
-                            side="right"
-                          >
-                            <Calendar
-                              mode="single"
-                              selected={filterDate}
-                              onSelect={setFilterDate}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      {filterDate && (
-                        <DropdownMenuItem onClick={clearDateFilter}>
-                          <X className="h-4 w-4 mr-2" />
-                          Clear date filter
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                {error ? (
-                  <p className="text-red-500">Error loading transactions: {error}</p>
-                ) : filteredAndSortedChatRecords.length === 0 ? (
-                  <p className="text-muted-foreground">
-                    {filterDate
-                      ? 'No transactions found for selected date'
-                      : 'No transactions found'}
-                  </p>
-                ) : (
-                  filteredAndSortedChatRecords.map((chatRecord) => (
-                    <ChatItem
-                      key={chatRecord.chatId}
-                      chatRecord={chatRecord}
-                      isOpen={openChats.has(chatRecord.chatId)}
-                      onToggle={toggleChat}
-                      onSelectTransaction={setSelectedTransaction}
-                    />
-                  ))
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="orders" className="mt-6">
-              {did ? (
-                <OrdersList userDid={did} />
+            <TabsContent
+              value="chat"
+              className="mt-6 max-h-[40vh] overflow-y-auto space-y-2"
+            >
+              {error ? (
+                <p className="text-red-500">
+                  Error loading transactions: {error}
+                </p>
+              ) : filteredAndSortedChatRecords.length === 0 ? (
+                <p className="text-muted-foreground">
+                  {filterDate
+                    ? 'No transactions found for selected date'
+                    : 'No transactions found'}
+                </p>
               ) : (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">请先登录以查看订单记录</p>
-                </div>
+                filteredAndSortedChatRecords.map((chatRecord) => (
+                  <AITransactionItem
+                    key={chatRecord.chatId}
+                    chatRecord={chatRecord}
+                    isOpen={openChats.has(chatRecord.chatId)}
+                    onToggle={toggleChat}
+                    onSelectTransaction={setSelectedTransaction}
+                  />
+                ))
               )}
+            </TabsContent>
+
+            <TabsContent value="orders" className="mt-6">
+              <OrdersList />
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
 
-      <TransactionDetailsModal
+      <AITransactionDetailsModal
         transaction={selectedTransaction}
         onClose={() => setSelectedTransaction(null)}
       />

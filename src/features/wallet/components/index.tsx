@@ -7,7 +7,3 @@ export function WalletWithProvider() {
     // </AppkitContextProvider>
   );
 }
-
-export { NowPaymentsTopupModal } from './nowpayments-topup-modal';
-export { PaymentWindow } from './payment-window';
-export { OrdersList } from './orders-list';

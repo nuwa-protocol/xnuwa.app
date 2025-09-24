@@ -1,4 +1,4 @@
-import { CircleDollarSign, WalletIcon } from 'lucide-react';
+import { BanknoteArrowDown, BanknoteArrowUp, CircleDollarSign, WalletIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -7,6 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip';
+import { cn } from '@/shared/utils/cn';
 import { WalletStore } from '../stores';
 import { TestnetFaucetDialog } from './testnet-faucet-dialog';
 
@@ -26,38 +33,26 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
 
   return (
     <>
-      <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-background via-background to-muted/20">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-theme-primary/5 via-transparent to-theme-primary/5" />
-        <div className="absolute top-0 right-0 w-32 h-32 bg-theme-primary/10 rounded-full -translate-y-16 translate-x-16 blur-2xl" />
-
-        <CardHeader className="relative pb-4">
-          <div className="flex items-center justify-between">
+      <Card
+        className={cn(
+          'relative overflow-hidden border-0 shadow-lg bg-theme-100',
+          'bg-gradient-to-br from-theme-100 via-theme-50 to-theme-100',
+          'dark:bg-gradient-to-br from-theme-950 via-theme-800 to-theme-950',
+        )}
+      >
+        <CardHeader className="sr-only">Wallet Balance Card</CardHeader>
+        <CardContent className="flex flex-col justify-between">
+          <div className="flex flex-row justify-between items-center">
+            {/* Title */}
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-theme-primary/10 border border-theme-primary/20">
                 <WalletIcon className="w-5 h-5 text-theme-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold">Balance</CardTitle>
-                <p className="text-sm text-muted-foreground">Testnet</p>
+                <CardTitle className="text-lg font-semibold">Credit Balance</CardTitle>
               </div>
             </div>
-            <div className="flex items-center">
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => setShowFaucetDialog(true)}
-              >
-                <CircleDollarSign className="w-3.5 h-3.5" />
-                Get More Balance
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="relative">
-          <div>
-            {/* Main balance display */}
+            {/* Balance Display */}
             <div className="space-y-3">
               <div className="flex items-baseline gap-2">
                 <div className="text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
@@ -69,6 +64,62 @@ export function BalanceCard({ onTopUp }: BalanceCardProps) {
               </div>
             </div>
           </div>
+          <TooltipProvider delayDuration={0}>
+            <div className="flex flex-row items-center gap-4 mt-10">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={onTopUp}
+                className="w-full"
+              >
+                <BanknoteArrowDown className="w-3.5 h-3.5" />
+                Buy
+              </Button>
+              {/* Wrap disabled buttons with tooltip triggers so tooltips still work */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="w-full cursor-not-allowed inline-block"
+                    title="coming soon"
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full pointer-events-none"
+                      disabled={true}
+                    >
+                      <CircleDollarSign className="w-3.5 h-3.5" />
+                      Transfer
+                    </Button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" align="center">
+                  Transfer function will be available soon
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="w-full cursor-not-allowed inline-block"
+                    title="coming soon"
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full pointer-events-none"
+                      disabled={true}
+                    >
+                      <BanknoteArrowUp className="w-3.5 h-3.5" />
+                      Withdraw
+                    </Button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" align="center">
+                  Withdraw function will be available soon
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
         </CardContent>
       </Card>
 

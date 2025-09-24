@@ -10,7 +10,7 @@ import type {
   PaymentTransaction,
 } from '../types';
 import { formatUsdCost } from '../utils';
-import { TransactionItem } from './transaction-item';
+import { AITransactionSubItem } from './ai-transaction-sub-item';
 
 const formatDate = (timestamp: number) => {
   return new Date(timestamp).toLocaleString();
@@ -31,7 +31,7 @@ interface ChatHistoryItemProps {
   onSelectTransaction: (transaction: PaymentTransaction) => void;
 }
 
-export function ChatItem({
+export function AITransactionItem({
   chatRecord,
   isOpen,
   onToggle,
@@ -83,7 +83,7 @@ export function ChatItem({
       <CollapsibleContent className="pl-7 pr-4 pb-2">
         <div className="space-y-2 border-l border-muted-foreground/50 pl-4">
           {chatRecord.transactions.map((transaction, index) => (
-            <TransactionItem
+            <AITransactionSubItem
               key={transaction.ctxId}
               index={index}
               transaction={transaction}

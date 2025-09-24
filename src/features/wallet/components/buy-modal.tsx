@@ -1,8 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState, useCallback, useRef } from 'react';
+import {
+  AlertCircle,
+  Coins,
+  Info,
+  Loader2,
+  RefreshCw,
+  Search,
+  X,
+} from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod/v3';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -19,42 +31,25 @@ import {
   FormMessage,
 } from '@/shared/components/ui/form';
 import { Input } from '@/shared/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select';
-import { Card, CardContent } from '@/shared/components/ui/card';
-import { Badge } from '@/shared/components/ui/badge';
-import { Alert, AlertDescription } from '@/shared/components/ui/alert';
-import { Loader2, Coins, AlertCircle, RefreshCw, Info, Search, X } from 'lucide-react';
-import { useDevMode } from '@/shared/hooks/use-dev-mode';
 import { useAuth } from '@/shared/hooks/use-auth';
-import { useSupportedCryptos } from '../hooks/use-supported-cryptos';
 import { useNowPayments } from '../hooks/use-nowpayments';
-import { PaymentWindow } from './payment-window';
+import { useSupportedCryptos } from '../hooks/use-supported-cryptos';
+import { PaymentModal } from './payment-modal';
 
 // 动态创建表单验证schema
-const createFormSchema = (minAmount: number, cryptoUnit: string = 'USD') => z.object({
-  amount: z
-    .string()
-    .min(1, '金额不能为空')
-    .refine(
-      (val) => !Number.isNaN(Number(val)),
-      '请输入有效的数字',
-    )
-    .refine((val) => Number(val) > 0, '金额必须大于0')
-    .refine(
-      (val) => Number(val) <= 10000,
-      '金额不能超过$10,000',
-    )
-    .refine(
-      (val) => Number(val) >= minAmount,
-      `最小充值金额为 ${minAmount} ${cryptoUnit}`,
-    ),
-});
+const createFormSchema = (minAmount: number, cryptoUnit: string = 'USD') =>
+  z.object({
+    amount: z
+      .string()
+      .min(1, '金额不能为空')
+      .refine((val) => !Number.isNaN(Number(val)), '请输入有效的数字')
+      .refine((val) => Number(val) > 0, '金额必须大于0')
+      .refine((val) => Number(val) <= 10000, '金额不能超过$10,000')
+      .refine(
+        (val) => Number(val) >= minAmount,
+        `最小充值金额为 ${minAmount} ${cryptoUnit}`,
+      ),
+  });
 
 type FormData = z.infer<ReturnType<typeof createFormSchema>>;
 
@@ -63,11 +58,19 @@ interface NowPaymentsTopupModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupModalProps) {
-  const { cryptos, isLoading: isLoadingCryptos, error: cryptosError, refreshCryptos } = useSupportedCryptos();
+export function NowPaymentsTopupModal({
+  open,
+  onOpenChange,
+}: NowPaymentsTopupModalProps) {
+  const {
+    cryptos,
+    isLoading: isLoadingCryptos,
+    error: cryptosError,
+    refreshCryptos,
+  } = useSupportedCryptos();
   const { createPayment, getExchangeRate, getMinAmount } = useNowPayments();
   const { did } = useAuth();
-  
+
   const [selectedCrypto, setSelectedCrypto] = useState<string>('');
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [minAmount, setMinAmount] = useState<number>(0);
@@ -75,20 +78,22 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
   const [isLoadingMinAmount, setIsLoadingMinAmount] = useState(false);
   const [paymentData, setPaymentData] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // 搜索相关状态
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   // 获取选中的加密货币信息
-  const selectedCryptoInfo = cryptos.find(crypto => crypto.value === selectedCrypto);
+  const selectedCryptoInfo = cryptos.find(
+    (crypto) => crypto.value === selectedCrypto,
+  );
   const maxAmount = 10000; // 默认最大金额
 
   // 过滤加密货币列表
-  const filteredCryptos = cryptos.filter(crypto => {
+  const filteredCryptos = cryptos.filter((crypto) => {
     if (!searchQuery.trim()) return true;
-    
+
     const query = searchQuery.toLowerCase();
     return (
       crypto.label.toLowerCase().includes(query) ||
@@ -130,7 +135,7 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
   // 获取最小金额
   const fetchMinAmount = useCallback(async () => {
     if (!selectedCrypto) return;
-    
+
     console.log('开始获取最小金额，selectedCrypto:', selectedCrypto);
     setIsLoadingMinAmount(true);
     try {
@@ -148,7 +153,7 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
   // 获取汇率
   const fetchExchangeRate = useCallback(async () => {
     if (!selectedCrypto) return;
-    
+
     console.log('开始获取汇率，selectedCrypto:', selectedCrypto);
     setIsLoadingRate(true);
     try {
@@ -165,7 +170,12 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
 
   // 当选择的加密货币变化时获取最小金额和汇率
   useEffect(() => {
-    console.log('useEffect触发，selectedCrypto:', selectedCrypto, 'open:', open);
+    console.log(
+      'useEffect触发，selectedCrypto:',
+      selectedCrypto,
+      'open:',
+      open,
+    );
     if (selectedCrypto && open) {
       fetchMinAmount();
       fetchExchangeRate();
@@ -175,7 +185,10 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
   // 点击外部关闭搜索下拉列表
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
         setIsSearchOpen(false);
       }
     };
@@ -190,20 +203,23 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
   }, [isSearchOpen]);
 
   // 计算美元金额
-  const calculateUSDAmount = useCallback((cryptoAmount: number): number => {
-    if (!exchangeRate || cryptoAmount === 0) return 0;
-    const result = cryptoAmount * exchangeRate;
-    console.log('calculateUSDAmount:', {
-      cryptoAmount,
-      exchangeRate,
-      result
-    });
-    return result;
-  }, [exchangeRate]);
+  const calculateUSDAmount = useCallback(
+    (cryptoAmount: number): number => {
+      if (!exchangeRate || cryptoAmount === 0) return 0;
+      const result = cryptoAmount * exchangeRate;
+      console.log('calculateUSDAmount:', {
+        cryptoAmount,
+        exchangeRate,
+        result,
+      });
+      return result;
+    },
+    [exchangeRate],
+  );
 
   // 动态创建表单schema
   const formSchema = createFormSchema(minAmount, cryptoUnit);
-  
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -221,41 +237,44 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
   // 预设金额选项
   const presetAmounts = [10, 50, 100, 500, 1000];
 
-  const onSubmit = useCallback(async (data: FormData) => {
-    if (!selectedCrypto) return;
-    
-    setIsSubmitting(true);
-    try {
-      const orderId = `nuwa_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      console.log('用户输入的加密货币金额:', data.amount);
-      console.log('当前汇率:', exchangeRate);
-      
-      // 计算美元金额
-      const usdAmount = calculateUSDAmount(Number(data.amount));
-      console.log('计算出的美元金额:', usdAmount);
-      
-      const paymentRequest = {
-        price_amount: usdAmount,
-        price_currency: 'USD',
-        order_id: orderId,
-        order_description: `NUWA Client top-up - ${usdAmount.toFixed(2)} USD`,
-        pay_currency: selectedCrypto,
-        ipn_callback_url: `https://nowpayment-service-test.up.railway.app/webhook/nowpayments`,
-        payer_did: did || undefined,
-      };
+  const onSubmit = useCallback(
+    async (data: FormData) => {
+      if (!selectedCrypto) return;
 
-      const paymentResponse = await createPayment(paymentRequest);
-      
-      if (paymentResponse) {
-        setPaymentData(paymentResponse);
+      setIsSubmitting(true);
+      try {
+        const orderId = `nuwa_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+        console.log('用户输入的加密货币金额:', data.amount);
+        console.log('当前汇率:', exchangeRate);
+
+        // 计算美元金额
+        const usdAmount = calculateUSDAmount(Number(data.amount));
+        console.log('计算出的美元金额:', usdAmount);
+
+        const paymentRequest = {
+          price_amount: usdAmount,
+          price_currency: 'USD',
+          order_id: orderId,
+          order_description: `NUWA Client top-up - ${usdAmount.toFixed(2)} USD`,
+          pay_currency: selectedCrypto,
+          ipn_callback_url: `https://nowpayment-service-test.up.railway.app/webhook/nowpayments`,
+          payer_did: did || undefined,
+        };
+
+        const paymentResponse = await createPayment(paymentRequest);
+
+        if (paymentResponse) {
+          setPaymentData(paymentResponse);
+        }
+      } catch (error) {
+        console.error('创建支付失败:', error);
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (error) {
-      console.error('创建支付失败:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [selectedCrypto, exchangeRate, calculateUSDAmount, createPayment]);
+    },
+    [selectedCrypto, exchangeRate, calculateUSDAmount, createPayment],
+  );
 
   const handlePaymentSuccess = useCallback(() => {
     setPaymentData(null);
@@ -270,7 +289,7 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
   // 如果正在显示支付窗口，显示支付界面
   if (paymentData) {
     return (
-      <PaymentWindow
+      <PaymentModal
         open={open}
         onOpenChange={onOpenChange}
         paymentData={paymentData}
@@ -293,14 +312,16 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* 加密货币选择 */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">选择加密货币</label>
+              <div className="text-sm font-medium">选择加密货币</div>
               <div className="relative" ref={searchRef}>
                 {/* 搜索输入框 */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder={isLoadingCryptos ? "加载中..." : "搜索加密货币..."}
+                    placeholder={
+                      isLoadingCryptos ? '加载中...' : '搜索加密货币...'
+                    }
                     value={searchQuery}
                     onChange={(e) => handleSearchChange(e.target.value)}
                     onFocus={() => setIsSearchOpen(true)}
@@ -330,8 +351,8 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
                           className="w-full px-3 py-2 text-left hover:bg-muted focus:bg-muted focus:outline-none flex items-center gap-2"
                         >
                           {crypto.icon ? (
-                            <img 
-                              src={crypto.icon} 
+                            <img
+                              src={crypto.icon}
                               alt={crypto.label}
                               className="w-5 h-5 rounded-full flex-shrink-0"
                               onError={(e) => {
@@ -348,7 +369,10 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
                             <div className="flex items-center gap-2">
                               <span className="truncate">{crypto.label}</span>
                               {crypto.network && (
-                                <Badge variant="secondary" className="text-xs flex-shrink-0">
+                                <Badge
+                                  variant="secondary"
+                                  className="text-xs flex-shrink-0"
+                                >
                                   {crypto.network}
                                 </Badge>
                               )}
@@ -369,8 +393,8 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
                   <div className="mt-2 p-2 bg-muted/50 rounded-md">
                     <div className="flex items-center gap-2">
                       {selectedCryptoInfo.icon ? (
-                        <img 
-                          src={selectedCryptoInfo.icon} 
+                        <img
+                          src={selectedCryptoInfo.icon}
                           alt={selectedCryptoInfo.label}
                           className="w-5 h-5 rounded-full"
                           onError={(e) => {
@@ -382,7 +406,9 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
                           {selectedCryptoInfo.value.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <span className="text-sm font-medium">{selectedCryptoInfo.label}</span>
+                      <span className="text-sm font-medium">
+                        {selectedCryptoInfo.label}
+                      </span>
                       {selectedCryptoInfo.network && (
                         <Badge variant="secondary" className="text-xs">
                           {selectedCryptoInfo.network}
@@ -479,7 +505,7 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
                     </Button>
                   ))}
                 </div>
-                {presetAmounts.some(preset => preset < minAmount) && (
+                {presetAmounts.some((preset) => preset < minAmount) && (
                   <div className="text-xs text-muted-foreground">
                     部分选项因小于最小充值金额而禁用
                   </div>
@@ -498,14 +524,20 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
                         {form.watch('amount') || '0'} {cryptoUnit}
                         {exchangeRate && (
                           <span className="text-muted-foreground ml-1">
-                            (≈${calculateUSDAmount(Number(form.watch('amount') || 0)).toFixed(2)})
+                            (≈$
+                            {calculateUSDAmount(
+                              Number(form.watch('amount') || 0),
+                            ).toFixed(2)}
+                            )
                           </span>
                         )}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span>加密货币:</span>
-                      <span className="font-medium">{selectedCryptoInfo?.label || '加载中...'}</span>
+                      <span className="font-medium">
+                        {selectedCryptoInfo?.label || '加载中...'}
+                      </span>
                     </div>
                     {minAmount > 0 && (
                       <div className="flex justify-between">
@@ -533,7 +565,9 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
               <div className="flex items-center justify-center py-2">
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 <span className="text-sm text-muted-foreground">
-                  {isLoadingMinAmount ? '正在获取最小金额...' : '正在获取汇率...'}
+                  {isLoadingMinAmount
+                    ? '正在获取最小金额...'
+                    : '正在获取汇率...'}
                 </span>
               </div>
             )}
@@ -548,7 +582,12 @@ export function NowPaymentsTopupModal({ open, onOpenChange }: NowPaymentsTopupMo
               </Button>
               <Button
                 type="submit"
-                disabled={!selectedCrypto || isSubmitting || isLoadingRate || isLoadingMinAmount}
+                disabled={
+                  !selectedCrypto ||
+                  isSubmitting ||
+                  isLoadingRate ||
+                  isLoadingMinAmount
+                }
               >
                 {isSubmitting ? (
                   <>

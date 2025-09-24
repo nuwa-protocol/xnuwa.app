@@ -28,7 +28,7 @@ interface TransactionItemProps {
   index: number;
 }
 
-export function TransactionItem({
+export function AITransactionSubItem({
   transaction,
   onSelect,
   index,
