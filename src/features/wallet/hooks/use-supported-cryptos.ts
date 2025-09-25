@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getConfig } from '@/shared/config/nowpayments.ts';
 
 export interface CryptoCurrency {
   value: string;
-  label: string;
+  name: string;
+  code: string;
   icon: string;
   network?: string;
   logoUrl?: string;
@@ -17,7 +18,7 @@ export interface CryptoCurrency {
   networkPrecision?: number;
 }
 
-// API货币数据接口
+// API Currency data interface
 interface ApiCurrency {
   id: number;
   code: string;
@@ -36,30 +37,27 @@ interface ApiCurrency {
   network_precision: number | null;
 }
 
-// 生成图标URL
+// Generate icon URL
 const generateIconUrl = (logoUrl: string): string => {
   if (logoUrl) {
-    // 如果logoUrl已经是完整的URL，直接返回
+    // If logoUrl is already a full URL, return it directly
     if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
       return logoUrl;
     }
-    // 否则拼接nowpayments.io域名
+    // Otherwise, concatenate nowpayments.io domain name
     return `https://nowpayments.io${logoUrl}`;
   }
   return '';
 };
 
-// 创建加密货币对象
+// Create crypto currency object
 const createCryptoCurrency = (apiCurrency: ApiCurrency): CryptoCurrency => {
   const iconUrl = generateIconUrl(apiCurrency.logo_url);
-  console.log(`处理货币 ${apiCurrency.code}:`, {
-    originalLogoUrl: apiCurrency.logo_url,
-    generatedIconUrl: iconUrl,
-  });
 
   return {
     value: apiCurrency.code.toLowerCase(),
-    label: `${apiCurrency.name} (${apiCurrency.code})`,
+    name: apiCurrency.name,
+    code: apiCurrency.code,
     icon: iconUrl,
     network: apiCurrency.network,
     logoUrl: apiCurrency.logo_url,
@@ -74,27 +72,18 @@ const createCryptoCurrency = (apiCurrency: ApiCurrency): CryptoCurrency => {
   };
 };
 
-// 默认加密货币列表
+// Default crypto currency list
 const defaultCryptos: CryptoCurrency[] = [];
 
-// API数据处理函数
+// API data processing function
 const processApiCurrencies = (currencies: ApiCurrency[]): CryptoCurrency[] => {
-  console.log('处理API货币数据:', currencies);
-
-  // 过滤启用的货币并按优先级排序
+  // Filter enabled currencies and sort by priority
   const enabledCurrencies = currencies
     .filter((currency) => currency.enable)
     .sort((a, b) => b.priority - a.priority);
 
-  console.log('启用的货币数量:', enabledCurrencies.length);
-
-  // 转换为CryptoCurrency格式
+  // Convert to CryptoCurrency format
   const formattedCryptos = enabledCurrencies.map(createCryptoCurrency);
-
-  console.log(
-    '格式化后的加密货币:',
-    formattedCryptos.map((c) => c.value),
-  );
 
   return formattedCryptos;
 };
@@ -113,36 +102,39 @@ export const useSupportedCryptos = () => {
       const response = await fetch(`${config.appUrl}/api/full-currencies`);
 
       if (!response.ok) {
-        throw new Error('获取支持的加密货币失败');
+        throw new Error('Failed to fetch supported cryptocurrencies');
       }
 
       const data = await response.json();
-      console.log('API响应数据:', data);
 
       if (!data.currencies || !Array.isArray(data.currencies)) {
-        throw new Error('API返回数据格式错误');
+        throw new Error('API returned data format error');
       }
 
       const processedCryptos = processApiCurrencies(data.currencies);
       setCryptos(processedCryptos);
     } catch (err) {
-      console.warn(
+      console.error(
         'Failed to fetch supported cryptocurrencies, using default list:',
         err,
       );
-      setError(err instanceof Error ? err.message : '获取支持的加密货币失败');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to fetch supported cryptocurrencies',
+      );
       setCryptos(defaultCryptos);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // 组件挂载时获取支持的加密货币
+  // When the component is mounted, fetch the supported cryptocurrencies
   useEffect(() => {
     fetchSupportedCryptos();
   }, [fetchSupportedCryptos]);
 
-  // 手动刷新支持的加密货币
+  // Manually refresh supported cryptocurrencies
   const refreshCryptos = useCallback(() => {
     fetchSupportedCryptos();
   }, [fetchSupportedCryptos]);

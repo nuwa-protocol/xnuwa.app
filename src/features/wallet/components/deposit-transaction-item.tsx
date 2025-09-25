@@ -1,6 +1,6 @@
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
-import type { Order } from '../hooks/use-orders';
+import type { Order } from '../hooks/use-deposit-orders';
 
 function formatAbsolute(dateStr?: string) {
   if (!dateStr) return 'No date';

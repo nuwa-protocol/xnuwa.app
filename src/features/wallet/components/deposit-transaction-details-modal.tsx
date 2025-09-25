@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
 import { Table, TableBody, TableCell, TableRow } from '@/shared/components/ui/table';
-import type { Order } from '../hooks/use-orders';
+import type { Order } from '../hooks/use-deposit-orders';
 
 function CopyableCell({ value }: { value: string | number | boolean | null }) {
   const [copied, setCopied] = useState(false);

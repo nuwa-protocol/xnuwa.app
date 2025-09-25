@@ -3,7 +3,7 @@ import { ChatSessionsStore } from '@/features/chat/stores';
 import { fetchTransactionsFromChatSession } from '../service';
 import type { ChatSessionTransactionRecords } from '../types';
 
-export const useChatTransactionInfo = () => {
+export const useAITransactions = () => {
   const [chatRecords, setChatRecords] = useState<
     ChatSessionTransactionRecords[]
   >([]);

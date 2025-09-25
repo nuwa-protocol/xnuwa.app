@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useChatTransactionInfo } from '../hooks/use-chat-transaction-info';
+import { useAITransactions } from '../hooks/use-ai-transactions';
 import type {
     ChatSessionTransactionRecords,
     PaymentTransaction,
@@ -16,7 +16,7 @@ import { AITransactionItem } from './ai-transaction-item';
 import { AITransactionSearch } from './ai-transaction-search';
 
 export function AITransactionList() {
-    const { chatRecords, error, refetch } = useChatTransactionInfo();
+    const { chatRecords, error, refetch } = useAITransactions();
     const [selectedTransaction, setSelectedTransaction] =
         useState<PaymentTransaction | null>(null);
     const [openChats, setOpenChats] = useState<Set<string>>(new Set());

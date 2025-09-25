@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/shared/hooks/use-auth';
-import { type Order, type OrdersFilters, useOrders } from '../hooks/use-orders';
+import { type Order, type OrdersFilters, useOrders } from '../hooks/use-deposit-orders';
 import type { SortOption } from '../types';
 import {
   DepositEmpty,
