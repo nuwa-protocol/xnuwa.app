@@ -86,7 +86,6 @@ export function SidebarChats() {
           opacity: open ? 1 : 0,
         }}
       >
-        w
         <SidebarLabel
           label={t('chatHistory.recentChats')}
           open={open}
