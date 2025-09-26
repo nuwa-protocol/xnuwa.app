@@ -1,3 +1,4 @@
+import { RefreshCw } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useDepositOrders } from '@/features/wallet/hooks/use-deposit-orders';
 import type {
@@ -12,27 +13,21 @@ import {
   DepositLoading,
   DepositSearchEmpty,
 } from './abnormal';
-import { DepositTransactionDetailsModal } from './details-modal';
 import { DepositTransactionsFilter } from './filter';
 import { DepositTransactionItem } from './item';
+import { DepositOrderModal } from './order-modal';
 import { DepositTransactionSearch } from './search';
 
 export function DepositTransctionList() {
-  const {
-    depositOrders,
-    isLoading,
-    error,
-    totalCount,
-    loadMore,
-    refresh,
-  } = useDepositOrders();
+  const { depositOrders, isLoading, error, totalCount, loadMore, refresh } =
+    useDepositOrders();
 
-  const [selectedOrder, setSelectedOrder] =
-    useState<DepositOrder | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<DepositOrder | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('time-desc');
   const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
   const [status, setStatus] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   const processedTransactions = useMemo(() => {
     return getProcessedTransactions(depositOrders, {
@@ -55,9 +50,11 @@ export function DepositTransctionList() {
     loadMore(filters);
   };
 
-  // When status changes, refresh from server with server-side status filter
-  // so pagination and counts reflect the selected status.
-  // Note: local filters (search/date/sort) are still applied client-side.
+  const handleSelectOrder = (order: DepositOrder) => {
+    setSelectedOrder(order);
+    setIsOrderModalOpen(true);
+  };
+
   useEffect(() => {
     const filters: FetchDepositOrdersFilter = {};
     if (status !== 'all') filters.status = [status];
@@ -86,6 +83,11 @@ export function DepositTransctionList() {
           status={status}
           setStatus={setStatus}
         />
+        <Button variant="outline" onClick={handleRefresh}>
+          <RefreshCw
+            className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`}
+          />
+        </Button>
       </div>
 
       {processedTransactions.length === 0 ? (
@@ -102,7 +104,7 @@ export function DepositTransctionList() {
           <DepositTransactionItem
             key={transaction.paymentId}
             transaction={transaction}
-            onSelect={setSelectedOrder}
+            onSelect={handleSelectOrder}
           />
         ))
       )}
@@ -119,10 +121,14 @@ export function DepositTransctionList() {
         </div>
       )}
 
-      <DepositTransactionDetailsModal
-        transaction={selectedOrder}
-        onClose={() => setSelectedOrder(null)}
-      />
+      {selectedOrder && (
+        <DepositOrderModal
+          key={selectedOrder.paymentId}
+          selectedOrderPaymentId={selectedOrder.paymentId}
+          open={isOrderModalOpen}
+          onOpenChange={(open) => setIsOrderModalOpen(open)}
+        />
+      )}
     </div>
   );
 }

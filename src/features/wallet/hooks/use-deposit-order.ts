@@ -28,7 +28,7 @@ export const useDepositOrder = () => {
     setCreateError(null);
     setOrder(null);
     try {
-      const paymentRequest: CreateDepositOrderRequest = {
+      const request: CreateDepositOrderRequest = {
         price_amount: amount,
         price_currency: 'USD',
         order_id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -37,10 +37,10 @@ export const useDepositOrder = () => {
         payer_did: userDid,
       };
 
-      const paymentResponse = await createDepositOrder(paymentRequest);
+      const response = await createDepositOrder(request);
 
-      if (paymentResponse) {
-        setOrder(mapCreatePaymentResponseToPaymentOrder(paymentResponse));
+      if (response) {
+        setOrder(mapCreatePaymentResponseToPaymentOrder(response));
       }
     } catch (err) {
       setCreateError(

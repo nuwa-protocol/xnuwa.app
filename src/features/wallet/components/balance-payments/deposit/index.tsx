@@ -31,9 +31,6 @@ export function BuyCreditsView() {
     updateOrder,
   } = useDepositOrder();
 
-  const isCompleted = order?.status === 'completed';
-  const isExpired = order?.status === 'expired';
-
   const handleBuyComplete = async (amount: number, currency: Currency) => {
     setAmount(amount);
     setCurrency(currency);
@@ -69,11 +66,11 @@ export function BuyCreditsView() {
   }
 
   if (order) {
-    if (isCompleted) {
+    if (order.status === 'completed') {
       return <OrderCompleted order={order} />;
     }
 
-    if (isExpired) {
+    if (order.status === 'expired') {
       return <OrderExpired order={order} onRetry={retryCreate} />;
     }
     return (

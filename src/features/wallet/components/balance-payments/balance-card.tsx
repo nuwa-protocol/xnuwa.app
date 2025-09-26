@@ -132,7 +132,10 @@ export function BalanceCard() {
         </CardContent>
       </Card>
 
-      <BuyCreditsModal open={showBuyModal} onOpenChange={setShowBuyModal} />
+      <BuyCreditsModal 
+        open={showBuyModal} 
+        onOpenChange={setShowBuyModal}
+      />
 
       <TestnetFaucetDialog
         open={showFaucetDialog}
