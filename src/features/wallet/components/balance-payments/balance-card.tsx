@@ -21,7 +21,7 @@ import {
 import { cn } from '@/shared/utils/cn';
 import { WalletStore } from '../../stores';
 import { TestnetFaucetDialog } from '../testnet-faucet-dialog';
-import { BuyCreditsModal } from './buy';
+import { BuyCreditsModal } from './deposit';
 
 export function BalanceCard() {
   const { usdAmount, balanceLoading, balanceError } = WalletStore();

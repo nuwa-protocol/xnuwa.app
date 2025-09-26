@@ -34,10 +34,10 @@ export function BuyCreditsView() {
   const isCompleted = order?.status === 'completed';
   const isExpired = order?.status === 'expired';
 
-  const handleBuyComplete = (amount: number, currency: Currency) => {
+  const handleBuyComplete = async (amount: number, currency: Currency) => {
     setAmount(amount);
     setCurrency(currency);
-    createOrder(amount, currency);
+    await createOrder(amount, currency);
   };
 
   const retryCreate = () => {
