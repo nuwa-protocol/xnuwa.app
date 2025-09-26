@@ -33,6 +33,10 @@ export function SidebarChats() {
   // check if both groups are empty
   const isAllEmpty = pinnedChats.length === 0 && recentChats.length === 0;
 
+  if (isAllEmpty && !open) {
+    return null;
+  }
+
   if (isAllEmpty) {
     return (
       <SidebarGroup>
