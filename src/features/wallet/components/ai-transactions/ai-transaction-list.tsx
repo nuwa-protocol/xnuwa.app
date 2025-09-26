@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { useAITransactions } from '../hooks/use-ai-transactions';
+import { useAITransactions } from '../../hooks/use-ai-transactions';
 import type {
     ChatSessionTransactionRecords,
     PaymentTransaction,
     SortOption,
-} from '../types';
+} from '../../types';
 import {
     AITransactionEmpty,
     AITransactionError,

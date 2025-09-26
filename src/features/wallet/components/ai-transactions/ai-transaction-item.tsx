@@ -8,8 +8,8 @@ import {
 import type {
   ChatSessionTransactionRecords,
   PaymentTransaction,
-} from '../types';
-import { formatUsdCost } from '../utils';
+} from '../../types';
+import { formatUsdCost } from '../../utils';
 import { AITransactionSubItem } from './ai-transaction-sub-item';
 
 const formatDate = (timestamp: number) => {
@@ -44,8 +44,8 @@ export function AITransactionItem({
   const chatTime =
     chatRecord.transactions.length > 0
       ? Math.max(
-          ...chatRecord.transactions.map((tx) => tx.details?.timestamp || 0),
-        )
+        ...chatRecord.transactions.map((tx) => tx.details?.timestamp || 0),
+      )
       : 0;
   return (
     <Collapsible open={isOpen} onOpenChange={() => onToggle(chatId)}>

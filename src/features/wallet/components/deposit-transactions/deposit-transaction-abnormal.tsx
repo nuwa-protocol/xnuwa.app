@@ -1,6 +1,7 @@
 import { AlertCircle, CircleOff, SearchX } from 'lucide-react';
 import { Button } from '@/shared/components';
 import { Skeleton } from '@/shared/components/ui/skeleton';
+import { generateUUID } from '@/shared/utils';
 
 export function DepositSearchEmpty({
   searchTerm,
@@ -33,7 +34,11 @@ export function DepositSearchEmpty({
           </Button>
         )}
         {filterDate && (
-          <Button variant="outline" size="sm" onClick={() => setFilterDate(undefined)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilterDate(undefined)}
+          >
             Clear Date
           </Button>
         )}
@@ -88,7 +93,10 @@ export function DepositLoading() {
       <div className="space-y-3">
         <Skeleton className="h-8 w-1/3" />
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="flex items-center justify-between gap-4">
+          <div
+            key={generateUUID()}
+            className="flex items-center justify-between gap-4"
+          >
             <div className="flex-1">
               <Skeleton className="h-4 w-1/2 mb-2" />
               <Skeleton className="h-3 w-1/4" />

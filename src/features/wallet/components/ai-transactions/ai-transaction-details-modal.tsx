@@ -12,7 +12,7 @@ import {
   TableCell,
   TableRow,
 } from '@/shared/components/ui/table';
-import type { PaymentTransaction } from '../types';
+import type { PaymentTransaction } from '../../types';
 
 const formatCost = (cost: bigint | undefined) => {
   if (!cost) return null;
@@ -57,9 +57,8 @@ function CopyableCell({ value, isNested = false }: CopyableCellProps) {
 
   return (
     <TableCell
-      className={`cursor-pointer hover:bg-muted/50 transition-colors font-mono text-xs break-all ${
-        value === null ? 'text-muted-foreground italic' : ''
-      } ${isNested ? 'pl-8' : ''}`}
+      className={`cursor-pointer hover:bg-muted/50 transition-colors font-mono text-xs break-all ${value === null ? 'text-muted-foreground italic' : ''
+        } ${isNested ? 'pl-8' : ''}`}
       onClick={handleCopy}
       title="Click to copy"
     >

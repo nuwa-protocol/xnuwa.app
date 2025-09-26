@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getPaymentHubClient } from '@/shared/services/payment-clients';
 import { createLocalStoragePersistConfig } from '@/shared/storage';
-import type { Transaction } from './types';
 
 function formatBigIntWithDecimals(
   value: bigint,
@@ -21,49 +20,30 @@ function formatBigIntWithDecimals(
 }
 
 interface WalletState {
-  // Legacy balance (keep for compatibility)
-  balance: number;
-  transactions: Transaction[];
-
   // Payment hub balance
   rgasAmount: string;
   usdAmount: string;
   balanceLoading: boolean;
   balanceError: string | null;
 
-  setBalance: (balance: number) => void;
-  addTransaction: (transaction: Transaction) => void;
   fetchPaymentBalance: (assetId?: string) => Promise<void>;
-  setBalanceError: (error: string | null) => void;
 }
 
 const persistConfig = createLocalStoragePersistConfig<WalletState>({
   name: 'wallet-storage',
   partialize: (state) => ({
-    balance: state.balance,
-    transactions: state.transactions,
+    rgasAmount: state.rgasAmount,
+    usdAmount: state.usdAmount,
   }),
 });
 
 export const WalletStore = create<WalletState>()(
   persist(
     (set, get) => ({
-      balance: 0,
-      transactions: [],
       rgasAmount: '0',
       usdAmount: '0',
       balanceLoading: false,
       balanceError: null,
-
-      setBalance: (balance) => {
-        set({ balance });
-      },
-
-      addTransaction: (transaction) => {
-        set((state) => ({
-          transactions: [...state.transactions, transaction],
-        }));
-      },
 
       fetchPaymentBalance: async (assetId = '0x3::gas_coin::RGas') => {
         set({ balanceLoading: true, balanceError: null });
@@ -81,10 +61,6 @@ export const WalletStore = create<WalletState>()(
             balanceLoading: false,
           });
         }
-      },
-
-      setBalanceError: (error) => {
-        set({ balanceError: error });
       },
     }),
     persistConfig,

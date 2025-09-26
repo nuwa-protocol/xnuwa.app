@@ -1,5 +1,5 @@
-import { WalletWithProvider } from '@/features/wallet/components';
+import { Wallet } from '@/features/wallet/components';
 
 export default function WalletPage() {
-  return <WalletWithProvider />;
+  return <Wallet />;
 }

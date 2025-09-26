@@ -1,6 +1,5 @@
 /**
- * NowPayments Configuration - 前端配置
- * 只包含前端需要的非敏感配置
+ * NowPayments Configuration
  */
 
 interface NowPaymentsConfig {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
 import { Table, TableBody, TableCell, TableRow } from '@/shared/components/ui/table';
-import type { Order } from '../hooks/use-deposit-orders';
+import type { DepositTransaction } from '../../types';
 
 function CopyableCell({ value }: { value: string | number | boolean | null }) {
   const [copied, setCopied] = useState(false);
@@ -66,28 +66,28 @@ function flattenObject(obj: unknown, prefix = ''): Array<{ key: string; value: s
 }
 
 export function DepositTransactionDetailsModal({
-  order,
+  transaction,
   onClose,
 }: {
-  order: Order | null;
+  transaction: DepositTransaction | null;
   onClose: () => void;
 }) {
-  if (!order) return null;
+  if (!transaction) return null;
 
-  const createdAt = order.created_at
-    ? `${new Date(order.created_at).toLocaleString()}`
+  const createdAt = transaction.created_at
+    ? `${new Date(transaction.created_at).toLocaleString()}`
     : null;
-  const updatedAt = order.updated_at
-    ? `${new Date(order.updated_at).toLocaleString()}`
+  const updatedAt = transaction.updated_at
+    ? `${new Date(transaction.updated_at).toLocaleString()}`
     : null;
-  const fiatFormatted = formatAmount(order.amount_fiat, order.currency_fiat);
-  const ipnRows = flattenObject(order.ipn_payload ?? undefined);
+  const fiatFormatted = formatAmount(transaction.amount_fiat, transaction.currency_fiat);
+  const ipnRows = flattenObject(transaction.ipn_payload ?? undefined);
 
   return (
-    <Dialog open={!!order} onOpenChange={onClose}>
+    <Dialog open={!!transaction} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Order Details</DialogTitle>
+          <DialogTitle>Transaction Details</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <Table>
@@ -95,26 +95,26 @@ export function DepositTransactionDetailsModal({
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">Identifiers</TableCell>
               </TableRow>
-              <Row label="Order ID" value={order.order_id || null} />
-              <Row label="Payment ID" value={order.nowpayments_payment_id} />
+              <Row label="Order ID" value={transaction.order_id || null} />
+              <Row label="Payment ID" value={transaction.nowpayments_payment_id} />
 
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">Status</TableCell>
               </TableRow>
-              <Row label="Status" value={order.status} />
-              <Row label="Pay Currency" value={order.pay_currency || null} />
-              <Row label="Payer DID" value={order.payer_did || null} />
+              <Row label="Status" value={transaction.status} />
+              <Row label="Pay Currency" value={transaction.pay_currency || null} />
+              <Row label="Payer DID" value={transaction.payer_did || null} />
 
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">Amounts</TableCell>
               </TableRow>
-              <Row label="Fiat Amount" value={fiatFormatted || order.amount_fiat} />
-              <Row label="Fiat Unit" value={order.currency_fiat} />
+              <Row label="Fiat Amount" value={fiatFormatted || transaction.amount_fiat} />
+              <Row label="Fiat Unit" value={transaction.currency_fiat} />
 
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">Transfers</TableCell>
               </TableRow>
-              <Row label="Transfer Tx" value={order.transfer_tx || null} />
+              <Row label="Transfer Tx" value={transaction.transfer_tx || null} />
 
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">Timestamps</TableCell>

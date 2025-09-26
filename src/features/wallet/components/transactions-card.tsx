@@ -12,10 +12,10 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui/tabs';
-import { AITransactionList } from './ai-transaction-list';
-import { DepositTransctionList } from './deposit-transaction-list';
+import { AITransactionList } from './ai-transactions/ai-transaction-list';
+import { DepositTransctionList } from './deposit-transactions/deposit-transaction-list';
 
-export function Transactions() {
+export function TransactionsCard() {
   const [activeTab, setActiveTab] = useState<
     'ai-transactions' | 'deposit-transactions'
   >('ai-transactions');

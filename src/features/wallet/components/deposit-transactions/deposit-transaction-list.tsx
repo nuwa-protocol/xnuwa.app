@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
-import { useAuth } from '@/shared/hooks/use-auth';
-import { type Order, type OrdersFilters, useOrders } from '../hooks/use-deposit-orders';
-import type { SortOption } from '../types';
+import { useDepositTransactions } from '../../hooks/use-deposit-transactions';
+import type { DepositTransaction, DepositTransactionFilter, SortOption } from '../../types';
 import {
   DepositEmpty,
   DepositError,
@@ -15,59 +14,57 @@ import { DepositTransactionItem } from './deposit-transaction-item';
 import { DepositTransactionSearch } from './deposit-transaction-search';
 
 export function DepositTransctionList() {
-  const { did } = useAuth();
   const {
-    orders,
+    depositTransactions,
     isLoading,
     error,
     totalCount,
-    loadMoreOrders,
-    refreshOrders,
-    clearError,
-  } = useOrders(did ?? undefined);
+    loadMore,
+    refresh,
+  } = useDepositTransactions();
 
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<DepositTransaction | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('time-desc');
   const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
   const [status, setStatus] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const processedOrders = useMemo(() => {
-    return getProcessedOrders(orders, {
+  const processedTransactions = useMemo(() => {
+    return getProcessedTransactions(depositTransactions, {
       sortBy,
       filterDate,
       status,
       searchTerm,
     });
-  }, [orders, sortBy, filterDate, status, searchTerm]);
+  }, [depositTransactions, sortBy, filterDate, status, searchTerm]);
 
   const handleRefresh = () => {
-    clearError();
-    const filters: OrdersFilters = {};
+    const filters: DepositTransactionFilter = {};
     if (status !== 'all') filters.status = [status];
-    refreshOrders(filters);
+    refresh(filters);
   };
 
   const handleLoadMore = () => {
-    const filters: OrdersFilters = {};
+    const filters: DepositTransactionFilter = {};
     if (status !== 'all') filters.status = [status];
-    loadMoreOrders(filters);
+    loadMore(filters);
   };
 
   // When status changes, refresh from server with server-side status filter
   // so pagination and counts reflect the selected status.
   // Note: local filters (search/date/sort) are still applied client-side.
   useEffect(() => {
-    const filters: OrdersFilters = {};
+    const filters: DepositTransactionFilter = {};
     if (status !== 'all') filters.status = [status];
-    refreshOrders(filters);
-  }, [status, did, refreshOrders]);
+    refresh(filters);
+  }, [status]);
 
   if (error) return <DepositError onRetry={handleRefresh} />;
 
-  if (isLoading && orders.length === 0) return <DepositLoading />;
+  if (isLoading && depositTransactions.length === 0) return <DepositLoading />;
 
-  if (!isLoading && orders.length === 0 && status === 'all')
+  if (!isLoading && depositTransactions.length === 0 && status === 'all')
     return <DepositEmpty onRetry={handleRefresh} />;
 
   return (
@@ -85,10 +82,9 @@ export function DepositTransctionList() {
           status={status}
           setStatus={setStatus}
         />
-
       </div>
 
-      {processedOrders.length === 0 ? (
+      {processedTransactions.length === 0 ? (
         <DepositSearchEmpty
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -98,16 +94,16 @@ export function DepositTransctionList() {
           setStatus={setStatus}
         />
       ) : (
-        processedOrders.map((order) => (
+        processedTransactions.map((transaction) => (
           <DepositTransactionItem
-            key={order.nowpayments_payment_id}
-            order={order}
-            onSelect={setSelectedOrder}
+            key={transaction.nowpayments_payment_id}
+            transaction={transaction}
+            onSelect={setSelectedTransaction}
           />
         ))
       )}
 
-      {orders.length < totalCount && (
+      {depositTransactions.length < totalCount && (
         <div className="flex justify-center my-3">
           <Button
             onClick={handleLoadMore}
@@ -120,15 +116,15 @@ export function DepositTransctionList() {
       )}
 
       <DepositTransactionDetailsModal
-        order={selectedOrder}
-        onClose={() => setSelectedOrder(null)}
+        transaction={selectedTransaction}
+        onClose={() => setSelectedTransaction(null)}
       />
     </div>
   );
 }
 
-export function getProcessedOrders(
-  orders: Order[],
+export function getProcessedTransactions(
+  depositTransactions: DepositTransaction[],
   {
     sortBy,
     filterDate,
@@ -141,11 +137,11 @@ export function getProcessedOrders(
     searchTerm?: string;
   },
 ) {
-  let filtered = [...orders];
+  let filtered = [...depositTransactions];
 
   // Filter by status (client-side)
   if (status && status !== 'all') {
-    filtered = filtered.filter((o) => o.status === status);
+    filtered = filtered.filter((t) => t.status === status);
   }
 
   // Filter by date (created_at within the selected day)
@@ -164,8 +160,8 @@ export function getProcessedOrders(
   // Search by order_id only
   const q = (searchTerm || '').trim().toLowerCase();
   if (q) {
-    filtered = filtered.filter((o) =>
-      (o.order_id || '').toLowerCase().includes(q),
+    filtered = filtered.filter((t) =>
+      (t.order_id || '').toLowerCase().includes(q),
     );
   }
 

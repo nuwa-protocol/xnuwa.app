@@ -20,21 +20,23 @@ import {
 } from '@/shared/components/ui/tooltip';
 import { cn } from '@/shared/utils/cn';
 import { WalletStore } from '../stores';
+import { BuyCreditsStepperModal } from './buy-credits';
 import { TestnetFaucetDialog } from './testnet-faucet-dialog';
 
-interface BalanceCardProps {
-  onBuy: () => void;
-}
-
-export function BalanceCard({ onBuy }: BalanceCardProps) {
+export function BalanceCard() {
   const { usdAmount, balanceLoading, balanceError } = WalletStore();
   const [showFaucetDialog, setShowFaucetDialog] = useState(false);
+  const [showBuyModal, setShowBuyModal] = useState(false);
 
   const usdValue = balanceLoading
     ? 'loading...'
     : balanceError
       ? 'Failed to load balance'
       : usdAmount;
+
+  const handleBuy = () => {
+    setShowBuyModal(true);
+  };
 
   return (
     <>
@@ -76,7 +78,7 @@ export function BalanceCard({ onBuy }: BalanceCardProps) {
               <Button
                 variant="primary"
                 size="sm"
-                onClick={onBuy}
+                onClick={handleBuy}
                 className="w-full"
               >
                 <BanknoteArrowDown className="w-3.5 h-3.5" />
@@ -129,6 +131,11 @@ export function BalanceCard({ onBuy }: BalanceCardProps) {
           </TooltipProvider>
         </CardContent>
       </Card>
+
+      <BuyCreditsStepperModal
+        open={showBuyModal}
+        onOpenChange={setShowBuyModal}
+      />
 
       <TestnetFaucetDialog
         open={showFaucetDialog}
