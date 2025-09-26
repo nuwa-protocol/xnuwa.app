@@ -2,6 +2,9 @@
  * NowPayments Configuration
  */
 
+export const NOWPAYMENTS_IPN_CALLBACK_URL =
+  'https://nowpayment-service-test.up.railway.app/webhook/nowpayments';
+
 interface NowPaymentsConfig {
   appUrl: string;
   appName: string;

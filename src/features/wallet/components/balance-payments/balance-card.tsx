@@ -19,9 +19,9 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
 import { cn } from '@/shared/utils/cn';
-import { WalletStore } from '../stores';
-import { BuyCreditsStepperModal } from './buy-credits';
-import { TestnetFaucetDialog } from './testnet-faucet-dialog';
+import { WalletStore } from '../../stores';
+import { TestnetFaucetDialog } from '../testnet-faucet-dialog';
+import { BuyCreditsModal } from './buy';
 
 export function BalanceCard() {
   const { usdAmount, balanceLoading, balanceError } = WalletStore();
@@ -132,10 +132,7 @@ export function BalanceCard() {
         </CardContent>
       </Card>
 
-      <BuyCreditsStepperModal
-        open={showBuyModal}
-        onOpenChange={setShowBuyModal}
-      />
+      <BuyCreditsModal open={showBuyModal} onOpenChange={setShowBuyModal} />
 
       <TestnetFaucetDialog
         open={showFaucetDialog}

@@ -1,34 +1,42 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/shared/hooks/use-auth';
-import { fetchDepositTransactions } from '../services/deposit-transactions';
-import type { DepositTransaction, DepositTransactionFilter } from '../types';
+import { fetchDepositOrders } from '../services/deposit';
+import type {
+  DepositOrder,
+  FetchDepositOrdersFilter,
+  FetchDepositOrdersResponse,
+} from '../types';
+import { mapFetchDepositOrdersResponseItemToPaymentOrder } from '../utils';
 
-export const useDepositTransactions = () => {
+export const useDepositOrders = () => {
   const { did: userDid } = useAuth();
-  const [depositTransactions, setDepositTransactions] = useState<
-    DepositTransaction[]
-  >([]);
+  const [depositOrders, setDepositOrders] = useState<DepositOrder[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
 
   const load = useCallback(
-    async (filters: DepositTransactionFilter = {}) => {
+    async (filters: FetchDepositOrdersFilter = {}) => {
       if (!userDid || isLoading) return;
 
       try {
         setIsLoading(true);
-        const result = await fetchDepositTransactions(userDid, filters);
-        console.log('result', result);
+        const result: FetchDepositOrdersResponse = await fetchDepositOrders(
+          userDid,
+          filters,
+        );
         if (result) {
-          setDepositTransactions(result.items);
+          const depositOrders = result.items.map(
+            mapFetchDepositOrdersResponseItemToPaymentOrder,
+          );
+          setDepositOrders(depositOrders);
           setTotalCount(result.count);
           setCurrentOffset(result.offset);
           setError(null);
         }
       } catch (err) {
-        setError('Failed to fetch deposit transactions');
+        setError('Failed to fetch deposit orders');
       } finally {
         setIsLoading(false);
       }
@@ -37,24 +45,27 @@ export const useDepositTransactions = () => {
   );
 
   const loadMore = useCallback(
-    async (filters: DepositTransactionFilter = {}) => {
+    async (filters: FetchDepositOrdersFilter = {}) => {
       if (!userDid || isLoading) return;
 
       try {
         const newOffset = currentOffset + (filters.limit || 50);
-        const result = await fetchDepositTransactions(userDid, {
+        const result = await fetchDepositOrders(userDid, {
           ...filters,
           offset: newOffset,
         });
         setTotalCount(result?.count || 0);
         if (result) {
-          setDepositTransactions((prev) => [...prev, ...result.items]);
+          const depositOrders = result.items.map(
+            mapFetchDepositOrdersResponseItemToPaymentOrder,
+          );
+          setDepositOrders((prev) => [...prev, ...depositOrders]);
           setCurrentOffset(result.offset);
           setTotalCount(result.count);
           setError(null);
         }
       } catch (err) {
-        setError('Failed to fetch deposit transactions');
+        setError('Failed to fetch deposit orders');
       } finally {
         setIsLoading(false);
       }
@@ -63,7 +74,7 @@ export const useDepositTransactions = () => {
   );
 
   const refresh = useCallback(
-    async (filters: DepositTransactionFilter = {}) => {
+    async (filters: FetchDepositOrdersFilter = {}) => {
       setCurrentOffset(0);
       await load(filters);
     },
@@ -71,21 +82,17 @@ export const useDepositTransactions = () => {
   );
 
   const getById = useCallback(
-    (orderId: string): DepositTransaction | undefined => {
-      return depositTransactions.find(
-        (transaction) => transaction.id === orderId,
-      );
+    (orderId: string): DepositOrder | undefined => {
+      return depositOrders.find((order) => order.orderId === orderId);
     },
-    [depositTransactions],
+    [depositOrders],
   );
 
   const getByStatus = useCallback(
-    (status: string): DepositTransaction[] => {
-      return depositTransactions.filter(
-        (transaction) => transaction.status === status,
-      );
+    (status: string): DepositOrder[] => {
+      return depositOrders.filter((order) => order.status === status);
     },
-    [depositTransactions],
+    [depositOrders],
   );
 
   useEffect(() => {
@@ -93,7 +100,7 @@ export const useDepositTransactions = () => {
   }, [userDid]);
 
   return {
-    depositTransactions,
+    depositOrders,
     isLoading,
     error,
     totalCount,

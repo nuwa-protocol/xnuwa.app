@@ -1,7 +1,17 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
-import { Table, TableBody, TableCell, TableRow } from '@/shared/components/ui/table';
-import type { DepositTransaction } from '../../types';
+import type { DepositOrder } from '@/features/wallet/types';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from '@/shared/components/ui/table';
 
 function CopyableCell({ value }: { value: string | number | boolean | null }) {
   const [copied, setCopied] = useState(false);
@@ -26,7 +36,13 @@ function CopyableCell({ value }: { value: string | number | boolean | null }) {
   );
 }
 
-function Row({ label, value }: { label: string; value: string | number | boolean | null }) {
+function Row({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number | boolean | null;
+}) {
   return (
     <TableRow>
       <TableCell className="font-medium text-sm">{label}</TableCell>
@@ -35,17 +51,28 @@ function Row({ label, value }: { label: string; value: string | number | boolean
   );
 }
 
-function formatAmount(amount: number | undefined, currency: string | undefined) {
+function formatAmount(
+  amount: number | undefined,
+  currency: string | undefined,
+) {
   if (amount === undefined || currency === undefined) return null;
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 4 }).format(amount);
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 4,
+    }).format(amount);
   } catch {
     return `${amount} ${currency}`;
   }
 }
 
-function flattenObject(obj: unknown, prefix = ''): Array<{ key: string; value: string | number | boolean | null }> {
-  const rows: Array<{ key: string; value: string | number | boolean | null }> = [];
+function flattenObject(
+  obj: unknown,
+  prefix = '',
+): Array<{ key: string; value: string | number | boolean | null }> {
+  const rows: Array<{ key: string; value: string | number | boolean | null }> =
+    [];
   if (!obj || typeof obj !== 'object') return rows;
   const entries = Object.entries(obj as Record<string, unknown>);
   for (const [k, v] of entries) {
@@ -54,8 +81,13 @@ function flattenObject(obj: unknown, prefix = ''): Array<{ key: string; value: s
       rows.push({ key: path, value: null });
     } else if (Array.isArray(v)) {
       // Represent arrays as comma-separated simple values or JSON if nested
-      const simple = v.every((x) => ['string', 'number', 'boolean'].includes(typeof x) || x === null);
-      rows.push({ key: path, value: simple ? (v as any[]).join(', ') : JSON.stringify(v) });
+      const simple = v.every(
+        (x) => ['string', 'number', 'boolean'].includes(typeof x) || x === null,
+      );
+      rows.push({
+        key: path,
+        value: simple ? (v as any[]).join(', ') : JSON.stringify(v),
+      });
     } else if (typeof v === 'object') {
       rows.push(...flattenObject(v, path));
     } else {
@@ -69,19 +101,22 @@ export function DepositTransactionDetailsModal({
   transaction,
   onClose,
 }: {
-  transaction: DepositTransaction | null;
+  transaction: DepositOrder | null;
   onClose: () => void;
 }) {
   if (!transaction) return null;
 
-  const createdAt = transaction.created_at
-    ? `${new Date(transaction.created_at).toLocaleString()}`
+  const createdAt = transaction.createdAt
+    ? `${new Date(transaction.createdAt).toLocaleString()}`
     : null;
-  const updatedAt = transaction.updated_at
-    ? `${new Date(transaction.updated_at).toLocaleString()}`
+  const updatedAt = transaction.updatedAt
+    ? `${new Date(transaction.updatedAt).toLocaleString()}`
     : null;
-  const fiatFormatted = formatAmount(transaction.amount_fiat, transaction.currency_fiat);
-  const ipnRows = flattenObject(transaction.ipn_payload ?? undefined);
+  const fiatFormatted = formatAmount(
+    transaction.purchasedAmount,
+    transaction.paymentCurrency,
+  );
+  const ipnRows = flattenObject(transaction ?? undefined);
 
   return (
     <Dialog open={!!transaction} onOpenChange={onClose}>
@@ -93,31 +128,53 @@ export function DepositTransactionDetailsModal({
           <Table>
             <TableBody>
               <TableRow className="bg-muted/30">
-                <TableCell colSpan={2} className="font-semibold text-sm">Identifiers</TableCell>
+                <TableCell colSpan={2} className="font-semibold text-sm">
+                  Identifiers
+                </TableCell>
               </TableRow>
-              <Row label="Order ID" value={transaction.order_id || null} />
-              <Row label="Payment ID" value={transaction.nowpayments_payment_id} />
+              <Row label="Order ID" value={transaction.orderId || null} />
+              <Row label="Payment ID" value={transaction.paymentId} />
 
               <TableRow className="bg-muted/30">
-                <TableCell colSpan={2} className="font-semibold text-sm">Status</TableCell>
+                <TableCell colSpan={2} className="font-semibold text-sm">
+                  Status
+                </TableCell>
               </TableRow>
               <Row label="Status" value={transaction.status} />
-              <Row label="Pay Currency" value={transaction.pay_currency || null} />
-              <Row label="Payer DID" value={transaction.payer_did || null} />
+              <Row
+                label="Pay Currency"
+                value={transaction.paymentCurrency || null}
+              />
+              <Row
+                label="Payer DID"
+                value={transaction.ipnPayload.payer_did || null}
+              />
 
               <TableRow className="bg-muted/30">
-                <TableCell colSpan={2} className="font-semibold text-sm">Amounts</TableCell>
+                <TableCell colSpan={2} className="font-semibold text-sm">
+                  Amounts
+                </TableCell>
               </TableRow>
-              <Row label="Fiat Amount" value={fiatFormatted || transaction.amount_fiat} />
-              <Row label="Fiat Unit" value={transaction.currency_fiat} />
+              <Row
+                label="Fiat Amount"
+                value={fiatFormatted || transaction.purchasedAmount}
+              />
+              <Row label="Fiat Unit" value={transaction.paymentCurrency} />
 
               <TableRow className="bg-muted/30">
-                <TableCell colSpan={2} className="font-semibold text-sm">Transfers</TableCell>
+                <TableCell colSpan={2} className="font-semibold text-sm">
+                  Transfers
+                </TableCell>
               </TableRow>
-              <Row label="Transfer Tx" value={transaction.transfer_tx || null} />
+              <Row
+                label="Transfer Tx"
+                value={transaction.ipnPayload.transfer_tx || null}
+              />
 
               <TableRow className="bg-muted/30">
-                <TableCell colSpan={2} className="font-semibold text-sm">Timestamps</TableCell>
+                <TableCell colSpan={2} className="font-semibold text-sm">
+                  Timestamps
+                </TableCell>
               </TableRow>
               <Row label="Created At" value={createdAt} />
               <Row label="Updated At" value={updatedAt} />
@@ -125,7 +182,9 @@ export function DepositTransactionDetailsModal({
               {ipnRows.length > 0 && (
                 <>
                   <TableRow className="bg-muted/30">
-                    <TableCell colSpan={2} className="font-semibold text-sm">Payload</TableCell>
+                    <TableCell colSpan={2} className="font-semibold text-sm">
+                      Payload
+                    </TableCell>
                   </TableRow>
                   {ipnRows.map(({ key, value }) => (
                     <Row key={key} label={key} value={value} />

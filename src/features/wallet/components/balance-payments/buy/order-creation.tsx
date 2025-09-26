@@ -1,20 +1,25 @@
+import { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 import type { Currency } from '../../../types';
 import { AmountInput } from './amount-input';
 import { CurrencyCombobox } from './currency-combox';
 import { PreviewCard } from './preview-card';
 
-export type BuyCreditsAmountStepProps = {
-  amount: number | null;
-  currency: Currency | null;
-  onAmountChange: (val: number | null) => void;
-  onCurrencyChange: (val: Currency) => void;
-  onNext: () => void;
+export type OrderCreationProps = {
+  onComplete: (amount: number, currency: Currency) => void;
 };
 
-export function BuyCreditsAmountStep(props: BuyCreditsAmountStepProps) {
-  const { amount, currency, onAmountChange, onCurrencyChange, onNext } = props;
+export function OrderCreation(props: OrderCreationProps) {
+  const [amount, setAmount] = useState<number | null>(null);
+  const [currency, setCurrency] = useState<Currency | null>(null);
+  const { onComplete } = props;
 
   return (
     <div className="flex flex-col gap-4">
@@ -28,12 +33,12 @@ export function BuyCreditsAmountStep(props: BuyCreditsAmountStepProps) {
         <CardContent className="space-y-5">
           <CurrencyCombobox
             currency={currency}
-            onCurrencyChange={onCurrencyChange}
+            onCurrencyChange={setCurrency}
           />
           <AmountInput
             currency={currency}
             amount={amount}
-            onAmountChange={onAmountChange}
+            onAmountChange={setAmount}
             disabled={!currency}
           />
           {/* Preview section (only after both currency and amount set) */}
@@ -42,7 +47,13 @@ export function BuyCreditsAmountStep(props: BuyCreditsAmountStepProps) {
           )}
         </CardContent>
       </Card>
-      <Button className='mt-4' onClick={() => onNext()}>Buy Credits</Button>
+      {
+        currency && amount && amount > 0 && (
+          <Button className="mt-4" onClick={() => onComplete(amount, currency)}>
+            Buy Credits
+          </Button>
+        )
+      }
     </div>
   );
 }

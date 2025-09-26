@@ -1,6 +1,6 @@
 import { formatAmount } from '@nuwa-ai/payment-kit';
+import type { PaymentTransaction } from '@/features/wallet/types';
 import { Button } from '@/shared/components/ui/button';
-import type { PaymentTransaction } from '../../types';
 
 const formatCost = (cost: bigint | undefined) => {
   if (!cost) return undefined;

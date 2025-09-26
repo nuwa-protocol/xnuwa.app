@@ -2,11 +2,11 @@ import {
   CalendarArrowDown,
   CalendarArrowUp,
   CalendarIcon,
-  Check,
   ListFilter,
   SortAsc,
   X,
 } from 'lucide-react';
+import type { SortOption } from '@/features/wallet/types';
 import { Button } from '@/shared/components/ui/button';
 import { Calendar } from '@/shared/components/ui/calendar';
 import {
@@ -15,9 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
 import {
@@ -25,34 +22,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover';
-import type { SortOption } from '../../types';
 
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'All statuses' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'processing', label: 'Processing' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'failed', label: 'Failed' },
-  { value: 'cancelled', label: 'Cancelled' },
-] as const;
-
-export function DepositTransactionsFilter({
+export const AITransactionsFilter = ({
   sortBy,
   setSortBy,
   filterDate,
   setFilterDate,
-  status,
-  setStatus,
 }: {
   sortBy: SortOption;
-  setSortBy: (v: SortOption) => void;
+  setSortBy: (sortBy: SortOption) => void;
   filterDate: Date | undefined;
-  setFilterDate: (v: Date | undefined) => void;
-  status: string;
-  setStatus: (v: string) => void;
-}) {
-  const clearDate = () => setFilterDate(undefined);
-  const clearStatus = () => setStatus('all');
+  setFilterDate: (filterDate: Date | undefined) => void;
+}) => {
+  const clearDateFilter = () => {
+    setFilterDate(undefined);
+  };
 
   return (
     <DropdownMenu>
@@ -65,7 +49,7 @@ export function DepositTransactionsFilter({
           <ListFilter className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Sort by</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => setSortBy('time-desc')}>
           <CalendarArrowDown className="h-4 w-4 mr-2" />
@@ -79,41 +63,14 @@ export function DepositTransactionsFilter({
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setSortBy('amount-desc')}>
           <SortAsc className="h-4 w-4 mr-2" />
-          Highest Amount
+          Most Cost
           {sortBy === 'amount-desc' && <span className="ml-auto">✓</span>}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setSortBy('amount-asc')}>
           <SortAsc className="h-4 w-4 rotate-180 mr-2" />
-          Lowest Amount
+          Least Cost
           {sortBy === 'amount-asc' && <span className="ml-auto">✓</span>}
         </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Status</DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-44">
-            {STATUS_OPTIONS.map((opt) => (
-              <DropdownMenuItem
-                key={opt.value}
-                onClick={() => setStatus(opt.value)}
-              >
-                {status === opt.value ? (
-                  <Check className="h-4 w-4 mr-2" />
-                ) : (
-                  <span className="w-4 h-4 mr-2" />
-                )}
-                {opt.label}
-              </DropdownMenuItem>
-            ))}
-            {status !== 'all' && (
-              <DropdownMenuItem onClick={clearStatus}>
-                <X className="h-4 w-4 mr-2" />
-                Clear status filter
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
 
         <DropdownMenuSeparator />
 
@@ -141,7 +98,7 @@ export function DepositTransactionsFilter({
         </div>
 
         {filterDate && (
-          <DropdownMenuItem onClick={clearDate}>
+          <DropdownMenuItem onClick={clearDateFilter}>
             <X className="h-4 w-4 mr-2" />
             Clear date filter
           </DropdownMenuItem>
@@ -149,4 +106,4 @@ export function DepositTransactionsFilter({
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};

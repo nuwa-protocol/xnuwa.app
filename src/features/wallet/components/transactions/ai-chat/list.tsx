@@ -1,19 +1,19 @@
 import { useMemo, useState } from 'react';
-import { useAITransactions } from '../../hooks/use-ai-transactions';
+import { useAITransactions } from '@/features/wallet/hooks/use-ai-transactions';
 import type {
     ChatSessionTransactionRecords,
     PaymentTransaction,
     SortOption,
-} from '../../types';
+} from '@/features/wallet/types';
 import {
     AITransactionEmpty,
     AITransactionError,
     AITransactionSearchEmpty,
-} from './ai-transaction-abnormal';
-import { AITransactionDetailsModal } from './ai-transaction-details-modal';
-import { AITransactionsFilter } from './ai-transaction-filter';
-import { AITransactionItem } from './ai-transaction-item';
-import { AITransactionSearch } from './ai-transaction-search';
+} from './abnormal';
+import { AITransactionDetailsModal } from './details-modal';
+import { AITransactionsFilter } from './filter';
+import { AITransactionItem } from './item';
+import { AITransactionSearch } from './search';
 
 export function AITransactionList() {
     const { chatRecords, error, refetch } = useAITransactions();

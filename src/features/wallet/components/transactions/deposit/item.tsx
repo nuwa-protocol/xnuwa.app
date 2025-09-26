@@ -1,6 +1,6 @@
+import { StatusBadge } from '@/features/wallet/components/status-badge';
+import type { DepositOrder } from '@/features/wallet/types';
 import { Button } from '@/shared/components/ui/button';
-import type { DepositTransaction } from '../../types';
-import { StatusBadge } from '../buy-credits/step-payment/status-badge';
 
 function formatAbsolute(dateStr?: string) {
   if (!dateStr) return 'No date';
@@ -9,15 +9,15 @@ function formatAbsolute(dateStr?: string) {
   return d.toLocaleString();
 }
 
-function formatAmount(amount: number, currency: string) {
+function formatAmount(amount: number) {
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency,
+      currency: 'USD',
       maximumFractionDigits: 4,
     }).format(amount);
   } catch {
-    return `${amount.toFixed(2)} ${currency}`;
+    return `${amount.toFixed(2)} USD`;
   }
 }
 
@@ -25,10 +25,10 @@ export function DepositTransactionItem({
   transaction,
   onSelect,
 }: {
-  transaction: DepositTransaction;
-  onSelect: (order: DepositTransaction) => void;
+  transaction: DepositOrder;
+  onSelect: (order: DepositOrder) => void;
 }) {
-  const orderId = transaction.order_id || transaction.nowpayments_payment_id;
+  const orderId = transaction.orderId || transaction.paymentId;
   return (
     <Button
       variant="ghost"
@@ -40,15 +40,14 @@ export function DepositTransactionItem({
           {orderId || 'Order'}
         </p>
         <p className="text-xs text-muted-foreground">
-          {formatAbsolute(transaction.created_at)}
+          {formatAbsolute(transaction.createdAt)}
         </p>
       </div>
       <div className="text-right">
         <div className="flex items-center justify-end space-x-1 text-sm font-medium">
           <span>
             {formatAmount(
-              Number(transaction.amount_fiat || 0),
-              transaction.currency_fiat,
+              Number(transaction.purchasedAmount || 0)
             )}
           </span>
         </div>

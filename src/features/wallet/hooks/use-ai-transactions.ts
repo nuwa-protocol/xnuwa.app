@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ChatSessionsStore } from '@/features/chat/stores';
-import { fetchTransactionsFromChatSession } from '../service';
+import { fetchTransactionsFromChatSession } from '../services';
 import type { ChatSessionTransactionRecords } from '../types';
 
 export const useAITransactions = () => {

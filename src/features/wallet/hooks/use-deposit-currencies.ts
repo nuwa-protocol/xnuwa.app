@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getSupportedCurrencies } from '../services/deposit-transactions';
+import { getSupportedCurrencies } from '../services/deposit';
 import type { Currency } from '../types';
 
 export const usePaymentCurrencies = () => {

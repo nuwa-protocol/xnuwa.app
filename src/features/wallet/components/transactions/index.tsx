@@ -12,8 +12,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui/tabs';
-import { AITransactionList } from './ai-transactions/ai-transaction-list';
-import { DepositTransctionList } from './deposit-transactions/deposit-transaction-list';
+import { AITransactionList } from './ai-chat/list';
+import { DepositTransctionList } from './deposit/list';
 
 export function TransactionsCard() {
   const [activeTab, setActiveTab] = useState<

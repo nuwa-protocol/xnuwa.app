@@ -1,16 +1,16 @@
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import type {
+  ChatSessionTransactionRecords,
+  PaymentTransaction,
+} from '@/features/wallet/types';
+import { formatUsdCost } from '@/features/wallet/utils';
 import { Button } from '@/shared/components/ui/button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/shared/components/ui/collapsible';
-import type {
-  ChatSessionTransactionRecords,
-  PaymentTransaction,
-} from '../../types';
-import { formatUsdCost } from '../../utils';
-import { AITransactionSubItem } from './ai-transaction-sub-item';
+import { AITransactionSubItem } from './sub-item';
 
 const formatDate = (timestamp: number) => {
   return new Date(timestamp).toLocaleString();

@@ -1,6 +1,6 @@
 import { DollarSign, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
-import { getMinAmount } from '@/features/wallet/services/deposit-transactions';
+import { getMinAmount } from '@/features/wallet/services/deposit';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';

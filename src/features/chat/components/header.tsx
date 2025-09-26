@@ -2,7 +2,7 @@ import { useChat } from '@ai-sdk/react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CapSelector } from '@/features/cap-store/components';
-import { fetchTransactionsFromChatSession } from '@/features/wallet/service';
+import { fetchTransactionsFromChatSession } from '@/features/wallet/services';
 import type { PaymentTransaction } from '@/features/wallet/types';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { generateUUID } from '@/shared/utils';

@@ -1,18 +1,21 @@
-import { getConfig } from '@/shared/config/nowpayments';
+import {
+  getConfig,
+  NOWPAYMENTS_IPN_CALLBACK_URL,
+} from '@/shared/config/nowpayments';
 import type {
-  CheckPaymentStatusResponse,
-  CreatePaymentOrderRequest,
-  CreatePaymentOrderResponse,
-  DepositTransactionFilter,
-  DepositTransactionsResponse,
+  CreateDepositOrderRequest,
+  CreateDepositOrderResponse,
+  FetchDepositOrderResponse,
+  FetchDepositOrdersFilter,
+  FetchDepositOrdersResponse,
   GetMinAmountResponse,
-} from '../types/deposit-transactions';
+} from '../types/deposit';
 import { normalizeCurrencies } from '../utils';
 
-export const fetchDepositTransactions = async (
+export const fetchDepositOrders = async (
   did: string,
-  filters: DepositTransactionFilter = {},
-): Promise<DepositTransactionsResponse | null> => {
+  filters: FetchDepositOrdersFilter = {},
+): Promise<FetchDepositOrdersResponse> => {
   try {
     const config = getConfig();
     const { status = [], limit = 50, offset = 0 } = filters;
@@ -25,23 +28,44 @@ export const fetchDepositTransactions = async (
     params.append('offset', offset.toString());
 
     const apiUrl = `${config.appUrl}/api/users/${did}/orders?${params.toString()}`;
-
     const response = await fetch(apiUrl);
 
     if (!response.ok) {
       throw new Error('Failed to fetch deposit transactions');
     }
 
-    const data: DepositTransactionsResponse = await response.json();
+    const data: FetchDepositOrdersResponse = await response.json();
     return data;
   } catch (err) {
     console.error('Get user orders error:', err);
     throw err;
   }
 };
-export const createPayment = async (
-  request: CreatePaymentOrderRequest,
-): Promise<CreatePaymentOrderResponse | null> => {
+
+export const fetchDepositOrder = async (
+  paymentId: string,
+): Promise<FetchDepositOrderResponse | null> => {
+  try {
+    const config = getConfig();
+
+    const apiUrl = `${config.appUrl}/api/payments-info/${paymentId}`;
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch trasaction');
+    }
+
+    const data: FetchDepositOrderResponse = await response.json();
+    return data;
+  } catch (err) {
+    console.error('Get user orders error:', err);
+    throw err;
+  }
+};
+
+export const createDepositOrder = async (
+  request: CreateDepositOrderRequest,
+): Promise<CreateDepositOrderResponse | null> => {
   try {
     const config = getConfig();
 
@@ -52,7 +76,10 @@ export const createPayment = async (
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify({
+        ...request,
+        ipn_callback_url: NOWPAYMENTS_IPN_CALLBACK_URL,
+      }),
     });
 
     if (!response.ok) {
@@ -61,33 +88,10 @@ export const createPayment = async (
       throw new Error(errorData.message || 'Create payment failed');
     }
 
-    const paymentData: CreatePaymentOrderResponse = await response.json();
+    const paymentData: CreateDepositOrderResponse = await response.json();
     return paymentData;
   } catch (err) {
     console.error('NowPayments payment creation error:', err);
-    throw err;
-  }
-};
-
-export const checkPaymentStatus = async (
-  paymentId: string,
-): Promise<CheckPaymentStatusResponse | null> => {
-  try {
-    const config = getConfig();
-    const apiUrl = `${config.appUrl}/api/payments/${paymentId}`;
-
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      console.error('Check payment status failed');
-      throw new Error('Check payment status failed');
-    }
-
-    const statusData: CheckPaymentStatusResponse = await response.json();
-
-    return statusData;
-  } catch (err) {
-    console.error('Payment status check error:', err);
     throw err;
   }
 };

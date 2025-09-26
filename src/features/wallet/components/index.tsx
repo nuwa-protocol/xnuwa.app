@@ -1,5 +1,5 @@
-import { BalanceCard } from './balance-card';
-import { TransactionsCard } from './transactions-card';
+import { BalanceCard } from './balance-payments/balance-card';
+import { TransactionsCard } from './transactions';
 
 export function Wallet() {
   return (

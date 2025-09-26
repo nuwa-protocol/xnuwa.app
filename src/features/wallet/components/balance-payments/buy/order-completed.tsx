@@ -1,17 +1,17 @@
-import { CheckCircle, CreditCard, ExternalLink } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import type { PaymentOrder } from '../../../types/deposit-transactions';
+import { CheckCircle, CreditCard } from 'lucide-react';
+import type { DepositOrder } from '@/features/wallet/types/deposit';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card';
 
-export type PaymentCompletedScreenProps = {
-  payment: PaymentOrder;
-  onViewWallet?: () => void;
+export type OrderCompletedProps = {
+  order: DepositOrder;
 };
 
-export function PaymentCompletedScreen({
-  payment,
-  onViewWallet,
-}: PaymentCompletedScreenProps) {
+export function OrderCompleted({ order }: OrderCompletedProps) {
   return (
     <div className="space-y-6">
       {/* Success Header */}
@@ -42,14 +42,14 @@ export function PaymentCompletedScreen({
             <div>
               <span className="text-muted-foreground">Credits Added</span>
               <div className="font-semibold text-lg">
-                ${payment.purchasedAmount || '0'} USD
+                ${order.purchasedAmount || '0'} USD
               </div>
             </div>
             <div>
               <span className="text-muted-foreground">Amount Paid</span>
               <div className="font-semibold">
-                {payment.received || payment.totalDue || '0'}{' '}
-                {payment.paymentCurrency?.toUpperCase() || 'N/A'}
+                {order.received || order.totalDue || '0'}{' '}
+                {order.paymentCurrency?.toUpperCase() || 'N/A'}
               </div>
             </div>
           </div>
@@ -58,20 +58,12 @@ export function PaymentCompletedScreen({
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Order ID</span>
               <span className="font-mono text-xs">
-                {payment.orderId || 'N/A'}
+                {order.orderId || 'N/A'}
               </span>
             </div>
           </div>
         </CardContent>
       </Card>
-
-      {/* Action Buttons */}
-      <div className="space-y-3">
-        <Button onClick={onViewWallet} className="w-full" size="lg">
-          <ExternalLink className="mr-2 h-4 w-4" />
-          View Wallet Balance
-        </Button>
-      </div>
     </div>
   );
 }

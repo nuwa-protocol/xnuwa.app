@@ -1,15 +1,16 @@
 import { XCircle } from 'lucide-react';
 import { Badge } from '@/shared/components/ui/badge';
+import type { DepositOrder } from '../types';
 
-export const StatusBadge = ({ status }: { status: string }) => {
-    switch (status?.toLowerCase()) {
-        case 'waiting':
+export const StatusBadge = ({ status }: { status: DepositOrder['status'] }) => {
+    switch (status) {
+        case 'pending':
             return (
                 <Badge
                     variant="outline"
                     className="text-amber-600 border-amber-200 bg-amber-50"
                 >
-                    Waiting
+                    Pending
                 </Badge>
             );
         case 'confirming':

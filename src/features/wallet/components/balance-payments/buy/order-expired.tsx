@@ -1,4 +1,5 @@
 import { Clock, RefreshCw, XCircle } from 'lucide-react';
+import type { DepositOrder } from '@/features/wallet/types/deposit';
 import { Button } from '@/shared/components/ui/button';
 import {
   Card,
@@ -7,17 +8,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import type { PaymentOrder } from '../../../types/deposit-transactions';
 
-export type PaymentExpiredScreenProps = {
-  payment: PaymentOrder;
-  onRetryPayment?: () => void;
+export type OrderExpiredProps = {
+  order: DepositOrder;
+  onRetry?: () => void;
 };
 
-export function PaymentExpiredScreen({
-  payment,
-  onRetryPayment,
-}: PaymentExpiredScreenProps) {
+export function OrderExpired({
+  order,
+  onRetry,
+}: OrderExpiredProps) {
   return (
     <div className="space-y-6">
       {/* Expired Header */}
@@ -51,27 +51,27 @@ export function PaymentExpiredScreen({
             <div>
               <span className="text-muted-foreground">Order Amount</span>
               <div className="font-semibold">
-                ${payment.purchasedAmount || '0'} USD
+                ${order.purchasedAmount || '0'} USD
               </div>
             </div>
             <div>
               <span className="text-muted-foreground">Payment Required</span>
               <div className="font-semibold">
-                {payment.totalDue || '0'}{' '}
-                {payment.paymentCurrency?.toUpperCase() || 'N/A'}
+                {order.totalDue || '0'}{' '}
+                {order.paymentCurrency?.toUpperCase() || 'N/A'}
               </div>
             </div>
           </div>
 
-          {payment.received && payment.received > 0 && (
+          {order.received && order.received > 0 && (
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
               <div className="flex items-center gap-2 text-amber-800 text-sm">
                 <Clock className="h-4 w-4" />
                 <span className="font-medium">Partial Payment Detected</span>
               </div>
               <div className="mt-1 text-xs text-amber-700">
-                Received: {payment.received}{' '}
-                {payment.paymentCurrency?.toUpperCase()}
+                Received: {order.received}{' '}
+                {order.paymentCurrency?.toUpperCase()}
               </div>
             </div>
           )}
@@ -80,15 +80,15 @@ export function PaymentExpiredScreen({
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Order ID</span>
               <span className="font-mono text-xs">
-                {payment.orderId || 'N/A'}
+                {order.orderId || 'N/A'}
               </span>
             </div>
 
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Expired At</span>
               <span className="text-xs">
-                {payment.expirationTime
-                  ? new Date(payment.expirationTime).toLocaleString()
+                {order.expirationTime
+                  ? new Date(order.expirationTime).toLocaleString()
                   : 'N/A'}
               </span>
             </div>
@@ -98,8 +98,8 @@ export function PaymentExpiredScreen({
 
       {/* Action Buttons */}
       <div className="space-y-3">
-        {onRetryPayment && (
-          <Button onClick={onRetryPayment} className="w-full" size="lg">
+        {onRetry && (
+          <Button onClick={onRetry} className="w-full" size="lg">
             <RefreshCw className="mr-2 h-4 w-4" />
             Retry Same Payment
           </Button>

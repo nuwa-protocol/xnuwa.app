@@ -1,6 +1,13 @@
 import { formatAmount } from '@nuwa-ai/payment-kit';
 import { baseQuickAmounts } from './constants';
-import type { Currency } from './types';
+import type {
+  CreateDepositOrderResponse,
+  Currency,
+  DepositOrder,
+  DepositOrderStatus,
+  FetchDepositOrderResponse,
+  FetchDepositOrdersResponseItem,
+} from './types';
 
 export const formatUsdCost = (cost: bigint | undefined) => {
   if (!cost) return undefined;
@@ -93,4 +100,86 @@ export const formatSmallNumber = (num: number): string => {
     str.length - decimalIndex - 1,
   );
   return num.toFixed(precision);
+};
+
+const mapOrderStatus = (status: string): DepositOrderStatus => {
+  switch (status.toLowerCase()) {
+    case 'waiting':
+      return 'pending';
+    case 'confirming':
+      return 'confirming';
+    case 'confirmed':
+      return 'confirming';
+    case 'sending':
+      return 'confirming';
+    case 'finished':
+      return 'completed';
+    case 'expired':
+      return 'expired';
+    case 'partially_paid':
+      return 'partially_paid';
+  }
+  return null;
+};
+
+// type conversions
+export const mapCreatePaymentResponseToPaymentOrder = (
+  response: CreateDepositOrderResponse,
+): DepositOrder => {
+  return {
+    paymentId: response.payment_id,
+    status: mapOrderStatus(response.payment_status),
+    paymentAddress: response.pay_address,
+    paymentCurrency: response.pay_currency,
+    paymentNetwork: response.network,
+    expirationTime: response.expiration_estimate_date,
+    totalDue: response.pay_amount,
+    received: 0,
+    purchasedAmount: response.price_amount,
+    orderId: response.order_id,
+    createdAt: response.created_at,
+    updatedAt: response.updated_at,
+    ipnPayload: {},
+  };
+};
+
+export const mapFetchDepositOrderResponseToPaymentOrder = (
+  response: FetchDepositOrderResponse,
+): DepositOrder => {
+  console.log(response);
+  return {
+    paymentId: response.db.nowpayments_payment_id,
+    status: mapOrderStatus(response.db.status),
+    paymentAddress: response.db.pay_address,
+    paymentCurrency: response.db.pay_currency,
+    paymentNetwork: response.db.network,
+    expirationTime: response.db.expiration_estimate_date,
+    totalDue: response.db.pay_amount,
+    received: response.nowpayments.outcome_amount,
+    purchasedAmount: response.db.price_amount,
+    orderId: response.db.order_id,
+    createdAt: response.db.created_at,
+    updatedAt: response.db.updated_at,
+    ipnPayload: response.db.ipn_payload,
+  };
+};
+
+export const mapFetchDepositOrdersResponseItemToPaymentOrder = (
+  response: FetchDepositOrdersResponseItem,
+): DepositOrder => {
+  return {
+    paymentId: response.nowpayments_payment_id,
+    status: mapOrderStatus(response.status),
+    paymentAddress: response.pay_address,
+    paymentCurrency: response.pay_currency,
+    paymentNetwork: response.network,
+    expirationTime: response.expiration_estimate_date,
+    totalDue: response.pay_amount,
+    received: response.amount_received,
+    purchasedAmount: response.price_amount,
+    orderId: response.order_id,
+    createdAt: response.created_at,
+    updatedAt: response.updated_at,
+    ipnPayload: response.ipn_payload,
+  };
 };

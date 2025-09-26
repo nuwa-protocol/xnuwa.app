@@ -1,52 +1,56 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useDepositOrders } from '@/features/wallet/hooks/use-deposit-orders';
+import type {
+  DepositOrder,
+  FetchDepositOrdersFilter,
+  SortOption,
+} from '@/features/wallet/types';
 import { Button } from '@/shared/components/ui/button';
-import { useDepositTransactions } from '../../hooks/use-deposit-transactions';
-import type { DepositTransaction, DepositTransactionFilter, SortOption } from '../../types';
 import {
   DepositEmpty,
   DepositError,
   DepositLoading,
   DepositSearchEmpty,
-} from './deposit-transaction-abnormal';
-import { DepositTransactionDetailsModal } from './deposit-transaction-details-modal';
-import { DepositTransactionsFilter } from './deposit-transaction-filter';
-import { DepositTransactionItem } from './deposit-transaction-item';
-import { DepositTransactionSearch } from './deposit-transaction-search';
+} from './abnormal';
+import { DepositTransactionDetailsModal } from './details-modal';
+import { DepositTransactionsFilter } from './filter';
+import { DepositTransactionItem } from './item';
+import { DepositTransactionSearch } from './search';
 
 export function DepositTransctionList() {
   const {
-    depositTransactions,
+    depositOrders,
     isLoading,
     error,
     totalCount,
     loadMore,
     refresh,
-  } = useDepositTransactions();
+  } = useDepositOrders();
 
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<DepositTransaction | null>(null);
+  const [selectedOrder, setSelectedOrder] =
+    useState<DepositOrder | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('time-desc');
   const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
   const [status, setStatus] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   const processedTransactions = useMemo(() => {
-    return getProcessedTransactions(depositTransactions, {
+    return getProcessedTransactions(depositOrders, {
       sortBy,
       filterDate,
       status,
       searchTerm,
     });
-  }, [depositTransactions, sortBy, filterDate, status, searchTerm]);
+  }, [depositOrders, sortBy, filterDate, status, searchTerm]);
 
   const handleRefresh = () => {
-    const filters: DepositTransactionFilter = {};
+    const filters: FetchDepositOrdersFilter = {};
     if (status !== 'all') filters.status = [status];
     refresh(filters);
   };
 
   const handleLoadMore = () => {
-    const filters: DepositTransactionFilter = {};
+    const filters: FetchDepositOrdersFilter = {};
     if (status !== 'all') filters.status = [status];
     loadMore(filters);
   };
@@ -55,16 +59,16 @@ export function DepositTransctionList() {
   // so pagination and counts reflect the selected status.
   // Note: local filters (search/date/sort) are still applied client-side.
   useEffect(() => {
-    const filters: DepositTransactionFilter = {};
+    const filters: FetchDepositOrdersFilter = {};
     if (status !== 'all') filters.status = [status];
     refresh(filters);
   }, [status]);
 
   if (error) return <DepositError onRetry={handleRefresh} />;
 
-  if (isLoading && depositTransactions.length === 0) return <DepositLoading />;
+  if (isLoading && depositOrders.length === 0) return <DepositLoading />;
 
-  if (!isLoading && depositTransactions.length === 0 && status === 'all')
+  if (!isLoading && depositOrders.length === 0 && status === 'all')
     return <DepositEmpty onRetry={handleRefresh} />;
 
   return (
@@ -96,14 +100,14 @@ export function DepositTransctionList() {
       ) : (
         processedTransactions.map((transaction) => (
           <DepositTransactionItem
-            key={transaction.nowpayments_payment_id}
+            key={transaction.paymentId}
             transaction={transaction}
-            onSelect={setSelectedTransaction}
+            onSelect={setSelectedOrder}
           />
         ))
       )}
 
-      {depositTransactions.length < totalCount && (
+      {depositOrders.length < totalCount && (
         <div className="flex justify-center my-3">
           <Button
             onClick={handleLoadMore}
@@ -116,15 +120,15 @@ export function DepositTransctionList() {
       )}
 
       <DepositTransactionDetailsModal
-        transaction={selectedTransaction}
-        onClose={() => setSelectedTransaction(null)}
+        transaction={selectedOrder}
+        onClose={() => setSelectedOrder(null)}
       />
     </div>
   );
 }
 
 export function getProcessedTransactions(
-  depositTransactions: DepositTransaction[],
+  depositOrders: DepositOrder[],
   {
     sortBy,
     filterDate,
@@ -137,7 +141,7 @@ export function getProcessedTransactions(
     searchTerm?: string;
   },
 ) {
-  let filtered = [...depositTransactions];
+  let filtered = [...depositOrders];
 
   // Filter by status (client-side)
   if (status && status !== 'all') {
@@ -151,8 +155,8 @@ export function getProcessedTransactions(
     const end = new Date(filterDate);
     end.setHours(23, 59, 59, 999);
     filtered = filtered.filter((o) => {
-      if (!o.created_at) return false;
-      const t = new Date(o.created_at).getTime();
+      if (!o.createdAt) return false;
+      const t = new Date(o.createdAt).getTime();
       return t >= start.getTime() && t <= end.getTime();
     });
   }
@@ -161,7 +165,7 @@ export function getProcessedTransactions(
   const q = (searchTerm || '').trim().toLowerCase();
   if (q) {
     filtered = filtered.filter((t) =>
-      (t.order_id || '').toLowerCase().includes(q),
+      (t.orderId || '').toLowerCase().includes(q),
     );
   }
 
@@ -169,28 +173,28 @@ export function getProcessedTransactions(
   return filtered.sort((a, b) => {
     switch (sortBy) {
       case 'time-asc': {
-        const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const tb = b.created_at ? new Date(b.created_at).getTime() : 0;
+        const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return ta - tb;
       }
       case 'time-desc': {
-        const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const tb = b.created_at ? new Date(b.created_at).getTime() : 0;
+        const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return tb - ta;
       }
       case 'amount-asc': {
-        const aa = Number(a.amount_fiat || 0);
-        const ab = Number(b.amount_fiat || 0);
+        const aa = Number(a.purchasedAmount || 0);
+        const ab = Number(b.purchasedAmount || 0);
         return aa - ab;
       }
       case 'amount-desc': {
-        const aa = Number(a.amount_fiat || 0);
-        const ab = Number(b.amount_fiat || 0);
+        const aa = Number(a.purchasedAmount || 0);
+        const ab = Number(b.purchasedAmount || 0);
         return ab - aa;
       }
       default: {
-        const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const tb = b.created_at ? new Date(b.created_at).getTime() : 0;
+        const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return tb - ta;
       }
     }

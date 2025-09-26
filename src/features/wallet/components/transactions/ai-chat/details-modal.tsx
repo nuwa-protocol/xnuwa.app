@@ -1,5 +1,6 @@
 import { formatAmount } from '@nuwa-ai/payment-kit';
 import { useState } from 'react';
+import type { PaymentTransaction } from '@/features/wallet/types';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,6 @@ import {
   TableCell,
   TableRow,
 } from '@/shared/components/ui/table';
-import type { PaymentTransaction } from '../../types';
 
 const formatCost = (cost: bigint | undefined) => {
   if (!cost) return null;
