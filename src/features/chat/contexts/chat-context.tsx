@@ -34,7 +34,7 @@ interface ChatProviderProps {
 
 export function ChatProvider({ children }: ChatProviderProps) {
   const navigate = useNavigate();
-  const { chatSessions, setChatSessionIsLoading } = ChatSessionsStore();
+  const { chatSessions } = ChatSessionsStore();
   const isNavigatingRef = useRef(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const urlChatId = searchParams.get('chat_id');
