@@ -3,12 +3,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui';
 import type { CapThumbnail } from '@/shared/types';
 
 const sizeClasses = {
-  sm: 'size-6', // 24px
-  md: 'size-8', // 32px
-  lg: 'size-10', // 40px
-  xl: 'size-16', // 64px
-  '2xl': 'size-24', // 96px
-  '3xl': 'size-32', // 128px
+  sm: 'size-2', // 8px
+  md: 'size-4', // 16px
+  lg: 'size-6', // 24px
+  xl: 'size-8', // 32px
+  '2xl': 'size-10', // 96px
+  '3xl': 'size-12', // 48px
+  '4xl': 'size-14', // 160px
+  '5xl': 'size-16', // 64px
+  '6xl': 'size-18', // 72px
+  '7xl': 'size-20', // 80px
+  '8xl': 'size-22', // 88px
+  '9xl': 'size-24', // 96px
 } as const;
 
 export function CapAvatar({

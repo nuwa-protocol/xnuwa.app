@@ -106,7 +106,7 @@ export default function Header({ chatId }: HeaderProps) {
     <header className="sticky top-0 z-10 grid grid-cols-3 items-center px-3 pt-2">
       {/* Left: Actions */}
       <div className="flex items-center gap-1.5">
-        <CapSelector />
+        <CapSelector size="md" />
       </div>
       {/* Center: Status area (AI or Save) */}
       <div className="flex flex-row justify-center items-center w-full">

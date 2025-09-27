@@ -15,24 +15,54 @@ import {
 } from '@/shared/components/ui';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
+import { cn } from '@/shared/utils';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
 
-const CapInfo = ({ cap }: { cap: Cap }) => (
+type CapSelectorSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | '8xl' | '9xl';
+
+const CapInfo = ({
+  cap,
+  size = 'sm',
+}: {
+  cap: Cap;
+  size?: CapSelectorSize;
+}) => (
   <>
     <CapAvatar
       capName={cap.metadata.displayName}
       capThumbnail={cap.metadata.thumbnail}
-      size="sm"
+      size={size}
       className="rounded-md"
     />
-    <span className="text-sm font-normal">{cap.metadata.displayName}</span>
+    <span
+      className={cn(
+        'text-sm font-normal',
+        size === 'md' && 'text-md font-medium',
+        size === 'lg' && 'text-lg font-semibold',
+        size === 'xl' && 'text-xl font-semibold',
+        size === '2xl' && 'text-2xl font-semibold',
+        size === '3xl' && 'text-3xl font-semibold',
+        size === '4xl' && 'text-4xl font-semibold',
+        size === '5xl' && 'text-5xl font-semibold',
+        size === '6xl' && 'text-6xl font-semibold',
+        size === '7xl' && 'text-7xl font-semibold',
+        size === '8xl' && 'text-8xl font-semibold',
+        size === '9xl' && 'text-9xl font-semibold',
+      )}
+    >
+      {cap.metadata.displayName}
+    </span>
   </>
 );
 
 // TODO: switching cap need to have cache
-export function CapSelector() {
+export function CapSelector({
+  size = 'sm',
+}: {
+  size?: CapSelectorSize;
+}) {
   const { currentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
   const { favoriteCaps, downloadCapByIDWithCache } = useCapStore();
@@ -69,7 +99,7 @@ export function CapSelector() {
           type="button"
         >
           <div className="flex items-center gap-2">
-            <CapInfo cap={currentCap} />
+            <CapInfo cap={currentCap} size={size} />
             {!isInitialized && (
               <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
             )}
@@ -101,12 +131,11 @@ export function CapSelector() {
         >
           <Button
             variant="ghost"
-            size="sm"
-            className="rounded-lg"
+            className="rounded-lg hover:bg-transparent"
             type="button"
           >
             <div className="flex items-center gap-2">
-              <CapInfo cap={currentCap} />
+              <CapInfo cap={currentCap} size={size} />
               {!isInitialized && (
                 <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
               )}
@@ -114,18 +143,18 @@ export function CapSelector() {
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="min-w-[200px]">
+        <DropdownMenuContent align="end" className="min-w-[200px]">
           {favoriteCaps.map((cap) => (
             <DropdownMenuItem
               key={cap.id}
               className="cursor-pointer"
               onSelect={() => handleCapSelect(cap)}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <CapAvatar
                   capName={cap.metadata.displayName}
                   capThumbnail={cap.metadata.thumbnail}
-                  size="sm"
+                  size="lg"
                   className="rounded-md"
                 />
                 <span className="text-sm">{cap.metadata.displayName}</span>
