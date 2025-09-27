@@ -1,20 +1,17 @@
-import { X } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
 import type { CapFormData } from '@/features/cap-studio/hooks/use-edit-form';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/shared/components/ui';
 import {
-  Badge,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui';
+  Tags,
+  TagsContent,
+  TagsEmpty,
+  TagsGroup,
+  TagsInput,
+  TagsItem,
+  TagsList,
+  TagsTrigger,
+  TagsValue,
+} from '@/shared/components/ui/shadcn-io/tags';
 
 interface SupportedInputsSelectorProps {
   form: UseFormReturn<CapFormData>;
@@ -69,66 +66,35 @@ export function SupportedInputsSelector({
           <FormItem>
             <FormLabel>Supported Inputs</FormLabel>
             <FormControl>
-              <div className="space-y-3">
-                {/* Selected inputs as badges */}
-                <div className="flex flex-wrap gap-2">
-                  {currentInputs.map((input) => {
-                    const inputType = inputTypes.find(
-                      (type) => type.value === input,
-                    );
-                    return (
-                      <Badge
-                        key={input}
-                        variant="secondary"
-                        className="flex items-center gap-1"
-                      >
-                        {inputType?.label || input}
-                        {input !== 'text' && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleRemoveInput(
-                                input,
-                                currentInputs,
-                                field.onChange,
-                              )
-                            }
-                            className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
-                          >
-                            <X size={12} />
-                          </button>
-                        )}
-                      </Badge>
-                    );
-                  })}
-                </div>
-
-                {/* Add new input selector */}
-                {availableInputs.length > 0 && (
-                  <Select
-                    value=""
-                    onValueChange={(value) => {
-                      if (value) {
-                        handleAddInput(value, currentInputs, field.onChange);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Add input type..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableInputs.map((inputType) => (
-                        <SelectItem
-                          key={inputType.value}
-                          value={inputType.value}
-                        >
-                          {inputType.label}
-                        </SelectItem>
+              <Tags value={field.value?.join(', ') || ''} setValue={field.onChange}>
+                <TagsTrigger>
+                  {field.value && field.value.length > 0
+                    ? field.value.map((tag) => (
+                      <TagsValue key={tag} onRemove={() => handleRemoveInput(tag,
+                        currentInputs,
+                        field.onChange)}>
+                        {tag}
+                      </TagsValue>
+                    ))
+                    : null}
+                </TagsTrigger>
+                <TagsContent>
+                  <TagsInput placeholder="Add input type..." />
+                  <TagsList>
+                    <TagsEmpty>No tags found.</TagsEmpty>
+                    <TagsGroup>
+                      {inputTypes.map((tag) => (
+                        <TagsItem key={tag.value} onSelect={() => handleAddInput(tag.value,
+                          currentInputs,
+                          field.onChange)}>
+                          {tag.label}
+                        </TagsItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
+                    </TagsGroup>
+                  </TagsList>
+                </TagsContent>
+              </Tags>
+
             </FormControl>
             <FormDescription>
               Select the input types your model supports (text is required)
