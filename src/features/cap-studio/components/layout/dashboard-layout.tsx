@@ -10,7 +10,7 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
   return (
     <div
       className={cn(
-        'min-h-screen bg-gradient-to-br from-background via-background to-muted/20 max-w-4xl mx-auto py-8 px-8 space-y-8',
+        'min-h-screen bg-gradient-to-br from-background via-background to-muted/20 w-full max-w-4xl mx-auto py-8 px-8 space-y-8',
         className,
       )}
     >

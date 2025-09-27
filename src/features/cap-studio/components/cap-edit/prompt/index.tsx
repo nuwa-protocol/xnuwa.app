@@ -1,4 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form';
+import type { CapFormData } from '@/features/cap-studio/hooks/use-edit-form';
 import {
   Card,
   CardContent,
@@ -13,7 +14,7 @@ import {
 import { PromptEditor } from './prompt-editor';
 
 interface PromptTabProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<CapFormData>;
 }
 
 export function PromptTab({ form }: PromptTabProps) {

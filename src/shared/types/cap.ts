@@ -22,13 +22,18 @@ export const CapIDSchema = z
 
 export const CapModelSchema = z.object({
   customGatewayUrl: z.string().url('Must be a valid URL').optional(),
-  modelType: z.enum([
-    'Language Model',
-    'Responses Model',
-    'Embedding Model',
-    'Image Model',
-    'Transcription Model',
-    'Speech Model',
+  providerId: z.enum([
+    'openai_chat_completion',
+    'openai_responses',
+    'anthropic',
+    'google',
+    'openrouter',
+    'xai',
+    'groq',
+    'togetherai',
+    'azure',
+    'deepseek',
+    'mistral',
   ]),
   modelId: z
     .string()
@@ -39,7 +44,7 @@ export const CapModelSchema = z.object({
     .array(z.enum(['text', 'image', 'file', 'audio']))
     .min(1)
     .refine((inputs) => inputs.includes('text'), 'text input is required'),
-  contextLength: z.number(),
+  contextLength: z.number().min(1000, 'Please enter a valid context length'),
 });
 
 export const CapPromptSuggestionSchema = z

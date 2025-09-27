@@ -19,7 +19,7 @@ const CapFormDataSchema = z.object({
   metadata: CapMetadataSchema,
 });
 
-type CapFormData = z.input<typeof CapFormDataSchema>;
+export type CapFormData = z.input<typeof CapFormDataSchema>;
 
 interface UseEditFormProps {
   editingCap?: LocalCap;
@@ -52,14 +52,13 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
         model: {
           customGatewayUrl:
             editingCap?.capData.core.model.customGatewayUrl || undefined,
+          providerId: editingCap?.capData.core.model.providerId || 'openrouter',
           modelId: editingCap?.capData.core.model.modelId || '',
-          parameters: editingCap?.capData.core.model.parameters || {},
+          contextLength: editingCap?.capData.core.model.contextLength || 0,
           supportedInputs: editingCap?.capData.core.model.supportedInputs || [
             'text',
           ],
-          modelType:
-            editingCap?.capData.core.model.modelType ?? 'Language Model',
-          contextLength: editingCap?.capData.core.model.contextLength || 0,
+          parameters: editingCap?.capData.core.model.parameters || {},
         },
         mcpServers: editingCap?.capData.core.mcpServers || {},
         artifact: editingCap?.capData.core.artifact || undefined,

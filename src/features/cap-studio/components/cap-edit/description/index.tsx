@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
-
+import type { CapFormData } from '@/features/cap-studio/hooks/use-edit-form';
 import { Markdown } from '@/shared/components/markdown';
 import {
   Card,
@@ -20,7 +20,7 @@ import {
 } from '@/shared/components/ui';
 
 interface DescriptionTabProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<CapFormData>;
 }
 
 export function DescriptionTab({ form }: DescriptionTabProps) {

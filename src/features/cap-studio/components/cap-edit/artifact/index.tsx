@@ -1,4 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form';
+import type { CapFormData } from '@/features/cap-studio/hooks/use-edit-form';
 import {
   Card,
   CardContent,
@@ -13,7 +14,7 @@ import {
 import { ArtifactEditor } from './artifact-editor';
 
 interface ArtifactTabProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<CapFormData>;
 }
 
 export function ArtifactTab({ form }: ArtifactTabProps) {
@@ -37,7 +38,7 @@ export function ArtifactTab({ form }: ArtifactTabProps) {
             <FormItem>
               <FormControl>
                 <ArtifactEditor
-                  value={field.value || { srcUrl: '', description: '' }}
+                  value={field.value || { srcUrl: '' }}
                   onChange={(value) => field.onChange(value)}
                 />
               </FormControl>

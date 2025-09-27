@@ -7,7 +7,7 @@ import {
   type UIMessage,
 } from 'ai';
 import { CapResolve } from '@/shared/services/cap-resolve';
-import { llmProvider } from '@/shared/services/llm-providers';
+import { LLMProvider } from '@/shared/services/llm-providers';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 import { generateUUID } from '@/shared/utils';
@@ -89,7 +89,7 @@ export const CreateAIChatStream = async ({
     execute: ({ writer }) => {
       let hasSendOnResponseDataMark = false;
       const result = streamText({
-        model: llmProvider.chat(model),
+        model: LLMProvider(model),
         system: prompt,
         messages: convertToModelMessages(viableMessages),
         tools: mergedTools,
@@ -176,7 +176,7 @@ export const CreateAIRequestStream = async ({
   });
 
   return streamText({
-    model: llmProvider.chat(model),
+    model: LLMProvider(model),
     system: capPrompt,
     prompt: prompt,
     tools: tools,

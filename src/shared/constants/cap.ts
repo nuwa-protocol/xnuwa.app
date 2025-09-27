@@ -1,4 +1,4 @@
-import type { Cap } from '../types';
+import type { Cap, CapModel } from '../types';
 
 export const predefinedTags = [
   'AI Model',
@@ -41,7 +41,7 @@ export const defaultCap: Cap = {
         temperature: 0.7,
       },
       supportedInputs: ['text', 'image'],
-      modelType: 'Language Model',
+      providerId: 'openrouter',
       contextLength: 128000,
     },
     mcpServers: {},
@@ -55,3 +55,92 @@ export const defaultCap: Cap = {
       'https://unpkg.com/@lobehub/icons-static-png@1.60.0/light/openai.png',
   },
 };
+
+export const SUPPORTED_PROVIDERS: Record<
+  CapModel['providerId'],
+  {
+    name: string;
+    description: string;
+    icon: string;
+    iconDark?: string;
+  }
+> = {
+  openai_chat_completion: {
+    name: 'OpenAI (Chat Completion API)',
+    description: 'Select this provider for OpenAI Chat Completion API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/openai.png',
+  },
+  openai_responses: {
+    name: 'OpenAI (Responses API)',
+    description: 'Select this provider for OpenAI Responses API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openai.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/openai.png',
+  },
+  anthropic: {
+    name: 'Anthropic',
+    description: 'Select this provider for Anthropic Messages API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/anthropic.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/anthropic.png',
+  },
+  google: {
+    name: 'Google',
+    description: 'Select this provider for Google  Generative API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/google.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/google.png',
+  },
+  xai: {
+    name: 'XAI',
+    description: 'Select this provider for xAI API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/xai.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/xai.png',
+  },
+  groq: {
+    name: 'Groq',
+    description: 'Select this provider for Groq API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/groq.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/groq.png',
+  },
+  togetherai: {
+    name: 'TogetherAI',
+    description: 'Select this provider for TogetherAI API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/togetherai.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/togetherai.png',
+  },
+  azure: {
+    name: 'Azure',
+    description: 'Select this provider for Azure OpenAI chat API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/azure.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/azure.png',
+  },
+  deepseek: {
+    name: 'DeepSeek',
+    description:
+      'Select this provider for DeepSeek API models, including the DeepSeek-V3 models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/deepseek.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/deepseek.png',
+  },
+  mistral: {
+    name: 'Mistral',
+    description: 'Select this provider for Mistral chat API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/mistral.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/mistral.png',
+  },
+  openrouter: {
+    name: 'OpenRouter',
+    description: 'Select this provider for OpenRouter API models.',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/openrouter.png',
+    iconDark:
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/openrouter.png',
+  },
+} as const;

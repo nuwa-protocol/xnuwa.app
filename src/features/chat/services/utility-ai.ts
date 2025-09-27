@@ -1,5 +1,5 @@
 import { generateText, type UIMessage } from 'ai';
-import { llmProvider } from '@/shared/services/llm-providers';
+import { UtilityLLMProvider } from '@/shared/services/llm-providers';
 import { generateUUID } from '@/shared/utils';
 import { ChatSessionsStore } from '../stores';
 
@@ -27,7 +27,7 @@ export async function generateTitleFromUserMessage({
   });
 
   const { text: title } = await generateText({
-    model: llmProvider.utility(),
+    model: UtilityLLMProvider(),
     system: `\n
         - you will generate a short title based on the first message a user begins a conversation with
         - ensure it is not more than 80 characters long

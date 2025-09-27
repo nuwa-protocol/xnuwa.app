@@ -1,4 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form';
+import type { CapFormData } from '@/features/cap-studio/hooks/use-edit-form';
 import {
   Card,
   CardContent,
@@ -18,7 +19,7 @@ import { CapTags } from './cap-tags';
 import { ThumbnailUpload } from './thumbnail-upload';
 
 interface GeneralTabProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<CapFormData>;
 }
 
 export function GeneralTab({ form }: GeneralTabProps) {
