@@ -89,9 +89,9 @@ export const SUPPORTED_PROVIDERS: Record<
   google: {
     name: 'Google',
     description: 'Select this provider for Google  Generative API models.',
-    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/google.png',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/google-color.png',
     iconDark:
-      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/google.png',
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/google-color.png',
   },
   xai: {
     name: 'XAI',
@@ -110,9 +110,9 @@ export const SUPPORTED_PROVIDERS: Record<
   togetherai: {
     name: 'TogetherAI',
     description: 'Select this provider for TogetherAI API models.',
-    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/togetherai.png',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/together-color.png',
     iconDark:
-      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/togetherai.png',
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/together-color.png',
   },
   azure: {
     name: 'Azure',

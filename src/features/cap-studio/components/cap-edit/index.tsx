@@ -50,7 +50,7 @@ export function CapEdit({ id }: { id?: string }) {
   return (
     <div className='h-full w-full flex flex-col max-w-4xl mx-auto'>
       {/* Header - Title, Save Button, and Tab Triggers */}
-      <header className="flex-shrink-0 border-b bg-background px-6 py-4">
+      <header className="flex-shrink-0 bg-background px-6 py-2">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-semibold">

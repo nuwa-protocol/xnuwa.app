@@ -69,7 +69,7 @@ export function ModelConfiguration({
             )}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div>
             <ModelIdInput form={form} />
             <ContextLengthInput form={form} />
             <ProviderIdSelector form={form} />
