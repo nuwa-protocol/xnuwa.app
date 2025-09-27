@@ -14,8 +14,8 @@ interface MessagesProps {
 }
 
 function PureMessages({ isReadonly }: MessagesProps) {
-  const { chat } = useChatContext();
-  const { messages, status } = useChat({ chat });
+  const { chat, isChatLoading } = useChatContext();
+  const { messages } = useChat({ chat });
   const [userMessagesHeight, setUserMessagesHeight] = useState(0);
 
   // Find the last clear context message index
@@ -56,6 +56,7 @@ function PureMessages({ isReadonly }: MessagesProps) {
     return `${calculatedMinHeight}px`;
   };
 
+
   return (
     <Conversation>
       <ConversationContent>
@@ -79,33 +80,7 @@ function PureMessages({ isReadonly }: MessagesProps) {
           );
         })}
 
-        {/* TODO: fix the loader timing */}
-        {(() => {
-          // Show loader during submission
-          if (
-            status === 'submitted' &&
-            messages.length > 0 &&
-            messages[messages.length - 1].role === 'user'
-          ) {
-            return true;
-          }
-
-          // Show loader during streaming if AI hasn't started outputting text/reasoning yet
-          if (status === 'streaming' && messages.length >= 2) {
-            const lastMessage = messages[messages.length - 1];
-            if (lastMessage.role === 'assistant') {
-              // Hide loader once AI starts outputting meaningful content
-              const hasTextOrReasoning = lastMessage.parts?.some(
-                (part) =>
-                  (part.type === 'text' && part.text?.trim()) ||
-                  part.type === 'reasoning',
-              );
-              return !hasTextOrReasoning;
-            }
-          }
-
-          return false;
-        })() && <Loader minHeight={getLoaderMinHeight()} />}
+        {isChatLoading && <Loader minHeight={getLoaderMinHeight()} />}
         <ConversationScrollButton />
       </ConversationContent>
     </Conversation>

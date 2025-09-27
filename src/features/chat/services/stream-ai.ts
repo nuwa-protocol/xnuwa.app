@@ -97,7 +97,11 @@ export const CreateAIChatStream = async ({
         maxRetries: 3,
         stopWhen: stepCountIs(10),
         headers,
-        onChunk: (chunk) => {
+        onChunk: ({ chunk }) => {
+          // leave for future implementation handler
+          // if (chunk.type === 'tool-call') {
+          // const { toolCallId, toolName } = chunk;
+          // }
           if (hasSendOnResponseDataMark) return;
           writer.write({
             type: 'data-mark',

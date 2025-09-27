@@ -9,7 +9,7 @@ import {
 } from '@/shared/components/ui/shadcn-io/tool';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 
-const GeneralToolCallID = ({ toolCallId }: { toolCallId: string }) => {
+const RemoteMCPToolCallID = ({ toolCallId }: { toolCallId: string }) => {
   const [copy, isCopied] = useCopyToClipboard();
   return (
     <div className="text-xs text-muted-foreground ml-6">
@@ -24,7 +24,7 @@ const GeneralToolCallID = ({ toolCallId }: { toolCallId: string }) => {
   );
 };
 
-const GeneralToolLoading = ({
+const RemoteMCPToolLoading = ({
   input,
   toolCallId,
 }: {
@@ -33,13 +33,13 @@ const GeneralToolLoading = ({
 }) => {
   return (
     <div>
-      <GeneralToolCallID toolCallId={toolCallId} />
+      <RemoteMCPToolCallID toolCallId={toolCallId} />
       <ToolInput input={input} />
     </div>
   );
 };
 
-const GeneralToolResult = ({
+const RemoteMCPToolResult = ({
   input,
   output,
   toolCallId,
@@ -50,7 +50,7 @@ const GeneralToolResult = ({
 }) => {
   return (
     <div>
-      <GeneralToolCallID toolCallId={toolCallId} />
+      <RemoteMCPToolCallID toolCallId={toolCallId} />
       <ToolInput input={input} />
       <ToolOutput
         output={<ToolResult result={output} />}
@@ -60,7 +60,7 @@ const GeneralToolResult = ({
   );
 };
 
-export const GeneralTool = ({
+export const RemoteMCPTool = ({
   input,
   output,
   toolCallId,
@@ -78,10 +78,10 @@ export const GeneralTool = ({
       <ToolHeader type={`tool-${toolName}`} state={state} />
       <ToolContent>
         {state === 'input-available' && (
-          <GeneralToolLoading input={input} toolCallId={toolCallId} />
+          <RemoteMCPToolLoading input={input} toolCallId={toolCallId} />
         )}
         {state === 'output-available' && (
-          <GeneralToolResult
+          <RemoteMCPToolResult
             input={input}
             output={output}
             toolCallId={toolCallId}

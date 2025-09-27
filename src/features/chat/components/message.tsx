@@ -8,8 +8,8 @@ import { cn } from '@/shared/utils';
 import { useChatContext } from '../contexts/chat-context';
 import { MessageActions } from './message-actions';
 import { ClearContextMessage } from './message-clear-context';
-import { GeneralTool } from './message-general-tool';
 import { MessageImage } from './message-image';
+import { RemoteMCPTool } from './message-mcp-tool';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { MessageText } from './message-text';
@@ -28,7 +28,6 @@ const PurePreviewMessage = ({
 }) => {
   const { chat } = useChatContext();
   const { messages, status, setMessages, regenerate } = useChat({ chat });
-
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
   const attachmentsFromUserMessage =
@@ -181,7 +180,7 @@ const PurePreviewMessage = ({
                 if (type === 'dynamic-tool') {
                   const { toolCallId, state, input, output, toolName } = part;
                   return (
-                    <GeneralTool
+                    <RemoteMCPTool
                       key={toolCallId}
                       input={input}
                       output={output}

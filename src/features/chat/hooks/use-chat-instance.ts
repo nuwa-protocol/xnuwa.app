@@ -7,10 +7,9 @@ import { ChatInstanceStore, ChatSessionsStore } from '../stores';
 import { convertToUIMessage } from '../utils';
 import { useUpdateChatTitle } from './use-update-chat-title';
 
-export function useChatInstance(chatId: string) {
+export function useChatInstance(chatId: string, onStreamStart?: () => void) {
   const navigate = useNavigate();
-  const { getChatSession, chatSessions, setChatSessionCap } =
-    ChatSessionsStore();
+  const { getChatSession, chatSessions } = ChatSessionsStore();
   const { getInstance } = ChatInstanceStore();
   const { updateTitle } = useUpdateChatTitle();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -52,9 +51,12 @@ export function useChatInstance(chatId: string) {
   // chat data handler
   const handleOnData = useCallback(
     (data: any) => {
+      // process the data mark onResponse - shows when the AI has started to respond
       if (data.type === 'data-mark' && data.data === 'onResponse') {
         updateTitle(chatId);
+        onStreamStart?.();
       }
+      // process the abnormal finish reason - content-filter
       if (data.type === 'data-finishReason') {
         const finishReason = data.data.finishReason;
         if (finishReason === 'content-filter') {
