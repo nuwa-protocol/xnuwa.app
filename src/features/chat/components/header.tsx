@@ -109,30 +109,32 @@ export default function Header({ chatId }: HeaderProps) {
         <CapSelector />
       </div>
       {/* Center: Status area (AI or Save) */}
-      <div className="flex flex-row justify-center items-center w-full">
-        <div className="flex flex-row justify-center items-center gap-2">
-          <p className="text-center text-sm py-1 rounded-lg font-medium text-foreground/90 md:text-base line-clamp-1">
-            {!!session && title}
-          </p>
-          {session && (
+      {session && (
+        <div className="flex flex-row justify-center items-center w-full">
+          <div className="flex flex-row justify-center items-center gap-2">
+            <p className="text-center text-sm py-1 rounded-lg font-medium text-foreground/90 md:text-base line-clamp-1">
+              {title}
+            </p>
             <ChatDropdownMenu
               session={session}
               onRename={handleRename}
               onTogglePin={handleTogglePin}
               onDelete={handleDeleteConversation}
             />
-          )}
+          </div>
         </div>
-      </div>
+      )}
       {/* Right: Context and Cost Indicator */}
-      <div className="justify-self-end px-2">
-        <ContextCostIndicator
-          contextUsage={session?.contextUsage}
-          contextLength={contextLength}
-          paymentInfo={paymentInfo}
-          onClearContext={handleClearConversation}
-        />
-      </div>
+      {session && (
+        <div className="justify-self-end px-2">
+          <ContextCostIndicator
+            contextUsage={session?.contextUsage}
+            contextLength={contextLength}
+            paymentInfo={paymentInfo}
+            onClearContext={handleClearConversation}
+          />
+        </div>
+      )}
     </header>
   );
 }

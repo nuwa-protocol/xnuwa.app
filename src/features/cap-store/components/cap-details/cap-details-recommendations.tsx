@@ -83,7 +83,7 @@ export function CapDetailsRecommendations({
             No recommendations yet.
           </p>
         ) : (
-          <div className="h-[50vh] pr-2 overflow-y-auto hide-scrollbar">
+          <div className="h-[calc(100vh-450px)] pr-2 overflow-y-auto hide-scrollbar">
             <div className="flex flex-col gap-2">
               {caps.map((cap) => {
                 const meta = cap.metadata;

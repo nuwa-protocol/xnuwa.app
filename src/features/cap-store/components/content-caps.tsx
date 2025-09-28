@@ -66,16 +66,25 @@ export function CapStoreCapsContent({
   }
 
   if (isFetching && true) {
-    return <CapStoreLoading />;
+    return (
+      <div className='flex flex-col h-full w-full'>
+        <CapStoreContentHeader showSearchAndSort={true} />
+        <CapStoreLoading />
+      </div>
+    );
   }
 
   if (caps.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
-        <Package className="size-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium mb-2 text-muted-foreground">
-          No AI Caps Found
-        </h3>
+      <div className='flex flex-col h-full w-full'>
+        <CapStoreContentHeader showSearchAndSort={true} />
+        <div className="w-full flex flex-col items-center justify-center min-h-[700px] text-center">
+
+          <Package className="size-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium mb-2 text-muted-foreground">
+            No AI Caps Found
+          </h3>
+        </div>
       </div>
     );
   }

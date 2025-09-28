@@ -67,7 +67,7 @@ export function CapDetailsHeader({
           <CapAvatar
             capName={capQueryData.metadata.displayName}
             capThumbnail={capQueryData.metadata.thumbnail}
-            size="3xl"
+            size="9xl"
             className="rounded-2xl shadow-lg"
           />
         </div>
@@ -205,7 +205,7 @@ export function CapDetailsHeader({
                 ratingCount={capQueryData.stats.ratingCount}
                 size={16}
                 isInteractive={false}
-                onRate={() => {}}
+                onRate={() => { }}
               />
             </div>
           </div>

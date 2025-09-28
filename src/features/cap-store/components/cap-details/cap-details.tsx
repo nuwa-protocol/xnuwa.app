@@ -165,7 +165,7 @@ export function CapDetails({ capId }: { capId: string }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col w-full h-full">
       {/* Content */}
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         <div className="max-w-6xl mx-auto p-6 md:p-8 space-y-8">

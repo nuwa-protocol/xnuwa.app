@@ -12,7 +12,7 @@ const sizeClasses = {
   '3xl': 'size-12', // 48px
   '4xl': 'size-14', // 160px
   '5xl': 'size-16', // 64px
-  '6xl': 'size-18', // 72px
+  '6xl': 'size-120', // 72px
   '7xl': 'size-20', // 80px
   '8xl': 'size-22', // 88px
   '9xl': 'size-24', // 96px
@@ -73,7 +73,7 @@ export function CapAvatar({
   // Use Avatar to get robust image failure handling + new visual style
   return (
     <Avatar
-      className={`${sizeClass} overflow-hidden bg-muted flex rounded-none items-center justify-center ${className || ''}`}
+      className={`${sizeClass} overflow-hidden dark:bg-white flex rounded-none items-center justify-center ${className || ''}`}
       aria-label={capName || 'Cap avatar'}
     >
       <AvatarImage

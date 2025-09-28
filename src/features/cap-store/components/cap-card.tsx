@@ -82,11 +82,11 @@ export function CapCard({ cap }: CapCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         <CapAvatar
           capName={capMetadata.displayName}
           capThumbnail={capMetadata.thumbnail}
-          size="xl"
+          size="7xl"
           className="rounded-md"
         />
         <div className="flex-1 min-w-0">
@@ -131,9 +131,8 @@ export function CapCard({ cap }: CapCardProps) {
 
       {/* Hover Overlay */}
       <div
-        className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${
-          isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
+        className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
       >
         <Button
           onClick={handleUseCap}

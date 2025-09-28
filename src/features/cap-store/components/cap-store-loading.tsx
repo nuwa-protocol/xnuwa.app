@@ -42,7 +42,7 @@ function CapCardSkeleton() {
 
 export function CapStoreLoading({ count = 24 }: CapStoreLoadingProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 p-6">
+    <div className="w-full grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 p-6">
       {Array.from({ length: count }, (_, index) => (
         <CapCardSkeleton key={generateUUID()} />
       ))}
