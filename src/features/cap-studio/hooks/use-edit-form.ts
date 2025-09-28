@@ -39,6 +39,7 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
       metadata: {
         displayName: editingCap?.capData.metadata.displayName || '',
         description: editingCap?.capData.metadata.description || '',
+        introduction: editingCap?.capData.metadata.introduction || '',
         tags: editingCap?.capData.metadata.tags || [],
         thumbnail: editingCap?.capData.metadata.thumbnail || undefined,
         homepage: editingCap?.capData.metadata.homepage || undefined,

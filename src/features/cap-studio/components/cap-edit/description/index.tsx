@@ -19,18 +19,18 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 
-interface DescriptionTabProps {
+interface IntroductionTabProps {
   form: UseFormReturn<CapFormData>;
 }
 
-export function DescriptionTab({ form }: DescriptionTabProps) {
+export function IntroductionTab({ form }: IntroductionTabProps) {
   // Local tab state for Write/Preview
   const [tab, setTab] = useState<'write' | 'preview'>('write');
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Cap Description</CardTitle>
+        <CardTitle className="text-base">Cap Introduction</CardTitle>
         <CardDescription>
           Tell us everything about your cap. Markdown is supported.
         </CardDescription>
@@ -38,7 +38,7 @@ export function DescriptionTab({ form }: DescriptionTabProps) {
       <CardContent className="space-y-4">
         <FormField
           control={form.control}
-          name="metadata.description"
+          name="metadata.introduction"
           render={({ field }) => (
             <FormItem>
               <FormControl>

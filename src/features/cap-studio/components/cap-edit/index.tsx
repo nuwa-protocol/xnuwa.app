@@ -13,7 +13,7 @@ import { useEditForm } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import { getErrorDescription } from '../../utils';
 import { ArtifactTab } from './artifact';
-import { DescriptionTab } from './description';
+import { IntroductionTab } from './description';
 import { GeneralTab } from './general';
 import { McpTab } from './mcp';
 import { ModelTab } from './model';
@@ -100,7 +100,7 @@ export function CapEdit({ id }: { id?: string }) {
         >
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="description">Description</TabsTrigger>
+            <TabsTrigger value="introduction">Introduction</TabsTrigger>
             <TabsTrigger value="model">Model</TabsTrigger>
             <TabsTrigger value="prompt">Prompt</TabsTrigger>
             <TabsTrigger value="mcp">MCP</TabsTrigger>
@@ -129,10 +129,10 @@ export function CapEdit({ id }: { id?: string }) {
               </TabsContent>
 
               <TabsContent
-                value="description"
+                value="introduction"
                 className="flex-1 p-6 overflow-y-auto hide-scrollbar"
               >
-                <DescriptionTab form={form} />
+                <IntroductionTab form={form} />
               </TabsContent>
 
               <TabsContent

@@ -56,10 +56,32 @@ export function GeneralTab({ form }: GeneralTabProps) {
               <FormItem>
                 <FormLabel>Display Name</FormLabel>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Human-readable name shown in the store.
+                  The display name of your Cap.
                 </p>
                 <FormControl>
                   <Input placeholder="My Awesome Cap" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="metadata.description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <div className='flex flex-row items-center justify-between'>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    A short description of your cap.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {field.value?.length || 0} / 150
+                  </p>
+                </div>
+                <FormControl>
+                  <Input placeholder="An awesome cap that lets you don anything" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
