@@ -46,16 +46,23 @@ export function DescriptionTab({ form }: DescriptionTabProps) {
                   value={tab}
                   onValueChange={(v) => setTab(v as typeof tab)}
                 >
-                  <TabsList>
-                    <TabsTrigger value="write">Write</TabsTrigger>
-                    <TabsTrigger value="preview">Preview</TabsTrigger>
-                  </TabsList>
+                  <div className="flex items-center justify-between gap-2">
+                    <TabsList>
+                      <TabsTrigger value="write">Write</TabsTrigger>
+                      <TabsTrigger value="preview">Preview</TabsTrigger>
+                    </TabsList>
+                    <span className="text-xs text-muted-foreground">
+                      {(field.value ?? '').length} / 5000
+                    </span>
+                  </div>
                   <TabsContent value="write" className="mt-3">
                     <Textarea
                       placeholder="Describe what your cap does, usage instructions, examples, limits, and credits. Use Markdown for formatting."
                       className="min-h-[320px]"
                       value={field.value ?? ''}
                       onChange={(e) => field.onChange(e.target.value)}
+                      // Enforce the schema's max length at input level for better UX
+                      maxLength={5000}
                     />
                   </TabsContent>
                   <TabsContent value="preview" className="mt-3">

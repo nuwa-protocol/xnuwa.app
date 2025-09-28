@@ -79,7 +79,7 @@ export const CapMetadataSchema = z.object({
   description: z
     .string()
     .min(20, 'Description must be at least 10 characters')
-    .max(500, 'Description too long'),
+    .max(5000, 'Description too long'),
   tags: z.array(z.string()).min(1, 'At least one tag is required'),
   homepage: z.string().url('Must be a valid URL').optional(),
   repository: z.string().url('Must be a valid URL').optional(),
