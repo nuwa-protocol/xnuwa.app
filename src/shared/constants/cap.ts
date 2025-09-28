@@ -117,24 +117,24 @@ export const SUPPORTED_PROVIDERS: Record<
   azure: {
     name: 'Azure',
     description: 'Select this provider for Azure OpenAI chat API models.',
-    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/azure.png',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/azureai-color.png',
     iconDark:
-      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/azure.png',
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/azureai-color.png',
   },
   deepseek: {
     name: 'DeepSeek',
     description:
       'Select this provider for DeepSeek API models, including the DeepSeek-V3 models.',
-    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/deepseek.png',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/deepseek-color.png',
     iconDark:
-      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/deepseek.png',
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/deepseek-color.png',
   },
   mistral: {
     name: 'Mistral',
     description: 'Select this provider for Mistral chat API models.',
-    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/mistral.png',
+    icon: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/mistral-color.png',
     iconDark:
-      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/mistral.png',
+      'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/mistral-color.png',
   },
   openrouter: {
     name: 'OpenRouter',
