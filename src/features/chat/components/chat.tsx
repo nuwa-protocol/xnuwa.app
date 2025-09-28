@@ -34,17 +34,11 @@ export function Chat({ isReadonly }: { isReadonly: boolean }) {
           <ResizablePanel
             defaultSize={40}
             minSize={30}
-            style={{ transition: 'flex-grow 200ms ease-out' }}
           >
-            <motion.div
-              layout
-              transition={{ layout: { type: 'tween', ease: 'easeOut', duration: 0.2 } }}
-              className="h-full"
-            >
+            <div className="h-full">
               <ChatContent isReadonly={isReadonly} />
-            </motion.div>
+            </div>
           </ResizablePanel>
-          {/* Hide the resize handle when the artifact panel is collapsed; keep mounted */}
           <ResizableHandle
             withHandle
             className={`h-4 my-auto ${!messageHasArtifactTool ? 'hidden' : ''}`}
@@ -52,35 +46,25 @@ export function Chat({ isReadonly }: { isReadonly: boolean }) {
           <ResizablePanel
             defaultSize={60}
             minSize={50}
-            /*
-             * Collapse the artifact panel without unmounting so we can animate with framer-motion.
-             * We override flexGrow via inline style (higher priority than the library's) to 0 when hidden,
-             * which makes the panel take no space while staying in the DOM.
-             */
             style={{
-              transition: 'flex-grow 200ms ease-out',
               ...(messageHasArtifactTool ? {} : { flexGrow: 0 }),
             }}
             className={`overflow-hidden ${!messageHasArtifactTool ? 'pointer-events-none' : ''}`}
           >
-            <motion.div
-              layout
-              transition={{ layout: { type: 'tween', ease: 'easeOut', duration: 0.2 } }}
-              className="h-full"
-            >
+            <div className="h-full">
               <motion.div
-                /* Animate slide in/out when state changes; keep mounted */
                 initial={false}
                 animate={{
                   x: messageHasArtifactTool ? 0 : '100%',
                   opacity: messageHasArtifactTool ? 1 : 0,
                 }}
                 transition={{ type: 'tween', ease: 'easeOut', duration: 0.2 }}
-                className={`h-full ${messageHasArtifactTool ? 'border-l-2' : ''}`}
+                className={`h-full transform-gpu ${messageHasArtifactTool ? 'border-l-2' : ''}`}
+                style={{ willChange: 'transform, opacity' }}
               >
                 <Artifact artifact={artifact} />
               </motion.div>
-            </motion.div>
+            </div>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

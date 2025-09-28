@@ -103,16 +103,16 @@ export default function Header({ chatId }: HeaderProps) {
   const contextLength = currentCap.core.model.contextLength;
 
   return (
-    <header className="sticky top-0 z-10 grid grid-cols-3 items-center px-3 pt-2">
+    <header className="w-full sticky top-0 z-10 grid grid-cols-3 items-center px-3 pt-2">
       {/* Left: Actions */}
-      <div className="flex items-center gap-1.5">
-        <CapSelector size="md" />
+      <div className="flex min-w-0 flex-1 mr-4">
+        <CapSelector />
       </div>
       {/* Center: Status area (AI or Save) */}
       <div className="flex flex-row justify-center items-center w-full">
         <div className="flex flex-row justify-center items-center gap-2">
           <p className="text-center text-sm py-1 rounded-lg font-medium text-foreground/90 md:text-base line-clamp-1">
-            {title}
+            {!!session && title}
           </p>
           {session && (
             <ChatDropdownMenu

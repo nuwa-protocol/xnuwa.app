@@ -14,55 +14,12 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import type { Cap } from '@/shared/types';
-import { cn } from '@/shared/utils';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
 import { CapAvatar } from './cap-avatar';
 
-type CapSelectorSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | '8xl' | '9xl';
-
-const CapInfo = ({
-  cap,
-  size = 'sm',
-}: {
-  cap: Cap;
-  size?: CapSelectorSize;
-}) => (
-  <>
-    <CapAvatar
-      capName={cap.metadata.displayName}
-      capThumbnail={cap.metadata.thumbnail}
-      size={size}
-      className="rounded-md"
-    />
-    <span
-      className={cn(
-        'text-sm font-normal',
-        size === 'md' && 'text-md font-medium',
-        size === 'lg' && 'text-lg font-semibold',
-        size === 'xl' && 'text-xl font-semibold',
-        size === '2xl' && 'text-2xl font-semibold',
-        size === '3xl' && 'text-3xl font-semibold',
-        size === '4xl' && 'text-4xl font-semibold',
-        size === '5xl' && 'text-5xl font-semibold',
-        size === '6xl' && 'text-6xl font-semibold',
-        size === '7xl' && 'text-7xl font-semibold',
-        size === '8xl' && 'text-8xl font-semibold',
-        size === '9xl' && 'text-9xl font-semibold',
-      )}
-    >
-      {cap.metadata.displayName}
-    </span>
-  </>
-);
-
 // TODO: switching cap need to have cache
-export function CapSelector({
-  size = 'sm',
-}: {
-  size?: CapSelectorSize;
-}) {
+export function CapSelector() {
   const { currentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
   const { favoriteCaps, downloadCapByIDWithCache } = useCapStore();
@@ -95,13 +52,25 @@ export function CapSelector({
           variant="outline"
           size="sm"
           onClick={() => navigate('/explore')}
-          className="rounded-lg"
+          className="rounded-lg w-full min-w-0"
           type="button"
         >
-          <div className="flex items-center gap-2">
-            <CapInfo cap={currentCap} size={size} />
+          <div className="flex items-center gap-2 w-full min-w-0">
+            <div className='flex flex-row items-center gap-2 min-w-0 flex-1'>
+              <CapAvatar
+                capName={currentCap.metadata.displayName}
+                capThumbnail={currentCap.metadata.thumbnail}
+                size="lg"
+                className='rounded-md'
+              />
+              <span
+                className='text-sm font-medium truncate min-w-0'
+              >
+                {currentCap.metadata.displayName}
+              </span>
+            </div>
             {!isInitialized && (
-              <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+              <Loader2 className="w-3 h-3 animate-spin text-muted-foreground flex-shrink-0" />
             )}
           </div>
         </Button>
@@ -131,19 +100,29 @@ export function CapSelector({
         >
           <Button
             variant="ghost"
-            className="rounded-lg hover:bg-transparent"
+            className="rounded-lg hover:bg-transparent w-full min-w-0"
             type="button"
           >
-            <div className="flex items-center gap-2">
-              <CapInfo cap={currentCap} size={size} />
+            <div className='flex items-center justify-start gap-2 w-full min-w-0 flex-1'>
+              <CapAvatar
+                capName={currentCap.metadata.displayName}
+                capThumbnail={currentCap.metadata.thumbnail}
+                size="lg"
+                className='rounded-md'
+              />
+              <span
+                className='text-sm font-medium truncate text-left min-w-0'
+              >
+                {currentCap.metadata.displayName}
+              </span>
               {!isInitialized && (
-                <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+                <Loader2 className="w-3 h-3 animate-spin text-muted-foreground flex-shrink-0" />
               )}
-              <ChevronDown className="w-3 h-3 text-muted-foreground" />
+              <ChevronDown className="w-3 h-3 text-muted-foreground flex-shrink-0" />
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-[200px]">
+        <DropdownMenuContent align="start" className="min-w-[200px]">
           {favoriteCaps.map((cap) => (
             <DropdownMenuItem
               key={cap.id}
@@ -155,7 +134,7 @@ export function CapSelector({
                   capName={cap.metadata.displayName}
                   capThumbnail={cap.metadata.thumbnail}
                   size="lg"
-                  className="rounded-md"
+                  className='rounded-md'
                 />
                 <span className="text-sm">{cap.metadata.displayName}</span>
               </div>

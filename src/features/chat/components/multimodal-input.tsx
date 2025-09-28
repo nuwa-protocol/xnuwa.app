@@ -16,7 +16,6 @@ import { ChatSessionsStore } from '../stores';
 import { type AttachmentData, AttachmentInput } from './attachment-input';
 import { InputSelections } from './input-selections';
 import { PreviewAttachment } from './preview-attachment';
-import { SuggestedActions } from './suggested-actions';
 
 function PureMultimodalInput({ className }: { className?: string }) {
   const { chat } = useChatContext();
@@ -83,8 +82,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
 
   return (
     <div className="relative w-full flex flex-col gap-4">
-      {messages.length === 0 && <SuggestedActions />}
-
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 p-2">
           {attachments.map((attachment, index) => (
