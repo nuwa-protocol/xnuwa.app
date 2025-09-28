@@ -149,12 +149,11 @@ export const getExchangeRate = async (
 };
 
 export const getMinAmount = async (
-  fromCurrency: string,
-  toCurrency: string = 'USD',
-): Promise<number | null> => {
+  currency: string,
+): Promise<string | null> => {
   try {
     const config = getConfig();
-    const apiUrl = `${config.appUrl}/api/min-amount?from=${fromCurrency}&to=${toCurrency}`;
+    const apiUrl = `${config.appUrl}/api/min-amount?from=${currency}&to=USD&fiat_equivalent=USD`;
 
     const response = await fetch(apiUrl);
 
@@ -165,7 +164,7 @@ export const getMinAmount = async (
 
     const data: GetMinAmountResponse = await response.json();
 
-    return data.min_amount;
+    return data.fiat_equivalent;
   } catch (err) {
     console.error('Get min amount error:', err);
     throw err;

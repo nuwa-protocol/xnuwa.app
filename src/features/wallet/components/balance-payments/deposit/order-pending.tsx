@@ -43,7 +43,7 @@ export function OrderPending({ order, isOrderUpdating, updateOrder }: OrderPendi
     };
 
     return (
-        <div className="space-y-6">
+        <div className="flex flex-col gap-4 max-w-xl">
             <div>
                 <div className="flex items-center justify-between">
                     <h3 className="flex items-center gap-2 text-lg font-medium">
@@ -85,13 +85,13 @@ export function OrderPending({ order, isOrderUpdating, updateOrder }: OrderPendi
                     <div className="space-y-3">
                         {/* Address Display - Hero Element */}
                         <Button
-                            className="relative cursor-pointer hover:bg-accent w-full"
+                            className="relative cursor-pointer hover:bg-accent w-full py-8"
                             variant="ghost"
                             asChild
                             onClick={() => handleCopy(order.paymentAddress)}
                         >
-                            <div className="p-4 rounded-lg bg-muted/50 border-2 border-dashed border-primary/30">
-                                <div className="font-mono text-sm break-all text-center leading-relaxed font-medium">
+                            <div className="p-4 rounded-lg bg-muted/50 border-2 border-dashed border-primary/30 w-full">
+                                <div className="font-mono text-sm break-all text-center leading-relaxed font-medium whitespace-pre-wrap py-2">
                                     {order.paymentAddress || 'Address not available'}
                                 </div>
                             </div>

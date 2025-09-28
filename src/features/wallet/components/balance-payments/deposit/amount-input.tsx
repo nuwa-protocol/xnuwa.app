@@ -13,6 +13,8 @@ import { cn } from '@/shared/utils';
 import type { Currency } from '../../../types';
 import { QuickAmounts } from '../../../utils';
 
+// TODO: compare the amount with the min amount and reject order creation
+
 export function AmountInput({
     currency,
     amount,
@@ -35,7 +37,7 @@ export function AmountInput({
         setIsFetchingMin(true);
         try {
             // Query the minimum FROM=USD to payCurrency so the result is in USD (credits)
-            const res = await getMinAmount('USD', payCurrency.code);
+            const res = await getMinAmount(payCurrency.code);
             setMinAmount(typeof res === 'number' ? res : 0);
         } catch (e) {
             setMinAmount(0);
@@ -68,6 +70,13 @@ export function AmountInput({
         if (minAmount && open) setIsQuickOpen(true);
         if (!open) setIsQuickOpen(false);
     }, [minAmount]);
+
+    const handleAmountChange = useCallback((val: number | null) => {
+        if (minAmount && val && val < minAmount) {
+            return;
+        }
+        onAmountChange(val);
+    }, [minAmount, onAmountChange]);
 
     return (
         <div className="space-y-2">

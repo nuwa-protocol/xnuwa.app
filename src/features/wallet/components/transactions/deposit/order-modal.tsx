@@ -39,7 +39,7 @@ export function DepositOrderModalContent({
     if (order?.status === 'completed') {
         return <OrderCompleted order={order} />;
     }
-    if (order?.status === 'expired' || (order?.expirationTime && new Date(order.expirationTime) < new Date())) {
+    if (order?.status === 'expired') {
         return <OrderExpired order={order} onRetry={onReCreate} />;
     }
     if (order?.status === 'pending' || order?.status === 'partially_paid') {
@@ -133,7 +133,7 @@ export function DepositOrderModal({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="max-w-lg">
                 <DialogHeader>
                     <DialogTitle>Deposit Order</DialogTitle>
                 </DialogHeader>

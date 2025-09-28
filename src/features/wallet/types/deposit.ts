@@ -54,6 +54,7 @@ export interface GetMinAmountResponse {
   min_amount: number;
   currency_from: string;
   currency_to: string;
+  fiat_equivalent: string;
 }
 
 export interface FetchDepositOrderResponse {
