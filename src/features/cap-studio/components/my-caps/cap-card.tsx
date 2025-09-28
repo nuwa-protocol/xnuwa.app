@@ -5,7 +5,7 @@ import {
   Check,
   Clock,
   Copy,
-  Edit,
+  Download,
   MoreVertical,
   Server,
   Share,
@@ -100,6 +100,28 @@ export function CapCard({
     addSuffix: true,
   });
 
+  // Export current cap data as a pretty-printed JSON file
+  const handleExportJson = () => {
+    try {
+      // omit top-level `id` and `authorDID` from export
+      const { id: _omitId, authorDID: _omitAuthor, ...exportCap } = cap.capData as any;
+      const json = JSON.stringify(exportCap, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${cap.capData.idName}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success('Exported cap JSON');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to export cap JSON');
+    }
+  };
+
   // Determine border color based on published status
   const borderColor =
     cap.status === 'submitted'
@@ -178,16 +200,17 @@ export function CapCard({
           {!isMultiSelectMode && (
             <div className="flex items-center space-x-2 shrink-0">
               <div className="flex grid grid-cols-1 gap-2">
+
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onEdit?.();
+                    onTest?.();
                   }}
                   size="sm"
-                  variant="default"
+                  className="w-full"
                 >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
+                  <Bug className="h-4 w-4 mr-2" />
+                  Test Cap
                 </Button>
 
                 {cap.status === 'draft' ? (
@@ -261,11 +284,11 @@ export function CapCard({
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation();
-                      onTest?.();
+                      handleExportJson();
                     }}
                   >
-                    <Bug className="h-4 w-4 mr-2" />
-                    Test Cap
+                    <Download className="h-4 w-4 mr-2" />
+                    Export JSON
                   </DropdownMenuItem>
 
                   <DropdownMenuSeparator />
