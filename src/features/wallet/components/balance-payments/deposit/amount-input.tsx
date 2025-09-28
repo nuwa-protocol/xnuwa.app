@@ -17,12 +17,10 @@ import { QuickAmounts } from '../../../utils';
 
 export function AmountInput({
     currency,
-    amount,
     onAmountChange,
     disabled,
 }: {
     currency: Currency | null;
-    amount: number | null;
     onAmountChange: (val: number | null) => void;
     disabled: boolean;
 }) {
@@ -30,6 +28,9 @@ export function AmountInput({
     const [isQuickOpen, setIsQuickOpen] = useState(false);
     const [minAmount, setMinAmount] = useState<number | null>(null);
     const [isFetchingMin, setIsFetchingMin] = useState(false);
+    const [belowMin, setBelowMin] = useState<boolean>(false);
+    const [amountInput, setAmountInput] = useState<number | null>(null);
+
 
     // Debounced fetch for min amount in USD (choose currency first)
     const fetchMin = async (payCurrency: Currency) => {
@@ -52,11 +53,6 @@ export function AmountInput({
         [currency],
     );
 
-    const belowMin = useMemo(() => {
-        if (!minAmount) return false;
-        return Number(amount) > 0 && Number(amount) < minAmount;
-    }, [amount, minAmount]);
-
     // When currency changes, fetch min and the USD-per-token rate
     useEffect(() => {
         if (!currency) {
@@ -71,11 +67,16 @@ export function AmountInput({
         if (!open) setIsQuickOpen(false);
     }, [minAmount]);
 
-    const handleAmountChange = useCallback((val: number | null) => {
-        if (minAmount && val && val < minAmount) {
+    const handleAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setAmountInput(Number(val));
+        if (minAmount && val && Number(val) < minAmount) {
+            setBelowMin(true);
+            onAmountChange(null);
             return;
         }
-        onAmountChange(val);
+        setBelowMin(false);
+        onAmountChange(Number(val));
     }, [minAmount, onAmountChange]);
 
     return (
@@ -94,8 +95,8 @@ export function AmountInput({
                                 min={0}
                                 placeholder="Enter amount"
                                 className="pl-10 pr-28"
-                                value={amount || undefined}
-                                onChange={(e) => onAmountChange(Number(e.target.value))}
+                                value={amountInput || undefined}
+                                onChange={handleAmountChange}
                                 disabled={disabled}
                             />
                             <span className="absolute right-2 text-muted-foreground text-xs">

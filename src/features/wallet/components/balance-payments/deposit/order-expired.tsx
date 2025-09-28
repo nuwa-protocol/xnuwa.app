@@ -63,7 +63,7 @@ export function OrderExpired({
             </div>
           </div>
 
-          {order.received && order.received > 0 && (
+          {order.received > 0 && (
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
               <div className="flex items-center gap-2 text-amber-800 text-sm">
                 <Clock className="h-4 w-4" />

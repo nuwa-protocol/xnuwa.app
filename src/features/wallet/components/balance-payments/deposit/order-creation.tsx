@@ -37,18 +37,17 @@ export function OrderCreation(props: OrderCreationProps) {
           />
           <AmountInput
             currency={currency}
-            amount={amount}
             onAmountChange={setAmount}
             disabled={!currency}
           />
           {/* Preview section (only after both currency and amount set) */}
-          {currency && amount && amount > 0 && (
+          {currency && amount !== null && amount > 0 && (
             <PreviewCard currency={currency} amount={amount} />
           )}
         </CardContent>
       </Card>
       {
-        currency && amount && amount > 0 && (
+        currency && amount !== null && amount > 0 && (
           <Button className="mt-4" onClick={() => onComplete(amount, currency)}>
             Buy Credits
           </Button>

@@ -42,7 +42,7 @@ export function DepositOrderModalContent({
     if (order?.status === 'expired') {
         return <OrderExpired order={order} onRetry={onReCreate} />;
     }
-    if (order?.status === 'pending' || order?.status === 'partially_paid') {
+    if (order?.status === 'pending' || order?.status === 'partially_paid' || order?.status === 'confirming') {
         return (
             <OrderPending
                 order={order}
