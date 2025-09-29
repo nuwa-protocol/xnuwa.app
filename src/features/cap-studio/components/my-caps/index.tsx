@@ -280,12 +280,13 @@ export function MyCaps({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-42">
-                  <DropdownMenuItem
+                  {/* Hide the batch create for now */}
+                  {/* <DropdownMenuItem
                     onClick={() => navigate('/cap-studio/batch-create')}
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     Batch Create
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuItem
                     onClick={() => importFileRef.current?.click()}
                   >
