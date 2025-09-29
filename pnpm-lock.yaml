@@ -60,8 +60,8 @@ importers:
         specifier: ^1.13.2
         version: 1.18.0
       '@nuwa-ai/cap-kit':
-        specifier: 0.6.2
-        version: 0.6.2(typescript@5.8.3)
+        specifier: 0.6.3
+        version: 0.6.3(typescript@5.8.3)
       '@nuwa-ai/identity-kit':
         specifier: ^0.6.0
         version: 0.6.0(typescript@5.8.3)
@@ -1262,8 +1262,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@nuwa-ai/cap-kit@0.6.2':
-    resolution: {integrity: sha512-jlBcz2p2nFqzi9N6wDQtB1jty7IJ75W+uTXZTXUKLmHMkuDWCp32TxEY8BZh3vB/puDS3m3LS1FfhCWzIcV6zQ==}
+  '@nuwa-ai/cap-kit@0.6.3':
+    resolution: {integrity: sha512-Liynp6k98M314Eu+42/xNKFp4+mhwNuQAc5PUYqVvCdWPB5tTfwVbuYvET0jeeCtCztzc0edDR0BSbMNCXp5Gg==}
 
   '@nuwa-ai/identity-kit-web@0.6.0':
     resolution: {integrity: sha512-kiRGLfKVU+dXlT7TN94AwFo9+Vmb0to12emKe9EQ04xDrN2qo1k1b9Ec2xZc5z0V+BYr0ndPOxgpF9DwxYh2uQ==}
@@ -8990,7 +8990,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@nuwa-ai/cap-kit@0.6.2(typescript@5.8.3)':
+  '@nuwa-ai/cap-kit@0.6.3(typescript@5.8.3)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.18.0
       '@noble/curves': 1.9.7
@@ -15302,8 +15302,8 @@ snapshots:
   ox@0.6.7(typescript@5.8.3)(zod@3.25.76):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
-      '@noble/curves': 1.9.7
-      '@noble/hashes': 1.8.0
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
       '@scure/bip32': 1.6.2
       '@scure/bip39': 1.5.4
       abitype: 1.0.8(typescript@5.8.3)(zod@3.25.76)

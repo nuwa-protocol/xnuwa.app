@@ -53,6 +53,7 @@ export const defaultCap: Cap = {
     tags: ['ai', 'chatbot', 'openai'],
     thumbnail:
       'https://unpkg.com/@lobehub/icons-static-png@1.60.0/light/openai.png',
+    introduction: 'This is a helpful assistant',
   },
 };
 
