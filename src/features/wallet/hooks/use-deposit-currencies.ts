@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { supportedCurrencies } from '../constants';
 import { getSupportedCurrencies } from '../services/deposit';
 import type { Currency } from '../types';
 
@@ -13,7 +14,11 @@ export const usePaymentCurrencies = () => {
     setError(null);
     try {
       const currencies = await getSupportedCurrencies();
-      setCurrencies(currencies);
+      setCurrencies(
+        currencies.filter((currency) =>
+          supportedCurrencies.includes(currency.code),
+        ),
+      );
     } catch (err) {
       console.error(
         'Failed to fetch supported cryptocurrencies, using default list:',

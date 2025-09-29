@@ -67,3 +67,34 @@ export const networkMap = {
 
 
 export const baseQuickAmounts = [5, 10, 20, 30, 50, 100];
+
+
+export const supportedCurrencies = [
+  "USDDTRC20",
+  "USDCSOL",
+  "USDTMATIC",
+  "TUSD",
+  "USDCXLM",
+  "USDCMATIC",
+  "USDDBSC",
+  "BUSDMATIC",
+  "USDCBSC",
+  "BEAM",
+  "DAI",
+  "USDTSOL",
+  "TUSDTRC20",
+  "FIRO",
+  "USDTERC20",
+  "USDP",
+  "USDC",
+  "USDTBSC",
+  "USDTTRC20",
+  "BTC",
+  "ETH",
+  "LTC",
+  "BCH",
+  "TRX",
+  "DOGE",
+  "LINK",
+  "TON"
+]
