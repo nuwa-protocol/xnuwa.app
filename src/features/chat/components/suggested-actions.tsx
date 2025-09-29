@@ -31,9 +31,9 @@ function PureSuggestedActions() {
        * - Horizontal scroll when content overflows.
        * - No horizontal gap between suggestions on each row.
        */
-      className="w-full overflow-x-auto overflow-y-hidden px-1 hide-scrollbar"
+      className="w-full overflow-x-auto overflow-y-hidden px-1 hide-scrollbar mx-auto"
     >
-      <div className="flex w-fit flex-col gap-2">
+      <div className="flex w-fit flex-col gap-2 mx-auto">
         {distributedRows.map((row, rIdx) => (
           <div key={`suggested-row-${generateUUID()}`} className="inline-flex min-w-max items-center gap-x-2">
             {row.map((suggestedAction, index) => (
