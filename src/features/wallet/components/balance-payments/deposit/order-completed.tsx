@@ -30,7 +30,7 @@ export function OrderCompleted({ order }: OrderCompletedProps) {
       </div>
 
       {/* Payment Summary Card */}
-      <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 via-background to-green-50/50">
+      <Card className="border-2 bg-muted">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-green-700">
             <CreditCard className="h-5 w-5" />

@@ -121,15 +121,20 @@ export function DepositOrderModal({
     onOpenChange: (open: boolean) => void;
     onReCreate?: () => void;
 }) {
-    const { order, isUpdating, updateError, updateOrder } = useDepositOrderById(
-        selectedOrderPaymentId,
-    );
+    const { order, isUpdating, updateError, updateOrder } = useDepositOrderById();
 
     useEffect(() => {
         if (open && selectedOrderPaymentId) {
-            updateOrder();
+            updateOrder(selectedOrderPaymentId);
         }
     }, [open, selectedOrderPaymentId]);
+
+    const handleUpdateOrder = () => {
+        if (selectedOrderPaymentId) {
+            // Force refresh to allow manual updates even if the same order is already loaded
+            updateOrder(selectedOrderPaymentId, { force: true });
+        }
+    };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -141,7 +146,7 @@ export function DepositOrderModal({
                     updateError={updateError}
                     isUpdating={isUpdating}
                     order={order}
-                    updateOrder={updateOrder}
+                    updateOrder={handleUpdateOrder}
                     onReCreate={onReCreate}
                 />
             </DialogContent>

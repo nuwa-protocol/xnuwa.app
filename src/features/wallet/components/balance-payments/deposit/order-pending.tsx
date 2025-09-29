@@ -6,7 +6,9 @@ import {
     RefreshCw,
     Wallet,
 } from 'lucide-react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { useTimeLeft } from '@/features/wallet/hooks/use-timeleft';
 import type { DepositOrder } from '@/features/wallet/types';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
@@ -18,7 +20,6 @@ import {
 } from '@/shared/components/ui/card';
 import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { networkMap } from '../../../constants';
-import { useTimeLeft } from '../../../hooks/use-timeleft';
 import { StatusBadge } from '../../status-badge';
 
 interface OrderPendingProps {
@@ -27,8 +28,16 @@ interface OrderPendingProps {
     updateOrder: () => void;
 }
 
-export function OrderPending({ order, isOrderUpdating, updateOrder }: OrderPendingProps) {
-    const { timeLeft } = useTimeLeft(order?.expirationTime || '');
+export function OrderPending({
+    order,
+    isOrderUpdating,
+    updateOrder,
+}: OrderPendingProps) {
+    const { timeLeft, updateExpirationTime } = useTimeLeft(order.expirationTime);
+
+    useEffect(() => {
+        updateExpirationTime(order.expirationTime);
+    }, [order.expirationTime]);
 
     const [copy] = useCopyToClipboard();
     const handleCopy = (text: string) => {
@@ -108,9 +117,7 @@ export function OrderPending({ order, isOrderUpdating, updateOrder }: OrderPendi
                 <CardContent className="space-y-3 text-sm">
                     <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Order ID</span>
-                        <span className="font-mono text-xs">
-                            {order.orderId || 'N/A'}
-                        </span>
+                        <span className="font-mono text-xs">{order.orderId || 'N/A'}</span>
                     </div>
 
                     <div className="flex justify-between items-center">
@@ -145,11 +152,9 @@ export function OrderPending({ order, isOrderUpdating, updateOrder }: OrderPendi
                                 {order.received || 0}{' '}
                                 {order.paymentCurrency?.toUpperCase() || 'N/A'}
                             </span>
-                            {
-                                order.status !== 'completed' && (
-                                    <Loader className="h-4 w-4 animate-spin" />
-                                )
-                            }
+                            {order.status !== 'completed' && (
+                                <Loader className="h-4 w-4 animate-spin" />
+                            )}
                         </div>
                     </div>
 

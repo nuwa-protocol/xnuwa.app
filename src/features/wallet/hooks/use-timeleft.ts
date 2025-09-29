@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
-
-const calculateTimeLeft = (estimatedExpirationDate: string) => {
-  const expirationTime = new Date(estimatedExpirationDate).getTime();
-  const now = Date.now();
-  return Math.max(0, Math.floor((expirationTime - now) / 1000));
-};
+import { calculateTimeLeft } from '../utils';
 
 export const useTimeLeft = (expirationTime: string) => {
   const [timeLeft, setTimeLeft] = useState<number>(
@@ -28,7 +23,12 @@ export const useTimeLeft = (expirationTime: string) => {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
+  const updateExpirationTime = (expirationTime: string) => {
+    setTimeLeft(calculateTimeLeft(expirationTime));
+  };
+
   return {
     timeLeft,
+    updateExpirationTime,
   };
 };

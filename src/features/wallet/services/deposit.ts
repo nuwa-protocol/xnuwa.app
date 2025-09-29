@@ -9,6 +9,7 @@ import type {
   FetchDepositOrdersFilter,
   FetchDepositOrdersResponse,
   GetMinAmountResponse,
+  GetPaymentEstimatedAmountResponse,
 } from '../types/deposit';
 import { normalizeCurrencies } from '../utils';
 
@@ -165,6 +166,32 @@ export const getMinAmount = async (
     const data: GetMinAmountResponse = await response.json();
 
     return data.fiat_equivalent;
+  } catch (err) {
+    console.error('Get min amount error:', err);
+    throw err;
+  }
+};
+
+export const getPaymentEstimatedAmount = async (
+  paymentId: string,
+): Promise<{ totalDue: number; expirationTime: string } | null> => {
+  try {
+    const config = getConfig();
+    const apiUrl = `${config.appUrl}/api/payment/${paymentId}/update-merchant-estimate`;
+
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      console.error('Get payment estimated amount error:');
+      throw new Error('Failed to get payment estimated amount');
+    }
+
+    const data: GetPaymentEstimatedAmountResponse = await response.json();
+
+    return {
+      totalDue: Number(data.pay_amount),
+      expirationTime: data.expiration_estimate_date,
+    };
   } catch (err) {
     console.error('Get min amount error:', err);
     throw err;

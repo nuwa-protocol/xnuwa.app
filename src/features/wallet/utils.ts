@@ -182,3 +182,10 @@ export const mapFetchDepositOrdersResponseItemToPaymentOrder = (
     ipnPayload: response.ipn_payload,
   };
 };
+
+export const calculateTimeLeft = (estimatedExpirationDate: string) => {
+  const expirationTime = new Date(estimatedExpirationDate).getTime();
+  const now = Date.now();
+  if (expirationTime < now) return 0;
+  return Math.max(0, Math.floor((expirationTime - now) / 1000));
+};

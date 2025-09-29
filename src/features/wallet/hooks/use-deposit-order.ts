@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '@/shared/hooks/use-auth';
-import { createDepositOrder, fetchDepositOrder } from '../services/deposit';
+import {
+  createDepositOrder,
+  fetchDepositOrder,
+  getPaymentEstimatedAmount,
+} from '../services/deposit';
 import type {
   CreateDepositOrderRequest,
   Currency,
@@ -31,8 +35,8 @@ export const useDepositOrder = () => {
       const request: CreateDepositOrderRequest = {
         price_amount: amount,
         price_currency: 'USD',
-        order_id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        order_description: `Buy ${amount} USD credits`,
+        order_id: `order_${userDid}_${amount}_${Date.now()}`,
+        order_description: `$${amount} USD of Nuwa AI credits`,
         pay_currency: currency.code.toLowerCase(),
         payer_did: userDid,
       };
@@ -64,6 +68,18 @@ export const useDepositOrder = () => {
 
       if (paymentStatus) {
         setOrder(mapFetchDepositOrderResponseToPaymentOrder(paymentStatus));
+
+        // if the order is not expired, update the estimated amount
+        if (order.expirationTime > new Date().toISOString()) {
+          const newEstimate = await getPaymentEstimatedAmount(order.paymentId);
+          if (newEstimate) {
+            setOrder({
+              ...order,
+              totalDue: newEstimate.totalDue,
+              expirationTime: newEstimate.expirationTime,
+            });
+          }
+        }
       } else {
         console.error('No payment data received from status check');
         setUpdateError('No payment data received from status check');

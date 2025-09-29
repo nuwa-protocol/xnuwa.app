@@ -57,6 +57,13 @@ export interface GetMinAmountResponse {
   fiat_equivalent: string;
 }
 
+export interface GetPaymentEstimatedAmountResponse {
+  id: string;
+  token_id: string;
+  pay_amount: string;
+  expiration_estimate_date: string;
+}
+
 export interface FetchDepositOrderResponse {
   db: {
     id?: string;

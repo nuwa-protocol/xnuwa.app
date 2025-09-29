@@ -36,9 +36,9 @@ export function OrderExpired({
       </div>
 
       {/* Expired Payment Details */}
-      <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 via-background to-red-50/50">
+      <Card className="border-2 bg-muted">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-700">
+          <CardTitle className="flex items-center gap-2 text-red-500">
             <Clock className="h-5 w-5" />
             Expired Order Details
           </CardTitle>
