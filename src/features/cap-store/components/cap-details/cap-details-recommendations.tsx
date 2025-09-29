@@ -1,6 +1,6 @@
-import { CapAvatar } from '.@/shared/components/cap-avatar';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   Card,
   CardContent,

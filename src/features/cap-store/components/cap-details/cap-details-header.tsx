@@ -1,4 +1,3 @@
-import { CapAvatar } from '.@/shared/components/cap-avatar';
 import type { Cap } from '@nuwa-ai/cap-kit';
 import {
   Download,
@@ -11,6 +10,7 @@ import {
   User,
 } from 'lucide-react';
 import { useState } from 'react';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   Badge,
   Button,
