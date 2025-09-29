@@ -1,4 +1,4 @@
-import { CapAvatar } from '@/features/cap-store/components/cap-avatar';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import type { Cap } from '@/shared/types';
 import { SuggestedActions } from './suggested-actions';
 

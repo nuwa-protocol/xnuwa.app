@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import type { CapThumbnail } from '@/shared/types';
 import { useSubmitCap } from '../hooks';
 import { CapStudioStore } from '../stores';
 import type { LocalCap } from '../types';
@@ -20,21 +19,14 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
     navigate('/cap-studio');
   };
 
-  const handleDirectSubmit = async (
-    thumbnail?: CapThumbnail,
-    homepage?: string,
-    repository?: string,
-  ) => {
+  const handleSubmit = async () => {
     setIsSubmitting(true);
-
-    const submitFormData = {
-      homepage: homepage || '',
-      repository: repository || '',
-    };
 
     try {
       // make the submission
       const result = await submitCap(cap.capData);
+
+      console.log(result);
 
       if (!result.success) {
         toast.error(result.message);
@@ -66,7 +58,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
 
   return {
     handleCancel,
-    handleDirectSubmit,
+    handleSubmit,
     isSubmitting,
   };
 };

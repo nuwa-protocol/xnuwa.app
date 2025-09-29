@@ -2,11 +2,11 @@ import { Download, Heart, Info, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import { Button, Card } from '@/shared/components/ui';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
-import { CapAvatar } from './cap-avatar';
 import { StarRating } from './star-rating';
 
 export interface CapCardProps {

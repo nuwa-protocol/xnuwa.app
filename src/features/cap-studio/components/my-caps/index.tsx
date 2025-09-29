@@ -1,6 +1,7 @@
 import {
   CheckSquare,
   ChevronDown,
+  FileUp,
   Plus,
   Search,
   Send,
@@ -278,7 +279,7 @@ export function MyCaps({
                     <ChevronDown />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuContent align="end" className="w-42">
                   <DropdownMenuItem
                     onClick={() => navigate('/cap-studio/batch-create')}
                   >
@@ -288,7 +289,7 @@ export function MyCaps({
                   <DropdownMenuItem
                     onClick={() => importFileRef.current?.click()}
                   >
-                    <Upload className="h-4 w-4 mr-2" />
+                    <FileUp className="h-4 w-4 mr-2" />
                     Import from JSON
                   </DropdownMenuItem>
                 </DropdownMenuContent>

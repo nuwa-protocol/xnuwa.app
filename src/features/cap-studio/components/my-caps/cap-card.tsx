@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,9 +24,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Button,
   Card,
   CardContent,
@@ -104,7 +102,11 @@ export function CapCard({
   const handleExportJson = () => {
     try {
       // omit top-level `id` and `authorDID` from export
-      const { id: _omitId, authorDID: _omitAuthor, ...exportCap } = cap.capData as any;
+      const {
+        id: _omitId,
+        authorDID: _omitAuthor,
+        ...exportCap
+      } = cap.capData as any;
       const json = JSON.stringify(exportCap, null, 2);
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -161,12 +163,7 @@ export function CapCard({
           )}
           <div className="flex items-start space-x-4 flex-1 min-w-0">
             <div className="w-12 h-12 flex items-center justify-center shrink-0">
-              <Avatar className="rounded-lg">
-                <AvatarImage src={cap.capData.metadata.thumbnail} />
-                <AvatarFallback>
-                  {cap.capData.metadata.displayName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
+              <CapAvatar capName={cap.capData.idName} capThumbnail={cap.capData.metadata.thumbnail} size="3xl" className='rounded-md' />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -200,7 +197,6 @@ export function CapCard({
           {!isMultiSelectMode && (
             <div className="flex items-center space-x-2 shrink-0">
               <div className="flex grid grid-cols-1 gap-2">
-
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();

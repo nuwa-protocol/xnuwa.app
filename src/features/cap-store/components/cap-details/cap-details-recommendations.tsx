@@ -1,3 +1,4 @@
+import { CapAvatar } from '.@/shared/components/cap-avatar';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -11,7 +12,6 @@ import { capKitService } from '@/shared/services/capkit-service';
 import { generateUUID } from '@/shared/utils';
 import type { RemoteCap } from '../../types';
 import { mapResultsToRemoteCaps } from '../../utils';
-import { CapAvatar } from '../cap-avatar';
 
 interface CapDetailsRecommendationsProps {
   currentCapId: string;

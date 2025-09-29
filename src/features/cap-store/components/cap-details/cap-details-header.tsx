@@ -1,3 +1,4 @@
+import { CapAvatar } from '.@/shared/components/cap-avatar';
 import type { Cap } from '@nuwa-ai/cap-kit';
 import {
   Download,
@@ -20,7 +21,6 @@ import {
 } from '@/shared/components/ui';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import type { RemoteCap } from '../../types';
-import { CapAvatar } from '../cap-avatar';
 import { StarRating } from '../star-rating';
 import { CapDetailsActions } from './cap-details-actions';
 

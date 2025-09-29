@@ -1,5 +1,4 @@
 import { CapStudioStore } from '../../stores';
-import { DashboardHeader, DashboardLayout } from '../layout/dashboard-layout';
 import { CapSubmitForm } from './cap-submit-form';
 
 export function Submit({ id }: { id: string }) {
@@ -9,21 +8,13 @@ export function Submit({ id }: { id: string }) {
 
   if (!cap) {
     return (
-      <DashboardLayout>
-        <DashboardHeader
-          title="Cap Not Found"
-          description="The cap you're trying to submit could not be found"
-        />
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Cap not found</p>
-        </div>
-      </DashboardLayout>
+      <div className="text-center w-full h-full py-12">
+        <p className="text-muted-foreground">Cap not found</p>
+      </div>
     );
   }
 
   return (
-    <DashboardLayout>
-      <CapSubmitForm cap={cap} />
-    </DashboardLayout>
+    <CapSubmitForm cap={cap} />
   );
 }

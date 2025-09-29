@@ -1,6 +1,7 @@
 import { AlertCircle, ChevronDown, Loader2, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   Button,
   DropdownMenu,
@@ -16,7 +17,6 @@ import {
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
-import { CapAvatar } from './cap-avatar';
 
 // TODO: switching cap need to have cache
 export function CapSelector() {
@@ -56,16 +56,14 @@ export function CapSelector() {
           type="button"
         >
           <div className="flex items-center gap-2 w-full min-w-0">
-            <div className='flex flex-row items-center gap-2 min-w-0 flex-1'>
+            <div className="flex flex-row items-center gap-2 min-w-0 flex-1">
               <CapAvatar
                 capName={currentCap.metadata.displayName}
                 capThumbnail={currentCap.metadata.thumbnail}
                 size="lg"
-                className='rounded-md'
+                className="rounded-md"
               />
-              <span
-                className='text-sm font-medium truncate min-w-0'
-              >
+              <span className="text-sm font-medium truncate min-w-0">
                 {currentCap.metadata.displayName}
               </span>
             </div>
@@ -103,16 +101,14 @@ export function CapSelector() {
             className="rounded-lg hover:bg-transparent w-full min-w-0"
             type="button"
           >
-            <div className='flex items-center justify-start gap-2 w-full min-w-0 flex-1'>
+            <div className="flex items-center justify-start gap-2 w-full min-w-0 flex-1">
               <CapAvatar
                 capName={currentCap.metadata.displayName}
                 capThumbnail={currentCap.metadata.thumbnail}
                 size="lg"
-                className='rounded-md'
+                className="rounded-md"
               />
-              <span
-                className='text-sm font-medium truncate text-left min-w-0'
-              >
+              <span className="text-sm font-medium truncate text-left min-w-0">
                 {currentCap.metadata.displayName}
               </span>
               {!isInitialized && (
@@ -134,7 +130,7 @@ export function CapSelector() {
                   capName={cap.metadata.displayName}
                   capThumbnail={cap.metadata.thumbnail}
                   size="lg"
-                  className='rounded-md'
+                  className="rounded-md"
                 />
                 <span className="text-sm">{cap.metadata.displayName}</span>
               </div>
