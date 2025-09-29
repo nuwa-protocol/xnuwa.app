@@ -1,13 +1,14 @@
+import { PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { CapSelector } from '@/features/cap-store/components';
+import { Button } from '@/shared/components';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
-import { PanelRightClose, PanelRightOpen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { CapSelector } from '@/features/cap-store/components';
-import { Button } from '@/shared/components';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { ChatSessionsStore } from '../stores';
 import { ChatDropdownMenu } from './chat-dropdown-menu';
 
@@ -23,6 +24,8 @@ export default function Header({
   setShowArtifact,
 }: HeaderProps) {
   const navigate = useNavigate();
+  const { currentCap } = CurrentCapStore();
+  const hasArtifact = !!currentCap.core.artifact;
   const { chatSessions, updateSession, deleteSession } = ChatSessionsStore();
   const session = chatSessions[chatId || ''] || null;
   const title = session?.title || 'New Chat';
@@ -72,31 +75,33 @@ export default function Header({
 
       {/* Right: Context and Cost Indicator */}
       <div className="justify-self-end px-2">
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                onClick={handleToggleArtifact}
-                variant="ghost"
-                size="sm"
-                aria-label="Toggle artifact panel"
+        {hasArtifact && (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleToggleArtifact}
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Toggle artifact panel"
+                >
+                  {showArtifact ? (
+                    <PanelRightClose className="size-6" />
+                  ) : (
+                    <PanelRightOpen className="size-6" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                align="end"
+                className="rounded-lg border border-border/60 bg-background/95 px-2.5 py-1 text-xs text-muted-foreground shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/80"
               >
-                {showArtifact ? (
-                  <PanelRightClose className="size-6" />
-                ) : (
-                  <PanelRightOpen className="size-6" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent
-              side="bottom"
-              align="end"
-              className="rounded-lg border border-border/60 bg-background/95 px-2.5 py-1 text-xs text-muted-foreground shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/80"
-            >
-              Artifact
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+                Artifact
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
     </header>
   );

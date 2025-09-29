@@ -20,13 +20,13 @@ export function SelectedModelInfo({ form, selectedModel }: SelectedModelInfoProp
       <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
         <div>
           <p className="text-sm font-medium text-muted-foreground">Model ID</p>
-          <p className="text-sm">{modelId}</p>
+          <p className="text-sm">{modelId || 'Select a model'}</p>
         </div>
         <div>
           <p className="text-sm font-medium text-muted-foreground">
             Context Length
           </p>
-          <p className="text-sm">{contextLength}</p>
+          <p className="text-sm">{contextLength || 'Select a model'}</p>
         </div>
         <div>
           <p className="text-sm font-medium text-muted-foreground">Provider ID</p>

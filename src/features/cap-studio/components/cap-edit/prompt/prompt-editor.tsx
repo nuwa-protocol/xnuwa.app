@@ -18,6 +18,7 @@ import {
 } from '@/shared/components/ui';
 import { promptVariables } from '@/shared/constants/cap';
 import { cn } from '@/shared/utils';
+import { ImprovePrompt } from './improve-prompt';
 import { InlineUISetup } from './inline-ui-setup';
 import { PromptSuggestions } from './prompt-suggestions';
 
@@ -155,12 +156,11 @@ export function PromptEditor({
           />
           {/* Inline UI Setup */}
           <InlineUISetup onInsertPrompt={insertText} />
+          {/* Improve Prompt */}
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-xs text-muted-foreground">
-            {wordCount} words
-          </span>
+          <ImprovePrompt prompt={value} onApply={handleChange} />
         </div>
       </div>
 
@@ -168,6 +168,9 @@ export function PromptEditor({
       <div className="relative">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="write">
+            <span className="absolute top-4 right-4 text-xs text-muted-foreground">
+              {wordCount} words
+            </span>
             <Textarea
               ref={textareaRef}
               value={value}

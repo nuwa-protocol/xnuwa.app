@@ -3,7 +3,7 @@ import type {
   ModelDetails,
   OpenRouterAPIResponse,
   OpenRouterModel,
-} from './components/cap-edit/model/model-selector/type';
+} from '../components/cap-edit/model/model-selector/type';
 
 async function modelFetch(gatewayUrl: string): Promise<OpenRouterAPIResponse> {
   const authorizedFetch = createAuthorizedFetch();

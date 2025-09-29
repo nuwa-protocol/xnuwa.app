@@ -10,7 +10,6 @@ import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useChatContext } from '../contexts/chat-context';
 import { Artifact } from './artifact';
 import { ChatContent } from './chat-content';
-import Header from './header';
 
 export function Chat({ isReadonly }: { isReadonly: boolean }) {
   const { currentCap } = CurrentCapStore();
@@ -39,9 +38,8 @@ export function Chat({ isReadonly }: { isReadonly: boolean }) {
       <div className="flex w-full h-full">
         <ResizablePanelGroup direction="horizontal">
           {/* Always render chat content; it should expand to full width when the artifact side is visually hidden */}
-          <ResizablePanel defaultSize={40} minSize={30} className='flex flex-col w-full h-full'>
-            <Header chatId={chat.id} showArtifact={showArtifact} setShowArtifact={setShowArtifact} />
-            <ChatContent isReadonly={isReadonly} />
+          <ResizablePanel defaultSize={40} minSize={30} className='w-full h-full'>
+            <ChatContent isReadonly={isReadonly} showArtifact={showArtifact} setShowArtifact={setShowArtifact} />
           </ResizablePanel>
           <ResizableHandle
             withHandle
@@ -75,5 +73,5 @@ export function Chat({ isReadonly }: { isReadonly: boolean }) {
     );
   }
 
-  return <ChatContent isReadonly={isReadonly} />;
+  return <ChatContent isReadonly={isReadonly} showArtifact={showArtifact} setShowArtifact={setShowArtifact} />;
 }
