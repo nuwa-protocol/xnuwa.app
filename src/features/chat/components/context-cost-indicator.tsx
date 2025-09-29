@@ -1,6 +1,8 @@
-import type { LanguageModelUsage } from 'ai';
+import { useChat } from '@ai-sdk/react';
 import { BrushCleaning } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchTransactionsFromChatSession } from '@/features/wallet/services';
 import type { PaymentTransaction } from '@/features/wallet/types';
 import { formatUsdCost } from '@/features/wallet/utils';
 import { Button } from '@/shared/components/ui/button';
@@ -9,24 +11,81 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import { generateUUID } from '@/shared/utils';
+import { useChatContext } from '../contexts/chat-context';
+import { ChatSessionsStore } from '../stores/chat-sessions-store';
 
-interface ContextCostIndicatorProps {
-  contextUsage?: LanguageModelUsage;
-  contextLength: number;
-  paymentInfo?: {
+export function ContextCostIndicator() {
+  const navigate = useNavigate();
+  const { chatSessions, updateSession, updateMessages } = ChatSessionsStore();
+  const [paymentInfo, setPaymentInfo] = useState<{
     transactions: PaymentTransaction[];
     totalAmount: bigint;
-  } | null;
-  onClearContext?: () => void;
-}
+  } | null>(null);
 
-export function ContextCostIndicator({
-  contextUsage,
-  contextLength,
-  paymentInfo,
-  onClearContext,
-}: ContextCostIndicatorProps) {
-  const navigate = useNavigate();
+  const { chat } = useChatContext();
+  const { setMessages } = useChat({ chat });
+  const { currentCap } = CurrentCapStore();
+  const session = chatSessions[chat.id || ''] || null;
+  const contextUsage = session?.contextUsage;
+  const contextLength = currentCap.core.model.contextLength;
+
+  useEffect(() => {
+    const getPaymentInfo = async () => {
+      const transactions = await fetchTransactionsFromChatSession(session);
+      const totalAmount = transactions.reduce(
+        (sum, tx) => sum + (tx.details?.payment?.costUsd || 0n),
+        0n,
+      );
+      setPaymentInfo({
+        transactions,
+        totalAmount,
+      });
+    };
+    getPaymentInfo();
+  }, [session]);
+
+  const handleClearConversation = async () => {
+    // add a clear context message seperator to the conversation messages
+    setMessages((messages) => {
+      // if already have clear context message, do nothing
+      if (
+        messages[messages.length - 1].role === 'system' &&
+        messages[messages.length - 1].parts?.some(
+          (part) =>
+            part.type === 'data-uimark' && part.data === 'clear-context',
+        )
+      ) {
+        return messages;
+      }
+      // if not have clear context message, add it
+      const contextSeperatorMessage = {
+        id: generateUUID(),
+        role: 'system' as const,
+        parts: [
+          {
+            type: 'data-uimark' as const,
+            data: 'clear-context',
+          },
+        ],
+      };
+      const updatedMessages = [...messages, contextSeperatorMessage];
+      updateMessages(chat.id, updatedMessages);
+      return updatedMessages;
+    });
+
+    // clear the context usage
+    updateSession(chat.id, {
+      contextUsage: {
+        inputTokens: 0,
+        outputTokens: 0,
+        totalTokens: 0,
+        reasoningTokens: 0,
+        cachedInputTokens: 0,
+      },
+    });
+  };
 
   const contextPercentage = contextUsage?.totalTokens
     ? Math.round((contextUsage.totalTokens / contextLength) * 100)
@@ -53,23 +112,21 @@ export function ContextCostIndicator({
         >
           {/* Background progress bar */}
           <div
-            className={`absolute inset-0 transition-all duration-300 ${
-              contextPercentage > 80
-                ? 'bg-red-500/20'
-                : contextPercentage > 60
-                  ? 'bg-yellow-500/20'
-                  : 'bg-green-500/20'
-            }`}
+            className={`absolute inset-0 transition-all duration-300 ${contextPercentage > 80
+              ? 'bg-red-500/20'
+              : contextPercentage > 60
+                ? 'bg-yellow-500/20'
+                : 'bg-green-500/20'
+              }`}
           />
           {/* Progress fill */}
           <div
-            className={`absolute left-0 top-0 h-full transition-all duration-300 ${
-              contextPercentage > 80
-                ? 'bg-red-500/40'
-                : contextPercentage > 60
-                  ? 'bg-yellow-500/40'
-                  : 'bg-green-500/40'
-            }`}
+            className={`absolute left-0 top-0 h-full transition-all duration-300 ${contextPercentage > 80
+              ? 'bg-red-500/40'
+              : contextPercentage > 60
+                ? 'bg-yellow-500/40'
+                : 'bg-green-500/40'
+              }`}
             style={{ width: `${Math.min(contextPercentage, 100)}%` }}
           />
           {/* Content */}
@@ -78,7 +135,7 @@ export function ContextCostIndicator({
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 p-0">
+      <DropdownMenuContent align="start" className="w-80 p-0">
         <div className="px-6 pt-6">
           {/* Context Usage Section */}
           {contextUsage && (
@@ -96,13 +153,12 @@ export function ContextCostIndicator({
               <div className="space-y-2">
                 <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      contextPercentage > 80
-                        ? 'bg-red-500'
-                        : contextPercentage > 60
-                          ? 'bg-yellow-500'
-                          : 'bg-green-500'
-                    }`}
+                    className={`h-full rounded-full transition-all duration-300 ${contextPercentage > 80
+                      ? 'bg-red-500'
+                      : contextPercentage > 60
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
+                      }`}
                     style={{ width: `${Math.min(contextPercentage, 100)}%` }}
                   />
                 </div>
@@ -146,19 +202,17 @@ export function ContextCostIndicator({
           )}
 
           {/* Clear Context Section */}
-          {onClearContext && (
-            <div className="py-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClearContext}
-                className="w-full h-10 rounded-lg bg-orange-50 hover:bg-orange-100 border border-orange-200 hover:border-orange-300 text-orange-700 hover:text-orange-800 transition-all duration-200"
-              >
-                <BrushCleaning className="h-4 w-4 mr-2" />
-                <span className="font-medium">Clear Conversation Context</span>
-              </Button>
-            </div>
-          )}
+          <div className="py-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearConversation}
+              className="w-full h-10 rounded-lg bg-orange-50 hover:bg-orange-100 border border-orange-200 hover:border-orange-300 text-orange-700 hover:text-orange-800 transition-all duration-200"
+            >
+              <BrushCleaning className="h-4 w-4 mr-2" />
+              <span className="font-medium">Clear Conversation Context</span>
+            </Button>
+          </div>
 
           {/* Separator */}
           <div className="border-t" />

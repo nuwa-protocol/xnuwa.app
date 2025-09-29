@@ -14,6 +14,7 @@ import { useChatContext } from '../contexts/chat-context';
 import { usePersistentInput } from '../hooks/use-persistent-input';
 import { ChatSessionsStore } from '../stores';
 import { type AttachmentData, AttachmentInput } from './attachment-input';
+import { ContextCostIndicator } from './context-cost-indicator';
 import { InputSelections } from './input-selections';
 import { PreviewAttachment } from './preview-attachment';
 
@@ -145,11 +146,9 @@ function PureMultimodalInput({ className }: { className?: string }) {
         {/* Cap Selector and Send Button */}
         <div className="flex justify-between items-center p-2">
           <div className="flex items-center gap-2 justify-between w-full">
-            <AttachmentInput
-              attachments={attachments}
-              onAttachmentsChange={setAttachments}
-            />
-
+            <div className="flex items-center gap-2">
+              <ContextCostIndicator />
+            </div>
             {status === 'submitted' || status === 'streaming' ? (
               <StopButton
                 stop={stop}
@@ -157,14 +156,20 @@ function PureMultimodalInput({ className }: { className?: string }) {
                 chatId={chat.id}
               />
             ) : (
-              <SendButton
-                input={input}
-                attachments={attachments}
-                submitForm={handleSend}
-                currentCap={currentCap}
-                isCurrentCapMCPInitialized={isInitialized}
-                isCurrentCapMCPError={isError}
-              />
+              <div className="flex items-center gap-2">
+                <AttachmentInput
+                  attachments={attachments}
+                  onAttachmentsChange={setAttachments}
+                />
+                <SendButton
+                  input={input}
+                  attachments={attachments}
+                  submitForm={handleSend}
+                  currentCap={currentCap}
+                  isCurrentCapMCPInitialized={isInitialized}
+                  isCurrentCapMCPError={isError}
+                />
+              </div>
             )}
           </div>
         </div>

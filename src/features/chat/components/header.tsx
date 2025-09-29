@@ -1,77 +1,34 @@
-import { useChat } from '@ai-sdk/react';
-import { useEffect, useState } from 'react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip';
+import { PanelRightClose, PanelRightOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CapSelector } from '@/features/cap-store/components';
-import { fetchTransactionsFromChatSession } from '@/features/wallet/services';
-import type { PaymentTransaction } from '@/features/wallet/types';
-import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import { generateUUID } from '@/shared/utils';
-import { useChatContext } from '../contexts/chat-context';
+import { Button } from '@/shared/components';
 import { ChatSessionsStore } from '../stores';
 import { ChatDropdownMenu } from './chat-dropdown-menu';
-import { ContextCostIndicator } from './context-cost-indicator';
 
 interface HeaderProps {
   chatId: string;
+  showArtifact: boolean;
+  setShowArtifact: (showArtifact: boolean) => void;
 }
 
-export default function Header({ chatId }: HeaderProps) {
+export default function Header({
+  chatId,
+  showArtifact,
+  setShowArtifact,
+}: HeaderProps) {
   const navigate = useNavigate();
-  const { chatSessions, updateSession, deleteSession, updateMessages } =
-    ChatSessionsStore();
-  const [paymentInfo, setPaymentInfo] = useState<{
-    transactions: PaymentTransaction[];
-    totalAmount: bigint;
-  } | null>(null);
+  const { chatSessions, updateSession, deleteSession } = ChatSessionsStore();
   const session = chatSessions[chatId || ''] || null;
   const title = session?.title || 'New Chat';
-  const { chat } = useChatContext();
-  const { setMessages } = useChat({ chat });
-  const { currentCap } = CurrentCapStore();
 
   const handleRename = async (newTitle: string) => {
     await updateSession(chatId, { title: newTitle });
-  };
-
-  const handleClearConversation = async () => {
-    // add a clear context message seperator to the conversation messages
-    setMessages((messages) => {
-      // if already have clear context message, do nothing
-      if (
-        messages[messages.length - 1].role === 'system' &&
-        messages[messages.length - 1].parts?.some(
-          (part) =>
-            part.type === 'data-uimark' && part.data === 'clear-context',
-        )
-      ) {
-        return messages;
-      }
-      // if not have clear context message, add it
-      const contextSeperatorMessage = {
-        id: generateUUID(),
-        role: 'system' as const,
-        parts: [
-          {
-            type: 'data-uimark' as const,
-            data: 'clear-context',
-          },
-        ],
-      };
-      const updatedMessages = [...messages, contextSeperatorMessage];
-      updateMessages(chatId, updatedMessages);
-      return updatedMessages;
-    });
-
-    // clear the context usage
-    updateSession(chatId, {
-      contextUsage: {
-        inputTokens: 0,
-        outputTokens: 0,
-        totalTokens: 0,
-        reasoningTokens: 0,
-        cachedInputTokens: 0,
-      },
-    });
   };
 
   const handleDeleteConversation = async () => {
@@ -85,22 +42,9 @@ export default function Header({ chatId }: HeaderProps) {
     }
   };
 
-  useEffect(() => {
-    const getPaymentInfo = async () => {
-      const transactions = await fetchTransactionsFromChatSession(session);
-      const totalAmount = transactions.reduce(
-        (sum, tx) => sum + (tx.details?.payment?.costUsd || 0n),
-        0n,
-      );
-      setPaymentInfo({
-        transactions,
-        totalAmount,
-      });
-    };
-    getPaymentInfo();
-  }, [session]);
-
-  const contextLength = currentCap.core.model.contextLength;
+  const handleToggleArtifact = () => {
+    setShowArtifact(!showArtifact);
+  };
 
   return (
     <header className="w-full sticky top-0 z-10 grid grid-cols-3 items-center px-3 pt-2">
@@ -109,8 +53,9 @@ export default function Header({ chatId }: HeaderProps) {
         <CapSelector />
       </div>
       {/* Center: Status area (AI or Save) */}
-      {session && (
-        <div className="flex flex-row justify-center items-center w-full">
+
+      <div className="flex flex-row justify-center items-center w-full">
+        {session && (
           <div className="flex flex-row justify-center items-center gap-2">
             <p className="text-center text-sm py-1 rounded-lg font-medium text-foreground/90 md:text-base line-clamp-1">
               {title}
@@ -122,19 +67,37 @@ export default function Header({ chatId }: HeaderProps) {
               onDelete={handleDeleteConversation}
             />
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
       {/* Right: Context and Cost Indicator */}
-      {session && (
-        <div className="justify-self-end px-2">
-          <ContextCostIndicator
-            contextUsage={session?.contextUsage}
-            contextLength={contextLength}
-            paymentInfo={paymentInfo}
-            onClearContext={handleClearConversation}
-          />
-        </div>
-      )}
+      <div className="justify-self-end px-2">
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleToggleArtifact}
+                variant="ghost"
+                size="sm"
+                aria-label="Toggle artifact panel"
+              >
+                {showArtifact ? (
+                  <PanelRightClose className="size-6" />
+                ) : (
+                  <PanelRightOpen className="size-6" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent
+              side="bottom"
+              align="end"
+              className="rounded-lg border border-border/60 bg-background/95 px-2.5 py-1 text-xs text-muted-foreground shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/80"
+            >
+              Artifact
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
     </header>
   );
 }
