@@ -12,7 +12,7 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
@@ -33,6 +33,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/components/ui/dialog';
+import {
+  CodeBlock,
+  CodeBlockCopyButton,
+} from '@/shared/components/ui/shadcn-io/code-block';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import { APP_URL } from '@/shared/config/app';
 import { CapStudioStore } from '../../stores';
@@ -65,6 +77,19 @@ export function CapCard({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const suppressCardClickUntilRef = useRef<number>(0); // suppress accidental card click after dialog closes
+
+  // Build the exportable JSON once per cap change (omit id/authorDID)
+  const exportJson = useMemo(() => {
+    try {
+      const { id: _omitId, authorDID: _omitAuthor, ...exportCap } =
+        (cap.capData as any) || {};
+      return JSON.stringify(exportCap, null, 2);
+    } catch {
+      return '{}';
+    }
+  }, [cap.capData]);
 
   const handleDelete = () => {
     deleteCap(cap.id);
@@ -86,6 +111,8 @@ export function CapCard({
   };
 
   const handleCardClick = () => {
+    // Prevent opening edit immediately after closing the export dialog (ghost click)
+    if (Date.now() < suppressCardClickUntilRef.current) return;
     if (!isMultiSelectMode && onEnterMultiSelectMode) {
       onEnterMultiSelectMode();
     } else if (isMultiSelectMode && onToggleSelect) {
@@ -98,17 +125,15 @@ export function CapCard({
     addSuffix: true,
   });
 
-  // Export current cap data as a pretty-printed JSON file
-  const handleExportJson = () => {
+  // Trigger the dialog that previews export JSON
+  const handleOpenExportDialog = () => {
+    setExportDialogOpen(true);
+  };
+
+  // Save the JSON to file (used by dialog "Save JSON")
+  const handleDownloadJson = () => {
     try {
-      // omit top-level `id` and `authorDID` from export
-      const {
-        id: _omitId,
-        authorDID: _omitAuthor,
-        ...exportCap
-      } = cap.capData as any;
-      const json = JSON.stringify(exportCap, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
+      const blob = new Blob([exportJson], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -121,6 +146,14 @@ export function CapCard({
     } catch (err) {
       console.error(err);
       toast.error('Failed to export cap JSON');
+    }
+  };
+
+  // Centralize open state changes to also set a short suppression window on close
+  const handleExportDialogOpenChange = (open: boolean) => {
+    setExportDialogOpen(open);
+    if (!open) {
+      suppressCardClickUntilRef.current = Date.now() + 300;
     }
   };
 
@@ -280,7 +313,7 @@ export function CapCard({
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleExportJson();
+                      handleOpenExportDialog();
                     }}
                   >
                     <Download className="h-4 w-4 mr-2" />
@@ -339,6 +372,39 @@ export function CapCard({
           },
         ]}
       />
+
+      {/* Export JSON preview dialog with copy/save actions */}
+      <Dialog open={exportDialogOpen} onOpenChange={handleExportDialogOpenChange}>
+        <DialogContent
+          className="sm:max-w-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DialogHeader>
+            <DialogTitle>Export JSON</DialogTitle>
+            <DialogDescription>
+              Preview and copy or save the JSON for @{cap.capData.idName}
+            </DialogDescription>
+          </DialogHeader>
+
+          <CodeBlock code={exportJson} language="json" className="max-h-[60vh] overflow-auto">
+            <CodeBlockCopyButton
+              onCopy={() => toast.success('JSON copied to clipboard')}
+              onError={() => toast.error('Failed to copy JSON')}
+              title="Copy JSON"
+            />
+          </CodeBlock>
+
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => handleExportDialogOpenChange(false)}>
+              Close
+            </Button>
+            <Button onClick={handleDownloadJson}>
+              <Download className="h-4 w-4 mr-2" />
+              Save JSON
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
