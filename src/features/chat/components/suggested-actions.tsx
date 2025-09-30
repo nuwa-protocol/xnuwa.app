@@ -10,7 +10,8 @@ import { useChatContext } from '../contexts';
 function PureSuggestedActions() {
   const { chat } = useChatContext();
   const { sendMessage } = useChat({ chat });
-  const { currentCap: cap } = CurrentCapStore();
+  const { getCurrentCap } = CurrentCapStore();
+  const cap = getCurrentCap();
 
   const suggestedActions = cap?.core.prompt.suggestions || [];
   // Rows: 2 by default; 3 when there are more than 6 suggestions

@@ -26,7 +26,8 @@ export const Artifact = ({ artifact }: ArtifactProps) => {
   } = useArtifact();
 
   const { chat } = useChatContext();
-  const { currentCap } = CurrentCapStore();
+  const { getCurrentCap } = CurrentCapStore();
+  const cap = getCurrentCap();
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden">
@@ -40,7 +41,7 @@ export const Artifact = ({ artifact }: ArtifactProps) => {
         <CapUIRenderer
           key={`${artifact}-${chat.id}`}
           srcUrl={artifact.srcUrl}
-          title={currentCap.idName}
+          title={cap?.idName || ''}
           artifact={true}
           onSendPrompt={handleSendPrompt}
           onAddSelection={handleAddSelection}

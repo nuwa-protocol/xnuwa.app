@@ -14,6 +14,8 @@ export function useChatInstance(chatId: string, onStreamStart?: () => void) {
   const { updateTitle } = useUpdateChatTitle();
   const [searchParams, setSearchParams] = useSearchParams();
   const { currentCap, setCurrentCap } = CurrentCapStore();
+  const cap =
+    currentCap && ('capData' in currentCap ? currentCap.capData : currentCap);
 
   // chat error handler
   const handleChatError = useCallback(
@@ -109,7 +111,7 @@ export function useChatInstance(chatId: string, onStreamStart?: () => void) {
 
   // if current session has a cap, set it to the current cap
   useEffect(() => {
-    if (chatSessions[chatId]?.cap && chatSessions[chatId]?.cap !== currentCap) {
+    if (chatSessions[chatId]?.cap && chatSessions[chatId]?.cap !== cap) {
       setCurrentCap(chatSessions[chatId]?.cap);
     }
   }, [chatSessions[chatId]?.cap, setCurrentCap]);

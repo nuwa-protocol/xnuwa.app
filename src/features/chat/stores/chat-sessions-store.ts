@@ -12,6 +12,9 @@ import type { ChatPayment, ChatSelection, ChatSession } from '../types';
 // ================= Constants ================= //
 export const createInitialChatSession = (chatId: string): ChatSession => {
   const { currentCap } = CurrentCapStore.getState();
+  if (!currentCap) {
+    throw new Error('No current cap found');
+  }
   return {
     id: chatId,
     title: 'New Chat',

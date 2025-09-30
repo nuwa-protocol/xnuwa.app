@@ -17,7 +17,7 @@ export function CapStudio() {
 
   const handleTestCap = (cap: LocalCap) => {
     // Set this cap as the current cap for testing
-    setCurrentCap(cap.capData);
+    setCurrentCap(cap);
     navigate(`/chat`);
   };
 

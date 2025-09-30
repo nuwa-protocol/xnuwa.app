@@ -7,22 +7,22 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/shared/components/ui/resizable';
-import { DefaultCapId } from '@/shared/constants/cap';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useChatContext } from '../contexts/chat-context';
 import { Artifact } from './artifact';
 import { ChatContent } from './chat-content';
 
 export function Chat({ isReadonly }: { isReadonly: boolean }) {
-  const { currentCap } = CurrentCapStore();
+  const { getCurrentCap } = CurrentCapStore();
+  const currentCap = getCurrentCap();
   const navigate = useNavigate();
 
   // if the user has not selected any cap before, go to the explore page
-  if (currentCap.id === DefaultCapId) {
+  if (!currentCap) {
     navigate('/explore');
   }
 
-  const artifact = currentCap.core.artifact;
+  const artifact = currentCap?.core.artifact;
   const { chat } = useChatContext();
   const [showArtifact, setShowArtifact] = useState(false);
   const { messages } = useChat({ chat });

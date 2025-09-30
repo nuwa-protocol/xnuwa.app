@@ -1,7 +1,7 @@
-import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+
 import { useChatContext } from '../contexts/chat-context';
 import { ChatSessionsStore } from '../stores/chat-sessions-store';
-import { CapInfo } from './cap-info';
+import { CurrentCapInfo } from './current-cap-info';
 import Header from './header';
 import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';
@@ -11,7 +11,7 @@ export function ChatContent({ isReadonly, showArtifact, setShowArtifact }: { isR
   const isNewChat = !(
     ChatSessionsStore().chatSessions[chat.id]?.messages.length > 0
   );
-  const { currentCap } = CurrentCapStore();
+
 
   return (
     <div className="flex flex-col h-full">
@@ -22,7 +22,7 @@ export function ChatContent({ isReadonly, showArtifact, setShowArtifact }: { isR
       />
       {isNewChat ? (
         <div className="flex-1 flex items-center justify-center px-4">
-          <CapInfo cap={currentCap} />
+          <CurrentCapInfo />
         </div>
       ) : (
         <Messages isReadonly={isReadonly} />
