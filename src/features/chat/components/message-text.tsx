@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Streamdown } from 'streamdown';
 import { Button } from '@/shared/components/ui/button';
 import {
   Tooltip,
@@ -19,7 +20,6 @@ import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 import { cn } from '@/shared/utils';
 import { useDeleteMessagesAfterId } from '../hooks';
 import { MessageEditor } from './message-editor';
-import { AssistantResponse } from './response';
 
 const MAX_MESSAGE_LENGTH = 150;
 
@@ -101,9 +101,7 @@ export const MessageText = ({
             },
           )}
         >
-          <AssistantResponse parseIncompleteMarkdown={true}>
-            {displayText}
-          </AssistantResponse>
+          <Streamdown parseIncompleteMarkdown={true}>{displayText}</Streamdown>
 
           {isUserMessageLong && (
             <Button
