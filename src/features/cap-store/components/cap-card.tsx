@@ -84,8 +84,7 @@ export function CapCard({ cap }: CapCardProps) {
     >
       <div className="flex items-start gap-3">
         <CapAvatar
-          capName={capMetadata.displayName}
-          capThumbnail={capMetadata.thumbnail}
+          cap={cap}
           size="7xl"
           className="rounded-md"
         />

@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChatDropdownMenu } from '@/features/chat/components/chat-dropdown-menu';
 import { ChatSessionsStore } from '@/features/chat/stores';
 import type { ChatSession } from '@/features/chat/types';
+import { CapAvatar } from '@/shared/components';
 import { cn } from '@/shared/utils';
 import { useSidebar } from './sidebar';
 
@@ -64,6 +65,8 @@ export const SidebarChatItem = ({
   const isSelected =
     location.pathname.startsWith('/chat') && chatSessionId === chat.id;
 
+  const isLocalCap = 'capData' in chat.cap;
+
   return (
     <div
       key={chat.id}
@@ -101,7 +104,13 @@ export const SidebarChatItem = ({
           }}
           className="flex-1 min-w-0 group-hover/sidebar:translate-x-1 transition duration-150"
         >
-          <div className="text-sm truncate max-w-[200px]">{chat.title}</div>
+          <div className="max-w-[210px] flex flex-row items-center gap-2">
+            {/* Avatar with a tiny corner dot when using a local cap */}
+            <div className="relative shrink-0">
+              <CapAvatar cap={chat.cap} size="md" className={cn("rounded-md", isLocalCap && "border border-2  border-muted-foreground opacity-50")} />
+            </div>
+            <span className="truncate text-sm">{chat.title}</span>
+          </div>
         </motion.div>
       </button>
       {((open && (hoveredChatId === chat.id || isHovered)) || isDialogOpen) && (

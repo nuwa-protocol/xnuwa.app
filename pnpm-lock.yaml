@@ -60,8 +60,8 @@ importers:
         specifier: ^1.13.2
         version: 1.18.0
       '@nuwa-ai/cap-kit':
-        specifier: 0.6.3
-        version: 0.6.3(typescript@5.8.3)
+        specifier: 0.6.5
+        version: 0.6.5(typescript@5.8.3)
       '@nuwa-ai/identity-kit':
         specifier: ^0.6.0
         version: 0.6.0(typescript@5.8.3)
@@ -72,8 +72,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0(express@5.1.0)(typescript@5.8.3)
       '@nuwa-ai/ui-kit':
-        specifier: ^0.5.8
-        version: 0.5.8(react@19.1.1)
+        specifier: ^0.6.0
+        version: 0.6.0(react@19.1.1)
       '@openrouter/ai-sdk-provider':
         specifier: ^1.2.0
         version: 1.2.0(ai@5.0.44(zod@3.25.76))(zod@3.25.76)
@@ -1208,8 +1208,8 @@ packages:
     resolution: {integrity: sha512-JvKyB6YwS3quM+88JPR0axeRgvdDu3Pv6mdZUy+w4qVkCzGgumb9bXG/TmtDRQv+671yaofVfXSQmFLlWU5qPQ==}
     engines: {node: '>=18'}
 
-  '@modelcontextprotocol/sdk@1.18.1':
-    resolution: {integrity: sha512-d//GE8/Yh7aC3e7p+kZG8JqqEAwwDUmAfvH1quogtbk+ksS6E0RR6toKKESPYYZVre0meqkJb27zb+dhqE9Sgw==}
+  '@modelcontextprotocol/sdk@1.18.2':
+    resolution: {integrity: sha512-beedclIvFcCnPrYgHsylqiYJVJ/CI47Vyc4tY8no1/Li/O8U4BTlJfy6ZwxkYwx+Mx10nrgwSVrA7VBbhh4slg==}
     engines: {node: '>=18'}
 
   '@msgpack/msgpack@3.1.2':
@@ -1286,8 +1286,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@nuwa-ai/cap-kit@0.6.3':
-    resolution: {integrity: sha512-Liynp6k98M314Eu+42/xNKFp4+mhwNuQAc5PUYqVvCdWPB5tTfwVbuYvET0jeeCtCztzc0edDR0BSbMNCXp5Gg==}
+  '@nuwa-ai/cap-kit@0.6.5':
+    resolution: {integrity: sha512-RwCpbSXgGw03uypIZ8n2G8y7uRntUXJ1dkg5uhu9Zns9oRxSsYjueVMdOU1LfVEHPeKrMKbRU7ef9nOitJj3FA==}
 
   '@nuwa-ai/identity-kit-web@0.6.0':
     resolution: {integrity: sha512-kiRGLfKVU+dXlT7TN94AwFo9+Vmb0to12emKe9EQ04xDrN2qo1k1b9Ec2xZc5z0V+BYr0ndPOxgpF9DwxYh2uQ==}
@@ -1296,9 +1296,6 @@ packages:
     peerDependenciesMeta:
       react:
         optional: true
-
-  '@nuwa-ai/identity-kit@0.5.1':
-    resolution: {integrity: sha512-4IAAAs/NEg97rvLcp0OTxAHsXFU5Z7JojzXViDGrlVYQBlcNMV7wjghpDZYf2d1EHc04CthIzE/N9BeF4g9Xtg==}
 
   '@nuwa-ai/identity-kit@0.6.0':
     resolution: {integrity: sha512-AV08WPJBnk826jiZ8af7OCNx8Grns2mByqpT56h2ZM9/3srtnXzlXs4M9YcyJiar3vn7lfJqpDADkMVQdXs9Kg==}
@@ -1314,8 +1311,8 @@ packages:
       pg:
         optional: true
 
-  '@nuwa-ai/ui-kit@0.5.8':
-    resolution: {integrity: sha512-i1aIlCLrUzmFzXpQrO1Ch+S6Y6L6RLW5C+EfSeOl8m9yHxLmAKQ08zG0y58RpApwrajonyEHLKrKWW8LcPTZEQ==}
+  '@nuwa-ai/ui-kit@0.6.0':
+    resolution: {integrity: sha512-ODcAAlLoKLGsZ052C/PxBjGnJBkOouTtd/0vnYKVewULxvhCu3wT0g/q9KSxIINwuPK0hzy7dyTLENcAWHLZwA==}
     peerDependencies:
       react: '>=16.8.0'
 
@@ -2413,10 +2410,6 @@ packages:
     resolution: {integrity: sha512-APwKy6YUhvZaEoHyM+9xqmTpviEI+9eL7LoCH+aLcvWYHJ663qG5zx7WzWZY+a9qkg5JtzcMyJ9z0WtQBMDmgA==}
     cpu: [x64]
     os: [win32]
-
-  '@roochnetwork/rooch-sdk@0.3.6':
-    resolution: {integrity: sha512-dbej3xzpb2WK9CJh90cT51hTSCee/GHRFIHbWhlCGse1zaiJh4KDuP+jpJJH5PYrrOQsCZNHU1WJ0hQTH8UNIA==}
-    engines: {node: '>=18.0.0'}
 
   '@roochnetwork/rooch-sdk@0.4.0':
     resolution: {integrity: sha512-8YEqhLL7c1/wDpxkbWzFhoL6Aj1pe62Yqdb/KsFnYqoJgj47MTHaf0J0vDl6bVVPJAWPDzCVVQyMz2WyfK2OlQ==}
@@ -8998,7 +8991,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@modelcontextprotocol/sdk@1.18.1':
+  '@modelcontextprotocol/sdk@1.18.2':
     dependencies:
       ajv: 6.12.6
       content-type: 1.0.5
@@ -9075,13 +9068,13 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@nuwa-ai/cap-kit@0.6.3(typescript@5.8.3)':
+  '@nuwa-ai/cap-kit@0.6.5(typescript@5.8.3)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.18.0
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
-      '@nuwa-ai/identity-kit': 0.5.1(typescript@5.8.3)
-      '@roochnetwork/rooch-sdk': 0.3.6(typescript@5.8.3)
+      '@nuwa-ai/identity-kit': 0.6.0(typescript@5.8.3)
+      '@roochnetwork/rooch-sdk': 0.4.0(typescript@5.8.3)
       ai: 5.0.44(zod@3.25.76)
       js-yaml: 4.1.0
       multiformats: 9.9.0
@@ -9095,16 +9088,6 @@ snapshots:
       '@nuwa-ai/identity-kit': 0.6.0(typescript@5.8.3)
     optionalDependencies:
       react: 19.1.1
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-
-  '@nuwa-ai/identity-kit@0.5.1(typescript@5.8.3)':
-    dependencies:
-      '@noble/curves': 1.9.7
-      '@noble/hashes': 1.8.0
-      '@roochnetwork/rooch-sdk': 0.3.6(typescript@5.8.3)
-      multiformats: 9.9.0
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -9144,9 +9127,9 @@ snapshots:
       - sury
       - typescript
 
-  '@nuwa-ai/ui-kit@0.5.8(react@19.1.1)':
+  '@nuwa-ai/ui-kit@0.6.0(react@19.1.1)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.18.1
+      '@modelcontextprotocol/sdk': 1.18.2
       penpal: 7.0.4
       react: 19.1.1
     transitivePeerDependencies:
@@ -10851,27 +10834,6 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.50.2':
     optional: true
-
-  '@roochnetwork/rooch-sdk@0.3.6(typescript@5.8.3)':
-    dependencies:
-      '@mysten/bcs': 1.0.4
-      '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
-      '@scure/base': 1.1.9
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      '@suchipi/femver': 1.0.0
-      bech32: 2.0.0
-      bs58check: 4.0.0
-      buffer: 6.0.3
-      debug: 4.4.3
-      eventsource: 3.0.6
-      rxjs: 7.8.2
-      tweetnacl: 1.0.3
-      valibot: 0.41.0(typescript@5.8.3)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
 
   '@roochnetwork/rooch-sdk@0.4.0(typescript@5.8.3)':
     dependencies:

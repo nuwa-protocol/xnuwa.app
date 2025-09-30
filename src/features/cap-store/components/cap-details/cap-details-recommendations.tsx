@@ -97,8 +97,7 @@ export function CapDetailsRecommendations({
                     className="flex items-center gap-3 rounded-md border px-2 py-2 hover:bg-muted cursor-pointer"
                   >
                     <CapAvatar
-                      capName={meta.displayName}
-                      capThumbnail={meta.thumbnail}
+                      cap={cap}
                       size="lg"
                       className="rounded-md"
                     />

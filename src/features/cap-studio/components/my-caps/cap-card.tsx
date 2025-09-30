@@ -196,7 +196,7 @@ export function CapCard({
           )}
           <div className="flex items-start space-x-4 flex-1 min-w-0">
             <div className="w-12 h-12 flex items-center justify-center shrink-0">
-              <CapAvatar capName={cap.capData.idName} capThumbnail={cap.capData.metadata.thumbnail} size="3xl" className='rounded-md' />
+              <CapAvatar cap={cap} size="3xl" className='rounded-md' />
             </div>
 
             <div className="flex-1 min-w-0">
