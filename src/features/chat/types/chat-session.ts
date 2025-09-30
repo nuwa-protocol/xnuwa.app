@@ -1,4 +1,5 @@
 import type { LanguageModelUsage, UIMessage } from 'ai';
+import type { LocalCap } from '@/features/cap-studio/types';
 import type { Cap } from '@/shared/types';
 
 export type ChatPaymentType = 'generate-title' | 'chat-message' | 'ai-request';
@@ -29,7 +30,7 @@ export interface ChatSession {
   updatedAt: number;
   messages: UIMessage[];
   payments: ChatPayment[];
-  cap: Cap;
+  cap: Cap | LocalCap;
   artifactState?: ChatArtifactState;
   selections?: ChatSelection[];
   contextUsage: LanguageModelUsage;

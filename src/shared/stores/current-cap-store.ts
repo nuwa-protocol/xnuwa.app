@@ -1,16 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { LocalCap } from '@/features/cap-studio/types';
 import { RemoteMCPManager } from '@/shared/services/global-mcp-manager';
 import { createLocalStoragePersistConfig } from '@/shared/storage';
 import type { Cap } from '@/shared/types';
 
 // TODO: remove current cap store and use url to identify the current cap
 interface CurrentCapState {
-  currentCap: Cap | null;
+  currentCap: Cap | LocalCap | null;
   isInitialized: boolean;
   isError: boolean;
   errorMessage: string | null;
-  setCurrentCap: (cap: Cap) => void;
+  setCurrentCap: (cap: Cap | LocalCap) => void;
+  getCurrentCap: () => Cap | null;
 
   //current cap artifact tools
   // Tools keyed by chat/session id
@@ -43,7 +45,16 @@ export const CurrentCapStore = create<CurrentCapState>()(
       isError: false,
       errorMessage: null,
 
-      setCurrentCap: (cap: Cap) => {
+      getCurrentCap: () => {
+        const currentCap = get().currentCap;
+        //if it's the local cap, return the capData
+        if (currentCap && 'capData' in currentCap) {
+          return currentCap.capData;
+        }
+        return currentCap;
+      },
+
+      setCurrentCap: (cap: Cap | LocalCap) => {
         set({
           currentCap: cap,
           isInitialized: false,
@@ -53,12 +64,15 @@ export const CurrentCapStore = create<CurrentCapState>()(
 
         // Initialize MCP for the new cap or cleanup if cap has no MCP servers
         const remoteMCPManager = RemoteMCPManager.getInstance();
-        const mcpServers = cap.core.mcpServers || {};
+        const mcpServers =
+          'capData' in cap
+            ? cap.capData.core.mcpServers
+            : cap.core.mcpServers || {};
         const hasRemoteMcps = Object.keys(mcpServers).length > 0;
 
         if (hasRemoteMcps) {
           remoteMCPManager
-            .initializeForCap(cap)
+            .initializeForCap('capData' in cap ? cap.capData : cap)
             .catch((error) => {
               const errorMessage =
                 error instanceof Error
@@ -71,7 +85,7 @@ export const CurrentCapStore = create<CurrentCapState>()(
               });
               console.error(
                 'Failed to initialize MCP for cap:@',
-                cap.idName,
+                'capData' in cap ? cap.capData.idName : cap.idName,
                 error,
               );
             })

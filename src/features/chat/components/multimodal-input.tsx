@@ -24,9 +24,10 @@ function PureMultimodalInput({ className }: { className?: string }) {
   });
   const { input, setInput, textareaRef, clearInput } = usePersistentInput();
   const { width } = useWindowSize();
-  const { currentCap, isInitialized, isError } = CurrentCapStore();
+  const { isInitialized, getCurrentCap } = CurrentCapStore();
   const [attachments, setAttachments] = useState<AttachmentData[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const cap = getCurrentCap();
 
   // Remove attachment
   const removeAttachment = useCallback((index: number) => {
@@ -50,8 +51,8 @@ function PureMultimodalInput({ className }: { className?: string }) {
 
     // Check if Cap has MCP servers and if they are initialized
     const hasMCPServers =
-      currentCap?.core?.mcpServers &&
-      Object.keys(currentCap.core.mcpServers).length > 0;
+      cap?.core?.mcpServers &&
+      Object.keys(cap.core.mcpServers).length > 0;
 
     if (hasMCPServers && !isInitialized) {
       toast.warning('Cap MCP is initializing, please try again later');
@@ -217,13 +218,14 @@ function PureSendButton({
   attachments: AttachmentData[];
 }) {
 
-  const { currentCap, isInitialized, isError } = CurrentCapStore();
+  const { isInitialized, getCurrentCap, isError } = CurrentCapStore();
+  const cap = getCurrentCap();
 
 
   // Check if Cap has MCP servers
   const hasMCPServers =
-    currentCap?.core?.mcpServers &&
-    Object.keys(currentCap.core.mcpServers).length > 0;
+    cap?.core?.mcpServers &&
+    Object.keys(cap.core.mcpServers).length > 0;
 
   const hasContent = input.trim().length > 0 || attachments.length > 0;
 

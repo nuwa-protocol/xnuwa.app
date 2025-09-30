@@ -30,6 +30,8 @@ export const useArtifact = () => {
   const streamMap = useRef(new Map<string, { aborted: boolean }>()); // track streams
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle'); // track saving status
   const { currentCap } = CurrentCapStore();
+  const cap =
+    currentCap && ('capData' in currentCap ? currentCap.capData : currentCap);
 
   const handleSendPrompt = useCallback(
     (prompt: string) => {
@@ -113,7 +115,7 @@ export const useArtifact = () => {
   // Handle stream request
   const handleStreamRequest = useCallback(
     async (request: StreamAIRequest, streamId: string, child: ChildMethods) => {
-      if (!currentCap) {
+      if (!cap) {
         return;
       }
       streamMap.current.set(streamId, { aborted: false });
@@ -121,7 +123,7 @@ export const useArtifact = () => {
         const { textStream } = await CreateAIRequestStream({
           chatId: chat.id,
           prompt: request.prompt,
-          cap: currentCap,
+          cap: cap,
         });
         for await (const textPart of textStream as AsyncIterable<string>) {
           if (streamMap.current.get(streamId)?.aborted) return;

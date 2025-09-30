@@ -13,7 +13,8 @@ import { Artifact } from './artifact';
 import { ChatContent } from './chat-content';
 
 export function Chat({ isReadonly }: { isReadonly: boolean }) {
-  const { currentCap } = CurrentCapStore();
+  const { getCurrentCap } = CurrentCapStore();
+  const currentCap = getCurrentCap();
   const navigate = useNavigate();
 
   // if the user has not selected any cap before, go to the explore page

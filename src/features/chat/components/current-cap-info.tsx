@@ -4,7 +4,10 @@ import { SuggestedActions } from './suggested-actions';
 
 // Clean, minimal info block using divs only; focus on layout & typography
 export function CurrentCapInfo() {
-  const { currentCap } = CurrentCapStore();
+  const { getCurrentCap } = CurrentCapStore();
+  const currentCap = getCurrentCap();
+  const isCurrentLocal = currentCap && 'capData' in currentCap;
+
   return (
     <div
       className="w-full max-w-4xl mx-auto px-4 md:px-6"
