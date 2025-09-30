@@ -255,7 +255,7 @@ export function CapDetails({ capId }: { capId: string }) {
                     </CardHeader>
                     <CardContent>
                       <p className="text-muted-foreground leading-relaxed text-base break-words">
-                        {capQueryData.metadata.description}
+                        {capQueryData.metadata.introduction}
                       </p>
                     </CardContent>
                   </Card>

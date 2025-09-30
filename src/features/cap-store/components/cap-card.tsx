@@ -92,7 +92,7 @@ export function CapCard({ cap }: CapCardProps) {
         <div className="flex-1 min-w-0">
           <h3
             ref={titleRef}
-            className="font-medium text-md leading-5 line-clamp-2"
+            className="font-medium text-md leading-5 line-clamp-1"
           >
             {capMetadata.displayName}
           </h3>
