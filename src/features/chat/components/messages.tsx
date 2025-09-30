@@ -57,7 +57,7 @@ function PureMessages({ isReadonly }: MessagesProps) {
             !message.parts?.some((part) => part.type === 'text');
 
           const shouldPushToTop =
-            (isStreaming || isSubmitting) && message.role === 'assistant' && index === messages.length - 1;
+            message.role === 'assistant' && index === messages.length - 1;
           const minHeight = getMessageMinHeight(shouldPushToTop);
 
           return (
