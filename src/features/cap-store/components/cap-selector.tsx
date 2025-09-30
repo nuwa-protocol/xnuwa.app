@@ -58,13 +58,13 @@ export function CapSelector() {
           <div className="flex items-center gap-2 w-full min-w-0">
             <div className="flex flex-row items-center gap-2 min-w-0 flex-1">
               <CapAvatar
-                capName={currentCap.metadata.displayName}
-                capThumbnail={currentCap.metadata.thumbnail}
+                capName={currentCap?.metadata.displayName || ''}
+                capThumbnail={currentCap?.metadata.thumbnail || ''}
                 size="lg"
                 className="rounded-md"
               />
               <span className="text-sm font-medium truncate min-w-0">
-                {currentCap.metadata.displayName}
+                {currentCap?.metadata.displayName}
               </span>
             </div>
             {!isInitialized && (
@@ -103,13 +103,13 @@ export function CapSelector() {
           >
             <div className="flex items-center justify-start gap-2 w-full min-w-0 flex-1">
               <CapAvatar
-                capName={currentCap.metadata.displayName}
-                capThumbnail={currentCap.metadata.thumbnail}
+                capName={currentCap?.metadata.displayName || ''}
+                capThumbnail={currentCap?.metadata.thumbnail || ''}
                 size="lg"
                 className="rounded-md"
               />
               <span className="text-sm font-medium truncate text-left min-w-0">
-                {currentCap.metadata.displayName}
+                {currentCap?.metadata.displayName || ''}
               </span>
               {!isInitialized && (
                 <Loader2 className="w-3 h-3 animate-spin text-muted-foreground flex-shrink-0" />

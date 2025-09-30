@@ -29,7 +29,7 @@ export function ContextCostIndicator() {
   const { currentCap } = CurrentCapStore();
   const session = chatSessions[chat.id || ''] || null;
   const contextUsage = session?.contextUsage;
-  const contextLength = currentCap.core.model.contextLength;
+  const contextLength = currentCap?.core.model.contextLength || 0;
 
   useEffect(() => {
     const getPaymentInfo = async () => {

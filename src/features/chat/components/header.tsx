@@ -25,7 +25,7 @@ export default function Header({
 }: HeaderProps) {
   const navigate = useNavigate();
   const { currentCap } = CurrentCapStore();
-  const hasArtifact = !!currentCap.core.artifact;
+  const hasArtifact = !!currentCap?.core.artifact;
   const { chatSessions, updateSession, deleteSession } = ChatSessionsStore();
   const session = chatSessions[chatId || ''] || null;
   const title = session?.title || 'New Chat';

@@ -40,7 +40,7 @@ export const Artifact = ({ artifact }: ArtifactProps) => {
         <CapUIRenderer
           key={`${artifact}-${chat.id}`}
           srcUrl={artifact.srcUrl}
-          title={currentCap.idName}
+          title={currentCap?.idName || ''}
           artifact={true}
           onSendPrompt={handleSendPrompt}
           onAddSelection={handleAddSelection}

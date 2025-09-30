@@ -113,6 +113,9 @@ export const useArtifact = () => {
   // Handle stream request
   const handleStreamRequest = useCallback(
     async (request: StreamAIRequest, streamId: string, child: ChildMethods) => {
+      if (!currentCap) {
+        return;
+      }
       streamMap.current.set(streamId, { aborted: false });
       try {
         const { textStream } = await CreateAIRequestStream({

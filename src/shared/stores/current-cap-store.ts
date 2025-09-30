@@ -1,13 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { defaultCap } from '@/shared/constants/cap';
 import { RemoteMCPManager } from '@/shared/services/global-mcp-manager';
 import { createLocalStoragePersistConfig } from '@/shared/storage';
 import type { Cap } from '@/shared/types';
 
 // TODO: remove current cap store and use url to identify the current cap
 interface CurrentCapState {
-  currentCap: Cap;
+  currentCap: Cap | null;
   isInitialized: boolean;
   isError: boolean;
   errorMessage: string | null;
@@ -39,7 +38,7 @@ const persistConfig = createLocalStoragePersistConfig<CurrentCapState>({
 export const CurrentCapStore = create<CurrentCapState>()(
   persist(
     (set, get) => ({
-      currentCap: defaultCap,
+      currentCap: null,
       isInitialized: true,
       isError: false,
       errorMessage: null,

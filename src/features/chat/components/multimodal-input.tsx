@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { useWindowSize } from 'usehooks-ts';
 import { Button } from '@/shared/components/ui/button';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import type { Cap } from '@/shared/types';
 import { useChatContext } from '../contexts/chat-context';
 import { usePersistentInput } from '../hooks/use-persistent-input';
 import { ChatSessionsStore } from '../stores';
@@ -165,9 +164,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
                   input={input}
                   attachments={attachments}
                   submitForm={handleSend}
-                  currentCap={currentCap}
-                  isCurrentCapMCPInitialized={isInitialized}
-                  isCurrentCapMCPError={isError}
                 />
               </div>
             )}
@@ -214,17 +210,16 @@ function PureSendButton({
   submitForm,
   input,
   attachments,
-  currentCap,
-  isCurrentCapMCPInitialized,
-  isCurrentCapMCPError,
+
 }: {
   submitForm: () => void;
   input: string;
   attachments: AttachmentData[];
-  currentCap: Cap;
-  isCurrentCapMCPInitialized: boolean;
-  isCurrentCapMCPError: boolean;
 }) {
+
+  const { currentCap, isInitialized, isError } = CurrentCapStore();
+
+
   // Check if Cap has MCP servers
   const hasMCPServers =
     currentCap?.core?.mcpServers &&
@@ -242,7 +237,7 @@ function PureSendButton({
       }}
       disabled={
         !hasContent ||
-        (hasMCPServers && (!isCurrentCapMCPInitialized || isCurrentCapMCPError))
+        (hasMCPServers && (!isInitialized || isError))
       }
     >
       <ArrowUpIcon size={14} />

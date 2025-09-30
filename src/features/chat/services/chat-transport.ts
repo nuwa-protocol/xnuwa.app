@@ -15,6 +15,9 @@ export class ClientChatTransport implements ChatTransport<UIMessage> {
     } & ChatRequestOptions,
   ): Promise<ReadableStream<UIMessageChunk>> {
     const { currentCap } = CurrentCapStore.getState();
+    if (!currentCap) {
+      throw new Error('No current cap found');
+    }
     const Stream = CreateAIChatStream({
       chatId: options.chatId,
       messages: options.messages,
