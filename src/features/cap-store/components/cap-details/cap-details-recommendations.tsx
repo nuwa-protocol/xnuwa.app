@@ -9,6 +9,7 @@ import {
   Skeleton,
 } from '@/shared/components/ui';
 import { capKitService } from '@/shared/services/capkit-service';
+import type { Cap } from '@/shared/types';
 import { generateUUID } from '@/shared/utils';
 import type { RemoteCap } from '../../types';
 import { mapResultsToRemoteCaps } from '../../utils';
@@ -97,8 +98,7 @@ export function CapDetailsRecommendations({
                     className="flex items-center gap-3 rounded-md border px-2 py-2 hover:bg-muted cursor-pointer"
                   >
                     <CapAvatar
-                      capName={meta.displayName}
-                      capThumbnail={meta.thumbnail}
+                      cap={cap as unknown as Cap}
                       size="lg"
                       className="rounded-md"
                     />

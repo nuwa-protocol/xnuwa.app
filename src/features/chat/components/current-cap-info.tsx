@@ -16,8 +16,7 @@ export function CurrentCapInfo() {
     >
       <div className="flex flex-col items-center text-center py-6">
         <CapAvatar
-          capName={currentCap?.metadata.displayName || ''}
-          capThumbnail={currentCap?.metadata.thumbnail || ''}
+          cap={currentCap}
           size="4xl"
           className="rounded-xl mb-2"
         />

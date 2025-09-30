@@ -65,8 +65,7 @@ export function CapDetailsHeader({
         {/* Large Avatar */}
         <div className="flex-shrink-0">
           <CapAvatar
-            capName={capQueryData.metadata.displayName}
-            capThumbnail={capQueryData.metadata.thumbnail}
+            cap={capQueryData as unknown as Cap}
             size="9xl"
             className="rounded-2xl shadow-lg"
           />

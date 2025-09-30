@@ -90,8 +90,7 @@ export function CapSelector() {
           <div className="flex items-center gap-2 w-full min-w-0">
             <div className="flex flex-row items-center gap-2 min-w-0 flex-1">
               <CapAvatar
-                capName={capName || ''}
-                capThumbnail={capThumbnail || ''}
+                cap={currentCap}
                 size="lg"
                 className="rounded-md"
               />
@@ -140,8 +139,7 @@ export function CapSelector() {
           >
             <div className="flex items-center justify-start gap-2 w-full min-w-0 flex-1">
               <CapAvatar
-                capName={capName || ''}
-                capThumbnail={capThumbnail || ''}
+                cap={currentCap}
                 size="lg"
                 className="rounded-md"
               />
@@ -172,8 +170,7 @@ export function CapSelector() {
                 >
                   <div className="flex items-center gap-3">
                     <CapAvatar
-                      capName={cap.capData.metadata.displayName}
-                      capThumbnail={cap.capData.metadata.thumbnail}
+                      cap={currentCap}
                       size="lg"
                       className="rounded-md"
                     />
@@ -197,8 +194,7 @@ export function CapSelector() {
             >
               <div className="flex items-center gap-3">
                 <CapAvatar
-                  capName={cap.metadata.displayName}
-                  capThumbnail={cap.metadata.thumbnail}
+                  cap={currentCap}
                   size="lg"
                   className="rounded-md"
                 />

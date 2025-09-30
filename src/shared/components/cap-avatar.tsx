@@ -1,10 +1,12 @@
 import type React from 'react';
+import type { LocalCap } from '@/features/cap-studio/types';
 import { useTheme } from '@/shared/components/theme-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui';
-import type { CapThumbnail } from '@/shared/types';
+import type { Cap } from '@/shared/types';
+
 
 const sizeClasses = {
-  sm: 'size-2', // 8px
+  sm: 'size-4', // 8px
   md: 'size-6', // 16px
   lg: 'size-6', // 24px
   xl: 'size-8', // 32px
@@ -19,19 +21,26 @@ const sizeClasses = {
 } as const;
 
 export function CapAvatar({
-  capName,
-  capThumbnail,
+  cap,
   size = 'md',
   className,
 }: {
-  capName: string;
-  capThumbnail: CapThumbnail;
+  cap: Cap | LocalCap | null;
   size?: keyof typeof sizeClasses;
   className?: string;
 }) {
+  const { resolvedTheme } = useTheme();
+  if (!cap) return null;
+
+  const capName =
+    'capData' in cap
+      ? cap.capData.metadata.displayName
+      : cap.metadata.displayName;
+  const capThumbnail =
+    'capData' in cap ? cap.capData.metadata.thumbnail : cap.metadata.thumbnail;
   const sizeClass = sizeClasses[size] || sizeClasses['md'];
   const initial = (capName || 'Cap').trim().charAt(0).toUpperCase();
-  const { resolvedTheme } = useTheme();
+
 
   // Map avatar visual size to a sensible text size for the fallback initial
   const textSizeMap: Record<keyof typeof sizeClasses, string> = {

@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChatDropdownMenu } from '@/features/chat/components/chat-dropdown-menu';
 import { ChatSessionsStore } from '@/features/chat/stores';
 import type { ChatSession } from '@/features/chat/types';
+import { CapAvatar } from '@/shared/components';
 import { cn } from '@/shared/utils';
 import { useSidebar } from './sidebar';
 
@@ -101,7 +102,14 @@ export const SidebarChatItem = ({
           }}
           className="flex-1 min-w-0 group-hover/sidebar:translate-x-1 transition duration-150"
         >
-          <div className="text-sm truncate max-w-[200px]">{chat.title}</div>
+          <div className="text-sm truncate max-w-[200px] flex flex-row items-center gap-2">
+            <CapAvatar
+              cap={chat.cap}
+              size='md'
+              className='rounded-md'
+            />
+            {chat.title}
+          </div>
         </motion.div>
       </button>
       {((open && (hoveredChatId === chat.id || isHovered)) || isDialogOpen) && (
