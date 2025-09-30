@@ -99,7 +99,7 @@ export function CapSelector() {
               </span>
               {isCurrentLocal && (
                 <Badge variant="secondary" className="ml-1">
-                  Local
+                  Dev
                 </Badge>
               )}
             </div>
@@ -147,8 +147,8 @@ export function CapSelector() {
                 {capName || ''}
               </span>
               {isCurrentLocal && (
-                <Badge variant="secondary" className="ml-1">
-                  Local
+                <Badge variant="secondary" className="ml-1 text-xs">
+                  Dev
                 </Badge>
               )}
               {!isInitialized && (
@@ -161,24 +161,26 @@ export function CapSelector() {
         <DropdownMenuContent align="start" className="min-w-[200px]">
           {localCapsToShow.length > 0 && (
             <>
-              <DropdownMenuLabel>Local Caps</DropdownMenuLabel>
+              <DropdownMenuLabel>Cap Studio</DropdownMenuLabel>
               {localCapsToShow.map((cap) => (
                 <DropdownMenuItem
                   key={cap.id}
                   className="cursor-pointer"
                   onSelect={() => handleLocalCapSelect(cap)}
                 >
-                  <div className="flex items-center gap-3">
-                    <CapAvatar
-                      cap={currentCap}
-                      size="lg"
-                      className="rounded-md"
-                    />
-                    <span className="text-sm">
-                      {cap.capData.metadata.displayName}
-                    </span>
+                  <div className="flex items-center gap-3 justify-between w-full">
+                    <div className="flex flex-row items-center gap-2">
+                      <CapAvatar
+                        cap={cap}
+                        size="lg"
+                        className="rounded-md"
+                      />
+                      <span className="text-sm">
+                        {cap.capData.metadata.displayName}
+                      </span>
+                    </div>
                     <Badge variant="secondary" className="ml-1">
-                      Local
+                      Dev
                     </Badge>
                   </div>
                 </DropdownMenuItem>
@@ -186,6 +188,7 @@ export function CapSelector() {
               {favoriteCaps.length > 0 && <DropdownMenuSeparator />}
             </>
           )}
+          <DropdownMenuLabel>Favorite Caps</DropdownMenuLabel>
           {favoriteCaps.map((cap) => (
             <DropdownMenuItem
               key={cap.id}
@@ -194,7 +197,7 @@ export function CapSelector() {
             >
               <div className="flex items-center gap-3">
                 <CapAvatar
-                  cap={currentCap}
+                  cap={cap}
                   size="lg"
                   className="rounded-md"
                 />

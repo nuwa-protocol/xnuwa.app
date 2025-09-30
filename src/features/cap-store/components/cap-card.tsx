@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import { Button, Card } from '@/shared/components/ui';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import type { Cap } from '@/shared/types';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
 import { StarRating } from './star-rating';
@@ -85,7 +84,7 @@ export function CapCard({ cap }: CapCardProps) {
     >
       <div className="flex items-start gap-3">
         <CapAvatar
-          cap={cap as unknown as Cap}
+          cap={cap}
           size="7xl"
           className="rounded-md"
         />

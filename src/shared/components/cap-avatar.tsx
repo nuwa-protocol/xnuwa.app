@@ -1,9 +1,9 @@
 import type React from 'react';
+import type { RemoteCap } from '@/features/cap-store/types';
 import type { LocalCap } from '@/features/cap-studio/types';
 import { useTheme } from '@/shared/components/theme-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui';
 import type { Cap } from '@/shared/types';
-
 
 const sizeClasses = {
   sm: 'size-4', // 8px
@@ -25,7 +25,7 @@ export function CapAvatar({
   size = 'md',
   className,
 }: {
-  cap: Cap | LocalCap | null;
+  cap: Cap | LocalCap | RemoteCap | null;
   size?: keyof typeof sizeClasses;
   className?: string;
 }) {
@@ -38,9 +38,9 @@ export function CapAvatar({
       : cap.metadata.displayName;
   const capThumbnail =
     'capData' in cap ? cap.capData.metadata.thumbnail : cap.metadata.thumbnail;
+  const capIdName = 'capData' in cap ? cap.capData.idName : cap.idName;
   const sizeClass = sizeClasses[size] || sizeClasses['md'];
   const initial = (capName || 'Cap').trim().charAt(0).toUpperCase();
-
 
   // Map avatar visual size to a sensible text size for the fallback initial
   const textSizeMap: Record<keyof typeof sizeClasses, string> = {
@@ -65,7 +65,7 @@ export function CapAvatar({
     for (let i = 0; i < s.length; i++) h = (h ^ s.charCodeAt(i)) * 16777619;
     return Math.abs(h);
   };
-  const h = hashString(capName || 'Cap');
+  const h = hashString(capIdName || 'Cap');
   const hue1 = h % 360;
   const hue2 = (hue1 + 25 + ((h >> 5) % 90)) % 360;
   const angle = 90 + (h % 180);
