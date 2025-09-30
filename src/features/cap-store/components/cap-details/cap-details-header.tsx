@@ -10,6 +10,7 @@ import {
   User,
 } from 'lucide-react';
 import { useState } from 'react';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   Badge,
   Button,
@@ -20,7 +21,6 @@ import {
 } from '@/shared/components/ui';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import type { RemoteCap } from '../../types';
-import { CapAvatar } from '../cap-avatar';
 import { StarRating } from '../star-rating';
 import { CapDetailsActions } from './cap-details-actions';
 
@@ -67,7 +67,7 @@ export function CapDetailsHeader({
           <CapAvatar
             capName={capQueryData.metadata.displayName}
             capThumbnail={capQueryData.metadata.thumbnail}
-            size="3xl"
+            size="9xl"
             className="rounded-2xl shadow-lg"
           />
         </div>
@@ -100,15 +100,12 @@ export function CapDetailsHeader({
           {/* Structured metadata below title (compact) */}
           <div className="mt-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-
               {/* Version (next line) */}
               <div className="flex items-center gap-2 min-w-0">
                 <GitBranch className="h-4 w-4 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">Version:</span>
                 <Badge variant="secondary">v{capQueryData.version}</Badge>
               </div>
-
-
 
               {/* CID (next line) */}
               <div className="flex items-center gap-2 min-w-0">
@@ -151,8 +148,6 @@ export function CapDetailsHeader({
                 <Badge className="gap-1">Verified</Badge>
               </div>
 
-
-
               {/* Author */}
               <div className="flex items-center gap-2 min-w-0">
                 <User className="h-4 w-4 text-muted-foreground" />
@@ -186,8 +181,6 @@ export function CapDetailsHeader({
                   </Tooltip>
                 </TooltipProvider>
               </div>
-
-
             </div>
           </div>
 

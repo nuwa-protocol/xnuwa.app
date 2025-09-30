@@ -2,7 +2,7 @@ import { Card, Skeleton } from '@/shared/components/ui';
 
 export function CapDetailsLoadingSkeleton() {
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex w-full flex-col h-full">
       <div className="flex-1 overflow-y-auto p-6 md:p-8 mb-4 hide-scrollbar">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -87,4 +87,3 @@ export function CapDetailsLoadingSkeleton() {
     </div>
   );
 }
-

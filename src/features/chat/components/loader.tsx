@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { generateUUID } from '@/shared/utils';
 
-export const Loader = ({ minHeight }: { minHeight: string }) => {
+export const Loader = ({ minHeight }: { minHeight: string | undefined }) => {
   return (
     <motion.div
       data-testid="message-assistant-loading"

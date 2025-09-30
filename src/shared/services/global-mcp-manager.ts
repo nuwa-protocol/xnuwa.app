@@ -1,6 +1,6 @@
 import { createNuwaMCPClient } from '@/shared/services/mcp-client';
 import { createPaymentMcpClient } from '@/shared/services/payment-mcp-client';
-import type { Cap } from '@/shared/types/cap';
+import type { Cap } from '@/shared/types';
 
 interface RemoteMCPInstance {
   clients: Map<string, any>;

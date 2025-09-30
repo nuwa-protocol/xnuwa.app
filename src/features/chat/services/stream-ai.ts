@@ -1,20 +1,21 @@
-import type { Cap } from '@nuwa-ai/cap-kit';
 import {
   convertToModelMessages,
   createUIMessageStream,
+  type LanguageModelUsage,
   stepCountIs,
   streamText,
   type UIMessage,
 } from 'ai';
 import { CapResolve } from '@/shared/services/cap-resolve';
-import { llmProvider } from '@/shared/services/llm-providers';
-import { CurrentArtifactMCPToolsStore } from '@/shared/stores/current-artifact-store';
+import { LLMProvider } from '@/shared/services/llm-providers';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import type { Cap } from '@/shared/types';
 import { generateUUID } from '@/shared/utils';
 import { handleError } from '@/shared/utils/handl-error';
 import { ChatSessionsStore } from '../stores';
 
 // Handle AI request, entrance of the AI workflow
-export const CreateAIStream = async ({
+export const CreateAIChatStream = async ({
   chatId,
   messages,
   signal,
@@ -26,7 +27,7 @@ export const CreateAIStream = async ({
   cap: Cap;
 }) => {
   // Resolve cap configuration
-  const capResolve = new CapResolve(cap);
+  const capResolve = new CapResolve(cap, chatId);
   const {
     prompt,
     model,
@@ -34,7 +35,7 @@ export const CreateAIStream = async ({
   } = await capResolve.getResolvedConfig();
 
   // Add artifact tools
-  const artifactTools = CurrentArtifactMCPToolsStore.getState().getTools();
+  const artifactTools = CurrentCapStore.getState().getCurrentCapArtifactTools();
 
   const mergedTools = artifactTools
     ? {
@@ -44,8 +45,11 @@ export const CreateAIStream = async ({
     : remoteMCPTools;
 
   // create a new chat session and update the messages
-  const { updateMessages, addPaymentCtxIdToChatSession } =
-    ChatSessionsStore.getState();
+  const {
+    updateMessages,
+    addPaymentCtxIdToChatSession,
+    updateChatSessionContextUsage,
+  } = ChatSessionsStore.getState();
   await updateMessages(chatId, messages);
 
   // create payment CTX id header
@@ -67,20 +71,37 @@ export const CreateAIStream = async ({
     timestamp: Date.now(),
   });
 
+  // exclude the messages before the last clear context mark
+  const lastClearContextIndex = messages.findLastIndex(
+    (message) =>
+      message.role === 'system' &&
+      message.parts?.some(
+        (part) => part.type === 'data-uimark' && part.data === 'clear-context',
+      ),
+  );
+  const viableMessages =
+    lastClearContextIndex !== -1
+      ? messages.slice(lastClearContextIndex + 1)
+      : messages;
+
   const stream = createUIMessageStream({
     originalMessages: messages,
     execute: ({ writer }) => {
       let hasSendOnResponseDataMark = false;
       const result = streamText({
-        model: llmProvider.chat(model),
+        model: LLMProvider(model),
         system: prompt,
-        messages: convertToModelMessages(messages),
+        messages: convertToModelMessages(viableMessages),
         tools: mergedTools,
         abortSignal: signal,
         maxRetries: 3,
         stopWhen: stepCountIs(10),
         headers,
-        onChunk: (chunk) => {
+        onChunk: ({ chunk }) => {
+          // leave for future implementation handler
+          // if (chunk.type === 'tool-call') {
+          // const { toolCallId, toolName } = chunk;
+          // }
           if (hasSendOnResponseDataMark) return;
           writer.write({
             type: 'data-mark',
@@ -110,6 +131,9 @@ export const CreateAIStream = async ({
           },
         }),
       );
+      result.usage.then((usage: LanguageModelUsage) => {
+        updateChatSessionContextUsage(chatId, usage);
+      });
       result.finishReason.then((finishReason) => {
         writer.write({
           type: 'data-finishReason',
@@ -123,4 +147,48 @@ export const CreateAIStream = async ({
   });
 
   return stream;
+};
+
+// Handle AI request from artifact
+export const CreateAIRequestStream = async ({
+  chatId,
+  prompt,
+  cap,
+}: {
+  chatId: string;
+  prompt: string;
+  cap: Cap;
+}) => {
+  const capResolve = new CapResolve(cap, chatId);
+  const {
+    prompt: capPrompt,
+    model,
+    tools,
+  } = await capResolve.getResolvedConfig();
+
+  // create payment CTX id header
+  const paymentCtxId = generateUUID();
+  const headers = {
+    'X-Client-Tx-Ref': paymentCtxId,
+  };
+
+  const { addPaymentCtxIdToChatSession } = ChatSessionsStore.getState();
+  await addPaymentCtxIdToChatSession(chatId, {
+    type: 'ai-request',
+    ctxId: paymentCtxId,
+    timestamp: Date.now(),
+  });
+
+  return streamText({
+    model: LLMProvider(model),
+    system: capPrompt,
+    prompt: prompt,
+    tools: tools,
+    maxRetries: 3,
+    stopWhen: stepCountIs(10),
+    headers,
+    onError: (error: any) => {
+      throw new Error(error);
+    },
+  });
 };

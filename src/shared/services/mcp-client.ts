@@ -260,7 +260,9 @@ export async function createNuwaMCPClient(
  * Use GlobalMCPManager.cleanup() instead.
  */
 export async function closeNuwaMCPClient(url: string): Promise<void> {
-  console.warn('closeNuwaMCPClient is deprecated. Use GlobalMCPManager.cleanup() instead.');
+  console.warn(
+    'closeNuwaMCPClient is deprecated. Use GlobalMCPManager.cleanup() instead.',
+  );
   // No-op since caching is handled by GlobalMCPManager
 }
 

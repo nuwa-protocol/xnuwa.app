@@ -1,14 +1,12 @@
 import { type UseChatHelpers, useChat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import cx from 'classnames';
-import { ArrowUpIcon, StopCircleIcon, TextSelect, X } from 'lucide-react';
+import { ArrowUpIcon, StopCircleIcon } from 'lucide-react';
 import type React from 'react';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWindowSize } from 'usehooks-ts';
-import { CapSelector } from '@/features/cap-store/components';
-import { Badge } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
@@ -16,8 +14,9 @@ import { useChatContext } from '../contexts/chat-context';
 import { usePersistentInput } from '../hooks/use-persistent-input';
 import { ChatSessionsStore } from '../stores';
 import { type AttachmentData, AttachmentInput } from './attachment-input';
+import { ContextCostIndicator } from './context-cost-indicator';
+import { InputSelections } from './input-selections';
 import { PreviewAttachment } from './preview-attachment';
-import { SuggestedActions } from './suggested-actions';
 
 function PureMultimodalInput({ className }: { className?: string }) {
   const { chat } = useChatContext();
@@ -28,8 +27,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
   const { width } = useWindowSize();
   const { currentCap, isInitialized, isError } = CurrentCapStore();
   const [attachments, setAttachments] = useState<AttachmentData[]>([]);
-  const { chatSessions, removeSelectionFromChatSession } = ChatSessionsStore();
-  const selections = chatSessions[chat.id]?.selections;
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Remove attachment
@@ -62,7 +59,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
       return;
     }
 
-    // TODO: how to send the selections?
     if (input.trim() || attachments.length > 0) {
       sendMessage({
         text: input,
@@ -87,8 +83,6 @@ function PureMultimodalInput({ className }: { className?: string }) {
 
   return (
     <div className="relative w-full flex flex-col gap-4">
-      {messages.length === 0 && <SuggestedActions />}
-
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 p-2">
           {attachments.map((attachment, index) => (
@@ -112,24 +106,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
         )}
       >
         {/* Selections */}
-        {selections && selections.length > 0 && (
-          <div className="flex flex-row flex-wrap gap-2 p-2 mx-2">
-            {selections?.map((selection) => (
-              <Badge
-                key={selection.label}
-                variant="default"
-                className="group cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors duration-200 flex items-center gap-1 shrink-0"
-                onClick={() =>
-                  removeSelectionFromChatSession(chat.id, selection.id)
-                }
-              >
-                <TextSelect size={12} className="group-hover:hidden" />
-                <X size={12} className="hidden group-hover:block" />
-                {selection.label}
-              </Badge>
-            ))}
-          </div>
-        )}
+        <InputSelections />
 
         {/*  Input Textarea */}
         <textarea
@@ -168,16 +145,10 @@ function PureMultimodalInput({ className }: { className?: string }) {
 
         {/* Cap Selector and Send Button */}
         <div className="flex justify-between items-center p-2">
-          <div className="flex items-center gap-2">
-            <CapSelector />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <AttachmentInput
-              attachments={attachments}
-              onAttachmentsChange={setAttachments}
-            />
-
+          <div className="flex items-center gap-2 justify-between w-full">
+            <div className="flex items-center gap-2">
+              <ContextCostIndicator />
+            </div>
             {status === 'submitted' || status === 'streaming' ? (
               <StopButton
                 stop={stop}
@@ -185,14 +156,20 @@ function PureMultimodalInput({ className }: { className?: string }) {
                 chatId={chat.id}
               />
             ) : (
-              <SendButton
-                input={input}
-                attachments={attachments}
-                submitForm={handleSend}
-                currentCap={currentCap}
-                isCurrentCapMCPInitialized={isInitialized}
-                isCurrentCapMCPError={isError}
-              />
+              <div className="flex items-center gap-2">
+                <AttachmentInput
+                  attachments={attachments}
+                  onAttachmentsChange={setAttachments}
+                />
+                <SendButton
+                  input={input}
+                  attachments={attachments}
+                  submitForm={handleSend}
+                  currentCap={currentCap}
+                  isCurrentCapMCPInitialized={isInitialized}
+                  isCurrentCapMCPError={isError}
+                />
+              </div>
             )}
           </div>
         </div>

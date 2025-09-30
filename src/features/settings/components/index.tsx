@@ -51,7 +51,7 @@ export function Settings() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-full">
       <div className="mx-auto max-w-4xl px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>

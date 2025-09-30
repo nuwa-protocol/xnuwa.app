@@ -1,5 +1,6 @@
 // re-export types from @nuwa-ai/cap-kit
 export type {
+  Artifact as CapArtifact,
   Cap,
   CapCore,
   CapID,
@@ -7,13 +8,14 @@ export type {
   CapMetadata,
   CapModel,
   CapPrompt,
+  CapStats,
   CapThumbnail,
   ResultCap,
-  CapStats
 } from '@nuwa-ai/cap-kit';
 
 // re-export schemas from @nuwa-ai/cap-kit
 export {
+  CapArtifactSchema,
   CapCoreSchema,
   CapIDNameSchema,
   CapIDSchema,
@@ -25,4 +27,3 @@ export {
   CapSchema,
   CapThumbnailSchema,
 } from '@nuwa-ai/cap-kit';
-

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Chat } from '@/features/chat/components';
+import { Chat } from '@/features/chat/components/chat';
+import { ChatProvider } from '@/features/chat/contexts';
 
 export default function ChatPage() {
   return (
@@ -10,7 +11,9 @@ export default function ChatPage() {
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       className="h-full"
     >
-      <Chat isReadonly={false} />
+      <ChatProvider>
+        <Chat isReadonly={false} />
+      </ChatProvider>
     </motion.div>
   );
 }

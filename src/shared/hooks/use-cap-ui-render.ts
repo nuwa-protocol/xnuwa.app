@@ -2,19 +2,21 @@ import { NUWA_CLIENT_TIMEOUT, type StreamAIRequest } from '@nuwa-ai/ui-kit';
 import { connect, WindowMessenger } from 'penpal';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CapUIRendererProps } from '@/shared/components/cap-ui-renderer';
+import { useTheme } from '@/shared/components/theme-provider';
 import {
   closeNuwaMCPClient,
   createNuwaMCPClient,
 } from '@/shared/services/mcp-client';
 import { type URLValidationResult, validateURL } from '@/shared/utils';
 
-export type ChildStreamMethods = {
+export type ChildMethods = {
   pushStreamChunk(
     streamId: string,
     chunk: { type: 'content' | 'error'; content?: any; error?: any },
   ): void;
   completeStream(streamId: string): void;
   errorStream(streamId: string, error: any): void;
+  updateTheme(theme: 'light' | 'dark'): void;
 };
 
 export const useCapUIRender = ({
@@ -58,7 +60,7 @@ export const useCapUIRender = ({
   ]);
 
   // Keep a ref to child's exposed methods
-  const childStreamRef = useRef<ChildStreamMethods | null>(null);
+  const childMethodsRef = useRef<ChildMethods | null>(null);
 
   const [height, setHeight] = useState<number>(100); // Default height
   const [validationResult, setValidationResult] =
@@ -126,11 +128,11 @@ export const useCapUIRender = ({
 
     // Streaming entrypoints called by child
     handleStreamRequest: async (request: StreamAIRequest, streamId: string) => {
-      if (!childStreamRef.current) {
+      if (!childMethodsRef.current) {
         console.error('Child stream method not found');
         return;
       }
-      onStreamRequestRef.current?.(request, streamId, childStreamRef.current);
+      onStreamRequestRef.current?.(request, streamId, childMethodsRef.current);
     },
 
     abortStream: async (streamId: string) => {
@@ -149,7 +151,7 @@ export const useCapUIRender = ({
         allowedOrigins: ['*'],
       });
 
-      const connection = connect<ChildStreamMethods>({
+      const connection = connect<ChildMethods>({
         messenger,
         methods: {
           ...nuwaClientMethods,
@@ -159,7 +161,7 @@ export const useCapUIRender = ({
       });
 
       const child = await connection.promise;
-      childStreamRef.current = child;
+      childMethodsRef.current = child;
 
       onPenpalConnected?.();
     } catch (error) {
@@ -196,35 +198,13 @@ export const useCapUIRender = ({
 
   const sandbox = 'allow-scripts';
 
-  const allowPermissions = `accelerometer 'none'; 
-           ambient-light-sensor 'none'; 
-           autoplay 'none'; 
-           battery 'none'; 
-           camera 'none'; 
-           display-capture 'none'; 
-           document-domain 'none'; 
-           encrypted-media 'none'; 
-           fullscreen 'none'; 
-           gamepad 'none'; 
-           geolocation 'none'; 
-           gyroscope 'none'; 
-           layout-animations 'none'; 
-           legacy-image-formats 'none'; 
-           magnetometer 'none'; 
-           microphone 'none'; 
-           midi 'none'; 
-           oversized-images 'none'; 
-           payment 'none'; 
-           picture-in-picture 'none'; 
-           publickey-credentials-get 'none'; 
-           speaker-selection 'none'; 
-           sync-xhr 'none'; 
-           unoptimized-images 'none'; 
-           unsized-media 'none'; 
-           usb 'none'; 
-           screen-wake-lock 'none'; 
-           web-share 'none'; 
-           xr-spatial-tracking 'none';`;
+  const allowPermissions = '';
+
+  // Update the theme when the theme changes
+  const { resolvedTheme } = useTheme();
+  useEffect(() => {
+    childMethodsRef.current?.updateTheme(resolvedTheme);
+  }, [resolvedTheme, childMethodsRef.current]);
 
   return {
     iframeRef,
@@ -235,6 +215,6 @@ export const useCapUIRender = ({
     height,
     validationResult,
     isValidating,
-    childStreamMethods: childStreamRef.current,
+    childMethods: childMethodsRef.current,
   };
 };

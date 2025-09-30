@@ -1,4 +1,6 @@
-import { MessageCircle } from 'lucide-react';
+import { Copy, MessageCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { Badge } from '@/shared/components';
 import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
@@ -8,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
+import { useAuth } from '@/shared/hooks';
+import { useCopyToClipboard } from '@/shared/hooks/use-copy-to-clipboard';
 
 interface TestnetFaucetDialogProps {
   open: boolean;
@@ -18,6 +22,8 @@ export function TestnetFaucetDialog({
   open,
   onOpenChange,
 }: TestnetFaucetDialogProps) {
+  const { did } = useAuth();
+  const [copy] = useCopyToClipboard();
   const handleDiscordClick = () => {
     // Open Discord link
     window.open('https://discord.gg/nuwaai', '_blank');
@@ -25,7 +31,7 @@ export function TestnetFaucetDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="max-w-[650px]">
         <DialogHeader>
           <DialogDescription className=" text-sm text-muted-foreground">
             Need more testnet balance?
@@ -71,6 +77,27 @@ export function TestnetFaucetDialog({
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-4 w-full ">
+          <span className="text-md font-medium w-full">
+            Don't forget to copy your DID :)
+          </span>
+          <div className="flex flex-row w-full items-left justify-start">
+            <Badge
+              variant="outline"
+              className="min-h-[40px] flex items-center text-xs leading-tight w-full cursor-pointer"
+              onClick={() => {
+                copy(did || '');
+                toast.success('DID Copied!');
+              }}
+            >
+              <span className="flex-1 text-left whitespace-pre-line font-mono">
+                {did}
+              </span>
+              <Copy className="w-4 h-4 flex-shrink-0" />
+            </Badge>
           </div>
         </div>
 

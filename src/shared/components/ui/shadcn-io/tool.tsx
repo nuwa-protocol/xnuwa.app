@@ -6,14 +6,7 @@ import {
 } from '@/shared/components/ui/collapsible';
 import { cn } from '@/shared/utils/index';
 import type { ToolUIPart } from 'ai';
-import {
-  CheckCircleIcon,
-  ChevronDownIcon,
-  CircleIcon,
-  Loader2,
-  WrenchIcon,
-  XCircleIcon,
-} from 'lucide-react';
+import { CheckCircleIcon, ChevronDownIcon, Loader, Loader2, WrenchIcon, XCircleIcon } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';
 import { CodeBlock } from './code-block';
 
@@ -41,7 +34,7 @@ const getStatusBadge = (status: ToolUIPart['state']) => {
   } as const;
 
   const icons = {
-    'input-streaming': <CircleIcon className="size-4" />,
+    'input-streaming': <Loader className="size-4 animate-spin" />,
     'input-available': <Loader2 className="size-4 animate-spin" />,
     'output-available': <CheckCircleIcon className="size-4 text-green-600" />,
     'output-error': <XCircleIcon className="size-4 text-red-600" />,

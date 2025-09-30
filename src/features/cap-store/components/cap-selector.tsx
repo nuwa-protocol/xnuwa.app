@@ -1,6 +1,7 @@
 import { AlertCircle, ChevronDown, Loader2, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   Button,
   DropdownMenu,
@@ -14,23 +15,10 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import type { Cap } from '@/shared/types';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
-import { CapAvatar } from './cap-avatar';
 
-const CapInfo = ({ cap }: { cap: Cap }) => (
-  <>
-    <CapAvatar
-      capName={cap.metadata.displayName}
-      capThumbnail={cap.metadata.thumbnail}
-      size="sm"
-      className='rounded-md'
-    />
-    <span className="text-sm font-normal">{cap.metadata.displayName}</span>
-  </>
-);
-
+// TODO: switching cap need to have cache
 export function CapSelector() {
   const { currentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
@@ -40,14 +28,17 @@ export function CapSelector() {
   const handleCapSelect = async (cap: RemoteCap) => {
     const id = cap.id;
     try {
-      toast.promise(async () => {
-        const cap = await downloadCapByIDWithCache(id);
-        setCurrentCap(cap);
-      }, {
-        loading: 'Loading cap...',
-        success: 'Cap is ready to use!',
-        error: 'Failed to load cap',
-      });
+      toast.promise(
+        async () => {
+          const cap = await downloadCapByIDWithCache(id);
+          setCurrentCap(cap);
+        },
+        {
+          loading: 'Loading cap...',
+          success: 'Cap is ready to use!',
+          error: 'Failed to load cap',
+        },
+      );
     } catch (error) {
       console.error('Failed to select cap:', error);
     }
@@ -58,16 +49,26 @@ export function CapSelector() {
     return (
       <TooltipProvider>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={() => navigate('/explore')}
-          className="rounded-lg"
+          className="rounded-lg min-w-0 w-fit"
           type="button"
         >
-          <div className="flex items-center gap-2">
-            <CapInfo cap={currentCap} />
+          <div className="flex items-center gap-2 w-full min-w-0">
+            <div className="flex flex-row items-center gap-2 min-w-0 flex-1">
+              <CapAvatar
+                capName={currentCap.metadata.displayName}
+                capThumbnail={currentCap.metadata.thumbnail}
+                size="lg"
+                className="rounded-md"
+              />
+              <span className="text-sm font-medium truncate min-w-0">
+                {currentCap.metadata.displayName}
+              </span>
+            </div>
             {!isInitialized && (
-              <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+              <Loader2 className="w-3 h-3 animate-spin text-muted-foreground flex-shrink-0" />
             )}
           </div>
         </Button>
@@ -91,19 +92,29 @@ export function CapSelector() {
   return (
     <TooltipProvider>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
+        <DropdownMenuTrigger
+          asChild
+          className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+        >
           <Button
-            variant="outline"
-            size="sm"
-            className="rounded-lg"
+            variant="ghost"
+            className="rounded-lg hover:bg-transparent w-fit min-w-0"
             type="button"
           >
-            <div className="flex items-center gap-2">
-              <CapInfo cap={currentCap} />
+            <div className="flex items-center justify-start gap-2 w-full min-w-0 flex-1">
+              <CapAvatar
+                capName={currentCap.metadata.displayName}
+                capThumbnail={currentCap.metadata.thumbnail}
+                size="lg"
+                className="rounded-md"
+              />
+              <span className="text-sm font-medium truncate text-left min-w-0">
+                {currentCap.metadata.displayName}
+              </span>
               {!isInitialized && (
-                <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+                <Loader2 className="w-3 h-3 animate-spin text-muted-foreground flex-shrink-0" />
               )}
-              <ChevronDown className="w-3 h-3 text-muted-foreground" />
+              <ChevronDown className="w-3 h-3 text-muted-foreground flex-shrink-0" />
             </div>
           </Button>
         </DropdownMenuTrigger>
@@ -114,11 +125,12 @@ export function CapSelector() {
               className="cursor-pointer"
               onSelect={() => handleCapSelect(cap)}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <CapAvatar
                   capName={cap.metadata.displayName}
                   capThumbnail={cap.metadata.thumbnail}
-                  size="sm"
+                  size="lg"
+                  className="rounded-md"
                 />
                 <span className="text-sm">{cap.metadata.displayName}</span>
               </div>

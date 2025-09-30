@@ -1,2 +1,2 @@
 export { ClientChatTransport } from './chat-transport';
-export { generateTitleFromUserMessage } from './utility-ai';
+export { generateTitleFromUserMessage } from './generate-title';

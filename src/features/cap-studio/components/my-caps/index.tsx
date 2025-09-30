@@ -1,14 +1,16 @@
 import {
   CheckSquare,
   ChevronDown,
+  FileUp,
   Plus,
   Search,
   Send,
   Trash2,
   Upload,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   Button,
   Card,
@@ -22,6 +24,8 @@ import {
   Input,
   Progress,
 } from '@/shared/components/ui';
+import { useAuth } from '@/shared/hooks';
+import { type Cap, CapSchema } from '@/shared/types';
 import { useSubmitCap } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
@@ -44,9 +48,11 @@ export function MyCaps({
   onBulkDelete,
 }: MyCapsProps) {
   const navigate = useNavigate();
+  const { did } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const { localCaps, deleteCap } = CapStudioStore();
+  const { localCaps, deleteCap, createCap } = CapStudioStore();
   const { bulkSubmitCaps, bulkProgress } = useSubmitCap();
+  const importFileRef = useRef<HTMLInputElement>(null);
 
   // Multi-select state
   const [selectedCapIds, setSelectedCapIds] = useState<Set<string>>(new Set());
@@ -88,7 +94,6 @@ export function MyCaps({
     }
     clearSelection();
   };
-  console.log('selectedCapIds', selectedCapIds);
 
   const handleBulkPublish = async () => {
     const selectedCaps = allCaps.filter((cap) => selectedCapIds.has(cap.id));
@@ -118,6 +123,63 @@ export function MyCaps({
   const selectedCaps = allCaps.filter((cap) => selectedCapIds.has(cap.id));
   const hasSelectedCaps = selectedCaps.length > 0;
 
+  // Build a full Cap object by injecting id and authorDID, then validate via CapSchema
+  const buildAndValidateCap = (capData: any): Cap => {
+    const partial = capData as Omit<Cap, 'id' | 'authorDID'>;
+    const normalizeAuthorDid = (raw?: string | null): string => {
+      if (!raw) return 'did::unknown';
+      if (raw.startsWith('did::')) return raw;
+      if (raw.startsWith('did:')) return `did::${raw.slice(4)}`;
+      return `did::${raw}`;
+    };
+
+    const authorDID = normalizeAuthorDid(did);
+
+    const fullCap: Cap = {
+      id: `${authorDID}:${partial.idName}`,
+      authorDID,
+      ...partial,
+    } as Cap;
+
+    CapSchema.parse(fullCap);
+    return fullCap;
+  };
+
+  const handleImportJson = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!did) {
+      toast.error('Please sign in to import a cap');
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      if (Array.isArray(data)) {
+        toast.error(
+          'This file contains multiple caps. Use Batch Create instead.',
+        );
+        return;
+      }
+
+      const validated = buildAndValidateCap(data);
+      const created = createCap(validated);
+      toast.success(`Imported "${created.capData.metadata.displayName}"`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to import cap';
+      toast.error(message);
+    } finally {
+      // reset input to allow importing the same file again if needed
+      event.target.value = '';
+    }
+  };
+
   if (localCaps.length === 0) {
     return (
       <Card className="border-dashed border-2 border-muted-foreground/25 bg-muted/5">
@@ -138,13 +200,21 @@ export function MyCaps({
               Create Your First Cap
             </Button>
             <Button
-              onClick={() => navigate('/cap-studio/batch-create')}
+              onClick={() => importFileRef.current?.click()}
               variant="outline"
               size="lg"
             >
               <Upload className="h-4 w-4 mr-2" />
-              Batch Create
+              Import Json
             </Button>
+            {/* Hidden input for importing a single cap JSON */}
+            <input
+              ref={importFileRef}
+              type="file"
+              accept=".json"
+              onChange={handleImportJson}
+              className="hidden"
+            />
           </div>
         </CardHeader>
       </Card>
@@ -217,15 +287,30 @@ export function MyCaps({
                     <ChevronDown />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem
+                <DropdownMenuContent align="end" className="w-42">
+                  {/* Hide the batch create for now */}
+                  {/* <DropdownMenuItem
                     onClick={() => navigate('/cap-studio/batch-create')}
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     Batch Create
+                  </DropdownMenuItem> */}
+                  <DropdownMenuItem
+                    onClick={() => importFileRef.current?.click()}
+                  >
+                    <FileUp className="h-4 w-4 mr-2" />
+                    Import from JSON
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              {/* Hidden input for importing a single cap JSON */}
+              <input
+                ref={importFileRef}
+                type="file"
+                accept=".json"
+                onChange={handleImportJson}
+                className="hidden"
+              />
             </>
           ) : (
             <div className="flex gap-2">
@@ -307,11 +392,14 @@ export function MyCaps({
               onUpdate={() => onSubmitCap?.(cap)}
               isMultiSelectMode={isMultiSelectMode}
               isSelected={selectedCapIds.has(cap.id)}
-              onToggleSelect={() => toggleCapSelection(cap.id)}
-              onEnterMultiSelectMode={() => {
-                enterMultiSelectMode();
+              // Only the checkbox should enter multi‑select mode. Card click should edit.
+              onToggleSelect={() => {
+                // If not already in multi-select, enter it when the checkbox is clicked
+                if (!isMultiSelectMode) setIsMultiSelectMode(true);
                 toggleCapSelection(cap.id);
               }}
+              // Clicking the card should open edit instead of entering multi-select
+              onEnterMultiSelectMode={() => onEditCap?.(cap)}
             />
           ))}
         </DashboardGrid>

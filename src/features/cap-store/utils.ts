@@ -22,6 +22,7 @@ export function mapResultCapToRemoteCap(
       repository: data.repository,
       homepage: data.homepage,
       thumbnail: data.thumbnail,
+      introduction: data.introduction,
     },
   };
 }

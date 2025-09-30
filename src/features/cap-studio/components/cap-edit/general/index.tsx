@@ -1,4 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form';
+import type { CapFormData } from '@/features/cap-studio/hooks/use-edit-form';
 import {
   Card,
   CardContent,
@@ -12,14 +13,13 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Textarea,
 } from '@/shared/components/ui';
 import { DashboardGrid } from '../../layout/dashboard-layout';
 import { CapTags } from './cap-tags';
 import { ThumbnailUpload } from './thumbnail-upload';
 
 interface GeneralTabProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<CapFormData>;
 }
 
 export function GeneralTab({ form }: GeneralTabProps) {
@@ -56,7 +56,7 @@ export function GeneralTab({ form }: GeneralTabProps) {
               <FormItem>
                 <FormLabel>Display Name</FormLabel>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Human-readable name shown in the store.
+                  The display name of your Cap.
                 </p>
                 <FormControl>
                   <Input placeholder="My Awesome Cap" {...field} />
@@ -72,12 +72,16 @@ export function GeneralTab({ form }: GeneralTabProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
+                <div className='flex flex-row items-center justify-between'>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    A short description of your cap.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {field.value?.length || 0} / 150
+                  </p>
+                </div>
                 <FormControl>
-                  <Textarea
-                    placeholder="Describe what your cap does..."
-                    rows={3}
-                    {...field}
-                  />
+                  <Input placeholder="An awesome cap that lets you don anything" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -104,18 +108,7 @@ export function GeneralTab({ form }: GeneralTabProps) {
               </FormItem>
             )}
           />
-        </CardContent>
-      </Card>
 
-      {/* Author Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Author Information</CardTitle>
-          <CardDescription>
-            Information about the cap author and licensing
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
           <FormField
             control={form.control}
             name="metadata.homepage"

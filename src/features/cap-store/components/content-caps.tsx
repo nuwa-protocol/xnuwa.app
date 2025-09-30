@@ -6,6 +6,7 @@ import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observe
 import { type UseRemoteCapParams, useCapStore } from '../stores';
 import { CapCard } from './cap-card';
 import { CapStoreLoading } from './cap-store-loading';
+import { CapStoreContentHeader } from './content-header';
 
 export function CapStoreCapsContent({
   tag,
@@ -65,22 +66,33 @@ export function CapStoreCapsContent({
   }
 
   if (isFetching && true) {
-    return <CapStoreLoading />;
+    return (
+      <div className='flex flex-col h-full w-full'>
+        <CapStoreContentHeader showSearchAndSort={true} />
+        <CapStoreLoading />
+      </div>
+    );
   }
 
   if (caps.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
-        <Package className="size-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium mb-2 text-muted-foreground">
-          No AI Caps Found
-        </h3>
+      <div className='flex flex-col h-full w-full'>
+        <CapStoreContentHeader showSearchAndSort={true} />
+        <div className="w-full flex flex-col items-center justify-center min-h-[700px] text-center">
+
+          <Package className="size-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium mb-2 text-muted-foreground">
+            No AI Caps Found
+          </h3>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col h-full">
+      <CapStoreContentHeader showSearchAndSort={true} />
+
       {/* Caps Grid Container with ScrollArea */}
       <ScrollArea className="flex-1">
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-6">

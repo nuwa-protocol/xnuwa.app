@@ -51,7 +51,7 @@ export const ImagePreviewDialog = ({
           alt={alt}
           className={cn(
             'max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl',
-            className
+            className,
           )}
         />
 

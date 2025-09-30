@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   Card,
   CardContent,
@@ -11,7 +12,6 @@ import { capKitService } from '@/shared/services/capkit-service';
 import { generateUUID } from '@/shared/utils';
 import type { RemoteCap } from '../../types';
 import { mapResultsToRemoteCaps } from '../../utils';
-import { CapAvatar } from '../cap-avatar';
 
 interface CapDetailsRecommendationsProps {
   currentCapId: string;
@@ -83,7 +83,7 @@ export function CapDetailsRecommendations({
             No recommendations yet.
           </p>
         ) : (
-          <div className="h-[50vh] pr-2 overflow-y-auto hide-scrollbar">
+          <div className="h-[calc(100vh-450px)] pr-2 overflow-y-auto hide-scrollbar">
             <div className="flex flex-col gap-2">
               {caps.map((cap) => {
                 const meta = cap.metadata;

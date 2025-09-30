@@ -1,4 +1,3 @@
-
 import { Tabs, TabsList, TabsTrigger } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks/use-language';
 import { SettingsStateStore } from '../stores';

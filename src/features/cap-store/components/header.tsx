@@ -8,12 +8,12 @@ import {
   Code,
   Coins,
   Heart,
-  Home,
   MoreHorizontal,
   Package,
   PenTool,
   Search,
   Star,
+  Tag,
   UserRoundPen,
   Wrench,
   X,
@@ -98,8 +98,8 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
       return { id: 'all', label: 'All Caps', type: 'section' };
     }
 
-    // Default to home
-    return { id: 'home', label: 'Home', type: 'section' };
+    // Default to all
+    return { id: 'all', label: 'All Caps', type: 'section' };
   };
 
   const activeSection = getActiveSection();
@@ -176,9 +176,7 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
 
   // handle active section change
   const handleActiveSectionChange = (section: CapStoreSection) => {
-    if (section.id === 'home') {
-      navigate('/explore');
-    } else if (section.id === 'favorites') {
+    if (section.id === 'favorites') {
       navigate('/explore/favorites');
     } else if (section.id === 'all') {
       navigate('/explore/caps');
@@ -196,32 +194,6 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
             <div className="flex items-center gap-2 flex-shrink-0">
               <NavigationMenu>
                 <NavigationMenuList className="gap-2">
-                  {/* Home / Featured Caps */}
-                  <NavigationMenuItem>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleActiveSectionChange({
-                          id: 'home',
-                          label: 'Home',
-                          type: 'section',
-                        })
-                      }
-                      className={`
-                            inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md
-                            transition-all duration-200 ease-out relative
-                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                            ${activeSection.id === 'home'
-                          ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                        }
-                          `}
-                    >
-                      <Home className="size-4" />
-                      <span>Home</span>
-                    </button>
-                  </NavigationMenuItem>
-
                   {/* All with Categories Dropdown */}
                   <NavigationMenuItem>
                     <NavigationMenuTrigger
@@ -230,11 +202,12 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                           transition-all duration-200 ease-out relative
                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                           data-[state=open]:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:shadow-sm
-                          ${activeSection.id === 'all' ||
-                          activeSection.type === 'tag'
-                          ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                        }
+                          ${
+                            activeSection.id === 'all' ||
+                            activeSection.type === 'tag'
+                              ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                          }
                         `}
                     >
                       {activeSection.type === 'tag' ? (
@@ -250,8 +223,8 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                         </>
                       ) : (
                         <>
-                          <Bot className="size-4" />
-                          <span>AI Caps</span>
+                          <Tag className="size-4" />
+                          <span>Tags</span>
                         </>
                       )}
                     </NavigationMenuTrigger>
@@ -270,10 +243,11 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                               flex items-center gap-3 px-3 py-2.5 rounded-md text-sm
                               transition-all duration-200
                               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                              ${activeSection.id === 'all'
-                              ? 'bg-accent text-accent-foreground font-semibold'
-                              : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                            }
+                              ${
+                                activeSection.id === 'all'
+                                  ? 'bg-accent text-accent-foreground font-semibold'
+                                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                              }
                             `}
                         >
                           <Bot className="size-4 text-muted-foreground" />
@@ -304,10 +278,11 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                                     flex items-center gap-3 px-3 py-2.5 w-full rounded-md text-sm
                                     transition-all duration-200
                                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                                    ${isSelected
-                                    ? 'bg-accent text-accent-foreground font-semibold'
-                                    : 'text-foreground hover:bg-accent/60 hover:text-accent-foreground'
-                                  }
+                                    ${
+                                      isSelected
+                                        ? 'bg-accent text-accent-foreground font-semibold'
+                                        : 'text-foreground hover:bg-accent/60 hover:text-accent-foreground'
+                                    }
                                   `}
                               >
                                 <IconComponent className="size-4 text-muted-foreground" />
@@ -329,10 +304,11 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                             inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md
                             transition-all duration-200 ease-out relative
                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                            ${activeSection.id === 'favorites'
-                          ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                        }
+                            ${
+                              activeSection.id === 'favorites'
+                                ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                            }
                           `}
                     >
                       <Heart className="size-4" />
@@ -377,53 +353,52 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                   </button>
                 )}
               </div>
-              {activeSection.id !== 'favorites' &&
-                activeSection.id !== 'home' && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-3 text-sm items-center justify-center font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                      >
-                        {(() => {
-                          const option = sortOptions.find(
-                            (opt) => opt.value === sortBy,
-                          );
-                          return (
-                            <>
-                              {option?.label}
-                              <ArrowDownWideNarrow className="size-4" />
-                            </>
-                          );
-                        })()}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      {sortOptions.map((option) => {
-                        const IconComponent = option.icon;
+              {activeSection.id !== 'favorites' && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 px-3 text-sm items-center justify-center font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                    >
+                      {(() => {
+                        const option = sortOptions.find(
+                          (opt) => opt.value === sortBy,
+                        );
                         return (
-                          <DropdownMenuItem
-                            key={`${option.value}-desc`}
-                            onClick={() => {
-                              const newParams = new URLSearchParams(searchParams);
-                              newParams.set('sortBy', option.value);
-                              newParams.set('sortOrder', 'desc');
-                              setSearchParams(newParams);
-                            }}
-                            className={`
+                          <>
+                            {option?.label}
+                            <ArrowDownWideNarrow className="size-4" />
+                          </>
+                        );
+                      })()}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    {sortOptions.map((option) => {
+                      const IconComponent = option.icon;
+                      return (
+                        <DropdownMenuItem
+                          key={`${option.value}-desc`}
+                          onClick={() => {
+                            const newParams = new URLSearchParams(searchParams);
+                            newParams.set('sortBy', option.value);
+                            newParams.set('sortOrder', 'desc');
+                            setSearchParams(newParams);
+                          }}
+                          className={`
                              flex items-center gap-2 cursor-pointer
                              ${sortBy === option.value && sortOrder === 'desc' ? 'bg-accent text-accent-foreground' : ''}
                            `}
-                          >
-                            <IconComponent className="size-4" />
-                            <span className="text-sm">{option.label}</span>
-                          </DropdownMenuItem>
-                        );
-                      })}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
+                        >
+                          <IconComponent className="size-4" />
+                          <span className="text-sm">{option.label}</span>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </TooltipProvider>

@@ -3,7 +3,7 @@ import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { TextShimmer } from '@/shared/components/ui/text-shimmer';
 import {
-  type ChildStreamMethods,
+  type ChildMethods,
   useCapUIRender,
 } from '@/shared/hooks/use-cap-ui-render';
 
@@ -89,7 +89,7 @@ export type CapUIRendererProps = {
   onStreamRequest?: (
     request: StreamAIRequest,
     streamId: string,
-    child: ChildStreamMethods,
+    child: ChildMethods,
   ) => void;
   onAbortStream?: (streamId: string) => void;
   onPenpalConnected?: () => void;
@@ -136,15 +136,15 @@ export const CapUIRenderer = (props: CapUIRendererProps) => {
         style={
           isLoading
             ? {
-              width: 0,
-              height: 0,
-              position: 'absolute',
-              border: 0,
-            }
+                width: 0,
+                height: 0,
+                position: 'absolute',
+                border: 0,
+              }
             : {
-              width: '100%',
-              height: artifact ? '100%' : height,
-            }
+                width: '100%',
+                height: artifact ? '100%' : height,
+              }
         }
         sandbox={sandbox}
         title={title ?? 'Nuwa Cap UI'}

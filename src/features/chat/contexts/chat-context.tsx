@@ -1,5 +1,13 @@
+import { useChat } from '@ai-sdk/react';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { generateUUID } from '@/shared/utils';
 import { useChatInstance } from '../hooks';
@@ -7,6 +15,7 @@ import { ChatSessionsStore } from '../stores';
 
 interface ChatContextValue {
   chat: ReturnType<typeof useChatInstance>;
+  isChatLoading: boolean;
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null);
@@ -37,7 +46,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
     if (newChatIdRef.current) {
       return newChatIdRef.current;
     }
-    newChatIdRef.current = generateUUID()
+    newChatIdRef.current = generateUUID();
     return newChatIdRef.current;
   }, [urlChatId, newChatIdRef]);
 
@@ -60,11 +69,26 @@ export function ChatProvider({ children }: ChatProviderProps) {
     }
   }, [urlChatId, chatId, chatSessions, navigate]);
 
+  // a temporary solution to the useChat status glitch - it runs to streaming status too early;
+  // set the loading state to the chat session when status becomes submitted
+  // and set it false when onData callback receies response data mark
+  const [isChatLoading, setIsChatLoading] = useState(false);
+
   // Get chat instance
-  const chat = useChatInstance(chatId);
+  const chat = useChatInstance(chatId, () => {
+    setIsChatLoading(false);
+  });
+
+  const { status } = useChat({ chat });
+  useEffect(() => {
+    if (status === 'submitted') {
+      setIsChatLoading(true);
+    }
+  }, [status, chatId]);
 
   const value: ChatContextValue = {
     chat,
+    isChatLoading,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

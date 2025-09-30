@@ -2,11 +2,11 @@ import { Download, Heart, Info, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { CapAvatar } from '@/shared/components/cap-avatar';
 import { Button, Card } from '@/shared/components/ui';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
-import { CapAvatar } from './cap-avatar';
 import { StarRating } from './star-rating';
 
 export interface CapCardProps {
@@ -82,17 +82,17 @@ export function CapCard({ cap }: CapCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         <CapAvatar
           capName={capMetadata.displayName}
           capThumbnail={capMetadata.thumbnail}
-          size="xl"
+          size="7xl"
           className="rounded-md"
         />
         <div className="flex-1 min-w-0">
           <h3
             ref={titleRef}
-            className="font-medium text-md leading-5 line-clamp-2"
+            className="font-medium text-md leading-5 line-clamp-1"
           >
             {capMetadata.displayName}
           </h3>

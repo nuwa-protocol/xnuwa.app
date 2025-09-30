@@ -61,6 +61,8 @@ export const MessageActions = memo(
   PureMessageActions,
   (prevProps, nextProps) => {
     if (prevProps.isStreaming !== nextProps.isStreaming) return false;
+    // Re-render when the message object changes (edited or streamed immutably)
+    if (prevProps.message !== nextProps.message) return false;
     return true;
   },
 );

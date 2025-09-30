@@ -7,7 +7,11 @@ import { useRehydration } from '@/shared/hooks';
 import { useAutoLoadingDetection } from '@/shared/hooks/use-auto-loading-detection';
 import { MobileWarning } from '../shared/components/mobile-warning';
 import { ThemeProvider } from '../shared/components/theme-provider';
-import { StructuredData, generateWebSiteSchema, generateOrganizationSchema } from '../shared/components/structured-data';
+import {
+  StructuredData,
+  generateWebSiteSchema,
+  generateOrganizationSchema,
+} from '../shared/components/structured-data';
 
 export default function RootLayout() {
   // Initialize wallet balance manager
@@ -33,9 +37,9 @@ export default function RootLayout() {
       {isMobile ? (
         // Render only the blocking page on mobile
         <>
-        <MobileWarning />
-        <StructuredData data={generateWebSiteSchema()} />
-        <StructuredData data={generateOrganizationSchema()} />
+          <MobileWarning />
+          <StructuredData data={generateWebSiteSchema()} />
+          <StructuredData data={generateOrganizationSchema()} />
         </>
       ) : (
         <AuthGuard>

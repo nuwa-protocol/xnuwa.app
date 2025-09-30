@@ -1,6 +1,6 @@
 import type { ComponentProps, HTMLAttributes } from 'react';
 import { memo, useMemo } from 'react';
-import { ResponseMarkdown } from './response-markdown';
+import { Markdown } from '@/shared/components/markdown';
 import { ResponseUI } from './response-ui';
 
 function parseCapUIAttributes(
@@ -21,12 +21,12 @@ function parseCapUIAttributes(
 interface ResponseWithUIProps extends HTMLAttributes<HTMLDivElement> {
   children: string;
   allowedImagePrefixes?: ComponentProps<
-    typeof ResponseMarkdown
+    typeof Markdown
   >['allowedImagePrefixes'];
-  allowedLinkPrefixes?: ComponentProps<typeof ResponseMarkdown>['allowedLinkPrefixes'];
-  defaultOrigin?: ComponentProps<typeof ResponseMarkdown>['defaultOrigin'];
+  allowedLinkPrefixes?: ComponentProps<typeof Markdown>['allowedLinkPrefixes'];
+  defaultOrigin?: ComponentProps<typeof Markdown>['defaultOrigin'];
   parseIncompleteMarkdown?: ComponentProps<
-    typeof ResponseMarkdown
+    typeof Markdown
   >['parseIncompleteMarkdown'];
 }
 
@@ -89,15 +89,11 @@ export const AssistantResponse = memo(
           if (part.type === 'capui') {
             const data = part.content as { url: string; title?: string };
             return (
-              <ResponseUI
-                key={data.url}
-                srcUrl={data.url}
-                title={data.title}
-              />
+              <ResponseUI key={data.url} srcUrl={data.url} title={data.title} />
             );
           } else {
             return (
-              <ResponseMarkdown
+              <Markdown
                 key={part.content}
                 allowedImagePrefixes={allowedImagePrefixes}
                 allowedLinkPrefixes={allowedLinkPrefixes}
@@ -105,7 +101,7 @@ export const AssistantResponse = memo(
                 parseIncompleteMarkdown={parseIncompleteMarkdown}
               >
                 {part.content}
-              </ResponseMarkdown>
+              </Markdown>
             );
           }
         })}

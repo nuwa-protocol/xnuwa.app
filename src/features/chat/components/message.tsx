@@ -1,34 +1,68 @@
-import { useChat } from '@ai-sdk/react';
+import type { UseChatHelpers } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 
-import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
-
 import { cn } from '@/shared/utils';
-import { useChatContext } from '../contexts/chat-context';
+import { Loader } from './loader';
 import { MessageActions } from './message-actions';
-import { GeneralTool } from './message-general-tool';
+import { ClearContextMessage } from './message-clear-context';
 import { MessageImage } from './message-image';
+import { RemoteMCPTool } from './message-mcp-tool';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { MessageText } from './message-text';
 import { PreviewAttachment } from './preview-attachment';
 
+// Lightweight message signature to detect content changes cheaply.
+// Helps catch in-place mutations during streaming while keeping comparator fast.
+const messageSignature = (m: UIMessage) => {
+  const parts = m.parts || [];
+  let sig = `${m.role}|${parts.length}|`;
+  for (let i = 0; i < parts.length; i++) {
+    const p: any = parts[i];
+    switch (p.type) {
+      case 'text':
+        sig += `t:${p.text?.length || 0}|`;
+        break;
+      case 'reasoning':
+        sig += `r:${p.text?.length || 0}|`;
+        break;
+      case 'file':
+        sig += `f:${p.url || ''}:${p.mediaType || ''}|`;
+        break;
+      case 'dynamic-tool':
+        sig += `d:${p.toolCallId || ''}:${p.state || ''}|`;
+        break;
+      case 'source-url':
+        sig += `s:${p.url || ''}|`;
+        break;
+      default:
+        sig += `${p.type}|`;
+        break;
+    }
+  }
+  return sig;
+};
 const PurePreviewMessage = ({
-  index,
+  chatId,
   message,
   isReadonly,
-  userMessagesHeight,
+  minHeight,
+  isStreamingReasoning,
+  isStreaming,
+  setMessages,
+  regenerate,
 }: {
-  index: number;
+  chatId: string;
   message: UIMessage;
   isReadonly: boolean;
-  userMessagesHeight: number;
+  minHeight: string | undefined;
+  isStreamingReasoning: boolean;
+  isStreaming: boolean;
+  setMessages: UseChatHelpers<UIMessage>['setMessages'];
+  regenerate: UseChatHelpers<UIMessage>['regenerate'];
 }) => {
-  const { chat } = useChatContext();
-  const { messages, status, setMessages, regenerate } = useChat({ chat });
-
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
   const attachmentsFromUserMessage =
@@ -36,29 +70,15 @@ const PurePreviewMessage = ({
       ? (message.parts || []).filter((part) => part.type === 'file')
       : [];
 
-  // calculate the minimum height of the message
-  const getMessageMinHeight = (shouldPushToTop: boolean, role: string) => {
-    if (shouldPushToTop && role === 'assistant') {
-      const headerHeight = 195;
-      const calculatedMinHeight = Math.max(
-        0,
-        window.innerHeight - headerHeight - userMessagesHeight,
-      );
-      return calculatedMinHeight > 0 ? `${calculatedMinHeight}px` : undefined;
-    }
-    return undefined;
-  };
+  const isClearContextMessage =
+    message.role === 'system' &&
+    message.parts?.some(
+      (part) => part.type === 'data-uimark' && part.data === 'clear-context',
+    );
 
-  const isStreaming = status === 'streaming' && messages.length - 1 === index;
-  const isStreamingReasoning =
-    isStreaming &&
-    message.role === 'assistant' &&
-    message.parts?.some((part) => part.type === 'reasoning') &&
-    !message.parts?.some((part) => part.type === 'text');
+  if (isClearContextMessage) return <ClearContextMessage />;
 
-  const shouldPushToTop =
-    status === 'submitted' && index === messages.length - 1;
-  const minHeight = getMessageMinHeight(shouldPushToTop, message.role);
+  if (message.parts?.length === 0) return <Loader minHeight={minHeight} />;
 
   return (
     <AnimatePresence>
@@ -121,67 +141,71 @@ const PurePreviewMessage = ({
             })()}
 
             {/* render message parts */}
-            {message.parts?.map((part, index) => {
-              // const processedTypes = new Set(['reasoning', 'source']);
-              // if (processedTypes.has(part.type)) return null;
+            {message.parts
+              ?.slice()
+              .sort((a, b) => {
+                if (a.type === 'reasoning' && b.type === 'text') return -1;
+                if (a.type === 'text' && b.type === 'reasoning') return 1;
+                return 0;
+              })
+              ?.map((part, index) => {
+                const { type } = part;
+                const key = `message-${message.id}-part-${index}`;
 
-              const { type } = part;
-              const key = `message-${message.id}-part-${index}`;
+                if (type === 'reasoning' && part.text?.trim().length > 0) {
+                  return (
+                    <MessageReasoning
+                      key={`reasoning-${message.id}-${index}`}
+                      isStreaming={isStreamingReasoning}
+                      content={part.text}
+                    />
+                  );
+                }
 
-              if (type === 'reasoning' && part.text?.trim().length > 0) {
-                return (
-                  <MessageReasoning
-                    key={`reasoning-${message.id}-${index}`}
-                    isStreaming={isStreamingReasoning}
-                    content={part.text}
-                  />
-                );
-              }
+                if (type === 'text') {
+                  return (
+                    <MessageText
+                      key={key}
+                      chatId={chatId}
+                      message={message}
+                      part={part}
+                      index={index}
+                      isReadonly={isReadonly}
+                      setMessages={setMessages}
+                      regenerate={regenerate}
+                      onModeChange={setMode}
+                    />
+                  );
+                }
 
-              if (type === 'text') {
-                return (
-                  <MessageText
-                    key={key}
-                    chatId={chat.id}
-                    message={message}
-                    part={part}
-                    index={index}
-                    isReadonly={isReadonly}
-                    setMessages={setMessages}
-                    regenerate={regenerate}
-                    onModeChange={setMode}
-                  />
-                );
-              }
+                if (type === 'file' && message.role === 'assistant') {
+                  return (
+                    <MessageImage
+                      key={key}
+                      imageName={part.filename}
+                      base64={part.url}
+                      mediaType={part.mediaType}
+                      alt={part.filename || 'Generated Image'}
+                    />
+                  );
+                }
 
-              if (type === 'file' && message.role === 'assistant') {
-                return (
-                  <MessageImage
-                    key={key}
-                    imageName={part.filename}
-                    base64={part.url}
-                    mediaType={part.mediaType}
-                    alt={part.filename || 'Generated Image'}
-                  />
-                );
-              }
+                if (type === 'dynamic-tool') {
+                  const { toolCallId, state, input, output, toolName } = part;
+                  return (
+                    <RemoteMCPTool
+                      key={toolCallId}
+                      input={input}
+                      output={output}
+                      toolCallId={toolCallId}
+                      toolName={toolName}
+                      state={state}
+                    />
+                  );
+                }
 
-              if (type === 'dynamic-tool') {
-                const { toolCallId, state, input, output, toolName } = part;
-                return (
-                  <GeneralTool
-                    key={toolCallId}
-                    input={input}
-                    output={output}
-                    toolCallId={toolCallId}
-                    toolName={toolName}
-                    state={state}
-                  />
-                );
-              }
-
-              return null;
-            })}
+                return null;
+              })}
 
             {!isReadonly && (
               <MessageActions
@@ -200,10 +224,21 @@ const PurePreviewMessage = ({
 export const PreviewMessage = memo(
   PurePreviewMessage,
   (prevProps, nextProps) => {
-    // For non-streaming messages, use normal memo optimization
-    if (prevProps.message.id !== nextProps.message.id) return false;
-    if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
+    // Re-render if any of these props change
+    if (prevProps.chatId !== nextProps.chatId) return false;
+    if (prevProps.isReadonly !== nextProps.isReadonly) return false;
+    if (prevProps.minHeight !== nextProps.minHeight) return false;
+    if (prevProps.isStreaming !== nextProps.isStreaming) return false;
+    if (prevProps.isStreamingReasoning !== nextProps.isStreamingReasoning)
+      return false;
+
+    // Prefer immutability: if the message object reference changes, re-render
+    if (prevProps.message !== nextProps.message) return false;
+
+    // Fallback for in-place mutation: compare a lightweight signature
+    if (messageSignature(prevProps.message) !== messageSignature(nextProps.message))
+      return false;
 
     return true;
   },
-);
+)

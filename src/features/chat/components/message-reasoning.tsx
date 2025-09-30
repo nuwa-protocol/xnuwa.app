@@ -2,13 +2,13 @@ import { useControllableState } from '@radix-ui/react-use-controllable-state';
 import { Brain, ChevronDownIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { createContext, memo, useContext, useEffect, useState } from 'react';
+import { Markdown } from '@/shared/components/markdown';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/shared/components/ui';
 import { cn } from '@/shared/utils/index';
-import { ResponseMarkdown } from './response-markdown';
 
 type AIReasoningContextValue = {
   isStreaming: boolean;
@@ -171,7 +171,7 @@ export const AIReasoningContent = memo(
       )}
       {...props}
     >
-      <ResponseMarkdown>{children}</ResponseMarkdown>
+      <Markdown>{children}</Markdown>
     </CollapsibleContent>
   ),
 );

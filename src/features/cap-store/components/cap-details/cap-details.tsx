@@ -33,7 +33,7 @@ export function CapDetails({ capId }: { capId: string }) {
   const [capQueryData, setCapQueryData] = useState<RemoteCap | null>(null);
   const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<boolean>(false);
-  const { downloadCapByIDWithCache } = useCapStore();
+  const { downloadCapByIDWithCache, fetchFavoriteCaps } = useCapStore();
 
   // Fetch full cap data when selectedCap changes
   useEffect(() => {
@@ -122,8 +122,14 @@ export function CapDetails({ capId }: { capId: string }) {
     if (isCapFavorite) {
       toast.promise(capKit.favorite(capId, 'remove'), {
         loading: 'Removing from favorites...',
-        success: () => {
+        success: async () => {
           setIsCapFavorite(false);
+          // Refresh cached favorites after successful removal
+          try {
+            await fetchFavoriteCaps();
+          } catch {
+            /* noop */
+          }
           return `Removed ${capQueryData.metadata.displayName} from favorites`;
         },
         error: (error) => {
@@ -137,8 +143,14 @@ export function CapDetails({ capId }: { capId: string }) {
     } else {
       toast.promise(capKit.favorite(capId, 'add'), {
         loading: 'Adding to favorites...',
-        success: () => {
+        success: async () => {
           setIsCapFavorite(true);
+          // Refresh cached favorites after successful addition
+          try {
+            await fetchFavoriteCaps();
+          } catch {
+            /* noop */
+          }
           return `Added ${capQueryData.metadata.displayName} to favorites`;
         },
         error: (error) => {
@@ -153,7 +165,7 @@ export function CapDetails({ capId }: { capId: string }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col w-full h-full">
       {/* Content */}
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         <div className="max-w-6xl mx-auto p-6 md:p-8 space-y-8">
@@ -243,7 +255,7 @@ export function CapDetails({ capId }: { capId: string }) {
                     </CardHeader>
                     <CardContent>
                       <p className="text-muted-foreground leading-relaxed text-base break-words">
-                        {capQueryData.metadata.description}
+                        {capQueryData.metadata.introduction}
                       </p>
                     </CardContent>
                   </Card>

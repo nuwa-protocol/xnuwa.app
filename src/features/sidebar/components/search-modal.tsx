@@ -1,5 +1,5 @@
 import { formatDistanceToNow, isSameDay, startOfDay } from 'date-fns';
-import { MessageSquare, X } from 'lucide-react';
+import { MessageSquare, SearchIcon, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as Dialog from '@/shared/components/ui';
@@ -137,3 +137,19 @@ export function SearchModal({ children }: { children: React.ReactNode }) {
     </Dialog.Dialog>
   );
 }
+
+export const SearchModalTrigger = () => {
+  const { t } = useLanguage();
+
+  return (
+    <SearchModal>
+      <button
+        type="button"
+        className="p-1 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-sm transition-colors"
+        aria-label={t('nav.sidebar.search')}
+      >
+        <SearchIcon className="size-4 font-semibold" />
+      </button>
+    </SearchModal>
+  );
+};

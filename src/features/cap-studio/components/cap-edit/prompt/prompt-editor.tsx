@@ -1,19 +1,15 @@
-import { Maximize2, Save, Variable, X } from 'lucide-react';
+import { Variable } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { Markdown } from '@/features/cap-studio/components/cap-edit/prompt/markdown';
-import { ResponseMarkdown } from '@/features/chat/components/response-markdown';
+import { Markdown } from '@/shared/components/markdown';
 import {
   Badge,
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
   Tabs,
   TabsContent,
   TabsList,
@@ -22,6 +18,7 @@ import {
 } from '@/shared/components/ui';
 import { promptVariables } from '@/shared/constants/cap';
 import { cn } from '@/shared/utils';
+import { ImprovePrompt } from './improve-prompt';
 import { InlineUISetup } from './inline-ui-setup';
 import { PromptSuggestions } from './prompt-suggestions';
 
@@ -53,16 +50,21 @@ function VariablesDialog({
           Variables
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="px-0">
+        <DialogHeader className="px-6">
           <DialogTitle>Prompt Variables</DialogTitle>
         </DialogHeader>
-        <div className="space-y-1">
+        <DialogDescription className="px-6">
+          Use the following variables to make your prompt dynamic. Each variable
+          will be replaced with the actual value before the prompt is sent to
+          LLM.
+        </DialogDescription>
+        <div>
           {promptVariables.map((variable) => (
             <button
               key={variable.name}
               type="button"
-              className="w-full text-left cursor-pointer hover:bg-muted/30 rounded-md p-2 transition-colors"
+              className="w-full text-left cursor-pointer hover:bg-accent rounded-md py-4 transition-colors m-0 px-6 border-t"
               onClick={() => {
                 onVariableSelect(`\n\n${variable.value}\n`);
                 onOpenChange(false);
@@ -76,9 +78,13 @@ function VariablesDialog({
                   {variable.name}
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground pl-1">
-                {variable.description}
-              </p>
+              <p className="text-sm mb-1">{variable.description}</p>
+              <div className="flex flex-col items-start">
+                <p className="text-xs font-semibold my-2">Example Prompt:</p>
+                <pre className="w-full text-xs text-muted-foreground whitespace-pre-wrap font-mono p-2 bg-muted/20 rounded-md border">
+                  {variable.example}
+                </pre>
+              </div>
             </button>
           ))}
         </div>
@@ -95,16 +101,10 @@ export function PromptEditor({
   placeholder,
   className,
 }: PromptEditorProps) {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('write');
-  const [drawerActiveTab, setDrawerActiveTab] = useState('write');
   const [isVariablesDialogOpen, setIsVariablesDialogOpen] = useState(false);
-  const [isDrawerVariablesDialogOpen, setIsDrawerVariablesDialogOpen] =
-    useState(false);
   const [wordCount, setWordCount] = useState(0);
-  const [drawerValue, setDrawerValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const drawerTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleChange = (newValue: string) => {
     onChange(newValue);
@@ -137,30 +137,6 @@ export function PromptEditor({
     insertText(variable);
   };
 
-  const openDrawer = () => {
-    setDrawerValue(value);
-    setIsDrawerOpen(true);
-  };
-
-  const handleDrawerSave = () => {
-    onChange(drawerValue);
-    setWordCount(
-      drawerValue
-        .trim()
-        .split(/\s+/)
-        .filter((word) => word.length > 0).length,
-    );
-    setIsDrawerOpen(false);
-  };
-
-  const handleDrawerCancel = () => {
-    setIsDrawerOpen(false);
-  };
-
-  const handleDrawerChange = (newValue: string) => {
-    setDrawerValue(newValue);
-  };
-
   return (
     <div className={cn('space-y-3', className)}>
       {/* Toolbar */}
@@ -180,15 +156,11 @@ export function PromptEditor({
           />
           {/* Inline UI Setup */}
           <InlineUISetup onInsertPrompt={insertText} />
+          {/* Improve Prompt */}
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-xs text-muted-foreground">
-            {wordCount} words
-          </span>
-          <Button variant="ghost" size="sm" type="button" onClick={openDrawer}>
-            <Maximize2 className="h-4 w-4" />
-          </Button>
+          <ImprovePrompt prompt={value} onApply={handleChange} />
         </div>
       </div>
 
@@ -196,6 +168,9 @@ export function PromptEditor({
       <div className="relative">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="write">
+            <span className="absolute top-4 right-4 text-xs text-muted-foreground">
+              {wordCount} words
+            </span>
             <Textarea
               ref={textareaRef}
               value={value}
@@ -209,7 +184,7 @@ export function PromptEditor({
             className="min-h-[800px] p-3 border rounded-md bg-muted/20"
           >
             <div className="prose prose-sm max-w-none">
-              <ResponseMarkdown>{value || 'No content to preview'}</ResponseMarkdown>
+              <Markdown>{value || 'No content to preview'}</Markdown>
             </div>
           </TabsContent>
         </Tabs>
@@ -232,122 +207,6 @@ export function PromptEditor({
           className="pt-4 border-t"
         />
       )}
-
-      {/* Bottom Drawer */}
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-        <DrawerContent className="h-[80vh]">
-          <div className="mx-auto w-full max-w-4xl p-6">
-            <DrawerHeader className="px-0">
-              <DrawerTitle>Prompt Editor</DrawerTitle>
-            </DrawerHeader>
-
-            <div className="flex-1 space-y-4">
-              {/* Drawer Toolbar */}
-              <div className="flex items-center justify-between border-b pb-3">
-                <div className="flex items-center space-x-2">
-                  <Tabs
-                    value={drawerActiveTab}
-                    onValueChange={setDrawerActiveTab}
-                  >
-                    <TabsList>
-                      <TabsTrigger value="write">Write</TabsTrigger>
-                      <TabsTrigger value="preview">Preview</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-
-                  {/* Variables */}
-                  <VariablesDialog
-                    isOpen={isDrawerVariablesDialogOpen}
-                    onOpenChange={setIsDrawerVariablesDialogOpen}
-                    onVariableSelect={(variable) => {
-                      const textarea = drawerTextareaRef.current;
-                      if (!textarea) return;
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const newValue =
-                        drawerValue.substring(0, start) +
-                        variable +
-                        drawerValue.substring(end);
-                      setDrawerValue(newValue);
-                      setTimeout(() => {
-                        textarea.focus();
-                        textarea.selectionStart = textarea.selectionEnd =
-                          start + variable.length;
-                      }, 0);
-                    }}
-                  />
-                  {/* Inline UI Setup */}
-                  <InlineUISetup
-                    onInsertPrompt={(text: string) => {
-                      const textarea = drawerTextareaRef.current;
-                      if (!textarea) return;
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
-                      const newValue =
-                        drawerValue.substring(0, start) +
-                        text +
-                        drawerValue.substring(end);
-                      setDrawerValue(newValue);
-                      setTimeout(() => {
-                        textarea.focus();
-                        textarea.selectionStart = textarea.selectionEnd =
-                          start + text.length;
-                      }, 0);
-                    }}
-                  />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    type="button"
-                    onClick={handleDrawerCancel}
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    Cancel
-                  </Button>
-                  <Button type="button" onClick={handleDrawerSave}>
-                    <Save className="h-4 w-4 mr-2" />
-                    Save
-                  </Button>
-                </div>
-              </div>
-
-              {/* Drawer Editor */}
-              <Tabs value={drawerActiveTab} onValueChange={setDrawerActiveTab}>
-                <TabsContent value="write">
-                  <Textarea
-                    ref={drawerTextareaRef}
-                    value={drawerValue}
-                    onChange={(e) => handleDrawerChange(e.target.value)}
-                    placeholder={placeholder}
-                    className="min-h-[400px] font-mono text-sm resize-none"
-                  />
-                </TabsContent>
-                <TabsContent
-                  value="preview"
-                  className="min-h-[400px] p-3 border rounded-md bg-muted/20"
-                >
-                  <div className="prose prose-sm max-w-none">
-                    <Markdown>
-                      {drawerValue || 'No content to preview'}
-                    </Markdown>
-                  </div>
-                </TabsContent>
-              </Tabs>
-
-              {/* Prompt Suggestions in Drawer */}
-              {onSuggestionsChange && (
-                <PromptSuggestions
-                  suggestions={suggestions}
-                  onSuggestionsChange={onSuggestionsChange}
-                  className="pt-4 border-t"
-                />
-              )}
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
     </div>
   );
 }
