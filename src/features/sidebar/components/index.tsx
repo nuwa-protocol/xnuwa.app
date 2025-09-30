@@ -3,6 +3,7 @@ import { Compass, Loader2, Plus, Settings, Wallet, Wrench } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { WalletStore } from '@/features/wallet/stores';
+import { useDevMode } from '@/shared/hooks';
 import { cn } from '@/shared/utils/cn';
 import { SidebarBody, SidebarProvider, useSidebar } from './sidebar';
 import { PrimarySidebarButton, SecondarySidebarButton } from './sidebar-button';
@@ -12,6 +13,7 @@ import { SidebarLogo } from './sidebar-logo';
 export function AppSidebarContent() {
   const navigate = useNavigate();
   const { open } = useSidebar();
+  const isDevMode = useDevMode();
 
   const { usdAmount, balanceLoading, balanceError } = WalletStore();
   const walletBalance = balanceLoading
@@ -98,12 +100,14 @@ export function AppSidebarContent() {
             targetPath="/explore"
             onClick={() => navigate('/explore')}
           />
-          <SecondarySidebarButton
-            icon={<Wrench className="size-5 shrink-0" />}
-            label="Cap Studio"
-            targetPath="/cap-studio"
-            onClick={() => navigate('/cap-studio')}
-          />
+          {isDevMode && (
+            <SecondarySidebarButton
+              icon={<Wrench className="size-5 shrink-0" />}
+              label="Cap Studio"
+              targetPath="/cap-studio"
+              onClick={() => navigate('/cap-studio')}
+            />
+          )}
         </div>
         <SidebarChats />
       </div>
