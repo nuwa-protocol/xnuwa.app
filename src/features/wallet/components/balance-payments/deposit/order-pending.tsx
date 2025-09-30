@@ -1,6 +1,7 @@
 import {
     BadgeDollarSign,
     Clock,
+    Copy,
     Loader,
     Network,
     RefreshCw,
@@ -52,7 +53,7 @@ export function OrderPending({
     };
 
     return (
-        <div className="flex flex-col gap-4 max-w-xl">
+        <div className="flex flex-col gap-4 max-w-lg mx-auto">
             <div>
                 <div className="flex items-center justify-between">
                     <h3 className="flex items-center gap-2 text-lg font-medium">
@@ -115,9 +116,30 @@ export function OrderPending({
                     <CardTitle className="text-base">Payment Info</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
-                    <div className="flex justify-between items-center">
+                    {/* Ensure long order ids never overflow the card by using a two-column grid.
+                       The value column gets min-w-0 and truncate so it ellipsizes gracefully. */}
+                    <div className="grid grid-cols-[auto,1fr] items-center gap-2">
                         <span className="text-muted-foreground">Order ID</span>
-                        <span className="font-mono text-xs">{order.orderId || 'N/A'}</span>
+                        <div className="min-w-0 flex items-center justify-end gap-1">
+                            <span
+                                className="font-mono text-xs truncate"
+                                title={order.orderId || 'N/A'}
+                            >
+                                {`${order.orderId.slice(0, 10)}...${order.orderId.slice(-10)}` || 'N/A'}
+                            </span>
+                            {order.orderId ? (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 shrink-0"
+                                    onClick={() => handleCopy(order.orderId!)}
+                                    aria-label="Copy Order ID"
+                                    title="Copy"
+                                >
+                                    <Copy className="h-3.5 w-3.5" />
+                                </Button>
+                            ) : null}
+                        </div>
                     </div>
 
                     <div className="flex justify-between items-center">
