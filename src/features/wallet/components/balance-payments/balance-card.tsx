@@ -1,9 +1,4 @@
-import {
-  BanknoteArrowDown,
-  BanknoteArrowUp,
-  CircleDollarSign,
-  WalletIcon,
-} from 'lucide-react';
+import { BanknoteArrowDown, BanknoteArrowUp, HandCoins, WalletIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -84,28 +79,16 @@ export function BalanceCard() {
                 <BanknoteArrowDown className="w-3.5 h-3.5" />
                 Buy
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFaucetDialog(true)}
+                className="w-full"
+              >
+                <HandCoins className="w-3.5 h-3.5" />
+                Free Credits
+              </Button>
               {/* Wrap disabled buttons with tooltip triggers so tooltips still work */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div
-                    className="w-full cursor-not-allowed inline-block"
-                    title="coming soon"
-                  >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full pointer-events-none"
-                      disabled={true}
-                    >
-                      <CircleDollarSign className="w-3.5 h-3.5" />
-                      Transfer
-                    </Button>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top" align="center">
-                  Transfer function will be available soon
-                </TooltipContent>
-              </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
@@ -132,8 +115,8 @@ export function BalanceCard() {
         </CardContent>
       </Card>
 
-      <BuyCreditsModal 
-        open={showBuyModal} 
+      <BuyCreditsModal
+        open={showBuyModal}
         onOpenChange={setShowBuyModal}
       />
 
