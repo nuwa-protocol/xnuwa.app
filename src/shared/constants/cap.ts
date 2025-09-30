@@ -26,8 +26,10 @@ export const promptVariables = [
   },
 ];
 
+export const DefaultCapId = 'did::default:default_cap';
+
 export const defaultCap: Cap = {
-  id: 'did::default:default_cap',
+  id: DefaultCapId,
   authorDID: 'did::default',
   idName: 'default_cap',
   core: {
