@@ -19,7 +19,7 @@ export function CapStoreFavoritesContent() {
 
   if (favoriteCapsError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
+      <div className="flex flex-col items-center justify-center w-full min-h-[700px] text-center">
         <Package className="size-12 text-red-500 mb-4" />
         <h3 className="text-lg font-medium mb-2 text-red-600">
           {t('capStore.status.error')}
@@ -40,7 +40,7 @@ export function CapStoreFavoritesContent() {
 
   if (caps.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
+      <div className="flex flex-col items-center justify-center w-full min-h-[700px] text-center">
         <Package className="size-12 text-muted-foreground mb-4" />
         <h3 className="text-lg font-medium mb-2">No Favorites</h3>
         <p className="text-muted-foreground max-w-md">

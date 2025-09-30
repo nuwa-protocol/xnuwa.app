@@ -49,10 +49,10 @@ export function CapSelector() {
     return (
       <TooltipProvider>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={() => navigate('/explore')}
-          className="rounded-lg w-full min-w-0"
+          className="rounded-lg min-w-0 w-fit"
           type="button"
         >
           <div className="flex items-center gap-2 w-full min-w-0">
@@ -98,7 +98,7 @@ export function CapSelector() {
         >
           <Button
             variant="ghost"
-            className="rounded-lg hover:bg-transparent w-full min-w-0"
+            className="rounded-lg hover:bg-transparent w-fit min-w-0"
             type="button"
           >
             <div className="flex items-center justify-start gap-2 w-full min-w-0 flex-1">
