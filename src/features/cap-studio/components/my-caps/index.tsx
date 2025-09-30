@@ -200,13 +200,21 @@ export function MyCaps({
               Create Your First Cap
             </Button>
             <Button
-              onClick={() => navigate('/cap-studio/batch-create')}
+              onClick={() => importFileRef.current?.click()}
               variant="outline"
               size="lg"
             >
               <Upload className="h-4 w-4 mr-2" />
-              Batch Create
+              Import Json
             </Button>
+            {/* Hidden input for importing a single cap JSON */}
+            <input
+              ref={importFileRef}
+              type="file"
+              accept=".json"
+              onChange={handleImportJson}
+              className="hidden"
+            />
           </div>
         </CardHeader>
       </Card>
