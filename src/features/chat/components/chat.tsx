@@ -25,7 +25,7 @@ export function Chat({ isReadonly }: { isReadonly: boolean }) {
   const artifact = currentCap?.core.artifact;
   const { chat } = useChatContext();
   const [showArtifact, setShowArtifact] = useState(false);
-  const { messages } = useChat({ chat });
+  const { messages } = useChat({ chat, experimental_throttle: 120 });
   const { currentCapArtifactTools } = CurrentCapStore();
 
   useEffect(() => {
