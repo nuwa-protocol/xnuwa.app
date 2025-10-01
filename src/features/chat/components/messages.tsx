@@ -1,4 +1,6 @@
 import { useChat } from '@ai-sdk/react';
+import { useEffect, useRef } from 'react';
+import { useStickToBottomContext } from 'use-stick-to-bottom';
 import { useChatContext } from '../contexts/chat-context';
 import {
   Conversation,
@@ -13,7 +15,12 @@ interface MessagesProps {
 
 function PureMessages({ isReadonly }: MessagesProps) {
   const { chat } = useChatContext();
-  const { messages, status, setMessages, regenerate } = useChat({ chat, experimental_throttle: 120 });
+  const { messages, status, setMessages, regenerate } = useChat({
+    chat,
+    experimental_throttle: 120,
+  });
+  const { scrollToBottom } = useStickToBottomContext();
+  const prevLengthRef = useRef<number>(messages.length);
 
   // Find the last clear context message index
   const lastClearContextIndex = messages.findLastIndex(
@@ -37,6 +44,22 @@ function PureMessages({ isReadonly }: MessagesProps) {
     return undefined;
   };
 
+  // When a user sends a new message, force scroll to bottom immediately
+  useEffect(() => {
+    const last = messages[messages.length - 1];
+    const lengthIncreased = messages.length > prevLengthRef.current;
+    if (lengthIncreased && last?.role === 'user') {
+      // Jump to bottom so the user instantly sees their message and the reply area
+      // Use instant to avoid visible scroll animation on send
+      try {
+        scrollToBottom({ animation: 'smooth', ignoreEscapes: true });
+      } catch {
+        // no-op if context not ready
+      }
+    }
+    prevLengthRef.current = messages.length;
+  }, [messages, scrollToBottom]);
+
   return (
     <ConversationContent>
       {messages.map((message, index) => {
@@ -44,8 +67,8 @@ function PureMessages({ isReadonly }: MessagesProps) {
         const isBeforeLastClearContext =
           lastClearContextIndex !== -1 && index < lastClearContextIndex;
 
-
-        const isStreaming = status === 'streaming' && messages.length - 1 === index;
+        const isStreaming =
+          status === 'streaming' && messages.length - 1 === index;
         const isStreamingReasoning =
           isStreaming &&
           message.role === 'assistant' &&
@@ -85,5 +108,5 @@ export function Messages({ isReadonly }: MessagesProps) {
       <PureMessages isReadonly={isReadonly} />
       <ConversationScrollButton />
     </Conversation>
-  )
-};
+  );
+}
