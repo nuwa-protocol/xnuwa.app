@@ -13,7 +13,7 @@ interface MessagesProps {
 
 function PureMessages({ isReadonly }: MessagesProps) {
   const { chat } = useChatContext();
-  const { messages, status, setMessages, regenerate } = useChat({ chat });
+  const { messages, status, setMessages, regenerate } = useChat({ chat, experimental_throttle: 120 });
 
   // Find the last clear context message index
   const lastClearContextIndex = messages.findLastIndex(
@@ -37,53 +37,53 @@ function PureMessages({ isReadonly }: MessagesProps) {
     return undefined;
   };
 
-
-
   return (
-    <Conversation>
-      <ConversationContent>
-        {messages.map((message, index) => {
-          // Messages before the last clear context should be muted
-          const isBeforeLastClearContext =
-            lastClearContextIndex !== -1 && index < lastClearContextIndex;
+    <ConversationContent>
+      {messages.map((message, index) => {
+        // Messages before the last clear context should be muted
+        const isBeforeLastClearContext =
+          lastClearContextIndex !== -1 && index < lastClearContextIndex;
 
 
-          const isStreaming = status === 'streaming' && messages.length - 1 === index;
-          const isSubmitting = status === 'submitted' && messages.length - 1 === index;
-          const isStreamingReasoning =
-            isStreaming &&
-            message.role === 'assistant' &&
-            message.parts?.some((part) => part.type === 'reasoning') &&
-            !message.parts?.some((part) => part.type === 'text');
+        const isStreaming = status === 'streaming' && messages.length - 1 === index;
+        const isStreamingReasoning =
+          isStreaming &&
+          message.role === 'assistant' &&
+          message.parts?.some((part) => part.type === 'reasoning') &&
+          !message.parts?.some((part) => part.type === 'text');
 
-          const shouldPushToTop =
-            message.role === 'assistant' && index === messages.length - 1;
-          const minHeight = getMessageMinHeight(shouldPushToTop);
+        const shouldPushToTop =
+          message.role === 'assistant' && index === messages.length - 1;
+        const minHeight = getMessageMinHeight(shouldPushToTop);
 
-          return (
-            <div
+        return (
+          <div
+            key={message.id}
+            className={isBeforeLastClearContext ? 'opacity-50' : ''}
+          >
+            <PreviewMessage
               key={message.id}
-              className={isBeforeLastClearContext ? 'opacity-50' : ''}
-            >
-              <PreviewMessage
-                key={message.id}
-                chatId={chat.id}
-                message={message}
-                isReadonly={isReadonly}
-                minHeight={minHeight}
-                isStreamingReasoning={isStreamingReasoning}
-                isStreaming={isStreaming}
-                setMessages={setMessages}
-                regenerate={regenerate}
-              />
-            </div>
-          );
-        })}
-
-        <ConversationScrollButton />
-      </ConversationContent>
-    </Conversation>
+              chatId={chat.id}
+              message={message}
+              isReadonly={isReadonly}
+              minHeight={minHeight}
+              isStreamingReasoning={isStreamingReasoning}
+              isStreaming={isStreaming}
+              setMessages={setMessages}
+              regenerate={regenerate}
+            />
+          </div>
+        );
+      })}
+    </ConversationContent>
   );
 }
 
-export const Messages = PureMessages;
+export function Messages({ isReadonly }: MessagesProps) {
+  return (
+    <Conversation>
+      <PureMessages isReadonly={isReadonly} />
+      <ConversationScrollButton />
+    </Conversation>
+  )
+};
