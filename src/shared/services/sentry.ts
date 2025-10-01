@@ -33,7 +33,8 @@ export function initSentry() {
 
       // add current cap information to event
       const currentCap = CurrentCapStore.getState().currentCap;
-      if (currentCap) {
+      const isLocalCap = currentCap && 'capData' in currentCap;
+      if (currentCap && !isLocalCap) {
         event.tags = {
           ...event.tags,
           current_cap: currentCap.id,
