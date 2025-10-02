@@ -79,7 +79,7 @@ export function OrderExpired({
           <div className="pt-4 border-t space-y-3">
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Order ID</span>
-              <span className="font-mono text-xs">
+              <span className="font-mono text-xs break-all text-right w-1/2">
                 {order.orderId || 'N/A'}
               </span>
             </div>
