@@ -196,10 +196,6 @@ export const useCapUIRender = ({
     }
   }, [title, srcUrl]);
 
-  const sandbox = 'allow-scripts';
-
-  const allowPermissions = '';
-
   // Update the theme when the theme changes
   const { resolvedTheme } = useTheme();
   useEffect(() => {
@@ -210,8 +206,6 @@ export const useCapUIRender = ({
     iframeRef,
     connectToPenpal,
     connectToMCP,
-    sandbox,
-    allowPermissions,
     height,
     validationResult,
     isValidating,
