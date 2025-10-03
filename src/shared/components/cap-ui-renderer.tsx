@@ -6,6 +6,7 @@ import {
   type ChildMethods,
   useCapUIRender,
 } from '@/shared/hooks/use-cap-ui-render';
+import { IFRAME_ALLOW_PERMISSIONS, IFRAME_SANDBOX } from '../config/iframe';
 
 const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
   if (artifact) {
@@ -104,8 +105,6 @@ export const CapUIRenderer = (props: CapUIRendererProps) => {
     iframeRef,
     connectToPenpal,
     connectToMCP,
-    sandbox,
-    allowPermissions,
     height,
     validationResult,
     isValidating,
@@ -132,21 +131,21 @@ export const CapUIRenderer = (props: CapUIRendererProps) => {
       {isLoading && <LoadingScreen artifact={artifact} />}
       <iframe
         src={srcUrl}
-        allow={allowPermissions}
+        allow={IFRAME_ALLOW_PERMISSIONS}
         style={
           isLoading
             ? {
-                width: 0,
-                height: 0,
-                position: 'absolute',
-                border: 0,
-              }
+              width: 0,
+              height: 0,
+              position: 'absolute',
+              border: 0,
+            }
             : {
-                width: '100%',
-                height: artifact ? '100%' : height,
-              }
+              width: '100%',
+              height: artifact ? '100%' : height,
+            }
         }
-        sandbox={sandbox}
+        sandbox={IFRAME_SANDBOX}
         title={title ?? 'Nuwa Cap UI'}
         ref={iframeRef}
         onLoad={() => {
