@@ -44,11 +44,6 @@ interface CapStoreState {
   isLoadingHome: boolean;
   homeError: string | null;
 
-  // Favorite caps management
-  favoriteCaps: RemoteCap[];
-  isFetchingFavoriteCaps: boolean;
-  favoriteCapsError: string | null;
-
   //downloaded caps management
   downloadedCaps: Record<string, Cap>;
 
@@ -64,7 +59,6 @@ interface CapStoreState {
   loadMore: () => Promise<any> | undefined;
   goToPage: (newPage: number) => Promise<any>;
   fetchHome: () => Promise<HomeData | null>;
-  fetchFavoriteCaps: () => Promise<RemoteCap[]>;
   downloadCapByIDWithCache: (id: string) => Promise<Cap>;
 }
 
@@ -96,10 +90,7 @@ const initialState = {
     latest: [],
   },
 
-  // Favorites
-  favoriteCaps: [],
-  isFetchingFavoriteCaps: false,
-  favoriteCapsError: null,
+  // Installed/Favorites moved to InstalledCapsStore
   isLoadingHome: false,
   homeError: null,
 
@@ -110,7 +101,7 @@ const initialState = {
 export const useCapStore = create<CapStoreState>()((set, get) => {
   // Auto-initialize when store is created
   const initialize = async () => {
-    const { isInitialized, fetchCaps, fetchFavoriteCaps, fetchHome } = get();
+    const { isInitialized, fetchCaps, fetchHome } = get();
     if (isInitialized) return;
 
     const capKit = await capKitService.getCapKit();
@@ -119,7 +110,7 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
     set({ isInitialized: true });
 
     // Initial data fetching
-    await Promise.all([fetchCaps(), fetchFavoriteCaps(), fetchHome()]);
+    await Promise.all([fetchCaps(), fetchHome()]);
   };
 
   // Call initialize immediately when store is created
@@ -268,29 +259,6 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
         set({
           homeError: 'Failed to load home data. Please try again.',
           isLoadingHome: false,
-        });
-        throw err;
-      }
-    },
-
-    fetchFavoriteCaps: async (): Promise<RemoteCap[]> => {
-      const capKit = await capKitService.getCapKit();
-      if (!capKit) {
-        return [];
-      }
-
-      set({ isFetchingFavoriteCaps: true, favoriteCapsError: null });
-
-      try {
-        const response = await capKit.queryMyFavorite();
-        const newFavoriteCaps: RemoteCap[] = mapResultsToRemoteCaps(response);
-        set({ favoriteCaps: newFavoriteCaps, isFetchingFavoriteCaps: false });
-        return newFavoriteCaps;
-      } catch (err) {
-        console.error('Error fetching favorite caps:', err);
-        set({
-          favoriteCapsError: 'Failed to fetch favorite caps. Please try again.',
-          isFetchingFavoriteCaps: false,
         });
         throw err;
       }

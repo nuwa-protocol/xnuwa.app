@@ -77,10 +77,10 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
     // Get tag from URL query
     const tag = searchParams.get('tag');
 
-    // Handle favorites route
-    if (path === 'favorites') {
-      return { id: 'favorites', label: 'Favorites', type: 'section' };
-    }
+  // Handle installed route (renamed from favorites)
+  if (path === 'installed') {
+    return { id: 'installed', label: 'Installed Caps', type: 'section' };
+  }
 
     // Handle caps route with tag
     if (path === 'caps' && tag) {
@@ -117,8 +117,8 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
   const getSectionIcon = (sectionId: string, type: string) => {
     if (type === 'section') {
       switch (sectionId) {
-        case 'favorites':
-          return Star;
+        case 'installed':
+          return Package;
         case 'all':
           return Bot;
         default:
@@ -176,8 +176,8 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
 
   // handle active section change
   const handleActiveSectionChange = (section: CapStoreSection) => {
-    if (section.id === 'favorites') {
-      navigate('/explore/favorites');
+    if (section.id === 'installed') {
+      navigate('/explore/installed');
     } else if (section.id === 'all') {
       navigate('/explore/caps');
     } else if (section.type === 'tag') {
@@ -295,24 +295,24 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                     </NavigationMenuContent>
                   </NavigationMenuItem>
 
-                  {/* Favorites - Third menu item */}
+                  {/* Installed - Third menu item (renamed from Favorites) */}
                   <NavigationMenuItem>
                     <button
                       type="button"
-                      onClick={() => navigate('/explore/favorites')}
+                      onClick={() => navigate('/explore/installed')}
                       className={`
                             inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md
                             transition-all duration-200 ease-out relative
                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                             ${
-                              activeSection.id === 'favorites'
+                              activeSection.id === 'installed'
                                 ? 'text-primary after:absolute after:-bottom-2 after:left-2 after:right-2 after:h-0.5 after:bg-primary after:rounded-full'
                                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                             }
                           `}
                     >
-                      <Heart className="size-4" />
-                      <span>Favorites</span>
+                      <Package className="size-4" />
+                      <span>Installed Caps</span>
                     </button>
                   </NavigationMenuItem>
                 </NavigationMenuList>
@@ -353,7 +353,7 @@ export function CapStoreHeader({ style }: { style?: React.CSSProperties }) {
                   </button>
                 )}
               </div>
-              {activeSection.id !== 'favorites' && (
+              {activeSection.id !== 'installed' && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button

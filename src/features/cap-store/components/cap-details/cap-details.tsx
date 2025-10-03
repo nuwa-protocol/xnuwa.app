@@ -14,7 +14,7 @@ import {
   TabsTrigger,
 } from '@/shared/components/ui';
 import { capKitService } from '@/shared/services/capkit-service';
-import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { Cap } from '@/shared/types';
 import { useCapStore } from '../../stores';
 import type { RemoteCap } from '../../types';
@@ -27,13 +27,13 @@ import { CapDetailsRecommendations } from './cap-details-recommendations';
 
 export function CapDetails({ capId }: { capId: string }) {
   const navigate = useNavigate();
-  const { setCurrentCap } = CurrentCapStore();
   const [isLoading, setIsLoading] = useState(true);
   const [downloadedCapData, setDownloadedCapData] = useState<Cap | null>(null);
   const [capQueryData, setCapQueryData] = useState<RemoteCap | null>(null);
   const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<boolean>(false);
-  const { downloadCapByIDWithCache, fetchFavoriteCaps } = useCapStore();
+  const { downloadCapByIDWithCache } = useCapStore();
+  const { fetchInstalledCaps } = InstalledCapsStore();
 
   // Fetch full cap data when selectedCap changes
   useEffect(() => {
@@ -58,7 +58,7 @@ export function CapDetails({ capId }: { capId: string }) {
         const favoriteStatus = await capKit.favorite(capId, 'isFavorite');
         setIsCapFavorite(favoriteStatus.data ?? false);
       } catch (error) {
-        console.error('Failed to fetch favorite status:', error);
+        console.error('Failed to fetch installed status:', error);
       }
     };
 
@@ -100,70 +100,6 @@ export function CapDetails({ capId }: { capId: string }) {
     });
   };
 
-  const handleRunCap = async () => {
-    setIsLoading(true);
-    try {
-      // If we already have the full cap data, use it directly
-      if (downloadedCapData) {
-        setCurrentCap(downloadedCapData);
-        navigate('/chat');
-      }
-    } catch (error) {
-      toast.error('Failed to run cap. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleToggleFavorite = async () => {
-    setIsTogglingFavorite(true);
-    const capKit = await capKitService.getCapKit();
-
-    if (isCapFavorite) {
-      toast.promise(capKit.favorite(capId, 'remove'), {
-        loading: 'Removing from favorites...',
-        success: async () => {
-          setIsCapFavorite(false);
-          // Refresh cached favorites after successful removal
-          try {
-            await fetchFavoriteCaps();
-          } catch {
-            /* noop */
-          }
-          return `Removed ${capQueryData.metadata.displayName} from favorites`;
-        },
-        error: (error) => {
-          console.error('Failed to remove from favorites:', error);
-          return 'Failed to remove from favorites. Please try again.';
-        },
-        finally: () => {
-          setIsTogglingFavorite(false);
-        },
-      });
-    } else {
-      toast.promise(capKit.favorite(capId, 'add'), {
-        loading: 'Adding to favorites...',
-        success: async () => {
-          setIsCapFavorite(true);
-          // Refresh cached favorites after successful addition
-          try {
-            await fetchFavoriteCaps();
-          } catch {
-            /* noop */
-          }
-          return `Added ${capQueryData.metadata.displayName} to favorites`;
-        },
-        error: (error) => {
-          console.error('Failed to add to favorites:', error);
-          return 'Failed to add to favorites. Please try again.';
-        },
-        finally: () => {
-          setIsTogglingFavorite(false);
-        },
-      });
-    }
-  };
-
   return (
     <div className="flex flex-col w-full h-full">
       {/* Content */}
@@ -184,11 +120,6 @@ export function CapDetails({ capId }: { capId: string }) {
           {/* Header Section with Hero Layout */}
           <CapDetailsHeader
             capQueryData={capQueryData}
-            isLoading={isLoading}
-            isCapFavorite={isCapFavorite}
-            isTogglingFavorite={isTogglingFavorite}
-            onRunCap={handleRunCap}
-            onToggleFavorite={handleToggleFavorite}
             downloadedCapData={downloadedCapData}
           />
 

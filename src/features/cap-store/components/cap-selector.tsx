@@ -20,14 +20,17 @@ import {
 } from '@/shared/components/ui';
 import useDevMode from '@/shared/hooks/use-dev-mode';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import { useCapStore } from '../stores';
 import type { RemoteCap } from '../types';
+import type { Cap } from '@/shared/types';
 
 // TODO: switching cap need to have cache
 export function CapSelector() {
   const { currentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
-  const { favoriteCaps, downloadCapByIDWithCache } = useCapStore();
+  const { installedCaps } = InstalledCapsStore();
+  const { downloadCapByIDWithCache } = useCapStore();
   const { setCurrentCap } = CurrentCapStore();
   const { localCaps } = CapStudioStore();
   const isDevMode = useDevMode();
@@ -62,11 +65,21 @@ export function CapSelector() {
     }
   };
 
+  // Directly switch to an installed cap (no download)
+  const handleInstalledCapSelect = (cap: Cap) => {
+    try {
+      setCurrentCap(cap);
+      toast.success('Cap is ready to use!');
+    } catch (error) {
+      console.error('Failed to select installed cap:', error);
+      toast.error('Failed to load cap');
+    }
+  };
 
 
   // Only show local caps in the selector when dev mode is enabled
   const localCapsToShow = isDevMode ? localCaps : [];
-  const hasAnyCaps = favoriteCaps.length + localCapsToShow.length > 0;
+  const hasAnyCaps = installedCaps.length + localCapsToShow.length > 0;
 
   // Determine if current cap is one of local caps (to show badge in trigger)
 
@@ -185,15 +198,15 @@ export function CapSelector() {
                   </div>
                 </DropdownMenuItem>
               ))}
-              {favoriteCaps.length > 0 && <DropdownMenuSeparator />}
+          {installedCaps.length > 0 && <DropdownMenuSeparator />}
             </>
           )}
-          <DropdownMenuLabel>Favorite Caps</DropdownMenuLabel>
-          {favoriteCaps.map((cap) => (
+          <DropdownMenuLabel>Installed Caps</DropdownMenuLabel>
+          {installedCaps.map((cap) => (
             <DropdownMenuItem
               key={cap.id}
               className="cursor-pointer"
-              onSelect={() => handleCapSelect(cap)}
+              onSelect={() => handleInstalledCapSelect(cap)}
             >
               <div className="flex items-center gap-3">
                 <CapAvatar

@@ -34,8 +34,8 @@ export function CapStoreSidebar() {
     const path = pathSegments[2];
     const tag = searchParams.get('tag');
 
-    if (path === 'favorites') {
-      return { id: 'favorites', label: 'Favorites', type: 'section' };
+    if (path === 'installed') {
+      return { id: 'installed', label: 'Installed Caps', type: 'section' };
     }
 
     if (path === 'caps' && tag) {
@@ -57,8 +57,8 @@ export function CapStoreSidebar() {
   const getSectionIcon = (sectionId: string, type: string) => {
     if (type === 'section') {
       switch (sectionId) {
-        case 'favorites':
-          return Star;
+        case 'installed':
+          return Package;
         case 'all':
           return Bot;
         default:
@@ -91,8 +91,8 @@ export function CapStoreSidebar() {
   };
 
   const handleActiveSectionChange = (section: CapStoreSection) => {
-    if (section.id === 'favorites') {
-      navigate('/explore/favorites');
+    if (section.id === 'installed') {
+      navigate('/explore/installed');
     } else if (section.id === 'all') {
       navigate('/explore/caps');
     } else if (section.type === 'tag') {
@@ -109,20 +109,20 @@ export function CapStoreSidebar() {
 
         <ScrollArea className="h-[calc(100vh-200px)]">
           <div className="space-y-1">
-            {/* Favorites */}
+            {/* Installed */}
             <Button
-              variant={activeSection.id === 'favorites' ? 'secondary' : 'ghost'}
+              variant={activeSection.id === 'installed' ? 'secondary' : 'ghost'}
               className="w-full justify-start gap-3 h-10"
               onClick={() =>
                 handleActiveSectionChange({
-                  id: 'favorites',
-                  label: 'Favorites',
+                  id: 'installed',
+                  label: 'Installed Caps',
                   type: 'section',
                 })
               }
             >
-              <Star className="size-4" />
-              <span>Favorites</span>
+              <Package className="size-4" />
+              <span>Installed Caps</span>
             </Button>
 
             {/* All Caps */}

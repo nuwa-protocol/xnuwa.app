@@ -26,21 +26,11 @@ import { CapDetailsActions } from './cap-details-actions';
 
 interface CapDetailsHeaderProps {
   capQueryData: RemoteCap;
-  isLoading: boolean;
-  isCapFavorite: boolean;
-  isTogglingFavorite: boolean;
-  onRunCap: () => void;
-  onToggleFavorite: () => void;
   downloadedCapData: Cap;
 }
 
 export function CapDetailsHeader({
   capQueryData,
-  isLoading,
-  isCapFavorite,
-  isTogglingFavorite,
-  onRunCap,
-  onToggleFavorite,
   downloadedCapData,
 }: CapDetailsHeaderProps) {
   const truncate = (value: string, head = 10, tail = 10) => {
@@ -215,12 +205,8 @@ export function CapDetailsHeader({
         {/* Right column: vertical actions */}
         <div className="w-full md:w-56 md:ml-auto flex flex-col gap-3">
           <CapDetailsActions
-            isLoading={isLoading}
-            isCapFavorite={isCapFavorite}
-            isTogglingFavorite={isTogglingFavorite}
-            onRunCap={onRunCap}
-            onToggleFavorite={onToggleFavorite}
             orientation="vertical"
+            capQueryData={capQueryData}
           />
           <ShareDialog
             title="Share this CAP"
