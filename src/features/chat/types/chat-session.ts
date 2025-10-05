@@ -30,7 +30,8 @@ export interface ChatSession {
   updatedAt: number;
   messages: UIMessage[];
   payments: ChatPayment[];
-  cap: Cap | LocalCap;
+  // Track multiple caps used in a single chat session. The last item is the most recently used.
+  caps: (Cap | LocalCap)[];
   artifactState?: ChatArtifactState;
   selections?: ChatSelection[];
   contextUsage: LanguageModelUsage;

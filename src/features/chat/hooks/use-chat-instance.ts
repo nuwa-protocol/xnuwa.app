@@ -9,7 +9,8 @@ import { useUpdateChatTitle } from './use-update-chat-title';
 
 export function useChatInstance(chatId: string, onStreamStart?: () => void) {
   const navigate = useNavigate();
-  const { getChatSession, chatSessions } = ChatSessionsStore();
+  const { getChatSession, chatSessions, addChatSessionCap } =
+    ChatSessionsStore();
   const { getInstance } = ChatInstanceStore();
   const { updateTitle } = useUpdateChatTitle();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -71,7 +72,7 @@ export function useChatInstance(chatId: string, onStreamStart?: () => void) {
         }
       }
     },
-    [chatId, updateTitle],
+    [chatId, updateTitle, onStreamStart, currentCap],
   );
 
   // chat finish handler
@@ -109,12 +110,19 @@ export function useChatInstance(chatId: string, onStreamStart?: () => void) {
     onData: handleOnData,
   };
 
-  // if current session has a cap, set it to the current cap
+  // if current session has caps, set the most recently used one as current
   useEffect(() => {
-    if (chatSessions[chatId]?.cap && chatSessions[chatId]?.cap !== cap) {
-      setCurrentCap(chatSessions[chatId]?.cap);
+    const session = chatSessions[chatId];
+    if (!session) return;
+
+    // Prefer the last cap in the caps array (most recently used)
+    const caps = session.caps;
+    const lastCap = caps && caps.length > 0 ? caps[caps.length - 1] : undefined;
+
+    if (lastCap && lastCap !== cap) {
+      setCurrentCap(lastCap);
     }
-  }, [chatSessions[chatId]?.cap, setCurrentCap]);
+  }, [chatSessions[chatId], setCurrentCap]);
 
   // return existing instance or create a new one from the store
   return getInstance(chatId, useChatInitConfig.initialMessages, {

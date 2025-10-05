@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createChatSessionsPersistConfig } from '@/shared/storage';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import type { LocalCap } from '@/features/cap-studio/types';
 import type { Cap } from '@/shared/types';
 import type { ChatPayment, ChatSelection, ChatSession } from '../types';
 
@@ -22,7 +23,8 @@ export const createInitialChatSession = (chatId: string): ChatSession => {
     updatedAt: Date.now(),
     messages: [],
     payments: [],
-    cap: currentCap,
+    // initialize with the currently selected cap
+    caps: [currentCap],
     contextUsage: {
       inputTokens: 0,
       outputTokens: 0,
@@ -57,7 +59,9 @@ interface ChatSessionsStoreState {
   addPaymentCtxIdToChatSession: (id: string, payment: ChatPayment) => void;
   updateChatSessionArtifactState: (id: string, state: any) => void;
   getChatSessionArtifactState: (id: string) => any;
-  setChatSessionCap: (id: string, cap: Cap) => void;
+  // Add a cap to the session. If it already exists, move it to the end (most recently used).
+  // Note: Local cap and remote cap with the same id are considered different.
+  addChatSessionCap: (id: string, cap: Cap | LocalCap) => void;
   updateChatSessionContextUsage: (
     id: string,
     usage: LanguageModelUsage,
@@ -165,11 +169,40 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
         }));
       },
 
-      setChatSessionCap: (id: string, cap: Cap) => {
-        get().upsertSession(id, (prev) => ({
-          cap: cap,
-          updatedAt: Date.now(),
-        }));
+      addChatSessionCap: (id: string, cap: Cap | LocalCap) => {
+        get().upsertSession(id, (prev) => {
+          const prevCaps = prev.caps || [];
+
+          // determine if cap already exists
+          const isLocal = (c: Cap | LocalCap): c is LocalCap =>
+            !!c && typeof c === 'object' && 'capData' in c;
+
+          const dupIndex = prevCaps.findIndex((c) => {
+            const aLocal = isLocal(c);
+            const bLocal = isLocal(cap);
+            // Local vs remote with same id are different
+            if (aLocal !== bLocal) return false;
+            // When both local: compare by local id
+            // When both remote: compare by cap id
+            return c.id === (cap as any).id;
+          });
+
+          let nextCaps: (Cap | LocalCap)[];
+          if (dupIndex >= 0) {
+            // move existing to the end
+            const copy = prevCaps.slice();
+            const [existing] = copy.splice(dupIndex, 1);
+            copy.push(existing);
+            nextCaps = copy;
+          } else {
+            nextCaps = [...prevCaps, cap];
+          }
+
+          return {
+            caps: nextCaps,
+            updatedAt: Date.now(),
+          };
+        });
       },
 
       deleteSession: (id: string) => {
