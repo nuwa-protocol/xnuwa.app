@@ -1,4 +1,4 @@
-import { Download, Heart, Info, PackagePlus } from 'lucide-react';
+import { Download, Eye, Info, PackagePlus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -6,8 +6,8 @@ import { CapAvatar } from '@/shared/components/cap-avatar';
 import { Badge, Button, Card } from '@/shared/components/ui';
 import { capKitService } from '@/shared/services/capkit-service';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
-import type { RemoteCap } from '../types';
 import type { Cap } from '@/shared/types';
+import type { RemoteCap } from '../types';
 import { StarRating } from './star-rating';
 
 export interface CapCardProps {
@@ -114,11 +114,11 @@ export function CapCard({ cap }: CapCardProps) {
           {capStats ? (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2">
               <div className="flex items-center gap-1">
-                <Download className="size-3" />
+                <Eye className="size-3" />
                 <span>{capStats.downloads}</span>
               </div>
               <div className="flex items-center gap-1">
-                <Heart className="size-3" />
+                <Download className="size-3" />
                 <span>{capStats.favorites}</span>
               </div>
               <StarRating

@@ -4,10 +4,10 @@ import {
   Brain,
   Code,
   Coins,
+  Download,
   MoreHorizontal,
   Package,
   PenTool,
-  Star,
   Wrench,
 } from 'lucide-react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -121,7 +121,7 @@ export function CapStoreSidebar() {
                 })
               }
             >
-              <Package className="size-4" />
+              <Download className="size-4" />
               <span>Installed Caps</span>
             </Button>
 
