@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import { Badge, Button, Card } from '@/shared/components/ui';
-import { capKitService } from '@/shared/services/capkit-service';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { Cap } from '@/shared/types';
 import type { RemoteCap } from '../types';
@@ -20,7 +19,7 @@ export function CapCard({ cap }: CapCardProps) {
   const [descriptionClamp, setDescriptionClamp] = useState<number>(2);
   const [isHovered, setIsHovered] = useState(false);
 
-  const { installedCaps, fetchInstalledCaps } = InstalledCapsStore();
+  const { installedCaps, fetchInstalledCaps, installCap } = InstalledCapsStore();
 
   /**
    * Dynamically calculate the description line number, so that the title (up to 2 lines) and description together take up 4 lines.
@@ -46,17 +45,9 @@ export function CapCard({ cap }: CapCardProps) {
 
   const handleInstallCap = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const capKit = await capKitService.getCapKit();
-    toast.promise(capKit.favorite(cap.id, 'add'), {
+    toast.promise(installCap(cap.id), {
       loading: 'Installing...',
-      success: async () => {
-        try {
-          await fetchInstalledCaps();
-        } catch {
-          /* noop */
-        }
-        return `Installed ${cap.metadata.displayName}`;
-      },
+      success: `Installed ${cap.metadata.displayName}`,
       error: 'Failed to install. Please try again.',
     });
   };

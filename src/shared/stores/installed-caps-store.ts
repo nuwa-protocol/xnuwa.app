@@ -1,14 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Cap } from '@/shared/types';
+import { rehydrationTracker } from '@/shared/hooks/use-rehydration';
 import { capKitService } from '@/shared/services/capkit-service';
 import { createInstalledCapsPersistConfig } from '@/shared/storage/indexeddb-config';
-import { rehydrationTracker } from '@/shared/hooks/use-rehydration';
+import type { Cap } from '@/shared/types';
 
 interface InstalledCapsState {
   installedCaps: Cap[];
   isFetchingInstalledCaps: boolean;
   installedCapsError: string | null;
+
+  installCap: (capId: string) => Promise<void>;
+  uninstallCap: (capId: string) => Promise<void>;
 
   fetchInstalledCaps: () => Promise<Cap[]>;
 }
@@ -24,6 +27,24 @@ export const InstalledCapsStore = create<InstalledCapsState>()(
       installedCaps: [],
       isFetchingInstalledCaps: false,
       installedCapsError: null,
+
+      installCap: async (capId: string) => {
+        const capKit = await capKitService.getCapKit();
+        const cap = await capKit.downloadByID(capId);
+        if (!cap) {
+          throw new Error('Failed to install cap');
+        }
+        await capKit.favorite(capId, 'add');
+        set({ installedCaps: [...get().installedCaps, cap] });
+      },
+
+      uninstallCap: async (capId: string) => {
+        const capKit = await capKitService.getCapKit();
+        await capKit.favorite(capId, 'remove');
+        set({
+          installedCaps: get().installedCaps.filter((c) => c.id !== capId),
+        });
+      },
 
       fetchInstalledCaps: async () => {
         const capKit = await capKitService.getCapKit();

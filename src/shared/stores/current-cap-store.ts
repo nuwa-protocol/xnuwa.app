@@ -11,7 +11,7 @@ interface CurrentCapState {
   isInitialized: boolean;
   isError: boolean;
   errorMessage: string | null;
-  setCurrentCap: (cap: Cap | LocalCap) => void;
+  setCurrentCap: (cap: Cap | LocalCap | null) => void;
   getCurrentCap: () => Cap | null;
 
   //current cap artifact tools
@@ -54,13 +54,18 @@ export const CurrentCapStore = create<CurrentCapState>()(
         return currentCap;
       },
 
-      setCurrentCap: (cap: Cap | LocalCap) => {
+      setCurrentCap: (cap: Cap | LocalCap | null) => {
         set({
           currentCap: cap,
           isInitialized: false,
           isError: false,
           errorMessage: null,
         });
+
+        if (!cap) {
+          set({ isInitialized: true });
+          return;
+        }
 
         // Initialize MCP for the new cap or cleanup if cap has no MCP servers
         const remoteMCPManager = RemoteMCPManager.getInstance();

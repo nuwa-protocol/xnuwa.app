@@ -1,5 +1,5 @@
 import { PackageCheck, PackagePlus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import {
   Button,
@@ -8,7 +8,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui';
-import { capKitService } from '@/shared/services/capkit-service';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { RemoteCap } from '../../types';
 
@@ -24,75 +23,32 @@ export function CapDetailsActions({
   const isVertical = orientation === 'vertical';
   const [isInstalling, setIsInstalling] = useState(false);
   const [isUninstalling, setIsUninstalling] = useState(false);
-  const [isCapInstalled, setIsCapInstalled] = useState(false);
-  const { fetchInstalledCaps } = InstalledCapsStore();
+  const { installedCaps, installCap, uninstallCap } = InstalledCapsStore();
+  const isCapInstalled = installedCaps.some((c) => c.id === capQueryData.id);
 
-  useEffect(() => {
-    const fetchFavoriteStatus = async () => {
-      const capKit = await capKitService.getCapKit();
-
-      try {
-        const favoriteStatus = await capKit.favorite(
-          capQueryData.id,
-          'isFavorite',
-        );
-        setIsCapInstalled(favoriteStatus.data ?? false);
-      } catch (error) {
-        console.error('Failed to fetch installed status:', error);
-      }
-    };
-    fetchFavoriteStatus();
-  }, [capQueryData.id]);
-
-  const handleToggleFavorite = async () => {
+  const handleToggleInstalled = async () => {
     if (isCapInstalled) {
       setIsUninstalling(true);
     } else {
       setIsInstalling(true);
     }
 
-    const capKit = await capKitService.getCapKit();
-
     if (isCapInstalled) {
-      toast.promise(capKit.favorite(capQueryData.id, 'remove'), {
+      toast.promise(uninstallCap(capQueryData.id), {
         loading: 'Uninstalling...',
-        success: async () => {
-          setIsCapInstalled(false);
-          // Refresh cached installed list after successful removal
-          try {
-            await fetchInstalledCaps();
-          } catch {
-            /* noop */
-          }
-          return `Removed ${capQueryData.metadata.displayName} from installed`;
-        },
+        success: `Removed ${capQueryData.metadata.displayName} from installed`,
         error: (error) => {
           console.error('Failed to remove from installed:', error);
           return 'Failed to remove from installed. Please try again.';
-        },
-        finally: () => {
-          setIsUninstalling(false);
-        },
+        }
       });
     } else {
-      toast.promise(capKit.favorite(capQueryData.id, 'add'), {
+      toast.promise(installCap(capQueryData.id), {
         loading: 'Installing...',
-        success: async () => {
-          setIsCapInstalled(true);
-          // Refresh cached installed list after successful addition
-          try {
-            await fetchInstalledCaps();
-          } catch {
-            /* noop */
-          }
-          return `Installed ${capQueryData.metadata.displayName}`;
-        },
+        success: `Installed ${capQueryData.metadata.displayName}`,
         error: (error) => {
           console.error('Failed to install:', error);
           return 'Failed to install. Please try again.';
-        },
-        finally: () => {
-          setIsInstalling(false);
         },
       });
     }
@@ -106,7 +62,7 @@ export function CapDetailsActions({
             {isCapInstalled ? (
               <Button
                 variant="outline"
-                onClick={handleToggleFavorite}
+                onClick={handleToggleInstalled}
                 disabled={isUninstalling || isInstalling}
                 className={`gap-2 group ${isVertical ? 'w-full' : ''}`}
                 aria-pressed
@@ -121,7 +77,7 @@ export function CapDetailsActions({
             ) : (
               <Button
                 variant="primary"
-                onClick={handleToggleFavorite}
+                onClick={handleToggleInstalled}
                 disabled={isUninstalling || isInstalling}
                 className={`gap-2 ${isVertical ? 'w-full' : ''}`}
                 aria-label="Install"
