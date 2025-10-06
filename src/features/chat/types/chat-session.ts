@@ -32,7 +32,8 @@ export interface ChatSession {
   payments: ChatPayment[];
   // Track multiple caps used in a single chat session. The last item is the most recently used.
   caps: (Cap | LocalCap)[];
-  artifactState?: ChatArtifactState;
+  // Per-cap artifact state; key is a cap-scoped key (e.g. "local:<id>" or "remote:<id>")
+  artifactStates?: Record<string, ChatArtifactState>;
   selections?: ChatSelection[];
   contextUsage: LanguageModelUsage;
   pinned?: boolean;

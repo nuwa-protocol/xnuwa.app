@@ -30,8 +30,15 @@ export const useArtifact = () => {
   const streamMap = useRef(new Map<string, { aborted: boolean }>()); // track streams
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle'); // track saving status
   const { currentCap } = CurrentCapStore();
+  // Underlying Cap object (for requests)
   const cap =
     currentCap && ('capData' in currentCap ? currentCap.capData : currentCap);
+  // Stable key for per-cap artifact state within a chat session
+  const capKey = currentCap
+    ? 'capData' in currentCap
+      ? `local:${currentCap.id}`
+      : `remote:${currentCap.id}`
+    : 'unknown';
 
   const handleSendPrompt = useCallback(
     (prompt: string) => {
@@ -60,7 +67,7 @@ export const useArtifact = () => {
   // Debounced persist function to avoid excessive writes
   const debouncedPersist = useDebounceCallback((state: any) => {
     try {
-      updateChatSessionArtifactState(chat.id, state);
+      updateChatSessionArtifactState(chat.id, capKey, state);
       setSaveStatus('saved');
     } catch (e) {
       console.error('Failed to save artifact state', e);
@@ -79,9 +86,9 @@ export const useArtifact = () => {
 
   // Get state from store instead of localStorage
   const handleGetState = useCallback(() => {
-    const state = getChatSessionArtifactState(chat.id);
+    const state = getChatSessionArtifactState(chat.id, capKey);
     return state?.value || null;
-  }, [chat.id, getChatSessionArtifactState]);
+  }, [chat.id, capKey, getChatSessionArtifactState]);
 
   // Set artifact mcp tools to the global store
   const handleMCPConnected = useCallback(

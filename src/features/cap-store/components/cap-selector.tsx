@@ -1,6 +1,12 @@
-import { AlertCircle, ChevronDown, Loader2, Package, Sparkles } from 'lucide-react';
+import {
+  AlertCircle,
+  ChevronDown,
+  Loader2,
+  Package,
+  Sparkles,
+} from 'lucide-react';
 import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CapStudioStore } from '@/features/cap-studio/stores/cap-studio-stores';
 import type { LocalCap } from '@/features/cap-studio/types';
@@ -22,7 +28,6 @@ import {
 import useDevMode from '@/shared/hooks/use-dev-mode';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
-import { ChatSessionsStore } from '@/features/chat/stores';
 import type { Cap } from '@/shared/types';
 
 // TODO: switching cap need to have cache
@@ -33,9 +38,6 @@ export function CapSelector() {
   const { localCaps } = CapStudioStore();
   const isDevMode = useDevMode();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { addChatSessionCap } = ChatSessionsStore();
-  const chatId = searchParams.get('chat_id');
 
   // Pick a sensible default cap when none is selected yet.
   // Prefer first installed cap; if none, fall back to first local cap (dev mode only).
@@ -54,10 +56,6 @@ export function CapSelector() {
   const handleLocalCapSelect = (cap: LocalCap) => {
     try {
       setCurrentCap(cap);
-      if (chatId) {
-        // Track cap change within the current chat session
-        addChatSessionCap(chatId, cap);
-      }
       toast.success('Local cap is ready to use!');
     } catch (error) {
       console.error('Failed to select local cap:', error);
@@ -69,10 +67,6 @@ export function CapSelector() {
   const handleInstalledCapSelect = (cap: Cap) => {
     try {
       setCurrentCap(cap);
-      if (chatId) {
-        // Track cap change within the current chat session
-        addChatSessionCap(chatId, cap);
-      }
       toast.success('Cap is ready to use!');
     } catch (error) {
       console.error('Failed to select installed cap:', error);
