@@ -29,7 +29,6 @@ import { type Cap, CapSchema } from '@/shared/types';
 import { useSubmitCap } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
-import { DashboardGrid } from '../layout/dashboard-layout';
 import { CapCard } from './cap-card';
 
 interface MyCapsProps {
@@ -381,7 +380,7 @@ export function MyCaps({
           </CardHeader>
         </Card>
       ) : (
-        <DashboardGrid cols={1}>
+        <div className='grid grid-cols-1 gap-4 overflow-y-auto max-h-[calc(100vh-250px)] hide-scrollbar'>
           {allCaps.map((cap) => (
             <CapCard
               key={cap.id}
@@ -402,7 +401,7 @@ export function MyCaps({
               onEnterMultiSelectMode={() => onEditCap?.(cap)}
             />
           ))}
-        </DashboardGrid>
+        </div>
       )}
     </div>
   );
