@@ -1,4 +1,6 @@
-import { Heart, Play } from 'lucide-react';
+import { PackageCheck, PackagePlus } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   Button,
   Tooltip,
@@ -6,71 +8,87 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui';
+import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
+import type { RemoteCap } from '../../types';
 
 interface CapDetailsActionsProps {
-  isLoading: boolean;
-  isCapFavorite: boolean;
-  isTogglingFavorite: boolean;
-  onRunCap: () => void;
-  onToggleFavorite: () => void;
   orientation?: 'horizontal' | 'vertical';
+  capQueryData: RemoteCap;
 }
 
 export function CapDetailsActions({
-  isLoading,
-  isCapFavorite,
-  isTogglingFavorite,
-  onRunCap,
-  onToggleFavorite,
   orientation = 'horizontal',
+  capQueryData,
 }: CapDetailsActionsProps) {
   const isVertical = orientation === 'vertical';
+  const [isInstalling, setIsInstalling] = useState(false);
+  const [isUninstalling, setIsUninstalling] = useState(false);
+  const { installedCaps, installCap, uninstallCap } = InstalledCapsStore();
+  const isCapInstalled = installedCaps.some((c) => c.id === capQueryData.id);
+
+  const handleToggleInstalled = async () => {
+    if (isCapInstalled) {
+      setIsUninstalling(true);
+    } else {
+      setIsInstalling(true);
+    }
+
+    if (isCapInstalled) {
+      toast.promise(uninstallCap(capQueryData.id), {
+        loading: 'Uninstalling...',
+        success: `Removed ${capQueryData.metadata.displayName} from installed`,
+        error: (error) => {
+          console.error('Failed to remove from installed:', error);
+          return 'Failed to remove from installed. Please try again.';
+        }
+      });
+    } else {
+      toast.promise(installCap(capQueryData.id), {
+        loading: 'Installing...',
+        success: `Installed ${capQueryData.metadata.displayName}`,
+        error: (error) => {
+          console.error('Failed to install:', error);
+          return 'Failed to install. Please try again.';
+        },
+      });
+    }
+  };
+
   return (
     <TooltipProvider>
       <div className={`flex gap-3 ${isVertical ? 'flex-col' : ''}`}>
-        <Button
-          onClick={onRunCap}
-          disabled={isLoading}
-          className={`gap-2 ${isVertical ? 'w-full' : ''}`}
-          variant="primary"
-          aria-label={isLoading ? 'Running cap' : 'Run cap'}
-        >
-          <Play className="h-4 w-4" />
-          {isLoading ? 'Loading...' : 'Run Cap'}
-        </Button>
-
         <Tooltip>
           <TooltipTrigger asChild>
-            {isCapFavorite ? (
+            {isCapInstalled ? (
               <Button
                 variant="outline"
-                onClick={onToggleFavorite}
-                disabled={isTogglingFavorite}
+                onClick={handleToggleInstalled}
+                disabled={isUninstalling || isInstalling}
                 className={`gap-2 group ${isVertical ? 'w-full' : ''}`}
                 aria-pressed
-                aria-label="Remove from favorites"
+                aria-label="Uninstall"
               >
-                <Heart className="h-4 w-4 fill-current text-red-500" />
-                <span className="group-hover:hidden">Favorited</span>
+                <PackageCheck className="h-4 w-4" />
+                <span className="group-hover:hidden">Installed</span>
                 <span className="hidden group-hover:inline">
-                  {isTogglingFavorite ? 'Removing...' : 'Remove'}
+                  {isUninstalling ? 'Uninstalling...' : 'Uninstall'}
                 </span>
               </Button>
             ) : (
               <Button
-                variant="outline"
-                onClick={onToggleFavorite}
-                disabled={isTogglingFavorite}
+                variant="primary"
+                onClick={handleToggleInstalled}
+                disabled={isUninstalling || isInstalling}
                 className={`gap-2 ${isVertical ? 'w-full' : ''}`}
-                aria-label="Add to favorites"
+                aria-label="Install"
               >
-                <Heart className="h-4 w-4" />
-                {isTogglingFavorite ? 'Adding...' : 'Favorite'}
+                <PackagePlus className="h-4 w-4 text-white" />
+                {isInstalling ? 'Downloading...' : 'Install'}
               </Button>
             )}
           </TooltipTrigger>
           <TooltipContent>
-            {isCapFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            {isCapInstalled ? 'Uninstall' : 'Install'}
           </TooltipContent>
         </Tooltip>
       </div>

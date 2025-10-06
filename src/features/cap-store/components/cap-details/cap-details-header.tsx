@@ -1,14 +1,5 @@
 import type { Cap } from '@nuwa-ai/cap-kit';
-import {
-  Download,
-  Fingerprint,
-  GitBranch,
-  Heart,
-  Share2,
-  ShieldCheck,
-  Tag,
-  User,
-} from 'lucide-react';
+import { Download, Eye, Fingerprint, GitBranch, Share2, ShieldCheck, Tag, User } from 'lucide-react';
 import { useState } from 'react';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
@@ -26,21 +17,11 @@ import { CapDetailsActions } from './cap-details-actions';
 
 interface CapDetailsHeaderProps {
   capQueryData: RemoteCap;
-  isLoading: boolean;
-  isCapFavorite: boolean;
-  isTogglingFavorite: boolean;
-  onRunCap: () => void;
-  onToggleFavorite: () => void;
   downloadedCapData: Cap;
 }
 
 export function CapDetailsHeader({
   capQueryData,
-  isLoading,
-  isCapFavorite,
-  isTogglingFavorite,
-  onRunCap,
-  onToggleFavorite,
   downloadedCapData,
 }: CapDetailsHeaderProps) {
   const truncate = (value: string, head = 10, tail = 10) => {
@@ -186,15 +167,15 @@ export function CapDetailsHeader({
           {/* Quick Stats */}
           <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-6 mb-4">
             <div className="flex items-center gap-2">
-              <Download className="h-4 w-4 text-muted-foreground" />
+              <Eye className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">
-                {capQueryData.stats.downloads} downloads
+                {capQueryData.stats.downloads} views
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Heart className="h-4 w-4 text-muted-foreground" />
+              <Download className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">
-                {capQueryData.stats.favorites} favorites
+                {capQueryData.stats.favorites} downloads
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -215,12 +196,8 @@ export function CapDetailsHeader({
         {/* Right column: vertical actions */}
         <div className="w-full md:w-56 md:ml-auto flex flex-col gap-3">
           <CapDetailsActions
-            isLoading={isLoading}
-            isCapFavorite={isCapFavorite}
-            isTogglingFavorite={isTogglingFavorite}
-            onRunCap={onRunCap}
-            onToggleFavorite={onToggleFavorite}
             orientation="vertical"
+            capQueryData={capQueryData}
           />
           <ShareDialog
             title="Share this CAP"

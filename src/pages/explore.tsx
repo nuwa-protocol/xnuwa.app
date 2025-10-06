@@ -1,7 +1,7 @@
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { CapDetails } from '@/features/cap-store/components';
 import { CapStoreCapsContent } from '@/features/cap-store/components/content-caps';
-import { CapStoreFavoritesContent } from '@/features/cap-store/components/content-favorites';
+import { CapStoreInstalledContent } from '@/features/cap-store/components/content-installed';
 import { CapStoreSidebar } from '@/features/cap-store/components/sidebar';
 
 const ExplorePageContent = () => {
@@ -19,8 +19,8 @@ const ExplorePageContent = () => {
     } else {
       return <CapStoreCapsContent tag={tag} sortBy={sortBy} search={search} />;
     }
-  } else if (path === 'favorites') {
-    return <CapStoreFavoritesContent />;
+  } else if (path === 'installed') {
+    return <CapStoreInstalledContent />;
   } else {
     return <CapStoreCapsContent tag={tag} sortBy={sortBy} search={search} />;
   }

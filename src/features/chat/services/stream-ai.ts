@@ -6,6 +6,8 @@ import {
   streamText,
   type UIMessage,
 } from 'ai';
+import type { LocalCap } from '@/features/cap-studio/types';
+import type { OnResponseDataMark } from '@/features/chat/types/marks';
 import { CapResolve } from '@/shared/services/cap-resolve';
 import { LLMProvider } from '@/shared/services/llm-providers';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
@@ -24,7 +26,7 @@ export const CreateAIChatStream = async ({
   chatId: string;
   messages: UIMessage[];
   signal?: AbortSignal;
-  cap: Cap;
+  cap: Cap | LocalCap;
 }) => {
   // Resolve cap configuration
   const capResolve = new CapResolve(cap, chatId);
@@ -103,9 +105,10 @@ export const CreateAIChatStream = async ({
           // const { toolCallId, toolName } = chunk;
           // }
           if (hasSendOnResponseDataMark) return;
+          const onResponse: OnResponseDataMark = { mark: 'onResponse', cap };
           writer.write({
             type: 'data-mark',
-            data: 'onResponse',
+            data: onResponse,
           });
           hasSendOnResponseDataMark = true;
         },

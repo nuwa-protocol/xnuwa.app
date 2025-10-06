@@ -65,7 +65,9 @@ export const SidebarChatItem = ({
   const isSelected =
     location.pathname.startsWith('/chat') && chatSessionId === chat.id;
 
-  const isLocalCap = 'capData' in chat.cap;
+  const lastCap = chat.caps && chat.caps.length > 0 ? chat.caps[chat.caps.length - 1] : null;
+  const isLocalCap = lastCap ? 'capData' in lastCap : false;
+  const capsCount = chat.caps?.length || 0;
 
   return (
     <div
@@ -105,9 +107,27 @@ export const SidebarChatItem = ({
           className="flex-1 min-w-0 group-hover/sidebar:translate-x-1 transition duration-150"
         >
           <div className="max-w-[210px] flex flex-row items-center gap-2">
-            {/* Avatar with a tiny corner dot when using a local cap */}
+            {/* Avatar of the latest cap; show a small count badge if >1 caps used */}
             <div className="relative shrink-0">
-              <CapAvatar cap={chat.cap} size="md" className={cn("rounded-md", isLocalCap && "border border-2  border-muted-foreground opacity-50")} />
+              <CapAvatar
+                cap={lastCap}
+                size="md"
+                className={cn(
+                  'rounded-md',
+                  isLocalCap && 'border border-2  border-muted-foreground opacity-50',
+                )}
+              />
+              {capsCount > 1 && (
+                <span
+                  className={cn(
+                    'absolute -top-1 -right-1 h-4 min-w-[16px] px-1 rounded-full',
+                    'bg-theme-500 text-white text-[10px] leading-4 font-bold text-center',
+                    'shadow ring-1 ring-background',
+                  )}
+                >
+                  {capsCount}
+                </span>
+              )}
             </div>
             <span className="truncate text-sm">{chat.title}</span>
           </div>

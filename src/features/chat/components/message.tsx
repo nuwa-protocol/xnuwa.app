@@ -3,6 +3,8 @@ import type { UIMessage } from 'ai';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
+import { MessageCap } from './message-cap';
+import { isOnResponseDataMarkPart, type OnResponseDataMarkPart } from '@/features/chat/types/marks';
 import { cn } from '@/shared/utils';
 import { Loader } from './loader';
 import { MessageActions } from './message-actions';
@@ -80,6 +82,14 @@ const PurePreviewMessage = ({
 
   if (message.parts?.length === 0) return <Loader minHeight={minHeight} />;
 
+  // Find the onResponse data mark part
+  const onResponsePart = (() => {
+    for (const part of message.parts || []) {
+      if (isOnResponseDataMarkPart(part)) return part as OnResponseDataMarkPart;
+    }
+    return null;
+  })();
+
   return (
     <AnimatePresence>
       <motion.div
@@ -104,6 +114,10 @@ const PurePreviewMessage = ({
               minHeight: minHeight,
             }}
           >
+            {/* Cap identity header for assistant messages when the onResponse mark is present */}
+            {message.role === 'assistant' && onResponsePart && (
+              <MessageCap part={onResponsePart} />
+            )}
             {attachmentsFromUserMessage.length > 0 && (
               <div
                 data-testid={`message-attachments`}

@@ -26,8 +26,13 @@ export const Artifact = ({ artifact }: ArtifactProps) => {
   } = useArtifact();
 
   const { chat } = useChatContext();
-  const { getCurrentCap } = CurrentCapStore();
+  const { getCurrentCap, currentCap } = CurrentCapStore();
   const cap = getCurrentCap();
+  const capKey = currentCap
+    ? 'capData' in currentCap
+      ? `local:${currentCap.id}`
+      : `remote:${currentCap.id}`
+    : 'unknown';
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden">
@@ -39,7 +44,7 @@ export const Artifact = ({ artifact }: ArtifactProps) => {
       /> */}
       <div className="min-h-0 flex-1 overflow-hidden">
         <CapUIRenderer
-          key={`${artifact}-${chat.id}`}
+          key={`${artifact.srcUrl}-${chat.id}-${capKey}`}
           srcUrl={artifact.srcUrl}
           title={cap?.idName || ''}
           artifact={true}

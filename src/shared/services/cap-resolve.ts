@@ -1,18 +1,25 @@
+import type { LocalCap } from '@/features/cap-studio/types';
 import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
 import { RemoteMCPManager } from '@/shared/services/global-mcp-manager';
 import type { Cap } from '@/shared/types';
 
 export class CapResolve {
-  private cap: Cap;
+  private cap: Cap | LocalCap;
   private isCurrentCapMCPError: boolean;
   private hasMCPServers: boolean;
   private chatId: string;
 
-  constructor(cap: Cap, chatId: string) {
+  constructor(cap: Cap | LocalCap, chatId: string) {
     this.cap = cap;
     this.isCurrentCapMCPError = false;
-    this.hasMCPServers = Object.keys(this.cap.core.mcpServers).length > 0;
+    this.hasMCPServers =
+      Object.keys(('capData' in cap ? cap.capData.core : cap.core).mcpServers)
+        .length > 0;
     this.chatId = chatId;
+  }
+
+  private get asCap(): Cap {
+    return 'capData' in this.cap ? this.cap.capData : this.cap;
   }
 
   private async getUserLocation(): Promise<string> {
@@ -80,14 +87,14 @@ export class CapResolve {
   }
 
   async getResolvedPrompt(): Promise<string> {
-    return await this.resolveVariables(this.cap.core.prompt.value);
+    return await this.resolveVariables(this.asCap.core.prompt.value);
   }
 
   async getResolvedTools(): Promise<Record<string, any>> {
     if (this.hasMCPServers && !this.isCurrentCapMCPError) {
       // Make sure MCP is initialized through global manager
       const remoteMCPManager = RemoteMCPManager.getInstance();
-      await remoteMCPManager.initializeForCap(this.cap);
+      await remoteMCPManager.initializeForCap(this.asCap);
 
       // Get tools from global manager
       return remoteMCPManager.getCurrentTools();
@@ -99,7 +106,7 @@ export class CapResolve {
   async getResolvedConfig() {
     return {
       prompt: await this.getResolvedPrompt(),
-      model: this.cap.core.model,
+      model: this.asCap.core.model,
       tools: await this.getResolvedTools(),
     };
   }

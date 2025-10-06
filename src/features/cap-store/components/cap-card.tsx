@@ -1,16 +1,16 @@
-import { Download, Heart, Info, Play } from 'lucide-react';
+import { Download, Eye, Info, PackagePlus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CapAvatar } from '@/shared/components/cap-avatar';
-import { Button, Card } from '@/shared/components/ui';
-import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import { useCapStore } from '../stores';
+import { Badge, Button, Card } from '@/shared/components/ui';
+import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
+import type { Cap } from '@/shared/types';
 import type { RemoteCap } from '../types';
 import { StarRating } from './star-rating';
 
 export interface CapCardProps {
-  cap: RemoteCap;
+  cap: RemoteCap | Cap;
 }
 
 export function CapCard({ cap }: CapCardProps) {
@@ -19,8 +19,7 @@ export function CapCard({ cap }: CapCardProps) {
   const [descriptionClamp, setDescriptionClamp] = useState<number>(2);
   const [isHovered, setIsHovered] = useState(false);
 
-  const { setCurrentCap } = CurrentCapStore();
-  const { downloadCapByIDWithCache } = useCapStore();
+  const { installedCaps, fetchInstalledCaps, installCap } = InstalledCapsStore();
 
   /**
    * Dynamically calculate the description line number, so that the title (up to 2 lines) and description together take up 4 lines.
@@ -44,28 +43,13 @@ export function CapCard({ cap }: CapCardProps) {
     return () => window.removeEventListener('resize', recomputeClamp);
   }, [cap]);
 
-  const handleUseCap = async (e: React.MouseEvent) => {
+  const handleInstallCap = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      toast.promise(
-        async () => {
-          const downloadedCap = await downloadCapByIDWithCache(cap.id);
-          if (downloadedCap) {
-            setCurrentCap(downloadedCap);
-            navigate('/chat');
-          } else {
-            console.error('Failed to download cap:', cap.id);
-          }
-        },
-        {
-          loading: 'Loading cap...',
-          success: 'Cap loaded successfully',
-          error: 'Failed to load cap',
-        },
-      );
-    } catch (error) {
-      console.error('Failed to download cap:', error);
-    }
+    toast.promise(installCap(cap.id), {
+      loading: 'Installing...',
+      success: `Installed ${cap.metadata.displayName}`,
+      error: 'Failed to install. Please try again.',
+    });
   };
 
   const handleShowDetails = (e: React.MouseEvent) => {
@@ -74,20 +58,31 @@ export function CapCard({ cap }: CapCardProps) {
   };
 
   const capMetadata = cap.metadata;
-  const capStats = cap.stats;
+  const capStats = 'stats' in cap ? cap.stats : undefined;
+
+  const isInstalled = installedCaps.some((c) => c.id === cap.id);
 
   return (
     <Card
-      className="p-4 hover:shadow-md transition-shadow relative overflow-hidden group"
+      className={`p-4 transition-shadow relative overflow-hidden group shadow-lg
+        ${isInstalled
+          ? 'border-theme-primary cursor-pointer hover:shadow-md hover:bg-accent/40 transition-colors transition-all'
+          : 'hover:shadow-md'
+        }
+      `}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => {
+        if (isInstalled) navigate(`/explore/caps/${cap.id}`);
+      }}
     >
+      {isInstalled && (
+        <Badge className="absolute bottom-3 right-3 bg-theme-primary text-white border border-theme-primary">
+          Installed
+        </Badge>
+      )}
       <div className="flex items-start gap-3">
-        <CapAvatar
-          cap={cap}
-          size="7xl"
-          className="rounded-md"
-        />
+        <CapAvatar cap={cap} size="7xl" className="rounded-md" />
         <div className="flex-1 min-w-0">
           <h3
             ref={titleRef}
@@ -110,11 +105,11 @@ export function CapCard({ cap }: CapCardProps) {
           {capStats ? (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2">
               <div className="flex items-center gap-1">
-                <Download className="size-3" />
+                <Eye className="size-3" />
                 <span>{capStats.downloads}</span>
               </div>
               <div className="flex items-center gap-1">
-                <Heart className="size-3" />
+                <Download className="size-3" />
                 <span>{capStats.favorites}</span>
               </div>
               <StarRating
@@ -128,27 +123,30 @@ export function CapCard({ cap }: CapCardProps) {
         </div>
       </div>
 
-      {/* Hover Overlay */}
-      <div
-        className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-      >
-        <Button
-          onClick={handleUseCap}
-          className="bg-theme-primary hover:bg-theme-primary/90 text-theme-primary-foreground"
+      {/* Hover Overlay (only when not installed) */}
+      {!isInstalled && (
+        <div
+          className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
         >
-          <Play className="w-4 h-4 mr-2" />
-          Run
-        </Button>
-        <Button
-          onClick={handleShowDetails}
-          variant="secondary"
-          className="bg-background/90 hover:bg-background"
-        >
-          <Info className="w-4 h-4 mr-2" />
-          Details
-        </Button>
-      </div>
+          <Button
+            onClick={handleInstallCap}
+            variant="primary"
+            className="gap-2"
+          >
+            <PackagePlus className="w-4 h-4 text-white" />
+            Install
+          </Button>
+          <Button
+            onClick={handleShowDetails}
+            variant="secondary"
+            className="bg-background/90 hover:bg-background"
+          >
+            <Info className="w-4 h-4 mr-2" />
+            Details
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }

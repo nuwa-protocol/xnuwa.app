@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createChatSessionsPersistConfig } from '@/shared/storage';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import type { LocalCap } from '@/features/cap-studio/types';
 import type { Cap } from '@/shared/types';
 import type { ChatPayment, ChatSelection, ChatSession } from '../types';
 
@@ -22,7 +23,8 @@ export const createInitialChatSession = (chatId: string): ChatSession => {
     updatedAt: Date.now(),
     messages: [],
     payments: [],
-    cap: currentCap,
+    // initialize with the currently selected cap
+    caps: [currentCap],
     contextUsage: {
       inputTokens: 0,
       outputTokens: 0,
@@ -55,9 +57,17 @@ interface ChatSessionsStoreState {
   addSelectionToChatSession: (id: string, selection: ChatSelection) => void;
   removeSelectionFromChatSession: (id: string, selectionId: string) => void;
   addPaymentCtxIdToChatSession: (id: string, payment: ChatPayment) => void;
-  updateChatSessionArtifactState: (id: string, state: any) => void;
-  getChatSessionArtifactState: (id: string) => any;
-  setChatSessionCap: (id: string, cap: Cap) => void;
+  // Persist artifact UI state per-cap within a chat session
+  updateChatSessionArtifactState: (
+    chatId: string,
+    capKey: string,
+    state: any,
+  ) => void;
+  // Read artifact UI state for a cap within a chat session
+  getChatSessionArtifactState: (chatId: string, capKey: string) => any;
+  // Add a cap to the session. If it already exists, move it to the end (most recently used).
+  // Note: Local cap and remote cap with the same id are considered different.
+  addChatSessionCap: (id: string, cap: Cap | LocalCap) => void;
   updateChatSessionContextUsage: (
     id: string,
     usage: LanguageModelUsage,
@@ -165,11 +175,40 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
         }));
       },
 
-      setChatSessionCap: (id: string, cap: Cap) => {
-        get().upsertSession(id, (prev) => ({
-          cap: cap,
-          updatedAt: Date.now(),
-        }));
+      addChatSessionCap: (id: string, cap: Cap | LocalCap) => {
+        get().upsertSession(id, (prev) => {
+          const prevCaps = prev.caps || [];
+
+          // determine if cap already exists
+          const isLocal = (c: Cap | LocalCap): c is LocalCap =>
+            !!c && typeof c === 'object' && 'capData' in c;
+
+          const dupIndex = prevCaps.findIndex((c) => {
+            const aLocal = isLocal(c);
+            const bLocal = isLocal(cap);
+            // Local vs remote with same id are different
+            if (aLocal !== bLocal) return false;
+            // When both local: compare by local id
+            // When both remote: compare by cap id
+            return c.id === (cap as any).id;
+          });
+
+          let nextCaps: (Cap | LocalCap)[];
+          if (dupIndex >= 0) {
+            // move existing to the end
+            const copy = prevCaps.slice();
+            const [existing] = copy.splice(dupIndex, 1);
+            copy.push(existing);
+            nextCaps = copy;
+          } else {
+            nextCaps = [...prevCaps, cap];
+          }
+
+          return {
+            caps: nextCaps,
+            updatedAt: Date.now(),
+          };
+        });
       },
 
       deleteSession: (id: string) => {
@@ -202,18 +241,33 @@ export const ChatSessionsStore = create<ChatSessionsStoreState>()(
         }
       },
 
-      updateChatSessionArtifactState: (chatId: string, artifactState: any) => {
-        get().upsertSession(chatId, (prev) => ({
-          // Preserve existing behavior: do not touch session.updatedAt here
-          artifactState: {
-            value: artifactState,
-            updatedAt: Date.now(),
-          },
-        }));
+      updateChatSessionArtifactState: (
+        chatId: string,
+        capKey: string,
+        artifactState: any,
+      ) => {
+        get().upsertSession(chatId, (prev) => {
+          const prevMap = prev.artifactStates || {};
+          return {
+            // Do not touch session.updatedAt here
+            artifactStates: {
+              ...prevMap,
+              [capKey]: {
+                value: artifactState,
+                updatedAt: Date.now(),
+              },
+            },
+          };
+        });
       },
 
-      getChatSessionArtifactState: (id: string) => {
-        return get().chatSessions[id]?.artifactState;
+      getChatSessionArtifactState: (chatId: string, capKey: string) => {
+        const session: any = get().chatSessions[chatId];
+        // New per-cap state first
+        const perCap = session?.artifactStates?.[capKey];
+        if (perCap) return perCap;
+        // Fallback: legacy single artifactState on session
+        return session?.artifactState;
       },
 
       updateChatSessionContextUsage: (

@@ -1,4 +1,11 @@
-import { AlertCircle, ChevronDown, Loader2, Sparkles } from 'lucide-react';
+import {
+  AlertCircle,
+  ChevronDown,
+  Loader2,
+  Package,
+  Sparkles,
+} from 'lucide-react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CapStudioStore } from '@/features/cap-studio/stores/cap-studio-stores';
@@ -20,36 +27,30 @@ import {
 } from '@/shared/components/ui';
 import useDevMode from '@/shared/hooks/use-dev-mode';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import { useCapStore } from '../stores';
-import type { RemoteCap } from '../types';
+import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
+import type { Cap } from '@/shared/types';
 
 // TODO: switching cap need to have cache
 export function CapSelector() {
-  const { currentCap, isInitialized, isError, errorMessage } =
+  const { currentCap, setCurrentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
-  const { favoriteCaps, downloadCapByIDWithCache } = useCapStore();
-  const { setCurrentCap } = CurrentCapStore();
+  const { installedCaps } = InstalledCapsStore();
   const { localCaps } = CapStudioStore();
   const isDevMode = useDevMode();
   const navigate = useNavigate();
-  const handleCapSelect = async (cap: RemoteCap) => {
-    const id = cap.id;
-    try {
-      toast.promise(
-        async () => {
-          const cap = await downloadCapByIDWithCache(id);
-          setCurrentCap(cap);
-        },
-        {
-          loading: 'Loading cap...',
-          success: 'Cap is ready to use!',
-          error: 'Failed to load cap',
-        },
-      );
-    } catch (error) {
-      console.error('Failed to select cap:', error);
+
+  // Pick a sensible default cap when none is selected yet.
+  // Prefer first installed cap; if none, fall back to first local cap (dev mode only).
+  useEffect(() => {
+    if (!currentCap) {
+      const firstInstalled = installedCaps[0];
+      // Only consider local caps when dev mode is enabled (they are visible in the menu then)
+      const firstLocal = isDevMode ? localCaps[0] : undefined;
+      if (firstInstalled) setCurrentCap(firstInstalled);
+      else if (firstLocal) setCurrentCap(firstLocal);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCap, installedCaps, isDevMode, localCaps]);
 
   // Directly switch to a local cap (no download)
   const handleLocalCapSelect = (cap: LocalCap) => {
@@ -62,67 +63,33 @@ export function CapSelector() {
     }
   };
 
-
+  // Directly switch to an installed cap (no download)
+  const handleInstalledCapSelect = (cap: Cap) => {
+    try {
+      setCurrentCap(cap);
+      toast.success('Cap is ready to use!');
+    } catch (error) {
+      console.error('Failed to select installed cap:', error);
+      toast.error('Failed to load cap');
+    }
+  };
 
   // Only show local caps in the selector when dev mode is enabled
   const localCapsToShow = isDevMode ? localCaps : [];
-  const hasAnyCaps = favoriteCaps.length + localCapsToShow.length > 0;
+  const hasAnyCaps = installedCaps.length + localCapsToShow.length > 0;
 
   // Determine if current cap is one of local caps (to show badge in trigger)
 
   const isCurrentLocal = currentCap && 'capData' in currentCap;
 
-  const capName = currentCap && ('capData' in currentCap ? currentCap.capData.metadata.displayName : currentCap.metadata.displayName);
-  const capThumbnail = currentCap && ('capData' in currentCap ? currentCap.capData.metadata.thumbnail : currentCap.metadata.thumbnail);
+  const capName =
+    currentCap &&
+    ('capData' in currentCap
+      ? currentCap.capData.metadata.displayName
+      : currentCap.metadata.displayName);
 
-
-  // If no favorite caps, open store directly on click
-  if (!hasAnyCaps && currentCap) {
-    return (
-      <TooltipProvider>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/explore')}
-          className="rounded-lg min-w-0 w-fit"
-          type="button"
-        >
-          <div className="flex items-center gap-2 w-full min-w-0">
-            <div className="flex flex-row items-center gap-2 min-w-0 flex-1">
-              <CapAvatar
-                cap={currentCap}
-                size="lg"
-                className="rounded-md"
-              />
-              <span className="text-sm font-medium truncate min-w-0">
-                {capName}
-              </span>
-              {isCurrentLocal && (
-                <Badge variant="secondary" className="ml-1">
-                  Dev
-                </Badge>
-              )}
-            </div>
-            {!isInitialized && (
-              <Loader2 className="w-3 h-3 animate-spin text-muted-foreground flex-shrink-0" />
-            )}
-          </div>
-        </Button>
-        {isError && (
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <AlertCircle className="w-3 h-3 text-destructive cursor-default" />
-            </TooltipTrigger>
-            <TooltipContent className="max-w-48 break-words">
-              <p>
-                {errorMessage ||
-                  'Cap Initialization Failed, Please Select Again or Check Network Connection'}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        )}
-      </TooltipProvider>
-    );
+  if (!currentCap) {
+    return null;
   }
 
   return (
@@ -138,13 +105,9 @@ export function CapSelector() {
             type="button"
           >
             <div className="flex items-center justify-start gap-2 w-full min-w-0 flex-1">
-              <CapAvatar
-                cap={currentCap}
-                size="lg"
-                className="rounded-md"
-              />
+              <CapAvatar cap={currentCap} size="lg" className="rounded-md" />
               <span className="text-sm font-medium truncate text-left min-w-0">
-                {capName || ''}
+                {capName || 'Install a cap to start'}
               </span>
               {isCurrentLocal && (
                 <Badge variant="secondary" className="ml-1 text-xs">
@@ -170,11 +133,7 @@ export function CapSelector() {
                 >
                   <div className="flex items-center gap-3 justify-between w-full">
                     <div className="flex flex-row items-center gap-2">
-                      <CapAvatar
-                        cap={cap}
-                        size="lg"
-                        className="rounded-md"
-                      />
+                      <CapAvatar cap={cap} size="lg" className="rounded-md" />
                       <span className="text-sm">
                         {cap.capData.metadata.displayName}
                       </span>
@@ -185,26 +144,34 @@ export function CapSelector() {
                   </div>
                 </DropdownMenuItem>
               ))}
-              {favoriteCaps.length > 0 && <DropdownMenuSeparator />}
+              {installedCaps.length > 0 && <DropdownMenuSeparator />}
             </>
           )}
-          <DropdownMenuLabel>Favorite Caps</DropdownMenuLabel>
-          {favoriteCaps.map((cap) => (
-            <DropdownMenuItem
-              key={cap.id}
-              className="cursor-pointer"
-              onSelect={() => handleCapSelect(cap)}
-            >
-              <div className="flex items-center gap-3">
-                <CapAvatar
-                  cap={cap}
-                  size="lg"
-                  className="rounded-md"
-                />
-                <span className="text-sm">{cap.metadata.displayName}</span>
-              </div>
-            </DropdownMenuItem>
-          ))}
+          {installedCaps.length > 0 && (
+            <DropdownMenuLabel>Installed Caps</DropdownMenuLabel>
+          )}
+          {installedCaps.length > 0 &&
+            installedCaps.map((cap) => (
+              <DropdownMenuItem
+                key={cap.id}
+                className="cursor-pointer"
+                onSelect={() => handleInstalledCapSelect(cap)}
+              >
+                <div className="flex items-center gap-3">
+                  <CapAvatar cap={cap} size="lg" className="rounded-md" />
+                  <span className="text-sm">{cap.metadata.displayName}</span>
+                </div>
+              </DropdownMenuItem>
+            ))}
+          {!hasAnyCaps && (
+            <div className="flex flex-col items-center justify-center gap-2 w-full py-3 px-2 text-center">
+              <Package className="w-6 h-6 text-muted-foreground" />
+              <span className="text-sm font-medium">No Installed Caps</span>
+              <span className="text-xs text-muted-foreground">
+                Browse the store and install a cap to get started.
+              </span>
+            </div>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
