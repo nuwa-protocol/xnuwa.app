@@ -61,6 +61,8 @@ export const useCapUIRender = ({
 
   // Keep a ref to child's exposed methods
   const childMethodsRef = useRef<ChildMethods | null>(null);
+  // Keep a ref to the current penpal connection so we can explicitly destroy it
+  const connectionRef = useRef<ReturnType<typeof connect<ChildMethods>> | null>(null);
 
   const [height, setHeight] = useState<number>(100); // Default height
   const [validationResult, setValidationResult] =
@@ -140,6 +142,9 @@ export const useCapUIRender = ({
     },
   };
 
+  // Current theme for initial sync on connect and subsequent updates
+  const { resolvedTheme } = useTheme();
+
   const connectToPenpal = useCallback(async () => {
     try {
       if (!iframeRef.current?.contentWindow) {
@@ -151,6 +156,13 @@ export const useCapUIRender = ({
         allowedOrigins: ['*'],
       });
 
+      // Tear down any previous connection before creating a new one
+      try {
+        connectionRef.current?.destroy?.();
+      } catch {}
+      connectionRef.current = null;
+      childMethodsRef.current = null;
+
       const connection = connect<ChildMethods>({
         messenger,
         methods: {
@@ -159,10 +171,16 @@ export const useCapUIRender = ({
         },
         timeout: NUWA_CLIENT_TIMEOUT,
       });
-
+      connectionRef.current = connection;
       const child = await connection.promise;
       childMethodsRef.current = child;
-
+      // Push the current theme to the child immediately after connect
+      try {
+        const themeToSend = resolvedTheme as 'light' | 'dark';
+        child.updateTheme(themeToSend);
+      } catch (e) {
+        console.warn('Penpal updateTheme on connect failed:', e);
+      }
       onPenpalConnected?.();
     } catch (error) {
       const err =
@@ -171,7 +189,7 @@ export const useCapUIRender = ({
           : new Error(`Failed to connect to ${title ?? srcUrl} over Penpal`);
       onPenpalConnectionError?.(err);
     }
-  }, [title, srcUrl, onPenpalConnected, onPenpalConnectionError]);
+  }, [title, srcUrl, onPenpalConnected, onPenpalConnectionError, resolvedTheme]);
 
   const connectToMCP = useCallback(async () => {
     try {
@@ -197,10 +215,30 @@ export const useCapUIRender = ({
   }, [title, srcUrl]);
 
   // Update the theme when the theme changes
-  const { resolvedTheme } = useTheme();
   useEffect(() => {
-    childMethodsRef.current?.updateTheme(resolvedTheme);
-  }, [resolvedTheme, childMethodsRef.current]);
+    try {
+      childMethodsRef.current?.updateTheme(resolvedTheme);
+    } catch (e) {
+      // Swallow penpal destroyed-connection errors during theme updates
+      // This can happen if the iframe reloaded/unmounted between renders
+      console.warn('Penpal updateTheme failed; connection likely destroyed');
+    }
+    // Only depend on the theme to avoid firing during connection churn
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedTheme]);
+
+  // Cleanup on unmount: destroy the connection and clear MCP client
+  useEffect(() => {
+    return () => {
+      try {
+        connectionRef.current?.destroy?.();
+      } catch {}
+      connectionRef.current = null;
+      childMethodsRef.current = null;
+      // Best-effort close of MCP client for this srcUrl
+      closeNuwaMCPClient(srcUrl).catch(() => {});
+    };
+  }, [srcUrl]);
 
   return {
     iframeRef,

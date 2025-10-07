@@ -3,11 +3,13 @@ import type { StreamAIRequest } from '@nuwa-ai/ui-kit';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import type { LocalCap } from '@/features/cap-studio/types';
 import { useChatContext } from '@/features/chat/contexts/chat-context';
 import { ChatSessionsStore } from '@/features/chat/stores/chat-sessions-store';
 import type { ChildMethods } from '@/shared/hooks/use-cap-ui-render';
 import { useDebounceCallback } from '@/shared/hooks/use-debounce-callback';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import type { Cap } from '@/shared/types';
 import { generateUUID } from '@/shared/utils';
 import { ChatErrorCode, handleError } from '@/shared/utils/handl-error';
 import { CreateAIRequestStream } from '../services/stream-ai';
@@ -15,7 +17,12 @@ import { CreateAIRequestStream } from '../services/stream-ai';
 // Saving status for artifact state persistence
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
-export const useArtifact = () => {
+// Optional opts allow scoping the hook to a specific cap and controlling
+// whether to register that cap's tools into the global CurrentCapStore.
+export const useArtifact = (opts?: {
+  cap?: Cap | LocalCap;
+  registerTools?: boolean; // default true
+}) => {
   const navigate = useNavigate();
   const {
     addSelectionToChatSession,
@@ -30,15 +37,22 @@ export const useArtifact = () => {
   const streamMap = useRef(new Map<string, { aborted: boolean }>()); // track streams
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle'); // track saving status
   const { currentCap } = CurrentCapStore();
+
+  // Choose the cap provided by the caller when present, otherwise fall back to the current cap
+  const capSource = opts?.cap ?? currentCap;
   // Underlying Cap object (for requests)
   const cap =
-    currentCap && ('capData' in currentCap ? currentCap.capData : currentCap);
+    capSource && ('capData' in capSource ? capSource.capData : capSource);
   // Stable key for per-cap artifact state within a chat session
-  const capKey = currentCap
-    ? 'capData' in currentCap
-      ? `local:${currentCap.id}`
-      : `remote:${currentCap.id}`
+  const capKey = capSource
+    ? 'capData' in capSource
+      ? `local:${capSource.id}`
+      : `remote:${capSource.id}`
     : 'unknown';
+  // Whether this instance should register its tools into the global store (default true)
+  const shouldRegisterTools = opts?.registerTools !== false;
+  // Keep last known MCP tools from this artifact instance
+  const lastToolsRef = useRef<Record<string, any> | null>(null);
 
   const handleSendPrompt = useCallback(
     (prompt: string) => {
@@ -93,9 +107,11 @@ export const useArtifact = () => {
   // Set artifact mcp tools to the global store
   const handleMCPConnected = useCallback(
     (tools: Record<string, any>) => {
-      setCurrentCapArtifactTools(tools);
+      // Cache tools locally for later re-registration if this cap becomes current
+      lastToolsRef.current = tools;
+      if (shouldRegisterTools) setCurrentCapArtifactTools(tools);
     },
-    [setCurrentCapArtifactTools],
+    [setCurrentCapArtifactTools, shouldRegisterTools],
   );
 
   // Handle mcp connection error
@@ -188,9 +204,12 @@ export const useArtifact = () => {
   // Clear tools on unmount to avoid leaking session-scoped UI tools
   useEffect(() => {
     return () => {
-      clearCurrentCapArtifactTools();
+      // Only clear tools if this instance registered them
+      if (shouldRegisterTools) {
+        clearCurrentCapArtifactTools();
+      }
     };
-  }, []);
+  }, [shouldRegisterTools]);
 
   return {
     hasConnectionError,
@@ -205,5 +224,6 @@ export const useArtifact = () => {
     handlePenpalConnectionError,
     handleStreamRequest,
     handleAbortStream,
+    lastToolsRef,
   };
 };
