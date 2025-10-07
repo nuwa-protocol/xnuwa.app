@@ -5,6 +5,15 @@ import { Button } from '@/shared/components/ui';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { SuggestedActions } from './suggested-actions';
 
+// Format large token counts into a compact string like "128k" or "2m".
+// We don't need exact precision here; whole-number rounding is fine.
+function formatContextLength(n?: number): string {
+  if (!n || n <= 0) return '';
+  return n >= 1_000_000
+    ? `${Math.round(n / 1_000_000)}M`
+    : `${Math.round(n / 1_000)}K`;
+}
+
 // Clean, minimal info block using divs only; focus on layout & typography
 export function CurrentCapInfo() {
   const { getCurrentCap } = CurrentCapStore();
@@ -56,10 +65,7 @@ export function CurrentCapInfo() {
 
         <div className="mb-4 flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <div>{currentCap?.core.model.modelId || ''}</div>
-          <div>
-            {' '}
-            • Context {Math.round(currentCap?.core.model.contextLength || 0 / 1000)}k
-          </div>
+          <div>{`• ${formatContextLength(currentCap?.core.model.contextLength)} Context`}</div>
           {currentCap?.core.artifact && ' • Artifact'}
           {Object.keys(currentCap?.core.mcpServers || {}).length > 0 &&
             ` • ${Object.keys(currentCap?.core.mcpServers || {}).length} MCP`}

@@ -29,6 +29,43 @@ function PureMultimodalInput({ className }: { className?: string }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const cap = getCurrentCap();
 
+  // Route general typing to the chat input so users can start typing anywhere.
+  // Similar to a command palette UX: we only react to plain character keys and Backspace
+  // when the event target isn't already an editable element.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const key = e.key;
+      const hasMod = e.metaKey || e.ctrlKey || e.altKey;
+      // Ignore if any modifiers (except Shift for capitals)
+      if (hasMod) return;
+
+      const target = e.target as HTMLElement | null;
+      // Skip if typing inside an input/textarea/contenteditable already
+      if (target && (target.closest('input, textarea, [contenteditable="true"], [contenteditable=""]'))) {
+        return;
+      }
+
+      const isChar = key.length === 1 && !e.repeat; // letters, numbers, punctuation, including space
+      const isBackspace = key === 'Backspace';
+      if (!isChar && !isBackspace) return;
+
+      // Focus our textarea and reflect the keystroke
+      if (textareaRef.current) {
+        e.preventDefault();
+        textareaRef.current.focus();
+        // Update value to include the typed character or remove last char on Backspace
+        if (isBackspace) {
+          setInput((prev) => prev.slice(0, -1));
+        } else {
+          setInput((prev) => prev + key);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [setInput, textareaRef]);
+
   // Remove attachment
   const removeAttachment = useCallback((index: number) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));

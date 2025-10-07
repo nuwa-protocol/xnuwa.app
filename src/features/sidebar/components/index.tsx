@@ -1,10 +1,8 @@
 import { motion } from 'framer-motion';
 import { Compass, Loader2, Plus, Settings, Wallet, Wrench } from 'lucide-react';
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { WalletStore } from '@/features/wallet/stores';
 import { useDevMode } from '@/shared/hooks';
-import { cn } from '@/shared/utils/cn';
 import { SidebarBody, SidebarProvider, useSidebar } from './sidebar';
 import { PrimarySidebarButton, SecondarySidebarButton } from './sidebar-button';
 import { SidebarChats } from './sidebar-chats';
@@ -26,27 +24,6 @@ export function AppSidebarContent() {
     navigate('/chat');
   };
 
-  // Keyboard shortcut: Cmd/Ctrl + K
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === 'k' &&
-        (event.metaKey || event.ctrlKey) &&
-        !event.shiftKey &&
-        !event.altKey
-      ) {
-        event.preventDefault();
-        handleNewChat();
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [handleNewChat]);
-  const getShortcutDisplay = () => {
-    const isMac = navigator.platform.toUpperCase().includes('MAC');
-    return isMac ? '⌘K' : 'Ctrl+K';
-  };
-
   return (
     <SidebarBody className="justify-between gap-6">
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -56,24 +33,6 @@ export function AppSidebarContent() {
             icon={<Plus className="size-5 shrink-0" />}
             label="New Chat"
             onClick={handleNewChat}
-            extraElement={
-              <motion.span
-                animate={{
-                  display: open ? 'inline-block' : 'none',
-                  opacity: open ? 1 : 0,
-                }}
-                className="text-xs text-neutral-500 dark:text-neutral-400 whitespace-pre shrink-0"
-              >
-                <kbd
-                  className={cn(
-                    'ml-auto text-xs font-mono px-1.5 mr-1 py-0.5 rounded border',
-                    'text-white/90 bg-white/20 border-white/20 backdrop-blur-sm',
-                  )}
-                >
-                  {getShortcutDisplay()}
-                </kbd>
-              </motion.span>
-            }
           />
         </div>
         <div className="mt-4 flex flex-col gap-1">
