@@ -113,6 +113,10 @@ export const Artifacts = ({ artifacts }: ArtifactsProps) => {
 
   if (!artifacts || artifacts.length === 0) return null;
 
+  if (artifacts.length === 1) {
+    return <ArtifactFrame instance={artifacts[0]} />;
+  }
+
   return (
     <Tabs
       value={activeTab}
