@@ -99,11 +99,19 @@ export const CreateAIChatStream = async ({
         maxRetries: 3,
         stopWhen: stepCountIs(10),
         headers,
-        onChunk: ({ chunk }) => {
+        onChunk: async ({ chunk }) => {
           // leave for future implementation handler
-          // if (chunk.type === 'tool-call') {
-          // const { toolCallId, toolName } = chunk;
-          // }
+          if (chunk.type === 'tool-call') {
+            const { toolCallId, toolName } = chunk;
+            console.log('toolCallId', toolCallId);
+            console.log('toolName', toolName);
+            await addPaymentCtxIdToChatSession(chatId, {
+              type: 'tool-call',
+              message: toolName,
+              ctxId: toolCallId,
+              timestamp: Date.now(),
+            });
+          }
           if (hasSendOnResponseDataMark) return;
           const onResponse: OnResponseDataMark = { mark: 'onResponse', cap };
           writer.write({

@@ -2,7 +2,11 @@ import type { LanguageModelUsage, UIMessage } from 'ai';
 import type { LocalCap } from '@/features/cap-studio/types';
 import type { Cap } from '@/shared/types';
 
-export type ChatPaymentType = 'generate-title' | 'chat-message' | 'ai-request';
+export type ChatPaymentType =
+  | 'generate-title'
+  | 'chat-message'
+  | 'ai-request'
+  | 'tool-call';
 
 export interface ChatPayment {
   type: ChatPaymentType;
