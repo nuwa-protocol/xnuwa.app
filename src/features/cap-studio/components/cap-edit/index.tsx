@@ -13,8 +13,8 @@ import { useEditForm } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import { getErrorDescription } from '../../utils';
 import { ArtifactTab } from './artifact';
-import { IntroductionTab } from './description';
 import { GeneralTab } from './general';
+import { IntroductionTab } from './introduction';
 import { McpTab } from './mcp';
 import { ModelTab } from './model';
 import { PromptTab } from './prompt';
@@ -25,7 +25,7 @@ export function CapEdit({ id }: { id?: string }) {
 
   const tabs = [
     { value: 'general', label: 'General' },
-    { value: 'description', label: 'Description' },
+    { value: 'introduction', label: 'Introduction' },
     { value: 'model', label: 'Model' },
     { value: 'prompt', label: 'Prompt' },
     { value: 'mcp', label: 'MCP' },
@@ -48,7 +48,7 @@ export function CapEdit({ id }: { id?: string }) {
   });
 
   return (
-    <div className='h-full w-full flex flex-col max-w-4xl mx-auto'>
+    <div className="h-full w-full flex flex-col max-w-4xl mx-auto">
       {/* Header - Title, Save Button, and Tab Triggers */}
       <header className="flex-shrink-0 bg-background px-6 py-2">
         <div className="flex items-center justify-between mb-4">

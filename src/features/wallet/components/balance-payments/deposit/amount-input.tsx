@@ -13,8 +13,6 @@ import { cn } from '@/shared/utils';
 import type { Currency } from '../../../types';
 import { QuickAmounts } from '../../../utils';
 
-// TODO: compare the amount with the min amount and reject order creation
-
 export function AmountInput({
     currency,
     onAmountChange,
@@ -94,7 +92,7 @@ export function AmountInput({
                                 inputMode="decimal"
                                 min={0}
                                 placeholder="Enter amount"
-                                className="pl-10 pr-28"
+                                className="pl-10 pr-28 font-medium text-lg"
                                 value={amountInput || undefined}
                                 onChange={handleAmountChange}
                                 disabled={disabled}
@@ -114,6 +112,7 @@ export function AmountInput({
                                     className="justify-center"
                                     onClick={() => {
                                         onAmountChange(v);
+                                        setAmountInput(v);
                                         setIsQuickOpen(false);
                                     }}
                                 >
