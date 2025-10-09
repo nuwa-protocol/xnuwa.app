@@ -9,7 +9,6 @@ import {
   Upload,
 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Button,
@@ -46,7 +45,6 @@ export function MyCaps({
   onCreateNew,
   onBulkDelete,
 }: MyCapsProps) {
-  const navigate = useNavigate();
   const { did } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const { localCaps, deleteCap, createCap } = CapStudioStore();
@@ -68,10 +66,6 @@ export function MyCaps({
       }
       return newSet;
     });
-  };
-
-  const enterMultiSelectMode = () => {
-    setIsMultiSelectMode(true);
   };
 
   const selectAllCaps = () => {
@@ -385,19 +379,15 @@ export function MyCaps({
             <CapCard
               key={cap.id}
               cap={cap}
-              onEdit={() => onEditCap?.(cap)}
               onTest={() => onTestCap?.(cap)}
               onSubmit={() => onSubmitCap?.(cap)}
-              onUpdate={() => onSubmitCap?.(cap)}
               isMultiSelectMode={isMultiSelectMode}
               isSelected={selectedCapIds.has(cap.id)}
-              // Only the checkbox should enter multi‑select mode. Card click should edit.
               onToggleSelect={() => {
                 // If not already in multi-select, enter it when the checkbox is clicked
                 if (!isMultiSelectMode) setIsMultiSelectMode(true);
                 toggleCapSelection(cap.id);
               }}
-              // Clicking the card should open edit instead of entering multi-select
               onEnterMultiSelectMode={() => onEditCap?.(cap)}
             />
           ))}

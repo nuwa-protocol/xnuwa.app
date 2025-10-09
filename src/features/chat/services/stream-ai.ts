@@ -100,11 +100,8 @@ export const CreateAIChatStream = async ({
         stopWhen: stepCountIs(10),
         headers,
         onChunk: async ({ chunk }) => {
-          // leave for future implementation handler
           if (chunk.type === 'tool-call') {
             const { toolCallId, toolName } = chunk;
-            console.log('toolCallId', toolCallId);
-            console.log('toolName', toolName);
             await addPaymentCtxIdToChatSession(chatId, {
               type: 'tool-call',
               message: toolName,

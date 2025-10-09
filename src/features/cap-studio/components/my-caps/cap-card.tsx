@@ -24,6 +24,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Badge,
   Button,
   Card,
   CardContent,
@@ -32,6 +33,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from '@/shared/components/ui';
 import {
   Dialog,
@@ -52,10 +56,8 @@ import type { LocalCap } from '../../types';
 
 interface CapCardProps {
   cap: LocalCap;
-  onEdit?: () => void;
   onTest?: () => void;
   onSubmit?: () => void;
-  onUpdate?: () => void;
   isMultiSelectMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: () => void;
@@ -64,10 +66,8 @@ interface CapCardProps {
 
 export function CapCard({
   cap,
-  onEdit,
   onTest,
   onSubmit,
-  onUpdate,
   isMultiSelectMode,
   isSelected,
   onToggleSelect,
@@ -83,8 +83,11 @@ export function CapCard({
   // Build the exportable JSON once per cap change (omit id/authorDID)
   const exportJson = useMemo(() => {
     try {
-      const { id: _omitId, authorDID: _omitAuthor, ...exportCap } =
-        (cap.capData as any) || {};
+      const {
+        id: _omitId,
+        authorDID: _omitAuthor,
+        ...exportCap
+      } = (cap.capData as any) || {};
       return JSON.stringify(exportCap, null, 2);
     } catch {
       return '{}';
@@ -196,7 +199,7 @@ export function CapCard({
           )}
           <div className="flex items-start space-x-4 flex-1 min-w-0">
             <div className="w-12 h-12 flex items-center justify-center shrink-0">
-              <CapAvatar cap={cap} size="3xl" className='rounded-md' />
+              <CapAvatar cap={cap} size="3xl" className="rounded-md" />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -204,6 +207,11 @@ export function CapCard({
                 <h3 className="font-semibold text-base truncate">
                   {cap.capData.metadata.displayName}
                 </h3>
+                {cap.status === 'submitted' && (
+                  <Badge className="shrink-0 bg-theme-primary/10 text-theme-primary">
+                    Published
+                  </Badge>
+                )}
               </div>
 
               <p className="text-sm text-muted-foreground mb-2 line-clamp-2 break-words overflow-hidden">
@@ -241,8 +249,27 @@ export function CapCard({
                   <Bug className="h-4 w-4 mr-2" />
                   Test Cap
                 </Button>
-
-                {cap.status === 'draft' ? (
+                {cap.status === 'submitted' ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSubmit?.();
+                        }}
+                        size="sm"
+                        variant="outline"
+                        className="w-full"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Publish
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-64">
+                      Publishing again will update this cap.
+                    </TooltipContent>
+                  </Tooltip>
+                ) : (
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -254,19 +281,6 @@ export function CapCard({
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     Publish
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onUpdate?.();
-                    }}
-                    size="sm"
-                    variant="outline"
-                    className="w-full"
-                  >
-                    <Upload className="h-4 w-4 mr-2" />
-                    Update
                   </Button>
                 )}
               </div>
@@ -374,7 +388,10 @@ export function CapCard({
       />
 
       {/* Export JSON preview dialog with copy/save actions */}
-      <Dialog open={exportDialogOpen} onOpenChange={handleExportDialogOpenChange}>
+      <Dialog
+        open={exportDialogOpen}
+        onOpenChange={handleExportDialogOpenChange}
+      >
         <DialogContent
           className="sm:max-w-2xl"
           onClick={(e) => e.stopPropagation()}
@@ -386,7 +403,11 @@ export function CapCard({
             </DialogDescription>
           </DialogHeader>
 
-          <CodeBlock code={exportJson} language="json" className="max-h-[60vh] overflow-auto">
+          <CodeBlock
+            code={exportJson}
+            language="json"
+            className="max-h-[60vh] overflow-auto"
+          >
             <CodeBlockCopyButton
               onCopy={() => toast.success('JSON copied to clipboard')}
               onError={() => toast.error('Failed to copy JSON')}
@@ -395,7 +416,10 @@ export function CapCard({
           </CodeBlock>
 
           <DialogFooter>
-            <Button variant="secondary" onClick={() => handleExportDialogOpenChange(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => handleExportDialogOpenChange(false)}
+            >
               Close
             </Button>
             <Button onClick={handleDownloadJson}>

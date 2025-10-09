@@ -18,7 +18,6 @@ import {
 } from '@/shared/components/ui';
 import { promptVariables } from '@/shared/constants/cap';
 import { cn } from '@/shared/utils';
-import { ImprovePrompt } from './improve-prompt';
 import { InlineUISetup } from './inline-ui-setup';
 import { PromptSuggestions } from './prompt-suggestions';
 
@@ -156,12 +155,12 @@ export function PromptEditor({
           />
           {/* Inline UI Setup */}
           <InlineUISetup onInsertPrompt={insertText} />
-          {/* Improve Prompt */}
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <ImprovePrompt prompt={value} onApply={handleChange} />
         </div>
+        {/* Improve Prompt (disabled for now) */}
+        {/* <div className="flex items-center space-x-2">
+          <ImprovePrompt prompt={value} onApply={handleChange} />
+        </div> */}
       </div>
 
       {/* Editor */}
