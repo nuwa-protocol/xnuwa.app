@@ -93,7 +93,6 @@ export function CurrencyCombobox({
                         >
                             <CommandEmpty>No currency found.</CommandEmpty>
                             <CommandGroup>
-                                {/* TODO: Limit to 20 for debug */}
                                 {cryptos.map((t) => (
                                     <CommandItem
                                         key={t.code}

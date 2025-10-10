@@ -63,6 +63,7 @@ export const networkMap = {
   ltc: 'Litecoin',
   icx: 'ICON',
   strax: 'STRAX',
+  sui: 'SUI',
 };
 
 
@@ -96,5 +97,6 @@ export const supportedCurrencies = [
   "TRX",
   "DOGE",
   "LINK",
-  "TON"
+  "TON",
+  "SUI"
 ]

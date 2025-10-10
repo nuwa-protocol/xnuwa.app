@@ -9,6 +9,7 @@ import type {
   FetchDepositOrdersFilter,
   FetchDepositOrdersResponse,
   GetMinAmountResponse,
+  GetOrderAmountWithTxFeeResponse,
   GetPaymentEstimatedAmountResponse,
 } from '../types/deposit';
 import { normalizeCurrencies } from '../utils';
@@ -57,6 +58,7 @@ export const fetchDepositOrder = async (
     }
 
     const data: FetchDepositOrderResponse = await response.json();
+    console.log(data);
     return data;
   } catch (err) {
     console.error('Get user orders error:', err);
@@ -145,6 +147,28 @@ export const getExchangeRate = async (
     return isNaN(numericAmount) ? null : numericAmount;
   } catch (err) {
     console.error('Get exchange rate error:', err);
+    throw err;
+  }
+};
+
+export const getOrderAmountWithTxFee = async (
+  amount: number,
+): Promise<GetOrderAmountWithTxFeeResponse | null> => {
+  try {
+    const config = getConfig();
+    const apiUrl = `${config.appUrl}/api/estimate-actual-cost?order_amount=${amount}`;
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      console.error('Get estimated order amount error:');
+      throw new Error('Failed to get estimated order amount');
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (err) {
+    console.error('Get estimated order amount error:', err);
     throw err;
   }
 };
