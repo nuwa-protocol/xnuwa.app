@@ -28,7 +28,17 @@ export function DepositTransactionItem({
   transaction: DepositOrder;
   onSelect: (order: DepositOrder) => void;
 }) {
-  const orderId = transaction.orderId || transaction.paymentId;
+  // Decide how to render the transferred amount on the right.
+  // Show "+" only when there's a positive credited amount; otherwise no sign.
+  const transferred = Number(transaction.transferredAmount || 0);
+  const showPlus = transferred > 0;
+  const amountClass =
+    transferred > 0
+      ? 'text-green-600'
+      : transferred < 0
+        ? 'text-red-600'
+        : 'text-muted-foreground';
+
   return (
     <Button
       variant="ghost"
@@ -37,7 +47,9 @@ export function DepositTransactionItem({
     >
       <div className="text-left">
         <p className="font-medium truncate max-w-[220px]">
-          {orderId || 'Order'}
+          Deposit Order of {formatAmount(
+            Number(transaction.purchasedAmount || 0)
+          )} USD
         </p>
         <p className="text-xs text-muted-foreground">
           {formatAbsolute(transaction.createdAt)}
@@ -45,10 +57,9 @@ export function DepositTransactionItem({
       </div>
       <div className="text-right">
         <div className="flex items-center justify-end space-x-1 text-sm font-medium">
-          <span>
-            {formatAmount(
-              Number(transaction.purchasedAmount || 0)
-            )}
+          <span className={amountClass}>
+            {showPlus ? '+ ' : ''}
+            {formatAmount(transferred)}
           </span>
         </div>
         <div className="mt-1">
