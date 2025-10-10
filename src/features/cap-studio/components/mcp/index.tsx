@@ -1,5 +1,4 @@
 import { useSearchParams } from 'react-router-dom';
-import { DashboardLayout } from '../layout/dashboard-layout';
 import { Mcp } from './mcp';
 
 export function MCPDebug() {
@@ -8,8 +7,8 @@ export function MCPDebug() {
   const mcpUIUrl = searchParams.get('mcpui');
 
   return (
-    <DashboardLayout className="max-w-full p-0">
+    <div className="max-w-full overflow-y-auto p-0">
       <Mcp mcpServerUrl={mcpServerUrl} mcpUIUrl={mcpUIUrl} />
-    </DashboardLayout>
+    </div>
   );
 }
