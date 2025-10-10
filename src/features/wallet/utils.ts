@@ -140,6 +140,7 @@ export const mapCreatePaymentResponseToPaymentOrder = (
     createdAt: response.created_at,
     updatedAt: response.updated_at,
     ipnPayload: {},
+    transferredAmount: 0,
   };
 };
 
@@ -161,12 +162,14 @@ export const mapFetchDepositOrderResponseToPaymentOrder = (
     createdAt: response.db.created_at,
     updatedAt: response.db.updated_at,
     ipnPayload: response.db.ipn_payload,
+    transferredAmount: response.db.transferred_amount / 10 ** 10,
   };
 };
 
 export const mapFetchDepositOrdersResponseItemToPaymentOrder = (
   response: FetchDepositOrdersResponseItem,
 ): DepositOrder => {
+  console.log('mapFetchDepositOrdersResponseItemToPaymentOrder', response);
   return {
     paymentId: response.nowpayments_payment_id,
     status: mapOrderStatus(response.status),
@@ -181,6 +184,7 @@ export const mapFetchDepositOrdersResponseItemToPaymentOrder = (
     createdAt: response.created_at,
     updatedAt: response.updated_at,
     ipnPayload: response.ipn_payload,
+    transferredAmount: response.transferred_amount / 10 ** 10,
   };
 };
 

@@ -100,6 +100,7 @@ export interface FetchDepositOrderResponse {
     network_precision?: number | null;
     time_limit?: number | null;
     burning_percent?: number | null;
+    transferred_amount: number;
     ipn_payload: {
       fee?: {
         currency: string;
@@ -164,6 +165,7 @@ export interface FetchDepositOrdersResponseItem {
   estimated_network_fee: number;
   payer_did: string;
   transfer_tx: string;
+  transferred_amount: number;
   ipn_payload: {
     fee: {
       currency: string;
@@ -246,4 +248,5 @@ export interface DepositOrder {
   createdAt: string;
   updatedAt: string;
   ipnPayload: any;
+  transferredAmount: number;
 }
