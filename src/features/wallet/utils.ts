@@ -117,7 +117,7 @@ const mapOrderStatus = (status: string): DepositOrderStatus => {
     case 'expired':
       return 'expired';
     case 'partially_paid':
-      return 'partially_paid';
+      return 'completed';
   }
   return null;
 };
@@ -147,6 +147,7 @@ export const mapCreatePaymentResponseToPaymentOrder = (
 export const mapFetchDepositOrderResponseToPaymentOrder = (
   response: FetchDepositOrderResponse,
 ): DepositOrder => {
+  console.log('response', response);
   return {
     paymentId: response.db.nowpayments_payment_id,
     status: mapOrderStatus(response.db.status),
@@ -169,7 +170,6 @@ export const mapFetchDepositOrderResponseToPaymentOrder = (
 export const mapFetchDepositOrdersResponseItemToPaymentOrder = (
   response: FetchDepositOrdersResponseItem,
 ): DepositOrder => {
-  console.log('mapFetchDepositOrdersResponseItemToPaymentOrder', response);
   return {
     paymentId: response.nowpayments_payment_id,
     status: mapOrderStatus(response.status),

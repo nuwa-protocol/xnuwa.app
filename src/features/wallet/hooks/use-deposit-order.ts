@@ -65,20 +65,19 @@ export const useDepositOrder = () => {
     setIsUpdating(true);
     try {
       const paymentStatus = await fetchDepositOrder(order.paymentId);
-
       if (paymentStatus) {
-        setOrder(mapFetchDepositOrderResponseToPaymentOrder(paymentStatus));
-
         // if the order is not expired, update the estimated amount
         if (order.expirationTime > new Date().toISOString()) {
           const newEstimate = await getPaymentEstimatedAmount(order.paymentId);
           if (newEstimate) {
             setOrder({
-              ...order,
+              ...mapFetchDepositOrderResponseToPaymentOrder(paymentStatus),
               totalDue: newEstimate.totalDue,
               expirationTime: newEstimate.expirationTime,
             });
           }
+        } else {
+          setOrder(mapFetchDepositOrderResponseToPaymentOrder(paymentStatus));
         }
       } else {
         console.error('No payment data received from status check');
