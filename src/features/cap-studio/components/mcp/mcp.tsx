@@ -448,13 +448,13 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       className={`flex gap-6 ${
         // In Artifact MCP mode, lock the layout to the viewport height so only the left pane scrolls
         mcpType === 'Artifact MCP' ? 'h-screen' : 'max-w-3xl mx-auto'
-      }`}
+        }`}
     >
       <div
         className={`flex-1 space-y-6 p-8 ${
           // Make the left pane the only scroll container in Artifact MCP mode
           mcpType === 'Artifact MCP' ? 'overflow-y-auto min-h-0 pr-2' : ''
-        }`}
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -680,10 +680,10 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                     // Extract schema from nested structure - handle both old and new formats
                     let toolSchema = {};
                     let formSchema = {};
-                    
+
                     // Try to get the actual schema object
                     const rawSchema = tool.inputSchema || tool.parameters || {};
-                    
+
                     // Handle nested jsonSchema structure (new format from McpToolConverter)
                     if (rawSchema.jsonSchema) {
                       toolSchema = rawSchema.jsonSchema.properties || {};
@@ -763,7 +763,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
         {/* Tool Execution Result */}
         {connected && lastToolResult && (
-          <Card>
+          <Card className='max-w-4xl'>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -788,8 +788,8 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
             </CardHeader>
             <CardContent>
               {/* Use a simple div so both axes can scroll without touching shared ScrollArea */}
-              <div className="h-64 w-full rounded-md border bg-muted/30 p-4 overflow-auto">
-                <pre className="text-xs font-mono whitespace-pre leading-snug">
+              <div className="h-64 w-full rounded-md border bg-muted/30 p-4 overflow-y-auto">
+                <pre className="text-xs font-mono whitespace-pre leading-snug text-wrap">
                   {JSON.stringify(lastToolResult.result, null, 2)}
                 </pre>
               </div>
@@ -878,9 +878,8 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                           {/* Wrap long logs automatically across lines */}
                           <div className="flex-1 min-w-0">
                             <span
-                              className={`${getLogColor(log.type)} ${
-                                log.type === 'result' ? 'font-mono text-xs' : ''
-                              } whitespace-pre-wrap break-words leading-snug`}
+                              className={`${getLogColor(log.type)} ${log.type === 'result' ? 'font-mono text-xs' : ''
+                                } whitespace-pre-wrap break-words leading-snug`}
                             >
                               {log.message}
                             </span>
