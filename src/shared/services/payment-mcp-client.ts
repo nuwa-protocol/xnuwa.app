@@ -1,9 +1,9 @@
-import {
-  createMcpClient,
-  UniversalMcpClient,
-  type CreateMcpClientOptions,
-} from '@nuwa-ai/payment-kit';
 import { IdentityKitWeb } from '@nuwa-ai/identity-kit-web';
+import {
+  type CreateMcpClientOptions,
+  createMcpClient,
+  type UniversalMcpClient,
+} from '@nuwa-ai/payment-kit';
 import type {
   NuwaMCPClient,
   PromptDefinition,

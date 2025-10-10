@@ -150,14 +150,6 @@ export function OrderPending({
                     </div>
 
                     <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Pay</span>
-                        <span className="font-medium">
-                            {order.totalDue || '0'}{' '}
-                            {order.paymentCurrency?.toUpperCase() || 'N/A'}
-                        </span>
-                    </div>
-
-                    <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Network</span>
                         <Badge variant="outline" className="flex items-center gap-1">
                             <Network className="h-3 w-3" />

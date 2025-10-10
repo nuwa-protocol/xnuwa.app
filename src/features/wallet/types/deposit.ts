@@ -48,6 +48,7 @@ export interface CreateDepositOrderResponse {
   time_limit: number;
   burning_percent: number;
   expiration_estimate_date: string;
+  estimated_network_fee: number;
 }
 
 export interface GetMinAmountResponse {
@@ -55,6 +56,12 @@ export interface GetMinAmountResponse {
   currency_from: string;
   currency_to: string;
   fiat_equivalent: string;
+}
+
+export interface GetOrderAmountWithTxFeeResponse {
+  order_amount: number;
+  network_fee: number;
+  actual_cost: number;
 }
 
 export interface GetPaymentEstimatedAmountResponse {
@@ -80,6 +87,7 @@ export interface FetchDepositOrderResponse {
     transfer_tx?: string | null;
     created_at: string;
     updated_at: string;
+    estimated_network_fee: number;
     price_amount: number;
     price_currency?: string;
     pay_amount: number;
@@ -153,6 +161,7 @@ export interface FetchDepositOrdersResponseItem {
   currency_fiat: string;
   status: string;
   pay_currency: string;
+  estimated_network_fee: number;
   payer_did: string;
   transfer_tx: string;
   ipn_payload: {

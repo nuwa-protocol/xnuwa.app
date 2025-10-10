@@ -1,3 +1,4 @@
+import { DialogDescription } from '@radix-ui/react-dialog';
 import { Coins } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
@@ -17,7 +18,6 @@ import { OrderPending } from './order-pending';
 
 const POLLING_INTERVAL = 3000;
 
-// Step 2: Create payment order and show payment details
 export function BuyCreditsView() {
   const [amount, setAmount] = useState<number | null>(null);
   const [currency, setCurrency] = useState<Currency | null>(null);
@@ -26,7 +26,6 @@ export function BuyCreditsView() {
     isCreating,
     isUpdating,
     createError,
-    updateError,
     createOrder,
     updateOrder,
   } = useDepositOrder();
@@ -53,7 +52,6 @@ export function BuyCreditsView() {
       return () => clearInterval(interval);
     }
   }, [order]);
-
 
   if (createError) {
     return (
@@ -105,6 +103,9 @@ export function BuyCreditsModal(props: BuyCreditsModalProps) {
             <Coins className="h-5 w-5" /> Buy Nuwa Credits
           </DialogTitle>
         </DialogHeader>
+        <DialogDescription className="sr-only">
+          Buy Nuwa Credits
+        </DialogDescription>
         <BuyCreditsView />
       </DialogContent>
     </Dialog>
