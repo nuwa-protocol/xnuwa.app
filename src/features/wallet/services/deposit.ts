@@ -58,7 +58,6 @@ export const fetchDepositOrder = async (
     }
 
     const data: FetchDepositOrderResponse = await response.json();
-    console.log(data);
     return data;
   } catch (err) {
     console.error('Get user orders error:', err);

@@ -42,7 +42,7 @@ export function OrderCompleted({ order }: OrderCompletedProps) {
             <div>
               <span className="text-muted-foreground">Credits Added</span>
               <div className="font-semibold text-lg">
-                ${order.purchasedAmount || '0'} USD
+                ${order.transferredAmount || '0'} USD
               </div>
             </div>
             <div>
@@ -58,7 +58,7 @@ export function OrderCompleted({ order }: OrderCompletedProps) {
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Order ID</span>
               <span className="font-mono text-xs break-all text-right w-1/2">
-                {order.orderId || 'N/A'}
+                {`${order.orderId.slice(0, 10)}...${order.orderId.slice(-10)}` || 'N/A'}
               </span>
             </div>
           </div>

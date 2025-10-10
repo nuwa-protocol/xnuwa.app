@@ -80,7 +80,7 @@ export function OrderExpired({
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Order ID</span>
               <span className="font-mono text-xs break-all text-right w-1/2">
-                {order.orderId || 'N/A'}
+                {`${order.orderId.slice(0, 10)}...${order.orderId.slice(-10)}` || 'N/A'}
               </span>
             </div>
 
