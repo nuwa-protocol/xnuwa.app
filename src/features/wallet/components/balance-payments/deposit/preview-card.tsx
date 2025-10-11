@@ -27,7 +27,8 @@ export function PreviewCard({
     const [actualOrderAmount, setActualOrderAmount] = useState<number | null>(
         null,
     );
-    const [transactionFee, setTransactionFee] = useState<number | null>(null);
+    const [networkFee, setNetworkFee] = useState<number | null>(null);
+    const [serviceFee, setServiceFee] = useState<number | null>(null);
 
     useEffect(() => {
         setIsLoading(true);
@@ -38,7 +39,8 @@ export function PreviewCard({
                 const result = await getOrderAmountWithTxFee(amount);
                 setExchangeRate(exchangeRate);
                 setActualOrderAmount(result?.actual_cost ?? null);
-                setTransactionFee(result?.network_fee ?? null);
+                setNetworkFee(result?.transaction_fee?.network_fee ?? null);
+                setServiceFee(result?.transaction_fee?.service_fee ?? null);
             } catch (error) {
                 setError(
                     error instanceof Error ? error.message : 'Failed to fetch data',
@@ -97,14 +99,6 @@ export function PreviewCard({
                     </div>
                 </div>
 
-                {/* Transaction Fee */}
-                <div className="flex items-center justify-between mt-2">
-                    <span className="text-sm text-muted-foreground">Transaction Fee</span>
-                    <span className="text-sm font-medium text-muted-foreground">
-                        {getExchangeAmount(transactionFee)} {currency.code.toUpperCase()}
-                    </span>
-                </div>
-
                 {/* Exchange Rate */}
                 <div className="flex items-center justify-between mt-2">
                     <span className="text-sm text-muted-foreground">Exchange Rate</span>
@@ -113,12 +107,28 @@ export function PreviewCard({
                     </span>
                 </div>
 
+                {/* Network Fee */}
+                <div className="flex items-center justify-between mt-2">
+                    <span className="text-sm text-muted-foreground">Transaction Fee</span>
+                    <span className="text-sm font-medium text-muted-foreground">
+                        {getExchangeAmount(networkFee)} {currency.code.toUpperCase()}
+                    </span>
+                </div>
+
+                {/* Service Fee */}
+                <div className="flex items-center justify-between mt-2">
+                    <span className="text-sm text-muted-foreground">Platform Fee</span>
+                    <span className="text-sm font-medium text-muted-foreground">
+                        {getExchangeAmount(serviceFee)} {currency.code.toUpperCase()}
+                    </span>
+                </div>
+
                 {/* Disclaimer */}
                 <div className="flex items-start gap-2 p-0 mt-4 rounded-lg bg-muted/30">
                     <div className="w-1 h-1 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
                     <p className="text-xs text-muted-foreground leading-relaxed">
                         Amounts are estimates. Final totals will be confirmed
-                        in the next step. Transaction Fee is charged by payment provider.
+                        in the next step. Transaction Fee is charged by payment provider. (We currently use nowpayments.io).
                     </p>
                 </div>
             </CardContent>

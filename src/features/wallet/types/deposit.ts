@@ -60,7 +60,10 @@ export interface GetMinAmountResponse {
 
 export interface GetOrderAmountWithTxFeeResponse {
   order_amount: number;
-  network_fee: number;
+  transaction_fee: {
+    network_fee: number;
+    service_fee: number;
+  };
   actual_cost: number;
 }
 
