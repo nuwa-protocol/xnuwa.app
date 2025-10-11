@@ -36,7 +36,6 @@ export function PreviewCard({
             try {
                 const exchangeRate = await getExchangeRate(currency.code);
                 const result = await getOrderAmountWithTxFee(amount);
-                console.log(result);
                 setExchangeRate(exchangeRate);
                 setActualOrderAmount(result?.actual_cost ?? null);
                 setTransactionFee(result?.network_fee ?? null);

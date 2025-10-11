@@ -147,7 +147,6 @@ export const mapCreatePaymentResponseToPaymentOrder = (
 export const mapFetchDepositOrderResponseToPaymentOrder = (
   response: FetchDepositOrderResponse,
 ): DepositOrder => {
-  console.log('response', response);
   return {
     paymentId: response.db.nowpayments_payment_id,
     status: mapOrderStatus(response.db.status),

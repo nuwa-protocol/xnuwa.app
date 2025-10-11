@@ -26,8 +26,6 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
       // make the submission
       const result = await submitCap(cap.capData);
 
-      console.log(result);
-
       if (!result.success) {
         toast.error(result.message);
         return;
