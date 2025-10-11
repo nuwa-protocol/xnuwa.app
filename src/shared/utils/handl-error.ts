@@ -9,8 +9,11 @@ export enum ChatErrorCode {
 // Configuration: Error patterns to ignore (case-insensitive matching) for the client user
 const IGNORED_ERROR_PATTERNS = ['payeedid'];
 
-// Configuration: Error patterns to ignore (case-insensitive matching) for the developer
-const IGNORED_ERROR_PATTERNS_DEVELOPER = ['aborterror'];
+// Configuration: Error patterns to ignore (case-insensitive matching) for the developer and the user
+const IGNORED_ERROR_PATTERNS_DEVELOPER = [
+  'aborterror',
+  'ReadableStreamDefaultController',
+];
 
 const INSUFFICIENT_FUNDS_ERROR_PATTERNS = ['balance', 'insufficient'];
 
