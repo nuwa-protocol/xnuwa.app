@@ -91,6 +91,7 @@ export interface FetchDepositOrderResponse {
     created_at: string;
     updated_at: string;
     estimated_network_fee: number;
+    estimated_service_fee: number;
     price_amount: number;
     price_currency?: string;
     pay_amount: number;
@@ -166,6 +167,7 @@ export interface FetchDepositOrdersResponseItem {
   status: string;
   pay_currency: string;
   estimated_network_fee: number;
+  estimated_service_fee: number;
   payer_did: string;
   transfer_tx: string;
   transferred_amount: number;

@@ -157,7 +157,9 @@ export const mapFetchDepositOrderResponseToPaymentOrder = (
     totalDue: response.db.pay_amount,
     received: response.nowpayments.actually_paid,
     purchasedAmount:
-      response.db.price_amount - response.db.estimated_network_fee,
+      response.db.price_amount -
+      response.db.estimated_network_fee -
+      response.db.estimated_service_fee,
     orderId: response.db.order_id,
     createdAt: response.db.created_at,
     updatedAt: response.db.updated_at,
@@ -178,7 +180,10 @@ export const mapFetchDepositOrdersResponseItemToPaymentOrder = (
     expirationTime: response.expiration_estimate_date,
     totalDue: response.pay_amount,
     received: response.amount_received,
-    purchasedAmount: response.price_amount - response.estimated_network_fee,
+    purchasedAmount:
+      response.price_amount -
+      response.estimated_network_fee -
+      response.estimated_service_fee,
     orderId: response.order_id,
     createdAt: response.created_at,
     updatedAt: response.updated_at,
