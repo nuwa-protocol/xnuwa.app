@@ -38,27 +38,25 @@ export function OrderCompleted({ order }: OrderCompletedProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Credits Added</span>
-              <div className="font-semibold text-lg">
+              <span className="font-mono text-xs break-all text-right w-1/2">
                 ${order.transferredAmount || '0'} USD
-              </div>
+              </span>
             </div>
-            <div>
-              <span className="text-muted-foreground">Amount Paid</span>
-              <div className="font-semibold">
-                {order.received || order.totalDue || '0'}{' '}
-                {order.paymentCurrency?.toUpperCase() || 'N/A'}
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t space-y-3">
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Order ID</span>
               <span className="font-mono text-xs break-all text-right w-1/2">
                 {`${order.orderId.slice(0, 10)}...${order.orderId.slice(-10)}` || 'N/A'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Order Time</span>
+              <span className="font-mono text-xs break-all text-right w-1/2">
+                {order.updatedAt
+                  ? new Date(order.updatedAt).toLocaleString()
+                  : 'N/A'}
               </span>
             </div>
           </div>

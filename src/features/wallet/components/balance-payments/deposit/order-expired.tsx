@@ -47,36 +47,14 @@ export function OrderExpired({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-muted-foreground">Order Amount</span>
-              <div className="font-semibold">
-                ${order.purchasedAmount || '0'} USD
-              </div>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Payment Required</span>
-              <div className="font-semibold">
-                {order.totalDue || '0'}{' '}
-                {order.paymentCurrency?.toUpperCase() || 'N/A'}
-              </div>
-            </div>
-          </div>
-
-          {order.received > 0 && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <div className="flex items-center gap-2 text-amber-800 text-sm">
-                <Clock className="h-4 w-4" />
-                <span className="font-medium">Partial Payment Detected</span>
-              </div>
-              <div className="mt-1 text-xs text-amber-700">
-                Received: {order.received}{' '}
-                {order.paymentCurrency?.toUpperCase()}
-              </div>
-            </div>
-          )}
-
           <div className="pt-4 border-t space-y-3">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Order Amount</span>
+              <span className="font-mono text-xs break-all text-right w-1/2">
+                ${order.purchasedAmount || '0'} USD
+              </span>
+            </div>
+
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Order ID</span>
               <span className="font-mono text-xs break-all text-right w-1/2">
