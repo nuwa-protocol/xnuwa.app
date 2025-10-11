@@ -69,8 +69,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0(react@19.1.1)(typescript@5.8.3)
       '@nuwa-ai/payment-kit':
-        specifier: ^0.6.1
-        version: 0.6.1(express@5.1.0)(typescript@5.8.3)
+        specifier: ^0.6.3
+        version: 0.6.3(express@5.1.0)(typescript@5.8.3)
       '@nuwa-ai/ui-kit':
         specifier: ^0.6.0
         version: 0.6.0(react@19.1.1)
@@ -1312,8 +1312,8 @@ packages:
   '@nuwa-ai/identity-kit@0.6.0':
     resolution: {integrity: sha512-AV08WPJBnk826jiZ8af7OCNx8Grns2mByqpT56h2ZM9/3srtnXzlXs4M9YcyJiar3vn7lfJqpDADkMVQdXs9Kg==}
 
-  '@nuwa-ai/payment-kit@0.6.1':
-    resolution: {integrity: sha512-CXiKNvpEwUG5GBf1kgBrB/NrKEyujBRcS68xcyC40Hm91o+kLDJtXfO2EooMpBnp5BzzmFKl5XQcmEa/9EzFNQ==}
+  '@nuwa-ai/payment-kit@0.6.3':
+    resolution: {integrity: sha512-VhpyFHcj8NKUwK1+fU+vEsSVDra7EwC6HIln8esFfIzwLK41fuuc61l4ioqFHWIQkhBNWrjsR4nwz922e3OyEA==}
     peerDependencies:
       express: '>=4'
       pg: '>=8'
@@ -5227,8 +5227,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mcp-proxy@5.8.0:
-    resolution: {integrity: sha512-qNdLNQzpFGj80UXu473Z7ZwZqRYMG6bvf64Wnmqqiaz8SU0GHaVD7U9odW++xYLSEI6EEZNl7SH3Vjw5NEdLXw==}
+  mcp-proxy@5.8.1:
+    resolution: {integrity: sha512-tlBekDacLg8iR6pe9k0AnOEi52zn2JLOWY3fPmbL/rhO+MRYIjEMsrBVWHD+D7vbAjR+gmZIzMUbvg3TawjafQ==}
     hasBin: true
 
   mdast-util-find-and-replace@3.0.2:
@@ -9178,7 +9178,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@nuwa-ai/payment-kit@0.6.1(express@5.1.0)(typescript@5.8.3)':
+  '@nuwa-ai/payment-kit@0.6.3(express@5.1.0)(typescript@5.8.3)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.18.2
       '@nuwa-ai/identity-kit': 0.6.0(typescript@5.8.3)
@@ -9189,7 +9189,7 @@ snapshots:
       fastmcp: 3.19.1
       js-yaml: 4.1.0
       lossless-json: 4.3.0
-      mcp-proxy: 5.8.0
+      mcp-proxy: 5.8.1
       on-headers: 1.1.0
       zod: 3.25.76
       zod-to-json-schema: 3.24.6(zod@3.25.76)
@@ -13730,7 +13730,7 @@ snapshots:
       execa: 9.6.0
       file-type: 21.0.0
       fuse.js: 7.1.0
-      mcp-proxy: 5.8.0
+      mcp-proxy: 5.8.1
       strict-event-emitter-types: 2.0.0
       undici: 7.16.0
       uri-templates: 0.2.0
@@ -14795,7 +14795,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mcp-proxy@5.8.0: {}
+  mcp-proxy@5.8.1: {}
 
   mdast-util-find-and-replace@3.0.2:
     dependencies:
