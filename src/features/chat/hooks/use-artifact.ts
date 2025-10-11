@@ -25,6 +25,7 @@ export const useArtifact = (opts?: {
 }) => {
   const navigate = useNavigate();
   const {
+    chatSessions,
     addSelectionToChatSession,
     updateChatSessionArtifactState,
     getChatSessionArtifactState,
@@ -91,6 +92,16 @@ export const useArtifact = (opts?: {
   // Save state to store with debounce and expose a save status
   const handleSaveState = useCallback(
     (state: any) => {
+      // don't store state until
+      // 1. a conversation is started
+      // 2. the cap is added to the chat session
+      if (
+        chatSessions[chat.id]?.messages?.length === 0 ||
+        !chatSessions[chat.id]?.caps?.includes(cap as Cap | LocalCap)
+      ) {
+        return;
+      }
+
       // Any incoming change indicates a pending save
       setSaveStatus('saving');
       debouncedPersist(state);
