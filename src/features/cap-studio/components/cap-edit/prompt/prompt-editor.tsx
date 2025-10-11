@@ -18,7 +18,8 @@ import {
 } from '@/shared/components/ui';
 import { promptVariables } from '@/shared/constants/cap';
 import { cn } from '@/shared/utils';
-import { InlineUISetup } from './inline-ui-setup';
+// Temporarily disable Inline UI feature
+// import { InlineUISetup } from './inline-ui-setup';
 import { PromptSuggestions } from './prompt-suggestions';
 
 interface PromptEditorProps {
@@ -153,8 +154,8 @@ export function PromptEditor({
             onOpenChange={setIsVariablesDialogOpen}
             onVariableSelect={insertVariable}
           />
-          {/* Inline UI Setup */}
-          <InlineUISetup onInsertPrompt={insertText} />
+          {/* Inline UI Setup (temporarily disabled) */}
+          {/* <InlineUISetup onInsertPrompt={insertText} /> */}
 
         </div>
         {/* Improve Prompt (disabled for now) */}

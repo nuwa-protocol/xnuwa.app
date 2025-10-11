@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { type UseFormReturn, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod/v3';
 import { useAuth } from '@/shared/hooks';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import {
   CapCoreSchema,
   CapIDNameSchema,
@@ -29,9 +30,10 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
   const navigate = useNavigate();
   const { did } = useAuth();
   const { createCap, updateCap } = CapStudioStore();
+  const { currentCap, setCurrentCap } = CurrentCapStore();
   const [isSaving, setIsSaving] = useState(false);
 
-  const form = useForm<CapFormData>({
+  const form: UseFormReturn<CapFormData> = useForm<CapFormData>({
     resolver: zodResolver(CapFormDataSchema),
     mode: 'onChange',
     defaultValues: {
@@ -68,14 +70,30 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
   });
 
   const handleUpdateCap = async (editingCap: LocalCap, data: CapFormData) => {
-    // Update existing cap
+    // Build the latest capData payload once to avoid fetching back from the store
+    const newCapData = {
+      id: `${did}:${data.idName}`,
+      authorDID: did || '',
+      ...data,
+    };
+
+    // Update existing cap in Cap Studio store
     updateCap(editingCap.id, {
-      capData: {
-        id: `${did}:${data.idName}`,
-        authorDID: did || '',
-        ...data,
-      },
+      capData: newCapData,
     });
+
+    // If the currently active cap is this local cap, also update the current cap store
+    // Otherwise the app could keep using stale cap data
+    const isEditingCurrentLocalCap =
+      currentCap && 'capData' in currentCap && currentCap.id === editingCap.id;
+    if (isEditingCurrentLocalCap) {
+      // Directly set the updated local cap instance to keep CurrentCapStore in sync
+      setCurrentCap({
+        ...editingCap,
+        capData: newCapData,
+        updatedAt: Date.now(),
+      });
+    }
 
     toast.success(`${data.metadata.displayName} has been updated successfully`);
 
