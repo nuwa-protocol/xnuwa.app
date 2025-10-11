@@ -8,8 +8,9 @@ import {
   RotateCcwIcon,
 } from 'lucide-react';
 import { useState } from 'react';
+import { harden } from 'rehype-harden';
 import { toast } from 'sonner';
-import { Streamdown } from 'streamdown';
+import { defaultRehypePlugins, Streamdown } from 'streamdown';
 import { Button } from '@/shared/components/ui/button';
 import {
   Tooltip,
@@ -101,7 +102,22 @@ export const MessageText = ({
             },
           )}
         >
-          <Streamdown parseIncompleteMarkdown={true}>{displayText}</Streamdown>
+          <Streamdown
+            rehypePlugins={[
+              defaultRehypePlugins.katex,
+              [
+                harden,
+                {
+                  allowedImagePrefixes: ['*'],
+                  allowedLinkPrefixes: ['*'],
+                  defaultOrigin: undefined,
+                },
+              ],
+            ]}
+            parseIncompleteMarkdown={true}
+          >
+            {displayText}
+          </Streamdown>
 
           {isUserMessageLong && (
             <Button
