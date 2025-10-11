@@ -145,7 +145,7 @@ export function OrderPending({
                     <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Purchase</span>
                         <span className="font-medium">
-                            ${order.purchasedAmount || '0'} USD
+                            ${order.purchasedAmount.toFixed(2) || '0'} USD
                         </span>
                     </div>
 
