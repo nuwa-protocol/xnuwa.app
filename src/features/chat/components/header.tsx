@@ -8,7 +8,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
-import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { ChatSessionsStore } from '../stores';
 import { ChatDropdownMenu } from './chat-dropdown-menu';
 
@@ -16,17 +15,16 @@ interface HeaderProps {
   chatId: string;
   showArtifact: boolean;
   setShowArtifact: (showArtifact: boolean) => void;
+  hasArtifact: boolean;
 }
 
 export default function Header({
   chatId,
   showArtifact,
   setShowArtifact,
+  hasArtifact,
 }: HeaderProps) {
   const navigate = useNavigate();
-  const { getCurrentCap } = CurrentCapStore();
-  const currentCap = getCurrentCap();
-  const hasArtifact = !!currentCap?.core.artifact;
   const { chatSessions, updateSession, deleteSession } = ChatSessionsStore();
   const session = chatSessions[chatId || ''] || null;
   const title = session?.title || 'New Chat';
