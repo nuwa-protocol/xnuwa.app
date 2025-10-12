@@ -64,6 +64,8 @@ export function Chat({ isReadonly }: { isReadonly: boolean }) {
     return list;
   })();
 
+  const hasArtifact = artifactInstances.length > 0;
+
   if (artifactInstances.length > 0) {
     return (
       <div className="flex w-full h-full">
@@ -71,11 +73,12 @@ export function Chat({ isReadonly }: { isReadonly: boolean }) {
           {/* Always render chat content; it should expand to full width when the artifact side is visually hidden */}
           <ResizablePanel
             defaultSize={40}
-            minSize={30}
+            minSize={15}
             className="w-full h-full"
           >
             <ChatContent
               isReadonly={isReadonly}
+              hasArtifact={hasArtifact}
               showArtifact={showArtifact}
               setShowArtifact={setShowArtifact}
             />
@@ -117,6 +120,7 @@ export function Chat({ isReadonly }: { isReadonly: boolean }) {
       isReadonly={isReadonly}
       showArtifact={showArtifact}
       setShowArtifact={setShowArtifact}
+      hasArtifact={hasArtifact}
     />
   );
 }

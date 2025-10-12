@@ -10,10 +10,12 @@ export function ChatContent({
   isReadonly,
   showArtifact,
   setShowArtifact,
+  hasArtifact,
 }: {
   isReadonly: boolean;
   showArtifact: boolean;
   setShowArtifact: (showArtifact: boolean) => void;
+  hasArtifact: boolean;
 }) {
   const { chat } = useChatContext();
   const { currentCap } = CurrentCapStore();
@@ -26,6 +28,7 @@ export function ChatContent({
         chatId={chat.id}
         showArtifact={showArtifact}
         setShowArtifact={setShowArtifact}
+        hasArtifact={hasArtifact}
       />
       {isNewChat ? (
         <div className="flex-1 flex items-center justify-center px-4">
