@@ -103,12 +103,8 @@ export const Artifacts = ({ artifacts }: ArtifactsProps) => {
   });
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
-  const { setCurrentCap } = CurrentCapStore();
-
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    const idx = tabs.indexOf(value);
-    if (idx >= 0) setCurrentCap(artifacts[idx].cap);
   };
 
   if (!artifacts || artifacts.length === 0) return null;
