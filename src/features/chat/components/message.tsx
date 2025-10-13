@@ -1,16 +1,20 @@
 import type { UseChatHelpers } from '@ai-sdk/react';
+import { isUIResource, type UIResource } from '@nuwa-ai/ui-kit';
 import type { UIMessage } from 'ai';
-
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
-import { MessageCap } from './message-cap';
-import { isOnResponseDataMarkPart, type OnResponseDataMarkPart } from '@/features/chat/types/marks';
+import {
+  isOnResponseDataMarkPart,
+  type OnResponseDataMarkPart,
+} from '@/features/chat/types/marks';
 import { cn } from '@/shared/utils';
 import { Loader } from './loader';
 import { MessageActions } from './message-actions';
+import { MessageCap } from './message-cap';
 import { ClearContextMessage } from './message-clear-context';
 import { MessageImage } from './message-image';
 import { RemoteMCPTool } from './message-mcp-tool';
+import { MessageMCPUI } from './message-mcp-ui';
 import { MessageReasoning } from './message-reasoning';
 import { MessageSource } from './message-source';
 import { MessageText } from './message-text';
@@ -206,6 +210,19 @@ const PurePreviewMessage = ({
 
                 if (type === 'dynamic-tool') {
                   const { toolCallId, state, input, output, toolName } = part;
+
+                  const uiRes = (output as any)?.content?.find((c: any) =>
+                    isUIResource(c as any),
+                  ) as UIResource;
+
+                  if (uiRes)
+                    return (
+                      <MessageMCPUI
+                        key={`mcp-ui-${toolCallId}`}
+                        resource={uiRes}
+                      />
+                    );
+
                   return (
                     <RemoteMCPTool
                       key={toolCallId}
@@ -250,9 +267,12 @@ export const PreviewMessage = memo(
     if (prevProps.message !== nextProps.message) return false;
 
     // Fallback for in-place mutation: compare a lightweight signature
-    if (messageSignature(prevProps.message) !== messageSignature(nextProps.message))
+    if (
+      messageSignature(prevProps.message) !==
+      messageSignature(nextProps.message)
+    )
       return false;
 
     return true;
   },
-)
+);

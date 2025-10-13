@@ -1,7 +1,7 @@
 import { NUWA_CLIENT_TIMEOUT, type StreamAIRequest } from '@nuwa-ai/ui-kit';
 import { connect, WindowMessenger } from 'penpal';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { CapUIRendererProps } from '@/shared/components/cap-ui-renderer';
+import type { CapUIRendererProps } from '@/shared/components/iframe-ui-renderer';
 import { useTheme } from '@/shared/components/theme-provider';
 import {
   closeUnifiedMcpClient,
@@ -19,7 +19,7 @@ export type ChildMethods = {
   updateTheme(theme: 'light' | 'dark'): void;
 };
 
-export const useCapUIRender = ({
+export const useIframeUIRenderer = ({
   srcUrl,
   onSendPrompt,
   onAddSelection,
@@ -62,7 +62,9 @@ export const useCapUIRender = ({
   // Keep a ref to child's exposed methods
   const childMethodsRef = useRef<ChildMethods | null>(null);
   // Keep a ref to the current penpal connection so we can explicitly destroy it
-  const connectionRef = useRef<ReturnType<typeof connect<ChildMethods>> | null>(null);
+  const connectionRef = useRef<ReturnType<typeof connect<ChildMethods>> | null>(
+    null,
+  );
 
   const [height, setHeight] = useState<number>(100); // Default height
   const [validationResult, setValidationResult] =
@@ -189,7 +191,13 @@ export const useCapUIRender = ({
           : new Error(`Failed to connect to ${title ?? srcUrl} over Penpal`);
       onPenpalConnectionError?.(err);
     }
-  }, [title, srcUrl, onPenpalConnected, onPenpalConnectionError, resolvedTheme]);
+  }, [
+    title,
+    srcUrl,
+    onPenpalConnected,
+    onPenpalConnectionError,
+    resolvedTheme,
+  ]);
 
   const connectToMCP = useCallback(async () => {
     try {

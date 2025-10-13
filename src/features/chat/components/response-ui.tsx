@@ -1,5 +1,5 @@
 import { useChat } from '@ai-sdk/react';
-import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
+import { IframeUIRenderer } from '@/shared/components/iframe-ui-renderer';
 import { useChatContext } from '../contexts/chat-context';
 
 interface ResponseUIProps {
@@ -16,7 +16,7 @@ export const ResponseUI = ({ srcUrl, title }: ResponseUIProps) => {
   };
 
   return (
-    <CapUIRenderer
+    <IframeUIRenderer
       srcUrl={srcUrl}
       title={title}
       onSendPrompt={handleSendPrompt}

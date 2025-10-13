@@ -11,7 +11,7 @@ import {
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap, CapArtifact } from '@/shared/types';
 import { useChatContext } from '../contexts/chat-context';
-import { Artifacts } from './artifact';
+import { Artifacts } from './artifacts';
 import { ChatContent } from './chat-content';
 
 export function Chat({ isReadonly }: { isReadonly: boolean }) {
