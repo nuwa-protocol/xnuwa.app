@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { TextShimmer } from '@/shared/components/ui/text-shimmer';
 import {
   type ChildMethods,
-  useCapUIRender,
-} from '@/shared/hooks/use-cap-ui-render';
+  useIframeUIRenderer,
+} from '@/shared/hooks/use-iframe-ui-renderer';
 import { IFRAME_ALLOW_PERMISSIONS, IFRAME_SANDBOX } from '../config/iframe';
 
 const ErrorScreen = ({ artifact }: { artifact?: boolean }) => {
@@ -99,7 +99,7 @@ export type CapUIRendererProps = {
   onMCPConnectionError?: (error: Error) => void;
 };
 
-export const CapUIRenderer = (props: CapUIRendererProps) => {
+export const IframeUIRenderer = (props: CapUIRendererProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const {
     iframeRef,
@@ -108,7 +108,7 @@ export const CapUIRenderer = (props: CapUIRendererProps) => {
     height,
     validationResult,
     isValidating,
-  } = useCapUIRender(props);
+  } = useIframeUIRenderer(props);
   const { srcUrl, title, artifact = false } = props;
 
   if (!srcUrl) {
@@ -151,7 +151,9 @@ export const CapUIRenderer = (props: CapUIRendererProps) => {
         onLoad={() => {
           setIsLoading(false);
           connectToPenpal();
-          connectToMCP();
+          if (artifact) {
+            connectToMCP();
+          }
         }}
         onErrorCapture={(error) => {
           console.error('UI Renderer Error', error);
@@ -161,4 +163,4 @@ export const CapUIRenderer = (props: CapUIRendererProps) => {
   );
 };
 
-CapUIRenderer.displayName = 'CapUIRenderer';
+IframeUIRenderer.displayName = 'IframeUIRenderer';

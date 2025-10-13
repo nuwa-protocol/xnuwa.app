@@ -15,7 +15,7 @@ import {
 import { useCallback, useEffect, useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { CapUIRenderer } from '@/shared/components/cap-ui-renderer';
+import { IframeUIRenderer } from '@/shared/components/iframe-ui-renderer';
 import {
   Button,
   Card,
@@ -909,7 +909,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
             </CardHeader>
             <CardContent className="flex-1 min-h-0 w-full bg-gradient-to-br from-muted/20 to-background border border-border rounded-xl shadow-xl overflow-hidden p-0">
               {url && showUIPreview ? (
-                <CapUIRenderer
+                <IframeUIRenderer
                   srcUrl={url}
                   title="Artifact MCP Preview"
                   artifact={true}
