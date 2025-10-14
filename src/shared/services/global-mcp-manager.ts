@@ -68,9 +68,8 @@ class RemoteMCPManager {
           allTools[prefixedToolName] = enhancedTool;
         }
       } catch (error) {
-        console.warn(
-          `Failed to get tools from MCP server ${serverName}:`,
-          error,
+        throw new Error(
+          `Failed to get tools from MCP server ${serverName}:${error}`,
         );
       }
     }
@@ -81,7 +80,7 @@ class RemoteMCPManager {
       initialized: true,
     };
     this.currentCapId = cap.id;
-    
+
     return allTools;
   }
 

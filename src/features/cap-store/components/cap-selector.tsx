@@ -195,7 +195,7 @@ export function CapSelector() {
       {/* Trigger button opens the search dialog */}
       <Button
         variant="ghost"
-        className="rounded-lg hover:bg-transparent w-fit min-w-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+        className="group rounded-lg justify-center items-center hover:bg-transparent w-fit min-w-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Open cap search"
@@ -205,39 +205,43 @@ export function CapSelector() {
           <span className="text-sm font-medium truncate text-left min-w-0">
             {capName || 'Install a cap to start'}
           </span>
-          {/* Small subtle shortcut badge next to cap name */}
-          <span
-            className="ml-1 inline-flex items-center rounded-md border border-border bg-muted/50 px-1.5 py-[1px] text-[10px] leading-4 text-muted-foreground"
-          >
-            {shortcutText}
-          </span>
+          {/* Local Cap badge */}
           {isCurrentLocal && (
             <Badge variant="secondary" className="ml-1 text-xs">
               Dev
             </Badge>
           )}
+          {/* Cap loading indicator */}
           {!isInitialized && (
             <Loader2 className="w-3 h-3 animate-spin text-muted-foreground flex-shrink-0" />
           )}
-          {/* Shortcut hint removed per request; users see it in input placeholder */}
+          {/* Cap error indicator */}
+          {isError && (
+            <Tooltip>
+              {/* Wrap the icon so it can receive pointer events inside Button
+                  (Button sets [&_svg]:pointer-events-none by default). */}
+              <TooltipTrigger asChild>
+                <span className="inline-flex pointer-events-auto">
+                  <AlertCircle className="w-3 h-3 text-destructive" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent className="z-[1000] max-w-48 break-words">
+                <p>
+                  {errorMessage ||
+                    'Cap Initialization Failed, Please Select Again or Check Network Connection'}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {/* Small subtle shortcut badge next to cap name */}
+          <span
+            className="ml-1 inline-flex items-center rounded-md border border-border bg-muted/50 px-1.5 py-[1px] text-[10px] leading-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+            aria-hidden
+          >
+            {shortcutText}
+          </span>
         </div>
       </Button>
-
-      {/* Cap error indicator */}
-      {isError && (
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <AlertCircle className="w-3 h-3 text-destructive cursor-default" />
-          </TooltipTrigger>
-          <TooltipContent className="max-w-48 break-words">
-            <p>
-              {errorMessage ||
-                'Cap Initialization Failed, Please Select Again or Check Network Connection'}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      )}
-
       {/* Command palette dialog for searching caps */}
       <DialogLikeCommand
         open={open}
