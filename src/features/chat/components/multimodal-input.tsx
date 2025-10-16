@@ -13,7 +13,11 @@ import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useChatContext } from '../contexts/chat-context';
 import { usePersistentInput } from '../hooks/use-persistent-input';
 import { ChatSessionsStore } from '../stores';
-import { type AttachmentData, AttachmentInput } from './attachment-input';
+import {
+  type AttachmentData,
+  AttachmentInput,
+  usePasteAttachments,
+} from './attachment-input';
 import { ContextIndicator } from './context-indicator';
 import { InputSelections } from './input-selections';
 import { PreviewAttachment } from './preview-attachment';
@@ -77,6 +81,14 @@ function PureMultimodalInput({ className }: { className?: string }) {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  const appendAttachments = useCallback((newAttachments: AttachmentData[]) => {
+    setAttachments((prev) => [...prev, ...newAttachments]);
+  }, []);
+
+  const handlePaste = usePasteAttachments({
+    onAttachmentsAdd: appendAttachments,
+  });
+
   // Auto focus when chat ID changes (page navigation)
   useEffect(() => {
     if (textareaRef.current && width && width > 768) {
@@ -126,18 +138,20 @@ function PureMultimodalInput({ className }: { className?: string }) {
   return (
     <div className="relative w-full flex flex-col gap-4">
       {attachments.length > 0 && (
-        <div className="flex flex-wrap gap-2 p-2">
-          {attachments.map((attachment, index) => (
-            <PreviewAttachment
-              key={`${attachment.filename || 'file'}-${index}`}
-              attachment={{
-                name: attachment.filename || 'Unknown file',
-                url: attachment.url,
-                contentType: attachment.mediaType,
-              }}
-              onRemove={() => removeAttachment(index)}
-            />
-          ))}
+        <div className="pointer-events-none absolute left-0 right-0 bottom-full z-20 mb-2">
+          <div className="pointer-events-auto flex flex-wrap gap-2 p-2">
+            {attachments.map((attachment, index) => (
+              <PreviewAttachment
+                key={`${attachment.filename || 'file'}-${index}`}
+                attachment={{
+                  name: attachment.filename || 'Unknown file',
+                  url: attachment.url,
+                  contentType: attachment.mediaType,
+                }}
+                onRemove={() => removeAttachment(index)}
+              />
+            ))}
+          </div>
         </div>
       )}
 
@@ -157,6 +171,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
             placeholder="Send a message..."
             value={input}
             onChange={(event) => setInput(event.target.value)}
+            onPaste={handlePaste}
             className="flex-1 min-h-[50px] max-h-[calc(25dvh-48px)] overflow-auto hide-scrollbar resize-none text-base bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none pt-3 px-3 pb-0"
             rows={2}
             autoFocus
