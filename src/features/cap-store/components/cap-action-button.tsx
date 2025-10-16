@@ -22,14 +22,14 @@ export const CapActionButton = ({ cap }: { cap: Cap | RemoteCap }) => {
         e.stopPropagation();
         if (isInstalling) return;
         setIsInstalling(true);
-        try {
-            await installCap(cap.id);
+        installCap(cap.id).then((cap) => {
+            setCurrentCap(cap);
             toast.success(`Installed ${cap.metadata.displayName}`);
-        } catch (error) {
+        }).catch(() => {
             toast.error('Failed to install. Please try again.');
-        } finally {
+        }).finally(() => {
             setIsInstalling(false);
-        }
+        })
     };
 
     const handleUseCap = (e: MouseEvent<HTMLButtonElement>) => {

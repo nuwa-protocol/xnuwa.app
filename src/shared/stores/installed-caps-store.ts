@@ -10,7 +10,7 @@ interface InstalledCapsState {
   isFetchingInstalledCaps: boolean;
   installedCapsError: string | null;
 
-  installCap: (capId: string) => Promise<void>;
+  installCap: (capId: string) => Promise<Cap>;
   uninstallCap: (capId: string) => Promise<void>;
 
   fetchInstalledCaps: () => Promise<Cap[]>;
@@ -35,7 +35,8 @@ export const InstalledCapsStore = create<InstalledCapsState>()(
           throw new Error('Failed to install cap');
         }
         await capKit.favorite(capId, 'add');
-        set({ installedCaps: [...get().installedCaps, cap] });
+        await set({ installedCaps: [...get().installedCaps, cap] });
+        return cap;
       },
 
       uninstallCap: async (capId: string) => {
