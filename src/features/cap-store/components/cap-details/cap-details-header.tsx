@@ -1,5 +1,14 @@
 import type { Cap } from '@nuwa-ai/cap-kit';
-import { Download, Eye, Fingerprint, GitBranch, Share2, ShieldCheck, Tag, User } from 'lucide-react';
+import {
+  Download,
+  Eye,
+  Fingerprint,
+  GitBranch,
+  Share2,
+  ShieldCheck,
+  Tag,
+  User,
+} from 'lucide-react';
 import { useState } from 'react';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
@@ -12,8 +21,8 @@ import {
 } from '@/shared/components/ui';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import type { RemoteCap } from '../../types';
+import { CapActionButton } from '../cap-action-button';
 import { StarRating } from '../star-rating';
-import { CapDetailsActions } from './cap-details-actions';
 
 interface CapDetailsHeaderProps {
   capQueryData: RemoteCap;
@@ -195,10 +204,7 @@ export function CapDetailsHeader({
 
         {/* Right column: vertical actions */}
         <div className="w-full md:w-56 md:ml-auto flex flex-col gap-3">
-          <CapDetailsActions
-            orientation="vertical"
-            capQueryData={capQueryData}
-          />
+          <CapActionButton cap={capQueryData} />
           <ShareDialog
             title="Share this CAP"
             description="Copy the link and share it with others."

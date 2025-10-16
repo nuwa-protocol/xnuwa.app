@@ -1,150 +1,93 @@
-import { Download, Eye, Info, PackagePlus } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { Download, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import type { ReactNode } from 'react';
 import { CapAvatar } from '@/shared/components/cap-avatar';
-import { Badge, Button, Card } from '@/shared/components/ui';
-import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
+import { Card } from '@/shared/components/ui';
 import type { Cap } from '@/shared/types';
 import type { RemoteCap } from '../types';
+import { CapActionButton } from './cap-action-button';
 import { StarRating } from './star-rating';
 
 export interface CapCardProps {
   cap: RemoteCap | Cap;
+  actions?: ReactNode;
 }
 
-export function CapCard({ cap }: CapCardProps) {
+const compactNumberFormatter = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+});
+
+const formatCompactNumber = (value: number) =>
+  compactNumberFormatter.format(value);
+
+export function CapCard({ cap, actions }: CapCardProps) {
   const navigate = useNavigate();
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const [descriptionClamp, setDescriptionClamp] = useState<number>(2);
-  const [isHovered, setIsHovered] = useState(false);
 
-  const { installedCaps, fetchInstalledCaps, installCap } = InstalledCapsStore();
+  const capData = ('capData' in cap ? cap.capData : cap) as Cap;
 
-  /**
-   * Dynamically calculate the description line number, so that the title (up to 2 lines) and description together take up 4 lines.
-   */
-  const recomputeClamp = () => {
-    const el = titleRef.current;
-    if (!el) return;
-    const computed = window.getComputedStyle(el);
-    const lineHeightPx = parseFloat(computed.lineHeight);
-    if (!lineHeightPx) return;
-    const height = el.getBoundingClientRect().height;
-    const lines = Math.max(1, Math.round(height / lineHeightPx));
-    const titleLines = Math.min(lines, 2);
-    const clamp = Math.max(0, 4 - titleLines);
-    setDescriptionClamp(clamp);
-  };
-
-  useEffect(() => {
-    recomputeClamp();
-    window.addEventListener('resize', recomputeClamp);
-    return () => window.removeEventListener('resize', recomputeClamp);
-  }, [cap]);
-
-  const handleInstallCap = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toast.promise(installCap(cap.id), {
-      loading: 'Installing...',
-      success: `Installed ${cap.metadata.displayName}`,
-      error: 'Failed to install. Please try again.',
-    });
-  };
-
-  const handleShowDetails = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/explore/caps/${cap.id}`);
-  };
-
-  const capMetadata = cap.metadata;
   const capStats = 'stats' in cap ? cap.stats : undefined;
 
-  const isInstalled = installedCaps.some((c) => c.id === cap.id);
+  const formattedViews = capStats
+    ? formatCompactNumber(capStats.downloads)
+    : null;
+  const formattedInstalls = capStats
+    ? formatCompactNumber(capStats.favorites)
+    : null;
 
   return (
     <Card
-      className={`p-4 transition-shadow relative overflow-hidden group shadow-lg
-        ${isInstalled
-          ? 'border-theme-primary cursor-pointer hover:shadow-md hover:bg-accent/40 transition-colors transition-all'
-          : 'hover:shadow-md'
-        }
-      `}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => {
-        if (isInstalled) navigate(`/explore/caps/${cap.id}`);
-      }}
+      className="relative flex flex-col gap-2 overflow-hidden p-4 transition-shadow shadow-lg cursor-pointer hover:shadow-md"
+      onClick={() => navigate(`/explore/caps/${cap.id}`)}
     >
-      {isInstalled && (
-        <Badge className="absolute bottom-3 right-3 bg-theme-primary text-white border border-theme-primary">
-          Installed
-        </Badge>
-      )}
-      <div className="flex items-start gap-3">
-        <CapAvatar cap={cap} size="7xl" className="rounded-md" />
-        <div className="flex-1 min-w-0">
-          <h3
-            ref={titleRef}
-            className="font-medium text-md leading-5 line-clamp-1"
-          >
-            {capMetadata.displayName}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <CapAvatar cap={cap} size="3xl" className="rounded-md" />
+          <h3 className="text-xl font-semibold leading-tight text-foreground line-clamp-2">
+            {capData.metadata.displayName}
           </h3>
-          {descriptionClamp > 0 ? (
-            <p
-              className="text-xs text-muted-foreground mt-1 leading-5 overflow-hidden"
-              style={{
-                display: '-webkit-box',
-                WebkitLineClamp: descriptionClamp,
-                WebkitBoxOrient: 'vertical' as any,
-              }}
-            >
-              {capMetadata.description}
-            </p>
-          ) : null}
-          {capStats ? (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2">
-              <div className="flex items-center gap-1">
-                <Eye className="size-3" />
-                <span>{capStats.downloads}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Download className="size-3" />
-                <span>{capStats.favorites}</span>
-              </div>
-              <StarRating
-                averageRating={capStats.averageRating}
-                userRating={capStats.userRating}
-                ratingCount={capStats.ratingCount}
-                size={14}
-              />
-            </div>
-          ) : null}
         </div>
+        {actions ?? <CapActionButton cap={cap} />}
+      </div>
+      <div className="min-h-[3.75rem] my-2">
+        {capData.metadata.description ? (
+          <p className="text-sm text-muted-foreground leading-5 line-clamp-3">
+            {capData.metadata.description}
+          </p>
+        ) : null}
       </div>
 
-      {/* Hover Overlay (only when not installed) */}
-      {!isInstalled && (
-        <div
-          className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-3 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
-        >
-          <Button
-            onClick={handleInstallCap}
-            variant="primary"
-            className="gap-2"
+      {capStats && (
+        <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground border-t border-between">
+          <span
+            className="flex items-center justify-center gap-1 border-r pt-3"
+            title="Views"
           >
-            <PackagePlus className="w-4 h-4 text-white" />
-            Install
-          </Button>
-          <Button
-            onClick={handleShowDetails}
-            variant="secondary"
-            className="bg-background/90 hover:bg-background"
+            <Eye className="size-3 text-muted-foreground" />
+            <span className="font-medium text-foreground">
+              {formattedViews}
+            </span>
+          </span>
+          <span
+            className="flex items-center justify-center gap-1 border-r pt-3 "
+            title="Installs"
           >
-            <Info className="w-4 h-4 mr-2" />
-            Details
-          </Button>
+            <Download className="size-3 text-muted-foreground" />
+            <span className="font-medium text-foreground">
+              {formattedInstalls}
+            </span>
+          </span>
+          <span
+            className="flex items-center justify-center gap-1 pt-3"
+            title="Average rating"
+          >
+            <StarRating
+              averageRating={capStats.averageRating}
+              userRating={capStats.userRating}
+              ratingCount={capStats.ratingCount}
+              size={14}
+            />
+          </span>
         </div>
       )}
     </Card>

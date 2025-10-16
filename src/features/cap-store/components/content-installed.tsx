@@ -1,8 +1,19 @@
-import { Package } from 'lucide-react';
-import { Button, ScrollArea } from '@/shared/components/ui';
+import { Loader2, MoreVertical, Package, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  ScrollArea,
+} from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import { CapCard } from './cap-card';
+import { CapActionButton } from './cap-action-button';
 import { CapStoreLoading } from './cap-store-loading';
 import { CapStoreContentHeader } from './content-header';
 
@@ -14,7 +25,44 @@ export function CapStoreInstalledContent() {
     installedCapsError,
     isFetchingInstalledCaps,
     fetchInstalledCaps,
+    uninstallCap,
   } = InstalledCapsStore();
+  const { currentCap, setCurrentCap } = CurrentCapStore();
+  const [uninstallingIds, setUninstallingIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  const markUninstalling = (capId: string) =>
+    setUninstallingIds((prev) => {
+      const next = new Set(prev);
+      next.add(capId);
+      return next;
+    });
+
+  const unmarkUninstalling = (capId: string) =>
+    setUninstallingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(capId);
+      return next;
+    });
+
+  const handleUninstallCap = async (capId: string, capName: string) => {
+    if (uninstallingIds.has(capId)) return;
+
+    markUninstalling(capId);
+    try {
+      await uninstallCap(capId);
+      if (currentCap && !('capData' in currentCap) && currentCap.id === capId) {
+        setCurrentCap(null);
+      }
+      toast.success(`Uninstalled ${capName}`);
+    } catch (error) {
+      console.error('Failed to uninstall cap:', error);
+      toast.error('Failed to uninstall. Please try again.');
+    } finally {
+      unmarkUninstalling(capId);
+    }
+  };
 
   // Backend API still uses the "favorite" concept; UI calls them "Installed Caps".
   const caps = installedCaps;
@@ -59,7 +107,65 @@ export function CapStoreInstalledContent() {
       {/* Caps Grid Container with ScrollArea */}
       <ScrollArea className="flex-1">
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-6">
-          {caps.length > 0 && caps.map((cap) => <CapCard key={cap.id} cap={cap} />)}
+          {caps.length > 0 &&
+            caps.map((cap) => {
+              const isUninstalling = uninstallingIds.has(cap.id);
+              return (
+                <CapCard
+                  key={cap.id}
+                  cap={cap}
+                  actions={
+                    <div
+                      className="flex items-center gap-1"
+                      onClick={(event) => event.stopPropagation()}
+                      onPointerDown={(event) => event.stopPropagation()}
+                    >
+                      <CapActionButton cap={cap} />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                            onClick={(event) => event.stopPropagation()}
+                            onPointerDown={(event) => event.stopPropagation()}
+                            aria-label="Cap options"
+                          >
+                            {isUninstalling ? (
+                              <Loader2 className="size-4 animate-spin" />
+                            ) : (
+                              <MoreVertical className="size-4" />
+                            )}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          onCloseAutoFocus={(event) => {
+                            // prevent card focus (which triggers navigation) when menu closes
+                            event.preventDefault();
+                          }}
+                        >
+                          <DropdownMenuItem
+                            disabled={isUninstalling}
+                            onSelect={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              handleUninstallCap(
+                                cap.id,
+                                cap.metadata.displayName,
+                              );
+                            }}
+                          >
+                            <Trash2 className="size-4" />
+                            Uninstall
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  }
+                />
+              );
+            })}
         </div>
       </ScrollArea>
     </div>
