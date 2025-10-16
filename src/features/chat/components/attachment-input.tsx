@@ -1,6 +1,6 @@
 import { PaperclipIcon } from 'lucide-react';
-import { useCallback, useEffect, useId } from 'react';
 import type React from 'react';
+import { useCallback, useEffect, useId } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import { convertFileToDataURL } from '../utils/files';
@@ -19,7 +19,6 @@ export const ACCEPTED_ATTACHMENT_TYPES = [
   'image/png',
   'image/gif',
   'image/webp',
-  'image/svg+xml',
 
   // Documents
   'application/pdf',
@@ -170,12 +169,14 @@ export function usePasteAttachments({
       const imageFiles = Array.from(clipboardData.items)
         .filter((item) => item.kind === 'file')
         .map((item) => item.getAsFile())
-        .filter(
-          (file): file is File =>
-            Boolean(file) &&
-            (file.type.startsWith('image/') ||
-              ACCEPTED_IMAGE_TYPES.includes(file.type as never)),
-        );
+        .filter((file): file is File => {
+          if (!file) return false;
+          const fileType = file.type || 'image/png';
+          return (
+            fileType.startsWith('image/') ||
+            ACCEPTED_IMAGE_TYPES.includes(fileType as never)
+          );
+        });
 
       if (imageFiles.length === 0) return false;
 
