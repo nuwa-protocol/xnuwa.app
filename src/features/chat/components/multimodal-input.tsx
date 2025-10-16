@@ -7,19 +7,24 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWindowSize } from 'usehooks-ts';
+import { CapSelector } from '@/features/cap-store/components';
 import { Button } from '@/shared/components/ui/button';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { useChatContext } from '../contexts/chat-context';
 import { usePersistentInput } from '../hooks/use-persistent-input';
 import { ChatSessionsStore } from '../stores';
-import { type AttachmentData, AttachmentInput } from './attachment-input';
-import { ContextCostIndicator } from './context-cost-indicator';
+import {
+  type AttachmentData,
+  AttachmentInput,
+  usePasteAttachments,
+} from './attachment-input';
+import { ContextIndicator } from './context-indicator';
 import { InputSelections } from './input-selections';
 import { PreviewAttachment } from './preview-attachment';
 
 function PureMultimodalInput({ className }: { className?: string }) {
   const { chat } = useChatContext();
-  const { messages, status, stop, setMessages, sendMessage } = useChat({
+  const { status, stop, setMessages, sendMessage } = useChat({
     chat,
   });
   const { input, setInput, textareaRef, clearInput } = usePersistentInput();
@@ -41,7 +46,12 @@ function PureMultimodalInput({ className }: { className?: string }) {
 
       const target = e.target as HTMLElement | null;
       // Skip if typing inside an input/textarea/contenteditable already
-      if (target && (target.closest('input, textarea, [contenteditable="true"], [contenteditable=""]'))) {
+      if (
+        target &&
+        target.closest(
+          'input, textarea, [contenteditable="true"], [contenteditable=""]',
+        )
+      ) {
         return;
       }
 
@@ -71,6 +81,14 @@ function PureMultimodalInput({ className }: { className?: string }) {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  const appendAttachments = useCallback((newAttachments: AttachmentData[]) => {
+    setAttachments((prev) => [...prev, ...newAttachments]);
+  }, []);
+
+  const handlePaste = usePasteAttachments({
+    onAttachmentsAdd: appendAttachments,
+  });
+
   // Auto focus when chat ID changes (page navigation)
   useEffect(() => {
     if (textareaRef.current && width && width > 768) {
@@ -88,8 +106,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
 
     // Check if Cap has MCP servers and if they are initialized
     const hasMCPServers =
-      cap?.core?.mcpServers &&
-      Object.keys(cap.core.mcpServers).length > 0;
+      cap?.core?.mcpServers && Object.keys(cap.core.mcpServers).length > 0;
 
     if (hasMCPServers && !isInitialized) {
       toast.warning('Cap MCP is initializing, please try again later');
@@ -121,70 +138,78 @@ function PureMultimodalInput({ className }: { className?: string }) {
   return (
     <div className="relative w-full flex flex-col gap-4">
       {attachments.length > 0 && (
-        <div className="flex flex-wrap gap-2 p-2">
-          {attachments.map((attachment, index) => (
-            <PreviewAttachment
-              key={`${attachment.filename || 'file'}-${index}`}
-              attachment={{
-                name: attachment.filename || 'Unknown file',
-                url: attachment.url,
-                contentType: attachment.mediaType,
-              }}
-              onRemove={() => removeAttachment(index)}
-            />
-          ))}
+        <div className="pointer-events-none absolute left-0 right-0 bottom-full z-20 mb-2">
+          <div className="pointer-events-auto flex flex-wrap gap-2 p-2">
+            {attachments.map((attachment, index) => (
+              <PreviewAttachment
+                key={`${attachment.filename || 'file'}-${index}`}
+                attachment={{
+                  name: attachment.filename || 'Unknown file',
+                  url: attachment.url,
+                  contentType: attachment.mediaType,
+                }}
+                onRemove={() => removeAttachment(index)}
+              />
+            ))}
+          </div>
         </div>
       )}
 
       <div
         className={cx(
-          'flex flex-col rounded-2xl bg-muted dark:border-zinc-700 border border-input ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+          'flex flex-col shadow-md rounded-2xl border border-border focus-within:border-theme-500 focus-within:shadow-xl',
           className,
         )}
       >
         {/* Selections */}
         <InputSelections />
-
-        {/*  Input Textarea */}
-        <textarea
-          data-testid="multimodal-input"
-          ref={textareaRef}
-          placeholder="Send a message..."
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          className="flex-1 min-h-[50px] max-h-[calc(25dvh-48px)] overflow-auto hide-scrollbar resize-none text-base bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none pt-3 px-3 pb-0"
-          rows={2}
-          autoFocus
-          style={
-            {
-              fieldSizing: 'content',
-            } as React.CSSProperties
-          }
-          onKeyDown={(event) => {
-            if (
-              event.key === 'Enter' &&
-              !event.shiftKey &&
-              !event.nativeEvent.isComposing
-            ) {
-              event.preventDefault();
-
-              if (status !== 'ready') {
-                console.warn(
-                  'The model is not ready to respond. Currnet status:',
-                  status,
-                );
-              }
-
-              handleSend();
+        <div className="flex flex-row ">
+          {/*  Input Textarea */}
+          <textarea
+            data-testid="multimodal-input"
+            ref={textareaRef}
+            placeholder="Send a message..."
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            onPaste={handlePaste}
+            className="flex-1 min-h-[50px] max-h-[calc(25dvh-48px)] overflow-auto hide-scrollbar resize-none text-base bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none pt-3 px-3 pb-0"
+            rows={2}
+            autoFocus
+            style={
+              {
+                fieldSizing: 'content',
+              } as React.CSSProperties
             }
-          }}
-        />
+            onKeyDown={(event) => {
+              if (
+                event.key === 'Enter' &&
+                !event.shiftKey &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+
+                if (status !== 'ready') {
+                  console.warn(
+                    'The model is not ready to respond. Currnet status:',
+                    status,
+                  );
+                }
+
+                handleSend();
+              }
+            }}
+          />
+
+          <div className="flex flex-col justify-center items-center p-2">
+            <ContextIndicator />
+          </div>
+        </div>
 
         {/* Cap Selector and Send Button */}
         <div className="flex justify-between items-center p-2">
           <div className="flex items-center gap-2 justify-between w-full">
             <div className="flex items-center gap-2">
-              <ContextCostIndicator />
+              <CapSelector />
             </div>
             {status === 'submitted' || status === 'streaming' ? (
               <StopButton
@@ -248,21 +273,17 @@ function PureSendButton({
   submitForm,
   input,
   attachments,
-
 }: {
   submitForm: () => void;
   input: string;
   attachments: AttachmentData[];
 }) {
-
   const { isInitialized, getCurrentCap, isError } = CurrentCapStore();
   const cap = getCurrentCap();
 
-
   // Check if Cap has MCP servers
   const hasMCPServers =
-    cap?.core?.mcpServers &&
-    Object.keys(cap.core.mcpServers).length > 0;
+    cap?.core?.mcpServers && Object.keys(cap.core.mcpServers).length > 0;
 
   const hasContent = input.trim().length > 0 || attachments.length > 0;
 
@@ -274,10 +295,7 @@ function PureSendButton({
         event.preventDefault();
         submitForm();
       }}
-      disabled={
-        !hasContent ||
-        (hasMCPServers && (!isInitialized || isError))
-      }
+      disabled={!hasContent || (hasMCPServers && (!isInitialized || isError))}
     >
       <ArrowUpIcon size={14} />
     </Button>
