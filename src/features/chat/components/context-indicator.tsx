@@ -24,6 +24,7 @@ import { ChatSessionsStore } from '../stores/chat-sessions-store';
 
 type PaymentInfo = {
   totalAmount: bigint;
+  toolCallAmount: bigint;
 };
 
 const PERCENT_MAX = 100;
@@ -61,19 +62,30 @@ export function ContextIndicator() {
         const transactions = await fetchTransactionsFromChatSession(session);
         if (!isMounted) return;
 
-        const totalAmount = transactions.reduce(
-          (sum, tx) => sum + (tx.details?.payment?.costUsd || 0n),
-          0n,
+        const { totalAmount, toolCallAmount } = transactions.reduce(
+          (acc, tx) => {
+            const amount = tx.details?.payment?.costUsd || 0n;
+            return {
+              totalAmount: acc.totalAmount + amount,
+              toolCallAmount:
+                tx.info.type === 'tool-call'
+                  ? acc.toolCallAmount + amount
+                  : acc.toolCallAmount,
+            };
+          },
+          { totalAmount: 0n, toolCallAmount: 0n },
         );
 
         setPaymentInfo({
           totalAmount,
+          toolCallAmount,
         });
       } catch (error) {
         console.error(error);
         if (isMounted) {
           setPaymentInfo({
             totalAmount: 0n,
+            toolCallAmount: 0n,
           });
         }
       }
@@ -129,20 +141,17 @@ export function ContextIndicator() {
     navigate('/wallet');
   }, [navigate]);
 
-  const totalCostDisplay = useMemo(() => {
-    const formatted = formatUsdCost(paymentInfo?.totalAmount || 0n);
-    if (!formatted) {
-      return '$0.00';
-    }
+  const totalCostDisplay = useMemo(
+    () => formatCostDisplay(paymentInfo?.totalAmount),
+    [paymentInfo?.totalAmount],
+  );
 
-    const amount = formatted.replace('$', '');
-    if (!amount.includes('.')) {
-      return `$${amount}.00`;
-    }
+  const hasToolCallCost = Boolean(paymentInfo?.toolCallAmount && paymentInfo?.toolCallAmount > 0);
 
-    const [dollars, cents] = amount.split('.');
-    return `$${dollars}.${cents.padEnd(2, '0')}`;
-  }, [paymentInfo?.totalAmount]);
+  const toolCallCostDisplay = useMemo(
+    () => formatCostDisplay(paymentInfo?.toolCallAmount),
+    [paymentInfo?.toolCallAmount],
+  );
 
   const usedTokens = contextUsage?.totalTokens ?? 0;
   const shouldRender =
@@ -181,6 +190,12 @@ export function ContextIndicator() {
               label="Cache"
               tokens={contextUsage?.cachedInputTokens}
             />
+            {hasToolCallCost && (
+              <UsageRow
+                label="Tool call cost"
+                cost={toolCallCostDisplay}
+              />
+            )}
           </div>
           <Button
             className="w-full justify-center"
@@ -193,7 +208,11 @@ export function ContextIndicator() {
             Clear conversation context
           </Button>
         </div>
-        <TotalCostRow costText={totalCostDisplay} onSelect={handleWalletClick} />
+        <CostRow
+          costText={totalCostDisplay}
+          label="Total cost"
+          onSelect={handleWalletClick}
+        />
       </HoverCardContent>
     </HoverCard>
   );
@@ -273,26 +292,30 @@ const UsageHeader = ({
 const UsageRow = ({
   label,
   tokens,
+  cost
 }: {
   label: string;
   tokens?: number | null;
+  cost?: string | null;
 }) => {
-  if (!tokens) {
+  if (!tokens && !cost) {
     return null;
   }
 
   return (
     <div className="flex items-center justify-between text-xs">
       <span className="text-muted-foreground">{label}</span>
-      <span>{formatCompact(tokens)}</span>
+      <span>{cost ?? formatCompact(tokens ?? 0)}</span>
     </div>
   );
 };
 
-const TotalCostRow = ({
+const CostRow = ({
+  label,
   costText,
   onSelect,
 }: {
+  label: string;
   costText: string;
   onSelect: () => void;
 }) => (
@@ -303,7 +326,7 @@ const TotalCostRow = ({
     role="button"
     tabIndex={0}
   >
-    <span className="text-muted-foreground">Total cost</span>
+    <span className="text-muted-foreground">{label}</span>
     <span className="font-medium">{costText}</span>
   </div>
 );
@@ -330,3 +353,18 @@ const formatCompact = (value: number) =>
   new Intl.NumberFormat('en-US', {
     notation: 'compact',
   }).format(value);
+
+const formatCostDisplay = (amount?: bigint | null) => {
+  const formatted = formatUsdCost(amount || 0n);
+  if (!formatted) {
+    return '$0.00';
+  }
+
+  const amountText = formatted.replace('$', '');
+  if (!amountText.includes('.')) {
+    return `$${amountText}.00`;
+  }
+
+  const [dollars, cents] = amountText.split('.');
+  return `$${dollars}.${cents.padEnd(2, '0')}`;
+};
