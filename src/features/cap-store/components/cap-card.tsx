@@ -1,5 +1,6 @@
 import { Download, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import { Card } from '@/shared/components/ui';
 import type { Cap } from '@/shared/types';
@@ -9,6 +10,7 @@ import { StarRating } from './star-rating';
 
 export interface CapCardProps {
   cap: RemoteCap | Cap;
+  actions?: ReactNode;
 }
 
 const compactNumberFormatter = new Intl.NumberFormat('en', {
@@ -19,7 +21,7 @@ const compactNumberFormatter = new Intl.NumberFormat('en', {
 const formatCompactNumber = (value: number) =>
   compactNumberFormatter.format(value);
 
-export function CapCard({ cap }: CapCardProps) {
+export function CapCard({ cap, actions }: CapCardProps) {
   const navigate = useNavigate();
 
   const capData = ('capData' in cap ? cap.capData : cap) as Cap;
@@ -45,7 +47,7 @@ export function CapCard({ cap }: CapCardProps) {
             {capData.metadata.displayName}
           </h3>
         </div>
-        <CapActionButton cap={cap} />
+        {actions ?? <CapActionButton cap={cap} />}
       </div>
       <div className="min-h-[3.75rem] my-2">
         {capData.metadata.description ? (

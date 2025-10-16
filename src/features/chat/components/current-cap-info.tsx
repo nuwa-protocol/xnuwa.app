@@ -1,5 +1,8 @@
+import { Package, Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CapAvatar } from '@/shared/components/cap-avatar';
+import { Button } from '@/shared/components/ui/button';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import { SuggestedActions } from './suggested-actions';
@@ -20,13 +23,35 @@ export function CurrentCapInfo() {
   const { installedCaps } = InstalledCapsStore();
   const navigate = useNavigate();
 
-  if (!currentCap) {
-    if (installedCaps.length > 0) {
-      setCurrentCap(installedCaps[0])
-    } else {
-      navigate('/explore');
-      return null;
+  useEffect(() => {
+    if (!currentCap && installedCaps.length > 0) {
+      setCurrentCap(installedCaps[0]);
     }
+  }, [currentCap]);
+
+  if (!currentCap) {
+    return (
+      <div
+        className="w-full max-w-4xl mx-auto px-4 md:px-6"
+        role="region"
+        aria-label="Capability information"
+      >
+        <div className="flex flex-col items-center text-center py-8">
+          <Package className="size-12 text-muted-foreground mb-3" />
+          <div className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
+            Install Your First Cap
+          </div>
+          <div className="mt-2 text-sm md:text-[15px] leading-6 text-muted-foreground/90">
+            Nuwa AI requires AI Capabilities to work. Please install a Cap to get started.
+          </div>
+          <div className="mt-4">
+            <Button variant="default" onClick={() => navigate('/explore')}>
+              <Sparkles className="w-4 h-4 mr-2" /> Explore Caps
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
