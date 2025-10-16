@@ -1,6 +1,5 @@
 import { PanelRightClose, PanelRightOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { CapSelector } from '@/features/cap-store/components';
 import { Button } from '@/shared/components';
 import {
   Tooltip,
@@ -28,6 +27,13 @@ export default function Header({
   const { chatSessions, updateSession, deleteSession } = ChatSessionsStore();
   const session = chatSessions[chatId || ''] || null;
   const title = session?.title || 'New Chat';
+  const centerTitle = showArtifact && hasArtifact;
+  const titleSectionClassName = centerTitle
+    ? 'flex flex-row items-center gap-2 flex-1 ml-4 min-w-0 justify-start'
+    : 'flex flex-row items-center gap-2 flex-1 min-w-0 justify-center';
+  const rightSectionClassName = centerTitle
+    ? 'flex items-center ml-auto px-2'
+    : 'flex flex-1 items-center justify-end px-2';
 
   const handleRename = async (newTitle: string) => {
     await updateSession(chatId, { title: newTitle });
@@ -49,16 +55,17 @@ export default function Header({
   };
 
   return (
-    <header className="w-full sticky top-0 z-10 grid grid-cols-3 items-center px-3 pt-2">
-      {/* Left: Actions */}
-      <div className="flex min-w-0 flex-1 mr-4">
-        <CapSelector />
-      </div>
-      {/* Center: Status area (AI or Save) */}
+    <header className="w-full sticky top-0 z-10 flex items-center px-3 pt-2">
+      {!centerTitle && (
+        <div className="flex min-w-0 flex-1 mr-4 gap-2 items-center">
+          {/* Left: Actions */}
+        </div>
+      )}
 
-      <div className="flex flex-row justify-center items-center w-full">
+      {/* Chat title */}
+      <div className={titleSectionClassName}>
         {session && (
-          <div className="flex flex-row justify-center items-center gap-2">
+          <div className="flex flex-row items-center gap-2">
             <p className="text-center text-sm py-1 rounded-lg font-medium text-foreground/90 md:text-base line-clamp-1">
               {title}
             </p>
@@ -72,8 +79,8 @@ export default function Header({
         )}
       </div>
 
-      {/* Right: Context and Cost Indicator */}
-      <div className="justify-self-end px-2">
+      {/* Right: Artifact Panel Control */}
+      <div className={rightSectionClassName}>
         {hasArtifact && (
           <TooltipProvider delayDuration={0}>
             <Tooltip>
