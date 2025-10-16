@@ -108,15 +108,6 @@ export function AttachmentInput({
     [attachments, onAttachmentsChange],
   );
 
-  // Remove attachment
-  const removeAttachment = useCallback(
-    (index: number) => {
-      const newAttachments = attachments.filter((_, i) => i !== index);
-      onAttachmentsChange(newAttachments);
-    },
-    [attachments, onAttachmentsChange],
-  );
-
   return (
     <>
       {/* File Input */}
@@ -140,7 +131,7 @@ export function AttachmentInput({
         }}
         variant="ghost"
         size="sm"
-        className={`p-1.5 h-fit rounded-md hover:bg-accent ${attachments.length > 0 ? 'bg-accent text-primary' : ''}`}
+        className={`p-1.5 h-fit rounded-md hover:bg-accent`}
         data-testid="attachment-toggle"
       >
         <PaperclipIcon size={14} />
