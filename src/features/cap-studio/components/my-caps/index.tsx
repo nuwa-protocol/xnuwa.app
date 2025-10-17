@@ -28,6 +28,7 @@ import { type Cap, CapSchema } from '@/shared/types';
 import { useSubmitCap } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
+import { parseYaml } from '@/features/cap-studio/utils/yaml';
 import { CapCard } from './cap-card';
 
 interface MyCapsProps {
@@ -138,7 +139,7 @@ export function MyCaps({
     return fullCap;
   };
 
-  const handleImportJson = async (
+  const handleImportYaml = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
@@ -151,7 +152,7 @@ export function MyCaps({
 
     try {
       const text = await file.text();
-      const data = JSON.parse(text);
+      const data = parseYaml(text);
 
       if (Array.isArray(data)) {
         toast.error(
@@ -198,14 +199,14 @@ export function MyCaps({
               size="lg"
             >
               <Upload className="h-4 w-4 mr-2" />
-              Import Json
+              Import YAML
             </Button>
-            {/* Hidden input for importing a single cap JSON */}
+            {/* Hidden input for importing a single cap YAML */}
             <input
               ref={importFileRef}
               type="file"
-              accept=".json"
-              onChange={handleImportJson}
+              accept=".yaml,.yml"
+              onChange={handleImportYaml}
               className="hidden"
             />
           </div>
@@ -292,16 +293,16 @@ export function MyCaps({
                     onClick={() => importFileRef.current?.click()}
                   >
                     <FileUp className="h-4 w-4 mr-2" />
-                    Import from JSON
+                    Import from YAML
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              {/* Hidden input for importing a single cap JSON */}
+              {/* Hidden input for importing a single cap YAML */}
               <input
                 ref={importFileRef}
                 type="file"
-                accept=".json"
-                onChange={handleImportJson}
+                accept=".yaml,.yml"
+                onChange={handleImportYaml}
                 className="hidden"
               />
             </>
