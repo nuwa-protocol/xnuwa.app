@@ -9,7 +9,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import type React from 'react';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { Button } from '@/shared/components';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import {
@@ -52,6 +52,7 @@ export const LLMModelSelector = ({
     'name',
   );
   const [showToolsOnly, setShowToolsOnly] = useState(false);
+  const toolsOnlyCheckboxId = useId();
 
   // Generate categories and providers from models
   const { providers } = useMemo(() => {
@@ -241,7 +242,7 @@ export const LLMModelSelector = ({
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
-                id="tools-only"
+                id={toolsOnlyCheckboxId}
                 checked={showToolsOnly}
                 onCheckedChange={(checked) => setShowToolsOnly(checked as boolean)}
               />
