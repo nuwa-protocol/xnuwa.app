@@ -1,10 +1,15 @@
 import { getHttpClient } from '@/shared/services/payment-clients';
+import { mergeRequestBody } from '@/shared/utils/merge-extra-body';
 
 /**
  * Create a fetch-compatible function backed by Payment Kit.
  * It automatically handles payment-channel headers and streaming settlement.
  */
-export function createPaymentFetch(_options?: { maxAmount?: bigint }) {
+export function createPaymentFetch(_options?: {
+  maxAmount?: bigint;
+  extraBody?: Record<string, unknown>;
+}) {
+  const extraBody = _options?.extraBody;
   return async function paymentFetch(
     input: RequestInfo | URL,
     init?: RequestInit,
@@ -40,10 +45,12 @@ export function createPaymentFetch(_options?: { maxAmount?: bigint }) {
       | 'PATCH';
 
     const client = await getHttpClient();
+    const requestInit = mergeRequestBody(finalInit, extraBody);
+
     const handle = await client.requestWithPayment(
       methodFromInit,
       targetUrl.toString(),
-      finalInit,
+      requestInit,
     );
     return handle.response;
   };
