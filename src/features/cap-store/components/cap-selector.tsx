@@ -17,6 +17,8 @@ import {
   CommandList,
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogTitle,
   Tabs,
   TabsContent,
   TabsList,
@@ -569,6 +571,8 @@ function DialogLikeCommand({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTitle className='sr-only'>Cap Selector</DialogTitle>
+      <DialogDescription className='sr-only'>Select a cap to start</DialogDescription>
       <DialogContent
         onKeyDownCapture={onKeyDownCapture}
         className="overflow-hidden p-0 shadow-lg max-w-md h-[560px] max-h-[80vh]"
