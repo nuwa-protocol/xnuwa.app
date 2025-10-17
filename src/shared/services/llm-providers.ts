@@ -12,14 +12,12 @@ import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import { createPaymentFetch } from '@/shared/services/payment-fetch';
 import type { CapModel } from '@/shared/types';
 
-const paymentFetch = createPaymentFetch();
-
 export const LLMProvider = (model: CapModel) => {
+  const paymentFetch = createPaymentFetch({ extraBody: model.parameters });
   const providerSettings = {
     apiKey: 'NOT-USED', // specify a fake api key to avoid SDK errors, the authorization header will be removed before sending to the gateway
     baseURL: model.customGatewayUrl || LLM_GATEWAY_BASE_URL,
     fetch: paymentFetch,
-    extraBody: model.parameters,
   };
 
   const providerId = model.providerId;
@@ -54,6 +52,7 @@ export const LLMProvider = (model: CapModel) => {
 };
 
 export const UtilityLLMProvider = () => {
+  const paymentFetch = createPaymentFetch();
   const UtilityProviderSettings = {
     apiKey: 'NOT-USED',
     baseURL: LLM_GATEWAY_BASE_URL,
