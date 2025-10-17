@@ -4,13 +4,11 @@ import {
   Bug,
   Check,
   Clock,
-  Copy,
   Download,
   Loader2,
   MoreVertical,
   PlayCircle,
   Server,
-  Share,
   StopCircle,
   Trash2,
   Upload,
@@ -52,8 +50,6 @@ import {
   CodeBlock,
   CodeBlockCopyButton,
 } from '@/shared/components/ui/shadcn-io/code-block';
-import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
-import { APP_URL } from '@/shared/config/app';
 import { stringifyYaml } from '@/features/cap-studio/utils/yaml';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
@@ -84,7 +80,6 @@ export function CapCard({
   const setCurrentCap = CurrentCapStore((state) => state.setCurrentCap);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const suppressCardClickUntilRef = useRef<number>(0); // suppress accidental card click after dialog closes
   const [isStoppingLiveDebug, setIsStoppingLiveDebug] = useState(false);
@@ -111,13 +106,6 @@ export function CapCard({
   const handleDelete = () => {
     deleteCap(cap.id);
     setShowDeleteDialog(false);
-  };
-
-  const handleCopyCid = async () => {
-    if (cap.cid) {
-      await navigator.clipboard.writeText(cap.cid);
-      toast.success(`Published CID copied: ${cap.cid}`);
-    }
   };
 
   const handleSelectClick = (e: React.MouseEvent) => {
@@ -403,36 +391,6 @@ export function CapCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
-                  {cap.id && (
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShareDialogOpen(true);
-                      }}
-                      onSelect={(e) => e.preventDefault()}
-                    >
-                      <Share className="h-4 w-4 mr-2" />
-                      Share
-                    </DropdownMenuItem>
-                  )}
-
-                  {cap.status === 'submitted' && cap.cid && (
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCopyCid();
-                      }}
-                    >
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy Published CID
-                    </DropdownMenuItem>
-                  )}
-
-                  {(cap.id ||
-                    (cap.status === 'submitted' && cap.cid)) && (
-                    <DropdownMenuSeparator />
-                  )}
-
                   {!isLiveDebugging && (
                     <>
                       <DropdownMenuItem
@@ -440,7 +398,6 @@ export function CapCard({
                           e.stopPropagation();
                           handleOpenLiveDebugDialog();
                         }}
-                        onSelect={(e) => e.preventDefault()}
                       >
                         <PlayCircle className="h-4 w-4 mr-2" />
                         Start Live Debugging
@@ -498,20 +455,6 @@ export function CapCard({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <ShareDialog
-        open={shareDialogOpen}
-        onOpenChange={setShareDialogOpen}
-        title={`Share ${cap.capData.metadata.displayName}`}
-        description="Share this published cap with others using this link."
-        links={[
-          {
-            id: 'share',
-            label: 'Share Link',
-            url: `${APP_URL}/chat?capid=${cap.id}`,
-          },
-        ]}
-      />
-
       {/* Export YAML preview dialog with copy/save actions */}
       <Dialog
         open={exportDialogOpen}
