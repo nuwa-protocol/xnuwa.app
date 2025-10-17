@@ -101,17 +101,22 @@ export function MyCaps({
 
   // Get and filter all caps
   const allCaps = useMemo(() => {
-    if (!searchQuery) return localCaps;
-
     const query = searchQuery.toLowerCase();
-    return localCaps.filter(
-      (cap) =>
-        cap.capData.metadata.displayName.toLowerCase().includes(query) ||
-        cap.capData.metadata.description.toLowerCase().includes(query) ||
-        cap.capData.metadata.tags.some((tag) =>
-          tag.toLowerCase().includes(query),
-        ),
-    );
+    const filteredCaps = !searchQuery
+      ? localCaps
+      : localCaps.filter(
+          (cap) =>
+            cap.capData.metadata.displayName.toLowerCase().includes(query) ||
+            cap.capData.metadata.description.toLowerCase().includes(query) ||
+            cap.capData.metadata.tags.some((tag) =>
+              tag.toLowerCase().includes(query),
+            ),
+        );
+
+    const liveCaps = filteredCaps.filter((cap) => Boolean(cap.liveSource?.url));
+    const otherCaps = filteredCaps.filter((cap) => !cap.liveSource?.url);
+
+    return [...liveCaps, ...otherCaps];
   }, [localCaps, searchQuery]);
 
   const selectedCaps = allCaps.filter((cap) => selectedCapIds.has(cap.id));

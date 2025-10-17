@@ -5,8 +5,7 @@ import { RemoteMCPManager } from '@/shared/services/global-mcp-manager';
 import { createLocalStoragePersistConfig } from '@/shared/storage';
 import type { Cap } from '@/shared/types';
 
-// TODO: remove current cap store and use url to identify the current cap
-interface CurrentCapState {
+export interface CurrentCapState {
   currentCap: Cap | LocalCap | null;
   isInitialized: boolean;
   isError: boolean;
@@ -38,8 +37,8 @@ const persistConfig = createLocalStoragePersistConfig<CurrentCapState>({
 });
 
 export const CurrentCapStore = create<CurrentCapState>()(
-  persist(
-    (set, get) => ({
+  persist((set, get) => {
+    return {
       currentCap: null,
       isInitialized: true,
       isError: false,
@@ -104,6 +103,7 @@ export const CurrentCapStore = create<CurrentCapState>()(
           });
         }
       },
+
       currentCapArtifactTools: null,
 
       setCurrentCapArtifactTools: (
@@ -119,11 +119,10 @@ export const CurrentCapStore = create<CurrentCapState>()(
       },
 
       clearCurrentCapArtifactTools: () => {
-        set((state) => {
+        set(() => {
           return { currentCapArtifactTools: null };
         });
       },
-    }),
-    persistConfig,
-  ),
+    };
+  }, persistConfig),
 );

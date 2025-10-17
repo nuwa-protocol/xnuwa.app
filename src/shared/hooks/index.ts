@@ -4,6 +4,7 @@ export * from './use-auth';
 export * from './use-debounce-callback';
 export * from './use-debounce-value';
 export * from './use-dev-mode';
+export * from './use-live-cap-connections';
 export * from './use-language';
 export * from './use-mobile';
 export * from './use-rehydration';
