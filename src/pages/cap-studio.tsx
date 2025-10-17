@@ -1,6 +1,5 @@
 import { useLocation } from 'react-router-dom';
 import { CapStudio } from '@/features/cap-studio/components';
-import { BatchCreate } from '@/features/cap-studio/components/batch-create';
 import { CapEdit } from '@/features/cap-studio/components/cap-edit';
 import { Submit } from '@/features/cap-studio/components/cap-submit';
 import { MCPDebug } from '@/features/cap-studio/components/mcp';
@@ -19,7 +18,6 @@ export default function CapStudioPage() {
 
   if (path === '/cap-studio') return <CapStudio />;
   if (path.startsWith('/cap-studio/create')) return <CapEdit />;
-  if (path.startsWith('/cap-studio/batch-create')) return <BatchCreate />;
   if (path.startsWith('/cap-studio/edit/'))
     return <CapEdit id={path.split('/').pop() || ''} />;
   if (path.startsWith('/cap-studio/submit/'))
