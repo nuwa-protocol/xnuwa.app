@@ -34,6 +34,9 @@ import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { Cap } from '@/shared/types';
 import { cn } from '@/shared/utils/cn';
 
+const LIVE_DEV_BADGE_CLASSES =
+  'bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-400/20 dark:text-amber-100 dark:border-amber-300';
+
 export function CapSelector() {
   const { currentCap, setCurrentCap, isInitialized, isError, errorMessage } =
     CurrentCapStore();
@@ -153,9 +156,6 @@ export function CapSelector() {
   // Only show local caps in the selector when dev mode is enabled
   const localCapsToShow = isDevMode ? localCaps : [];
 
-  // Determine if current cap is one of local caps (to show badge in trigger)
-  const isCurrentLocal = currentCap && 'capData' in currentCap;
-
   const capName =
     currentCap &&
     ('capData' in currentCap
@@ -178,6 +178,10 @@ export function CapSelector() {
   if (!currentCap) {
     return null;
   }
+
+  const currentLocalCap =
+    'capData' in currentCap ? (currentCap as LocalCap) : undefined;
+  const isCurrentLiveDev = Boolean(currentLocalCap?.liveSource?.url);
 
   // Precompute filtered lists (Command's own filtering is disabled)
   const q = searchValue.trim().toLowerCase();
@@ -206,9 +210,15 @@ export function CapSelector() {
             {capName || 'Install a cap to start'}
           </span>
           {/* Local Cap badge */}
-          {isCurrentLocal && (
-            <Badge variant="secondary" className="ml-1 text-xs">
-              Dev
+          {currentLocalCap && (
+            <Badge
+              variant="secondary"
+              className={cn(
+                'ml-1 text-xs',
+                isCurrentLiveDev && LIVE_DEV_BADGE_CLASSES,
+              )}
+            >
+              {isCurrentLiveDev ? 'Live Dev' : 'Dev'}
             </Badge>
           )}
           {/* Cap loading indicator */}
@@ -441,13 +451,17 @@ const CapItem = ({
 }) => {
   const isLocal = 'capData' in cap;
   const capData = isLocal ? cap.capData : cap;
+  const isLiveDebugging = isLocal ? Boolean(cap.liveSource?.url) : false;
   return (
     <>
       <CapAvatar cap={cap} size="md" className="rounded-md" />
       <span className="font-medium">{capData.metadata.displayName}</span>
       {isLocal && (
-        <Badge variant="secondary" className="ml-auto">
-          Dev
+        <Badge
+          variant="secondary"
+          className={cn('ml-auto', isLiveDebugging && LIVE_DEV_BADGE_CLASSES)}
+        >
+          {isLiveDebugging ? 'Live Dev' : 'Dev'}
         </Badge>
       )}
       {isInstalled && (
