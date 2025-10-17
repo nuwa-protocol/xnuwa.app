@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Toaster } from 'sonner';
 import { AuthGuard } from '@/features/auth/components';
 import { useWalletBalanceManager } from '@/features/wallet/hooks/use-wallet-balance-manager';
-import { useRehydration } from '@/shared/hooks';
+import { useLiveCapConnections, useRehydration } from '@/shared/hooks';
 import { useAutoLoadingDetection } from '@/shared/hooks/use-auto-loading-detection';
 import { MobileWarning } from '../shared/components/mobile-warning';
 import { ThemeProvider } from '../shared/components/theme-provider';
@@ -16,6 +16,9 @@ import {
 export default function RootLayout() {
   // Initialize wallet balance manager
   useWalletBalanceManager();
+
+  // Manage live cap connections globally
+  useLiveCapConnections();
 
   // Check if the app is loaded, remove the HTML loading
   useAutoLoadingDetection();

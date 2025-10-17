@@ -4,11 +4,12 @@ import {
   Bug,
   Check,
   Clock,
-  Copy,
   Download,
+  Loader2,
   MoreVertical,
+  PlayCircle,
   Server,
-  Share,
+  StopCircle,
   Trash2,
   Upload,
 } from 'lucide-react';
@@ -49,11 +50,11 @@ import {
   CodeBlock,
   CodeBlockCopyButton,
 } from '@/shared/components/ui/shadcn-io/code-block';
-import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
-import { APP_URL } from '@/shared/config/app';
 import { stringifyYaml } from '@/features/cap-studio/utils/yaml';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
+import { LiveDebugCapDialog } from './live-debug-cap-dialog';
 
 interface CapCardProps {
   cap: LocalCap;
@@ -74,12 +75,17 @@ export function CapCard({
   onToggleSelect,
   onEnterMultiSelectMode,
 }: CapCardProps) {
-  const { deleteCap } = CapStudioStore();
+  const { deleteCap, updateCap } = CapStudioStore();
+  const currentCap = CurrentCapStore((state) => state.currentCap);
+  const setCurrentCap = CurrentCapStore((state) => state.setCurrentCap);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const suppressCardClickUntilRef = useRef<number>(0); // suppress accidental card click after dialog closes
+  const [isStoppingLiveDebug, setIsStoppingLiveDebug] = useState(false);
+  const [isLiveDebugDialogOpen, setIsLiveDebugDialogOpen] = useState(false);
+  const [liveDebugSourceUrl, setLiveDebugSourceUrl] = useState('');
+  const [isStartingLiveDebug, setIsStartingLiveDebug] = useState(false);
 
   // Build the exportable YAML once per cap change (omit id/authorDID)
   const exportYaml = useMemo(() => {
@@ -95,16 +101,11 @@ export function CapCard({
     }
   }, [cap.capData]);
 
+  const isLiveDebugging = Boolean(cap.liveSource?.url);
+
   const handleDelete = () => {
     deleteCap(cap.id);
     setShowDeleteDialog(false);
-  };
-
-  const handleCopyCid = async () => {
-    if (cap.cid) {
-      await navigator.clipboard.writeText(cap.cid);
-      toast.success(`Published CID copied: ${cap.cid}`);
-    }
   };
 
   const handleSelectClick = (e: React.MouseEvent) => {
@@ -117,6 +118,8 @@ export function CapCard({
   const handleCardClick = () => {
     // Prevent opening edit immediately after closing the export dialog (ghost click)
     if (Date.now() < suppressCardClickUntilRef.current) return;
+    if (isLiveDebugDialogOpen) return;
+    if (isLiveDebugging && !isMultiSelectMode) return;
     if (!isMultiSelectMode && onEnterMultiSelectMode) {
       onEnterMultiSelectMode();
     } else if (isMultiSelectMode && onToggleSelect) {
@@ -161,9 +164,75 @@ export function CapCard({
     }
   };
 
+  const syncCurrentCapLiveSource = (
+    nextLiveSource?: LocalCap['liveSource'],
+  ) => {
+    if (
+      currentCap &&
+      'capData' in currentCap &&
+      currentCap.id === cap.id
+    ) {
+      setCurrentCap({
+        ...currentCap,
+        liveSource: nextLiveSource,
+        updatedAt: Date.now(),
+      });
+    }
+  };
+
+  const handleStartLiveDebug = () => {
+    const trimmedUrl = liveDebugSourceUrl.trim();
+    if (!trimmedUrl) {
+      toast.error('Please enter a valid source URL.');
+      return;
+    }
+
+    setIsStartingLiveDebug(true);
+    try {
+      const nextLiveSource: LocalCap['liveSource'] = { url: trimmedUrl };
+      updateCap(cap.id, { liveSource: nextLiveSource });
+      syncCurrentCapLiveSource(nextLiveSource);
+      toast.success('Live debugging started.');
+      setIsLiveDebugDialogOpen(false);
+    } catch (error) {
+      console.error('Failed to start live debugging:', error);
+      toast.error('Failed to start live debugging. Please try again.');
+    } finally {
+      setIsStartingLiveDebug(false);
+    }
+  };
+
+  const handleStopLiveDebug = () => {
+    setIsStoppingLiveDebug(true);
+    try {
+      updateCap(cap.id, { liveSource: undefined });
+      syncCurrentCapLiveSource(undefined);
+      const latestCurrent = CurrentCapStore.getState().currentCap;
+      if (
+        latestCurrent &&
+        'capData' in latestCurrent &&
+        latestCurrent.id === cap.id
+      ) {
+        setCurrentCap(latestCurrent);
+      }
+      toast.success('Live debugging stopped.');
+    } catch (error) {
+      console.error('Failed to stop live debugging:', error);
+      toast.error('Failed to stop live debugging. Please try again.');
+    } finally {
+      setIsStoppingLiveDebug(false);
+    }
+  };
+
+  const handleOpenLiveDebugDialog = () => {
+    setLiveDebugSourceUrl(cap.liveSource?.url ?? '');
+    setIsLiveDebugDialogOpen(true);
+  };
+
   // Determine border color based on published status
-  const borderColor =
-    cap.status === 'submitted'
+  const borderColor = isLiveDebugging
+    ? 'border-l-amber-400 dark:border-l-amber-500'
+    : cap.status === 'submitted'
       ? 'border-l-theme-primary/50'
       : 'border-l-primary/20';
 
@@ -172,7 +241,8 @@ export function CapCard({
       className={`
         hover:shadow-md transition-all duration-200 border-l-4 
         ${borderColor}
-        cursor-pointer
+        ${isLiveDebugging && !isMultiSelectMode ? 'cursor-default' : 'cursor-pointer'}
+        ${isLiveDebugging ? 'border border-amber-200/70 bg-amber-50/40 dark:border-amber-500/60 dark:bg-amber-500/5' : ''}
         group
       `}
       onClick={handleCardClick}
@@ -208,6 +278,11 @@ export function CapCard({
                 <h3 className="font-semibold text-base truncate">
                   {cap.capData.metadata.displayName}
                 </h3>
+                {isLiveDebugging && (
+                  <Badge className="shrink-0 bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-400/20 dark:text-amber-100 dark:border-amber-300 uppercase tracking-wide">
+                    Live Debugging
+                  </Badge>
+                )}
                 {cap.status === 'submitted' && (
                   <Badge className="shrink-0 bg-theme-primary/10 text-theme-primary">
                     Published
@@ -250,7 +325,25 @@ export function CapCard({
                   <Bug className="h-4 w-4 mr-2" />
                   Test Cap
                 </Button>
-                {cap.status === 'submitted' ? (
+                {isLiveDebugging ? (
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStopLiveDebug();
+                    }}
+                    size="sm"
+                    variant="outline"
+                    className="w-full text-amber-700 border-amber-300 hover:bg-amber-100 hover:text-amber-800 dark:text-amber-200 dark:border-amber-400 dark:hover:bg-amber-500/20"
+                    disabled={isStoppingLiveDebug}
+                  >
+                    {isStoppingLiveDebug ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <StopCircle className="h-4 w-4 mr-2" />
+                    )}
+                    Stop Live Debug
+                  </Button>
+                ) : cap.status === 'submitted' ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
@@ -298,32 +391,20 @@ export function CapCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
-                  {cap.id && (
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShareDialogOpen(true);
-                      }}
-                      onSelect={(e) => e.preventDefault()}
-                    >
-                      <Share className="h-4 w-4 mr-2" />
-                      Share
-                    </DropdownMenuItem>
+                  {!isLiveDebugging && (
+                    <>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenLiveDebugDialog();
+                        }}
+                      >
+                        <PlayCircle className="h-4 w-4 mr-2" />
+                        Start Live Debugging
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
                   )}
-
-                  {cap.status === 'submitted' && cap.cid && (
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCopyCid();
-                      }}
-                    >
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy Published CID
-                    </DropdownMenuItem>
-                  )}
-
-                  {cap.status === 'submitted' && <DropdownMenuSeparator />}
 
                   <DropdownMenuItem
                     onClick={(e) => {
@@ -374,20 +455,6 @@ export function CapCard({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <ShareDialog
-        open={shareDialogOpen}
-        onOpenChange={setShareDialogOpen}
-        title={`Share ${cap.capData.metadata.displayName}`}
-        description="Share this published cap with others using this link."
-        links={[
-          {
-            id: 'share',
-            label: 'Share Link',
-            url: `${APP_URL}/chat?capid=${cap.id}`,
-          },
-        ]}
-      />
-
       {/* Export YAML preview dialog with copy/save actions */}
       <Dialog
         open={exportDialogOpen}
@@ -430,6 +497,29 @@ export function CapCard({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <LiveDebugCapDialog
+        open={isLiveDebugDialogOpen}
+        onOpenChange={(open) => {
+          setIsLiveDebugDialogOpen(open);
+          if (!open) {
+            setLiveDebugSourceUrl(cap.liveSource?.url ?? '');
+            setIsStartingLiveDebug(false);
+            suppressCardClickUntilRef.current = Date.now() + 300;
+          }
+        }}
+        url={liveDebugSourceUrl}
+        onUrlChange={setLiveDebugSourceUrl}
+        expectedIdName={cap.capData.idName}
+        onSubmit={handleStartLiveDebug}
+        onCancel={() => {
+          setIsLiveDebugDialogOpen(false);
+          setLiveDebugSourceUrl(cap.liveSource?.url ?? '');
+          setIsStartingLiveDebug(false);
+          suppressCardClickUntilRef.current = Date.now() + 300;
+        }}
+        isSubmitting={isStartingLiveDebug}
+      />
     </Card>
   );
 }

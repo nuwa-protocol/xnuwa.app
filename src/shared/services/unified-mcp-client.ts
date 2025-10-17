@@ -1,5 +1,9 @@
 import { IdentityKitWeb } from '@nuwa-ai/identity-kit-web';
-import { createMcpClient, UniversalMcpClient, McpServerType } from '@nuwa-ai/payment-kit';
+import {
+  createMcpClient,
+  type McpServerType,
+  type UniversalMcpClient,
+} from '@nuwa-ai/payment-kit';
 import { PostMessageMCPTransport } from '@nuwa-ai/ui-kit';
 import type {
   NuwaMCPClient,
@@ -207,7 +211,7 @@ const clientCache = new Map<string, UnifiedMcpClientAdapter>();
 /**
  * Creates a unified MCP client that supports both HTTP and PostMessage transports
  * This is the main entry point for creating MCP clients in nuwa-client
- * 
+ *
  * Note: This function creates a new client instance each time. For application-level
  * client management (e.g., Cap-based MCP servers), use RemoteMCPManager instead.
  * This lightweight caching is only for preventing immediate reconnections in error scenarios.
@@ -225,7 +229,7 @@ export async function createUnifiedMcpClient(
 ): Promise<UnifiedMcpClientAdapter> {
   // Lightweight caching to prevent immediate reconnections in error scenarios
   const cacheKey = url;
-  
+
   // Return existing client if available and still connected
   const existingClient = clientCache.get(cacheKey);
   if (existingClient) {
@@ -247,13 +251,13 @@ export async function createUnifiedMcpClient(
   // Initialize identity kit for DID authentication
   const sdk = await IdentityKitWeb.init({ storage: 'local' });
 
-  let customTransport;
-  
+  let customTransport: any;
+
   if (transportType === 'postMessage') {
     if (!postMessageOptions) {
       throw new Error('PostMessage transport requires postMessageOptions');
     }
-    
+
     // Create PostMessage transport using ui-kit
     customTransport = new PostMessageMCPTransport({
       targetWindow: postMessageOptions.targetWindow,
@@ -275,10 +279,10 @@ export async function createUnifiedMcpClient(
   });
 
   const clientAdapter = new UnifiedMcpClientAdapter(universalClient);
-  
+
   // Cache the client for immediate reuse (prevents reconnection storms)
   clientCache.set(cacheKey, clientAdapter);
-  
+
   return clientAdapter;
 }
 
@@ -307,18 +311,18 @@ export async function closeUnifiedMcpClient(url: string): Promise<void> {
  */
 export async function closeAllUnifiedMcpClients(): Promise<void> {
   const closePromises: Promise<void>[] = [];
-  
+
   for (const [cacheKey, client] of clientCache.entries()) {
     closePromises.push(
       client.close().catch((error) => {
         console.warn(`Failed to close MCP client ${cacheKey}:`, error);
-      })
+      }),
     );
   }
-  
+
   // Wait for all clients to close
   await Promise.allSettled(closePromises);
-  
+
   // Clear the cache
   clientCache.clear();
 }

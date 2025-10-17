@@ -10,4 +10,10 @@ export interface LocalCap {
   createdAt: number;
   updatedAt: number;
   did?: string; // Added for IndexedDB storage
+  // for live debugging cap
+  liveSource?: {
+    url: string;
+    lastSyncedAt?: number;
+    status?: 'connected' | 'connecting' | 'error';
+  };
 }
