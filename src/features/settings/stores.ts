@@ -3,18 +3,10 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Locale } from '@/shared/locales';
 import { createLocalStoragePersistConfig } from '@/shared/storage';
+import type { UserSettings } from './types';
 
 // ================= Interfaces ================= //
-
-// user settings interface
-interface UserSettings {
-  language: Locale;
-  name: string;
-  avatar: string | null;
-  devMode: boolean;
-}
 
 // settings interface
 interface SettingsState {

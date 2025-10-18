@@ -8,6 +8,7 @@ import ErrorPage from './pages/error';
 import ExplorePage from './pages/explore';
 import { LandingPage } from './pages/landing';
 import LoginPage from './pages/login';
+import OAuthCallbackPage from './pages/oauth-callback';
 import SettingsPage from './pages/settings';
 import WalletPage from './pages/wallet';
 
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
       },
       { path: 'login', element: <LoginPage /> },
       { path: 'callback', element: <CallbackPage /> },
+      { path: 'oauth-callback', element: <OAuthCallbackPage /> },
     ],
   },
 ]);

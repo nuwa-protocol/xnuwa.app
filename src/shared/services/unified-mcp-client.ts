@@ -13,6 +13,7 @@ import type {
   ResourceTemplateDefinition,
 } from '../types/mcp-client';
 import { MCPError } from '../types/mcp-client';
+import { handleMCPOauth } from './mcp-oauth';
 
 /**
  * Adapter that wraps UniversalMcpClient to provide NuwaMCPClient interface
@@ -20,7 +21,10 @@ import { MCPError } from '../types/mcp-client';
  * while supporting both payment-enabled and standard MCP servers.
  */
 export class UnifiedMcpClientAdapter implements NuwaMCPClient {
-  constructor(private universalClient: UniversalMcpClient) {}
+  constructor(
+    private universalClient: UniversalMcpClient,
+    private readonly mcpUrl?: string,
+  ) {}
 
   get raw() {
     return this.universalClient;
@@ -30,11 +34,7 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
     try {
       return await this.universalClient.tools();
     } catch (err: any) {
-      throw new MCPError({
-        message: `Failed to list tools: ${err.message}`,
-        code: err.code,
-        detail: err.detail || err.stack,
-      });
+      this.handleError('Failed to list tools', err);
     }
   }
 
@@ -57,11 +57,7 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
 
       return promptsMap;
     } catch (err: any) {
-      throw new MCPError({
-        message: `Failed to list prompts: ${err.message}`,
-        code: err.code,
-        detail: err.detail || err.stack,
-      });
+      this.handleError('Failed to list prompts', err);
     }
   }
 
@@ -90,11 +86,7 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
         ],
       };
     } catch (err: any) {
-      throw new MCPError({
-        message: `Failed to get prompt "${name}": ${err.message}`,
-        code: err.code,
-        detail: err.detail || err.stack,
-      });
+      this.handleError(`Failed to get prompt "${name}"`, err);
     }
   }
 
@@ -141,11 +133,7 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
 
       return resourcesMap;
     } catch (err: any) {
-      throw new MCPError({
-        message: `Failed to list resources: ${err.message}`,
-        code: err.code,
-        detail: err.detail || err.stack,
-      });
+      this.handleError('Failed to list resources', err);
     }
   }
 
@@ -154,11 +142,7 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
       const result = await this.universalClient.readResource(uri);
       return result as T;
     } catch (err: any) {
-      throw new MCPError({
-        message: `Failed to read resource "${uri}": ${err.message}`,
-        code: err.code,
-        detail: err.detail || err.stack,
-      });
+      this.handleError(`Failed to read resource "${uri}"`, err);
     }
   }
 
@@ -173,11 +157,10 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
       });
       return result as T;
     } catch (err: any) {
-      throw new MCPError({
-        message: `Failed to read resource template "${uriTemplate}": ${err.message}`,
-        code: err.code,
-        detail: err.detail || err.stack,
-      });
+      this.handleError(
+        `Failed to read resource template "${uriTemplate}"`,
+        err,
+      );
     }
   }
 
@@ -201,6 +184,49 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
 
   supportsAuth(): boolean {
     return this.universalClient.supportsAuth();
+  }
+
+  private handleError(context: string, error: unknown): never {
+    const err = error as { [key: string]: any } | undefined;
+
+    if (this.isUnauthorizedError(err)) {
+      this.handleUnauthorizedError(err).catch((oauthError) => {
+        console.error(
+          'Failed to initiate OAuth flow for MCP client:',
+          oauthError,
+        );
+      });
+    }
+
+    throw new MCPError({
+      message: `${context}: ${err?.message ?? 'Unknown error'}`,
+      code: err?.code,
+      detail: err?.detail || err?.stack,
+    });
+  }
+
+  private isUnauthorizedError(
+    error: { [key: string]: any } | undefined,
+  ): boolean {
+    if (!error) {
+      return false;
+    }
+
+    // we can't get the full response error here so we have to match the error message
+    return error.toString().includes('HTTP 401');
+  }
+
+  private async handleUnauthorizedError(
+    _error: { [key: string]: any } | undefined,
+  ): Promise<void> {
+    // TODO: Implement OAuth re-authentication flow for 401 responses.
+    console.log('[MCP Client] handle oauth flow for 401 response', {
+      url: this.mcpUrl,
+    });
+    if (!this.mcpUrl) {
+      throw new Error('MCP URL is required for OAuth');
+    }
+    await handleMCPOauth(this.mcpUrl);
   }
 }
 
@@ -278,7 +304,7 @@ export async function createUnifiedMcpClient(
     ...(customTransport && { customTransport }),
   });
 
-  const clientAdapter = new UnifiedMcpClientAdapter(universalClient);
+  const clientAdapter = new UnifiedMcpClientAdapter(universalClient, url);
 
   // Cache the client for immediate reuse (prevents reconnection storms)
   clientCache.set(cacheKey, clientAdapter);
