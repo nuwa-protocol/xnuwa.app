@@ -264,9 +264,11 @@ export const handleMCPOauth = async (url: string): Promise<OAuth2Token> => {
           });
 
           SettingsStateStore.getState().upsertUserMCPOAuth({
+            mcpUrl: url,
             resource,
             resourceName,
             token,
+            client,
           });
 
           dispatchMcpOAuthEvent('mcp-oauth:complete', {

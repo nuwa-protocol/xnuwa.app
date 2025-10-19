@@ -4,11 +4,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createLocalStoragePersistConfig } from '@/shared/storage';
-import type {
-  UserMCPOAuth,
-  UserMCPOAuthPayload,
-  UserSettings,
-} from './types';
+import type { UserMCPOAuth, UserMCPOAuthPayload, UserSettings } from './types';
 
 // ================= Interfaces ================= //
 
@@ -63,15 +59,11 @@ export const SettingsStateStore = create<SettingsState>()(
           },
         }));
       },
-      upsertUserMCPOAuth: ({ resource, resourceName, token }) => {
+      upsertUserMCPOAuth: (payload: UserMCPOAuthPayload) => {
         set((state) => ({
           userMCPOAuths: {
             ...state.userMCPOAuths,
-            [resource]: {
-              resourceName,
-              token,
-              updatedAt: Date.now(),
-            },
+            [payload.mcpUrl]: payload,
           },
         }));
       },

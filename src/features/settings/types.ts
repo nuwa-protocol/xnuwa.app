@@ -1,4 +1,4 @@
-import type { OAuth2Token } from '@badgateway/oauth2-client';
+import type { OAuth2Client, OAuth2Token } from '@badgateway/oauth2-client';
 import type { Locale } from '@/shared/locales';
 
 export type UserSettings = {
@@ -9,16 +9,14 @@ export type UserSettings = {
 };
 
 export type UserMCPOAuth = Record<
-  string,
-  {
-    resourceName: string;
-    updatedAt: number;
-    token: OAuth2Token;
-  }
+  string, // using the mcpUrl as the key
+  UserMCPOAuthPayload
 >;
 
 export type UserMCPOAuthPayload = {
+  mcpUrl: string;
   resource: string;
   resourceName: string;
   token: OAuth2Token;
+  client: OAuth2Client;
 };
