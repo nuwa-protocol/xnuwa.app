@@ -508,19 +508,19 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
   return (
     <div
-      className={`flex gap-6 ${
+      className={`flex ${
         // In Artifact MCP mode, lock the layout to the viewport height so only the left pane scrolls
-        mcpType === 'Artifact MCP' ? 'h-screen' : 'max-w-3xl mx-auto'
+        mcpType === 'Artifact MCP' ? 'h-screen' : 'w-full'
         }`}
     >
       <div
         className={`flex-1 space-y-6 p-8 ${
           // Make the left pane the only scroll container in Artifact MCP mode
-          mcpType === 'Artifact MCP' ? 'overflow-y-auto min-h-0 pr-2' : ''
+          mcpType === 'Artifact MCP' ? 'overflow-y-auto min-h-0 pr-2' : 'max-w-4xl mx-auto'
           }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between max-w-4xl">
           <div>
             <h3 className="text-lg font-semibold">MCP Tools</h3>
             <p className="text-sm text-muted-foreground">
@@ -828,7 +828,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
         {/* Tool Execution Result */}
         {connected && lastToolResult && (
-          <Card className="max-w-4xl">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
