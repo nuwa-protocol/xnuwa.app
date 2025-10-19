@@ -12,6 +12,7 @@ import {
 import {
   type McpOAuthPopupRequestDetail,
   onMcpOAuthPopupRequest,
+  dispatchMcpOAuthEvent,
 } from '@/shared/services/mcp-oauth-event';
 
 export function McpOAuthDialogManager(): React.ReactNode | null {
@@ -46,9 +47,16 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
     return () => {
       unsubscribe();
       if (requestRef.current) {
-        requestRef.current.reject(
-          new Error('OAuth authorization dismissed during cleanup'),
+        const error = new Error(
+          'OAuth authorization dismissed during cleanup',
         );
+        dispatchMcpOAuthEvent('mcp-oauth:error', {
+          url: requestRef.current.url,
+          resource: requestRef.current.resource,
+          resourceName: requestRef.current.resourceName,
+          error,
+        });
+        requestRef.current.reject(error);
         requestRef.current = null;
       }
     };
@@ -75,7 +83,14 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
       console.error(
         `Unable to open OAuth window for ${detail.resourceName || detail.url}. Please allow popups and try again.`,
       );
-      detail.reject(new Error('Failed to open OAuth window'));
+      const error = new Error('Failed to open OAuth window');
+      dispatchMcpOAuthEvent('mcp-oauth:error', {
+        url: detail.url,
+        resource: detail.resource,
+        resourceName: detail.resourceName,
+        error,
+      });
+      detail.reject(error);
       cleanupRequest();
       return;
     }
@@ -95,7 +110,14 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
     }
 
     closeReasonRef.current = 'cancel';
-    detail.reject(new Error('OAuth authorization cancelled by user'));
+    const error = new Error('OAuth authorization cancelled by user');
+    dispatchMcpOAuthEvent('mcp-oauth:error', {
+      url: detail.url,
+      resource: detail.resource,
+      resourceName: detail.resourceName,
+      error,
+    });
+    detail.reject(error);
     console.log(
       `Authorization cancelled for ${detail.resourceName || detail.url}.`,
     );
@@ -118,7 +140,14 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
         return;
       }
 
-      detail.reject(new Error('OAuth authorization dismissed'));
+      const error = new Error('OAuth authorization dismissed');
+      dispatchMcpOAuthEvent('mcp-oauth:error', {
+        url: detail.url,
+        resource: detail.resource,
+        resourceName: detail.resourceName,
+        error,
+      });
+      detail.reject(error);
       console.log(
         `Authorization dismissed for ${detail.resourceName || detail.url}.`,
       );

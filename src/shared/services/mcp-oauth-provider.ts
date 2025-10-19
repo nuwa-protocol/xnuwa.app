@@ -10,7 +10,11 @@ import {
   MCP_OAUTH_CALLBACK_URL,
   MCP_OAUTH_ORIGIN,
 } from '@/shared/config/mcp-oauth';
-import { dispatchMcpOAuthEvent, requestMcpOAuthPopup } from './mcp-oauth-event';
+import {
+  dispatchMcpOAuthEvent,
+  onMcpOAuthEvent,
+  requestMcpOAuthPopup,
+} from './mcp-oauth-event';
 
 const RESOURCE_METADATA_URL = '/.well-known/oauth-protected-resource';
 
@@ -29,14 +33,22 @@ export class StreamableHTTPTransportOAuthProvider
   private _mcpUrl: string;
   private _resourceMetadata?: ResourceMetadata;
   private _popup?: Window | null;
+  private _popupMonitor?: number;
+  private _awaitingCallback = false;
 
   private _onRedirect = async (url: URL) => {
-    this._popup = await requestMcpOAuthPopup({
-      url: this._mcpUrl,
-      resource: this._resourceMetadata?.resource ?? '',
-      resourceName: this._resourceMetadata?.resource_name ?? '',
-      authUrl: url.toString(),
-    });
+    try {
+      this._popup = await requestMcpOAuthPopup({
+        url: this._mcpUrl,
+        resource: this._resourceMetadata?.resource ?? '',
+        resourceName: this._resourceMetadata?.resource_name ?? '',
+        authUrl: url.toString(),
+      });
+    } catch (error) {
+      this._awaitingCallback = false;
+      this.stopPopupMonitor();
+      throw error;
+    }
 
     if (!this._popup) {
       const error = new Error('Failed to open OAuth window');
@@ -48,6 +60,9 @@ export class StreamableHTTPTransportOAuthProvider
       });
       throw error;
     }
+
+    this._awaitingCallback = true;
+    this.startPopupMonitor();
   };
 
   constructor({
@@ -99,6 +114,14 @@ export class StreamableHTTPTransportOAuthProvider
       tokens,
     });
     this._tokens = tokens;
+    this._awaitingCallback = false;
+    this.stopPopupMonitor();
+    try {
+      this._popup?.close();
+    } catch (error) {
+      console.warn('Failed to close OAuth popup after token save', error);
+    }
+    this._popup = null;
   }
 
   redirectToAuthorization(authorizationUrl: URL): void {
@@ -114,6 +137,39 @@ export class StreamableHTTPTransportOAuthProvider
       throw new Error('No code verifier saved');
     }
     return this._codeVerifier;
+  }
+
+  private startPopupMonitor(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    this.stopPopupMonitor();
+    this._popupMonitor = window.setInterval(() => {
+      if (!this._popup || this._popup.closed) {
+        this.stopPopupMonitor();
+        if (this._awaitingCallback) {
+          const error = new Error('OAuth window closed before completion');
+          dispatchMcpOAuthEvent('mcp-oauth:error', {
+            url: this._mcpUrl,
+            resource: this._resourceMetadata?.resource ?? '',
+            resourceName: this._resourceMetadata?.resource_name ?? '',
+            error,
+          });
+        }
+        this._awaitingCallback = false;
+        this._popup = null;
+      }
+    }, 500);
+  }
+
+  private stopPopupMonitor(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    if (this._popupMonitor !== undefined) {
+      window.clearInterval(this._popupMonitor);
+      this._popupMonitor = undefined;
+    }
   }
 }
 
@@ -136,15 +192,33 @@ export const handleUahtorized = async () => {
 };
 
 function waitForOAuthCallback() {
-  return new Promise((resolve) => {
+  return new Promise<string>((resolve, reject) => {
+    const cleanup = () => {
+      window.removeEventListener('message', handler);
+      unsubscribeError();
+    };
+
     const handler = (event: MessageEvent) => {
       if (event.origin !== MCP_OAUTH_ORIGIN) return;
       if (event.data?.type !== 'mcp-oauth') return;
       const code = event.data.code;
       if (!code) return;
-      window.removeEventListener('message', handler);
+      cleanup();
       resolve(code);
     };
+
+    const unsubscribeError = onMcpOAuthEvent('mcp-oauth:error', (detail) => {
+      cleanup();
+      const error =
+        detail.error instanceof Error
+          ? detail.error
+          : new Error(
+              detail.error
+                ? String(detail.error)
+                : 'OAuth authorization failed',
+            );
+      reject(error);
+    });
 
     window.addEventListener('message', handler);
   });
