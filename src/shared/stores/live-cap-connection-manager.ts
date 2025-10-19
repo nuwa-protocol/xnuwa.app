@@ -175,7 +175,7 @@ export const createLiveCapConnectionManager = (): LiveCapConnectionManager => {
         disposeConnection(connection);
       };
 
-      console.log(
+      console.debug(
         '[live-cap] connected',
         latestCap.capData.metadata.displayName,
       );

@@ -3,28 +3,23 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Locale } from '@/shared/locales';
 import { createLocalStoragePersistConfig } from '@/shared/storage';
+import type { UserMCPOAuth, UserMCPOAuthPayload, UserSettings } from './types';
 
 // ================= Interfaces ================= //
-
-// user settings interface
-interface UserSettings {
-  language: Locale;
-  name: string;
-  avatar: string | null;
-  devMode: boolean;
-}
 
 // settings interface
 interface SettingsState {
   // grouped user settings
   settings: UserSettings;
+  userMCPOAuths: UserMCPOAuth;
   setSettings: (settings: UserSettings) => void;
   setSetting: <K extends keyof UserSettings>(
     key: K,
     value: UserSettings[K],
   ) => void;
+  upsertUserMCPOAuth: (oauth: UserMCPOAuthPayload) => void;
+  removeUserMCPOAuth: (resource: string) => void;
 
   // reset settings
   resetSettings: () => void;
@@ -36,6 +31,7 @@ const persistConfig = createLocalStoragePersistConfig<SettingsState>({
   name: 'settings-storage',
   partialize: (state) => ({
     settings: state.settings,
+    mcpOAuths: state.userMCPOAuths,
   }),
 });
 
@@ -51,6 +47,7 @@ export const SettingsStateStore = create<SettingsState>()(
         avatar: null,
         devMode: false,
       },
+      userMCPOAuths: {},
       setSettings: (settings: UserSettings) => {
         set({ settings });
       },
@@ -62,6 +59,20 @@ export const SettingsStateStore = create<SettingsState>()(
           },
         }));
       },
+      upsertUserMCPOAuth: (payload: UserMCPOAuthPayload) => {
+        set((state) => ({
+          userMCPOAuths: {
+            ...state.userMCPOAuths,
+            [payload.mcpUrl]: payload,
+          },
+        }));
+      },
+      removeUserMCPOAuth: (resource: string) => {
+        set((state) => {
+          const { [resource]: _removed, ...rest } = state.userMCPOAuths;
+          return { userMCPOAuths: rest };
+        });
+      },
 
       // Reset functionality
       resetSettings: () => {
@@ -72,6 +83,7 @@ export const SettingsStateStore = create<SettingsState>()(
             avatar: null,
             devMode: false,
           },
+          userMCPOAuths: {},
         });
       },
     }),

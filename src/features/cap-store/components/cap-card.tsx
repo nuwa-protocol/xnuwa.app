@@ -37,7 +37,7 @@ export function CapCard({ cap, actions }: CapCardProps) {
 
   return (
     <Card
-      className="relative flex flex-col gap-2 overflow-hidden p-4 transition-shadow shadow-lg cursor-pointer hover:shadow-md"
+      className="group relative flex flex-col gap-2 overflow-hidden p-4 transition-shadow shadow-lg cursor-pointer hover:shadow-md"
       onClick={() => navigate(`/explore/caps/${cap.id}`)}
     >
       <div className="flex items-center justify-between gap-3">
@@ -47,7 +47,9 @@ export function CapCard({ cap, actions }: CapCardProps) {
             {capData.metadata.displayName}
           </h3>
         </div>
-        {actions ?? <CapActionButton cap={cap} />}
+        <div className="hidden items-center gap-1 group-hover:flex group-focus-within:flex">
+          {actions ?? <CapActionButton cap={cap} />}
+        </div>
       </div>
       <div className="min-h-[3.75rem] my-2">
         {capData.metadata.description ? (

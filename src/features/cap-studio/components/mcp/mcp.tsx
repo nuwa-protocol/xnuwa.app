@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui';
+import { onMcpOAuthEvent } from '@/shared/services/mcp-oauth-event';
 import {
   closeUnifiedMcpClient,
   createUnifiedMcpClient,
@@ -132,45 +133,112 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       toast.success(`Successfully connected to ${url}`);
       setConnected(true);
     } catch (err) {
-      pushLog({
-        type: 'error',
-        message: `Connection failed: ${String(err)}`,
-      });
+      const error = err as { [key: string]: any } | undefined;
 
-      toast.error(String(err));
-
+      if (error?.code === 'OAUTH_FLOW_INITIATED') {
+        pushLog({
+          type: 'info',
+          message: `MCP Server requires authentication. Please complete the OAuth flow and try again.`,
+        });
+        await closeUnifiedMcpClient(url);
+        return;
+      } else {
+        pushLog({
+          type: 'error',
+          message: `Connection failed: ${String(error)}`,
+        });
+      }
       await closeUnifiedMcpClient(url);
     } finally {
       setConnecting(false);
     }
   }, [connecting, url, pushLog, mcpType]);
 
-  const handleToolsDiscovery = useCallback(
-    async (mcpClient: NuwaMCPClient) => {
-      try {
-        // Fetch server capabilities
-        const toolsList = await mcpClient.tools();
-        setTools(toolsList);
+  // handle oauth events
+  useEffect(() => {
+    if (!url) {
+      return;
+    }
+
+    const unsubscribeStart = onMcpOAuthEvent(
+      'mcp-oauth:start',
+      ({ url: eventUrl, resourceName }) => {
+        if (eventUrl !== url) {
+          return;
+        }
+        const name = resourceName || eventUrl;
         pushLog({
           type: 'info',
-          message: `Discovered ${Object.keys(toolsList).length} tools`,
-          data: { tools: Object.keys(toolsList) },
+          message: `Starting OAuth flow for ${name}`,
+        });
+      },
+    );
+
+    const unsubscribeComplete = onMcpOAuthEvent(
+      'mcp-oauth:complete',
+      ({ url: eventUrl, resourceName }) => {
+        if (eventUrl !== url) {
+          return;
+        }
+        const name = resourceName || eventUrl;
+        pushLog({
+          type: 'success',
+          message: `OAuth flow completed for ${name}. Retrying connection...`,
         });
 
-        // Initialize tool parameters
-        const initialParams: Record<string, any> = {};
-        Object.entries(toolsList).forEach(([toolName, tool]) => {
-          initialParams[toolName] = {};
-        });
+        if (!connecting) {
+          void handleConnect();
+        }
+      },
+    );
 
-        setToolParams(initialParams);
-      } catch (err) {
+    const unsubscribeError = onMcpOAuthEvent(
+      'mcp-oauth:error',
+      ({ url: eventUrl, resourceName, error }) => {
+        if (eventUrl !== url) {
+          return;
+        }
+
+        const name = resourceName || eventUrl;
+        const message =
+          error instanceof Error
+            ? error.message
+            : typeof error === 'string'
+              ? error
+              : 'Unknown error';
+
         pushLog({
           type: 'error',
-          message: `Failed to discover tools: ${String(err)}`,
+          message: `OAuth flow failed for ${name}: ${message}`,
         });
-        throw err;
-      }
+      },
+    );
+
+    return () => {
+      unsubscribeStart();
+      unsubscribeComplete();
+      unsubscribeError();
+    };
+  }, [url, pushLog, handleConnect, connecting]);
+
+  const handleToolsDiscovery = useCallback(
+    async (mcpClient: NuwaMCPClient) => {
+      // Fetch server capabilities
+      const toolsList = await mcpClient.tools();
+      setTools(toolsList);
+      pushLog({
+        type: 'info',
+        message: `Discovered ${Object.keys(toolsList).length} tools`,
+        data: { tools: Object.keys(toolsList) },
+      });
+
+      // Initialize tool parameters
+      const initialParams: Record<string, any> = {};
+      Object.entries(toolsList).forEach(([toolName, tool]) => {
+        initialParams[toolName] = {};
+      });
+
+      setToolParams(initialParams);
     },
     [pushLog],
   );
@@ -440,19 +508,19 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
   return (
     <div
-      className={`flex gap-6 ${
+      className={`flex ${
         // In Artifact MCP mode, lock the layout to the viewport height so only the left pane scrolls
-        mcpType === 'Artifact MCP' ? 'h-screen' : 'max-w-3xl mx-auto'
+        mcpType === 'Artifact MCP' ? 'h-screen' : 'w-full'
         }`}
     >
       <div
         className={`flex-1 space-y-6 p-8 ${
           // Make the left pane the only scroll container in Artifact MCP mode
-          mcpType === 'Artifact MCP' ? 'overflow-y-auto min-h-0 pr-2' : ''
+          mcpType === 'Artifact MCP' ? 'overflow-y-auto min-h-0 pr-2' : 'max-w-4xl mx-auto'
           }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between max-w-4xl">
           <div>
             <h3 className="text-lg font-semibold">MCP Tools</h3>
             <p className="text-sm text-muted-foreground">
@@ -728,7 +796,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                                 uiSchema={{
                                   ...Object.keys(toolSchema).reduce(
                                     (acc, paramName) => {
-                                      const paramDef = (toolSchema as any)[paramName];
+                                      const paramDef = (toolSchema as any)[
+                                        paramName
+                                      ];
                                       acc[paramName] = {
                                         'ui:title': `${paramName} ${paramDef?.type ? `(${paramDef.type})` : ''}`,
                                         'ui:placeholder':
@@ -758,7 +828,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
         {/* Tool Execution Result */}
         {connected && lastToolResult && (
-          <Card className='max-w-4xl'>
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>

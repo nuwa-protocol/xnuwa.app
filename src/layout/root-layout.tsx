@@ -3,10 +3,11 @@ import { useEffect, useState } from 'react';
 import { Toaster } from 'sonner';
 import { AuthGuard } from '@/features/auth/components';
 import { useWalletBalanceManager } from '@/features/wallet/hooks/use-wallet-balance-manager';
-import { useLiveCapConnections, useRehydration } from '@/shared/hooks';
+import { useLiveCapConnections } from '@/shared/hooks';
 import { useAutoLoadingDetection } from '@/shared/hooks/use-auto-loading-detection';
 import { MobileWarning } from '../shared/components/mobile-warning';
 import { ThemeProvider } from '../shared/components/theme-provider';
+import { McpOAuthDialogManager } from '../shared/components/mcp-oauth-dialog';
 import {
   StructuredData,
   generateWebSiteSchema,
@@ -23,8 +24,7 @@ export default function RootLayout() {
   // Check if the app is loaded, remove the HTML loading
   useAutoLoadingDetection();
 
-  // Check if the app is rehydrated
-  const isRehydrated = useRehydration();
+  // Determine if the viewport is considered mobile
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -33,7 +33,7 @@ export default function RootLayout() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  if (!isRehydrated || isMobile === null) return null;
+  if (isMobile === null) return null;
 
   return (
     <ThemeProvider>
@@ -47,6 +47,7 @@ export default function RootLayout() {
       ) : (
         <AuthGuard>
           <Toaster position="top-center" expand={true} richColors />
+          <McpOAuthDialogManager />
           <Outlet />
         </AuthGuard>
       )}
