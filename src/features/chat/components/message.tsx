@@ -1,12 +1,13 @@
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { isUIResource, type UIResource } from '@nuwa-ai/ui-kit';
-import type { UIMessage } from 'ai';
+import type { ToolUIPart, UIMessage } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
 import {
   isOnResponseDataMarkPart,
   type OnResponseDataMarkPart,
 } from '@/features/chat/types/marks';
+import { TextShimmer } from '@/shared/components/ui/text-shimmer';
 import { cn } from '@/shared/utils';
 import { Loader } from './loader';
 import { MessageActions } from './message-actions';
@@ -81,6 +82,10 @@ const PurePreviewMessage = ({
     message.parts?.some(
       (part) => part.type === 'data-uimark' && part.data === 'clear-context',
     );
+  const sources =
+    message.parts
+      ?.filter((part) => part.type === 'source-url')
+      .map((part) => part.url) ?? [];
 
   if (isClearContextMessage) return <ClearContextMessage />;
 
@@ -140,24 +145,6 @@ const PurePreviewMessage = ({
               </div>
             )}
 
-            {/* render source */}
-            {(() => {
-              const sources: any[] = [];
-              message.parts?.forEach((part) => {
-                if (part.type === 'source-url') {
-                  sources.push(part.url);
-                }
-              });
-              if (sources.length === 0) return null;
-              return (
-                <MessageSource
-                  key={`sources-${message.id}`}
-                  sources={sources}
-                  className="mb-2"
-                />
-              );
-            })()}
-
             {/* render message parts */}
             {message.parts
               ?.slice()
@@ -194,6 +181,26 @@ const PurePreviewMessage = ({
                       onModeChange={setMode}
                     />
                   );
+                }
+
+                if (typeof type === 'string' && type.startsWith('tool-')) {
+                  const rawToolName = type.slice('tool-'.length);
+                  const formattedToolName = rawToolName
+                    ? rawToolName
+                      .replace(/[-_]/g, ' ')
+                      .replace(/\b\w/g, (char) => char.toUpperCase())
+                    : 'Tool';
+                  const { state } = part as ToolUIPart;
+                  if (state === 'input-streaming') {
+                    return (
+                      <TextShimmer
+                        key={key}
+                        className="text-sm font-medium tracking-wide"
+                      >
+                        {`Running ${formattedToolName}…`}
+                      </TextShimmer>
+                    );
+                  }
                 }
 
                 if (type === 'file' && message.role === 'assistant') {
@@ -238,12 +245,23 @@ const PurePreviewMessage = ({
                 return null;
               })}
 
-            {!isReadonly && (
-              <MessageActions
-                key={`action-${message.id}`}
-                message={message}
-                isStreaming={isStreaming}
-              />
+            {(!isReadonly || sources.length > 0) && (
+              <div className="flex items-center gap-3 pt-2">
+                {!isReadonly && (
+                  <MessageActions
+                    key={`action-${message.id}`}
+                    message={message}
+                    isStreaming={isStreaming}
+                  />
+                )}
+                {sources.length > 0 && (
+                  <MessageSource
+                    key={`sources-${message.id}`}
+                    sources={sources}
+                    className="ml-auto"
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>
