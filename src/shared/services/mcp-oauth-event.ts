@@ -1,4 +1,4 @@
-import type { OAuth2Token } from '@badgateway/oauth2-client';
+import type { OAuthTokens } from '@modelcontextprotocol/sdk/shared/auth.js';
 import { generateUUID } from '../utils/generate-uuid';
 
 export type McpOAuthEventType =
@@ -12,7 +12,7 @@ export interface McpOAuthEventDetail {
   url: string;
   resource: string;
   resourceName: string;
-  token?: OAuth2Token;
+  token?: OAuthTokens;
   error?: unknown;
 }
 
