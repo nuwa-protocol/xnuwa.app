@@ -238,8 +238,8 @@ export function CapSelector() {
                 </span>
               </TooltipTrigger>
               <TooltipContent className="z-[1000] max-w-sm break-words space-y-2 py-2 px-3 leading-3">
-                <p className="text-sm leading-3">
-                  {'Cap launch Failed, please try again.'}
+                <p className="text-sm leading-3 text-destructive">
+                  {'Cap Errors, some Cap functions might not work.'}
                 </p>
                 {errorMessage && (
                   <p className="text-xs text-muted-foreground">
@@ -249,7 +249,7 @@ export function CapSelector() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-auto w-full px-2 py-1 text-sm text-destructive"
+                  className="h-auto w-full px-2 py-1 text-sm text-theme-500"
                   onClick={(event) => {
                     event.preventDefault();
                     event.stopPropagation();

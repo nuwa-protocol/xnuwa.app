@@ -136,10 +136,10 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Connect {pendingRequest.resourceName || pendingRequest.url}
+            Connection Request for {pendingRequest.resourceName || pendingRequest.url}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            The server at <span className='font-bold'>{pendingRequest.url}</span> requires OAuth authentication. A
+            This Cap requires authenticated connection to <span className='font-bold'>{pendingRequest.url}</span>. A
             new window will open to continue the flow.
           </AlertDialogDescription>
         </AlertDialogHeader>
