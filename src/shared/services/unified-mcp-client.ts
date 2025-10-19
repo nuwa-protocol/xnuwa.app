@@ -58,7 +58,10 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
           try {
             await this.transport.close();
           } catch (transportCloseErr) {
-            console.warn('Failed to close MCP transport after OAuth', transportCloseErr);
+            console.warn(
+              'Failed to close MCP transport after OAuth',
+              transportCloseErr,
+            );
           }
         }
         // The underlying SDK leaves the abort controller set after close(); clear it
@@ -73,7 +76,10 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
           try {
             await this.universalClient.redetect();
           } catch (redetectErr) {
-            console.warn('Failed to reinitialize MCP client after OAuth', redetectErr);
+            console.warn(
+              'Failed to reinitialize MCP client after OAuth',
+              redetectErr,
+            );
           }
         }
 
@@ -81,7 +87,6 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
         try {
           return await fn();
         } catch (retryErr: any) {
-          console.log('retry error', retryErr);
           return this.handleError(context, retryErr);
         }
       } else {
@@ -92,7 +97,6 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
 
   async tools(): Promise<Record<string, any>> {
     return this.withAuthRetry(() => {
-      console.log('listing tools');
       return this.universalClient.tools();
     }, 'Failed to list tools');
   }

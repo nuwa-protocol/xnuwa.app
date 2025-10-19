@@ -10,9 +10,9 @@ import {
   AlertDialogTitle,
 } from '@/shared/components/ui';
 import {
+  dispatchMcpOAuthEvent,
   type McpOAuthPopupRequestDetail,
   onMcpOAuthPopupRequest,
-  dispatchMcpOAuthEvent,
 } from '@/shared/services/mcp-oauth-event';
 
 export function McpOAuthDialogManager(): React.ReactNode | null {
@@ -37,9 +37,6 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
           );
           return current;
         }
-        console.log(
-          `Authorization requested for ${detail.resourceName || detail.url}`,
-        );
         return detail;
       });
     });
@@ -47,9 +44,7 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
     return () => {
       unsubscribe();
       if (requestRef.current) {
-        const error = new Error(
-          'OAuth authorization dismissed during cleanup',
-        );
+        const error = new Error('OAuth authorization dismissed during cleanup');
         dispatchMcpOAuthEvent('mcp-oauth:error', {
           url: requestRef.current.url,
           resource: requestRef.current.resource,
@@ -96,9 +91,6 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
     }
 
     detail.confirm(popup);
-    console.log(
-      `OAuth window opened for ${detail.resourceName || detail.url}.`,
-    );
     cleanupRequest();
   }, [cleanupRequest]);
 
@@ -118,9 +110,6 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
       error,
     });
     detail.reject(error);
-    console.log(
-      `Authorization cancelled for ${detail.resourceName || detail.url}.`,
-    );
     cleanupRequest();
   }, [cleanupRequest]);
 
@@ -148,9 +137,6 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
         error,
       });
       detail.reject(error);
-      console.log(
-        `Authorization dismissed for ${detail.resourceName || detail.url}.`,
-      );
       cleanupRequest();
     },
     [cleanupRequest],
@@ -165,11 +151,13 @@ export function McpOAuthDialogManager(): React.ReactNode | null {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Connection Request for {pendingRequest.resourceName || pendingRequest.url}
+            Connection Request for{' '}
+            {pendingRequest.resourceName || pendingRequest.url}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This Cap requires authenticated connection to <span className='font-bold'>{pendingRequest.url}</span>. A
-            new window will open to continue the flow.
+            This Cap requires authenticated connection to{' '}
+            <span className="font-bold">{pendingRequest.url}</span>. A new
+            window will open to continue the flow.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

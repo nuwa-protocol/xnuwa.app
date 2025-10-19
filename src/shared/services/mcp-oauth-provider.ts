@@ -94,7 +94,7 @@ export class StreamableHTTPTransportOAuthProvider
   }
 
   saveClientInformation(clientInformation: OAuthClientInformationFull): void {
-    console.log('saving client information', clientInformation);
+    console.debug('[MCP OAuth]saving client information', clientInformation);
     this._clientInformation = clientInformation;
   }
 
@@ -102,13 +102,13 @@ export class StreamableHTTPTransportOAuthProvider
     if (!this._tokens) {
       this._tokens =
         SettingsStateStore.getState().userMCPOAuths[this._mcpUrl]?.tokens;
-      console.log('retrieving tokens', this._tokens);
+      console.debug('[MCP OAuth] Getting saved tokens', this._tokens);
     }
     return this._tokens;
   }
 
   saveTokens(tokens: OAuthTokens): void {
-    console.log('saving tokens', tokens);
+    console.debug('[MCP OAuth] Saving tokens', tokens);
     SettingsStateStore.getState().upsertUserMCPOAuth({
       mcpUrl: this._mcpUrl,
       tokens,
