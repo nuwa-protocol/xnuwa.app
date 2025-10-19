@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from './layout/main-layout';
 import RootLayout from './layout/root-layout';
+import RehydrationGuard from './layout/rehydration-guard';
 import CallbackPage from './pages/callback';
 import CapStudioPage from './pages/cap-studio';
 import ChatPage from './pages/chat';
@@ -19,21 +20,27 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        element: <MainLayout />,
+        element: <RehydrationGuard />,
         errorElement: <ErrorPage />,
         children: [
-          { index: true, element: <LandingPage /> },
           {
-            path: 'chat',
-            element: <ChatPage />,
+            element: <MainLayout />,
+            errorElement: <ErrorPage />,
+            children: [
+              { index: true, element: <LandingPage /> },
+              {
+                path: 'chat',
+                element: <ChatPage />,
+              },
+              { path: 'wallet', element: <WalletPage /> },
+              { path: 'settings', element: <SettingsPage /> },
+              { path: 'explore/*', element: <ExplorePage /> },
+              { path: 'cap-studio/*', element: <CapStudioPage /> },
+            ],
           },
-          { path: 'wallet', element: <WalletPage /> },
-          { path: 'settings', element: <SettingsPage /> },
-          { path: 'explore/*', element: <ExplorePage /> },
-          { path: 'cap-studio/*', element: <CapStudioPage /> },
+          { path: 'login', element: <LoginPage /> },
         ],
       },
-      { path: 'login', element: <LoginPage /> },
       { path: 'callback', element: <CallbackPage /> },
       { path: 'oauth-callback', element: <OAuthCallbackPage /> },
     ],
