@@ -1,4 +1,4 @@
-import type { OAuth2Client, OAuth2Token } from '@badgateway/oauth2-client';
+import type { OAuthTokens } from '@modelcontextprotocol/sdk/shared/auth.js';
 import type { Locale } from '@/shared/locales';
 
 export type UserSettings = {
@@ -15,8 +15,5 @@ export type UserMCPOAuth = Record<
 
 export type UserMCPOAuthPayload = {
   mcpUrl: string;
-  resource: string;
-  resourceName: string;
-  token: OAuth2Token;
-  client: OAuth2Client;
+  tokens: OAuthTokens;
 };

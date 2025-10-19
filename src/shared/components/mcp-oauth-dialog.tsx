@@ -12,7 +12,7 @@ import {
 import {
   type McpOAuthPopupRequestDetail,
   onMcpOAuthPopupRequest,
-} from '@/shared/services/mcp-oauth';
+} from '@/shared/services/mcp-oauth-event';
 
 export function McpOAuthDialogManager(): React.ReactNode | null {
   const [pendingRequest, setPendingRequest] =

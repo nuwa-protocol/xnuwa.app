@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui';
-import { onMcpOAuthEvent } from '@/shared/services/mcp-oauth';
+import { onMcpOAuthEvent } from '@/shared/services/mcp-oauth-event';
 import {
   closeUnifiedMcpClient,
   createUnifiedMcpClient,
