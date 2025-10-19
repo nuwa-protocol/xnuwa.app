@@ -132,13 +132,19 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       toast.success(`Successfully connected to ${url}`);
       setConnected(true);
     } catch (err) {
-      pushLog({
-        type: 'error',
-        message: `Connection failed: ${String(err)}`,
-      });
 
-      toast.error(String(err));
-
+      if ((err as any).code === 'OAUTH_FLOW_INITIATED') {
+        pushLog({
+          type: 'info',
+          message: `MCP Server requires authentication. Please complete the OAuth flow and try again.`,
+        });
+        return;
+      } else {
+        pushLog({
+          type: 'error',
+          message: `Connection failed: ${String(err)}`,
+        });
+      }
       await closeUnifiedMcpClient(url);
     } finally {
       setConnecting(false);
@@ -147,30 +153,22 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
   const handleToolsDiscovery = useCallback(
     async (mcpClient: NuwaMCPClient) => {
-      try {
-        // Fetch server capabilities
-        const toolsList = await mcpClient.tools();
-        setTools(toolsList);
-        pushLog({
-          type: 'info',
-          message: `Discovered ${Object.keys(toolsList).length} tools`,
-          data: { tools: Object.keys(toolsList) },
-        });
+      // Fetch server capabilities
+      const toolsList = await mcpClient.tools();
+      setTools(toolsList);
+      pushLog({
+        type: 'info',
+        message: `Discovered ${Object.keys(toolsList).length} tools`,
+        data: { tools: Object.keys(toolsList) },
+      });
 
-        // Initialize tool parameters
-        const initialParams: Record<string, any> = {};
-        Object.entries(toolsList).forEach(([toolName, tool]) => {
-          initialParams[toolName] = {};
-        });
+      // Initialize tool parameters
+      const initialParams: Record<string, any> = {};
+      Object.entries(toolsList).forEach(([toolName, tool]) => {
+        initialParams[toolName] = {};
+      });
 
-        setToolParams(initialParams);
-      } catch (err) {
-        pushLog({
-          type: 'error',
-          message: `Failed to discover tools: ${String(err)}`,
-        });
-        throw err;
-      }
+      setToolParams(initialParams);
     },
     [pushLog],
   );
@@ -728,7 +726,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
                                 uiSchema={{
                                   ...Object.keys(toolSchema).reduce(
                                     (acc, paramName) => {
-                                      const paramDef = (toolSchema as any)[paramName];
+                                      const paramDef = (toolSchema as any)[
+                                        paramName
+                                      ];
                                       acc[paramName] = {
                                         'ui:title': `${paramName} ${paramDef?.type ? `(${paramDef.type})` : ''}`,
                                         'ui:placeholder':
@@ -758,7 +758,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
 
         {/* Tool Execution Result */}
         {connected && lastToolResult && (
-          <Card className='max-w-4xl'>
+          <Card className="max-w-4xl">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>

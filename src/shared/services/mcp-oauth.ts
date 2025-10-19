@@ -32,11 +32,9 @@ export const handleMCPOauth = async (url: string): Promise<void> => {
     resourceMetadata.resource_name ?? resourceMetadata.resourceName ?? resource;
 
   const { userMCPOAuths } = SettingsStateStore.getState();
-  const existingOAuth = userMCPOAuths.find(
-    (item) => item.resource === resource && item.token,
-  );
+  const existingOAuth = userMCPOAuths[resource];
 
-  if (existingOAuth) {
+  if (existingOAuth?.token) {
     // TODO: return the existing token for the request
     return;
   }
@@ -92,13 +90,15 @@ const handleCallback =
       codeVerifier,
     });
 
-    const { addUserMCPOAuth } = SettingsStateStore.getState();
+    const { upsertUserMCPOAuth } = SettingsStateStore.getState();
 
-    addUserMCPOAuth({
+    upsertUserMCPOAuth({
       resource,
       resourceName,
       token: token,
     });
+
+    console.log('token', token);
   };
 
 const registerClient = async (registrationEndpoint: string) => {

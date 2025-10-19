@@ -189,6 +189,7 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
   private handleError(context: string, error: unknown): never {
     const err = error as { [key: string]: any } | undefined;
 
+    // check for oauth error
     if (this.isUnauthorizedError(err)) {
       this.handleUnauthorizedError(err).catch((oauthError) => {
         console.error(
@@ -196,13 +197,18 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
           oauthError,
         );
       });
+      throw new MCPError({
+        message: `${context}: Unauthorized - OAuth flow initiated`,
+        code: 'OAUTH_FLOW_INITIATED',
+        detail: 'OAuth flow initiated',
+      });
+    } else {
+      throw new MCPError({
+        message: `${context}: ${err?.message ?? 'Unknown error'}`,
+        code: err?.code,
+        detail: err?.detail || err?.stack,
+      });
     }
-
-    throw new MCPError({
-      message: `${context}: ${err?.message ?? 'Unknown error'}`,
-      code: err?.code,
-      detail: err?.detail || err?.stack,
-    });
   }
 
   private isUnauthorizedError(

@@ -4,7 +4,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createLocalStoragePersistConfig } from '@/shared/storage';
-import type { UserMCPOAuth, UserSettings } from './types';
+import type {
+  UserMCPOAuth,
+  UserMCPOAuthPayload,
+  UserSettings,
+} from './types';
 
 // ================= Interfaces ================= //
 
@@ -12,13 +16,13 @@ import type { UserMCPOAuth, UserSettings } from './types';
 interface SettingsState {
   // grouped user settings
   settings: UserSettings;
-  userMCPOAuths: UserMCPOAuth[];
+  userMCPOAuths: UserMCPOAuth;
   setSettings: (settings: UserSettings) => void;
   setSetting: <K extends keyof UserSettings>(
     key: K,
     value: UserSettings[K],
   ) => void;
-  addUserMCPOAuth: (oauth: Omit<UserMCPOAuth, 'updatedAt'>) => void;
+  upsertUserMCPOAuth: (oauth: UserMCPOAuthPayload) => void;
   removeUserMCPOAuth: (resource: string) => void;
 
   // reset settings
@@ -47,7 +51,7 @@ export const SettingsStateStore = create<SettingsState>()(
         avatar: null,
         devMode: false,
       },
-      userMCPOAuths: [],
+      userMCPOAuths: {},
       setSettings: (settings: UserSettings) => {
         set({ settings });
       },
@@ -59,23 +63,23 @@ export const SettingsStateStore = create<SettingsState>()(
           },
         }));
       },
-      addUserMCPOAuth: (oauth: Omit<UserMCPOAuth, 'updatedAt'>) => {
-        set((state) => {
-          console.log('addUserMCPOAuth', oauth);
-          return {
-            userMCPOAuths: [
-              ...state.userMCPOAuths,
-              { ...oauth, updatedAt: Date.now() },
-            ],
-          };
-        });
+      upsertUserMCPOAuth: ({ resource, resourceName, token }) => {
+        set((state) => ({
+          userMCPOAuths: {
+            ...state.userMCPOAuths,
+            [resource]: {
+              resourceName,
+              token,
+              updatedAt: Date.now(),
+            },
+          },
+        }));
       },
       removeUserMCPOAuth: (resource: string) => {
-        set((state) => ({
-          userMCPOAuths: state.userMCPOAuths.filter(
-            (item) => item.resource !== resource,
-          ),
-        }));
+        set((state) => {
+          const { [resource]: _removed, ...rest } = state.userMCPOAuths;
+          return { userMCPOAuths: rest };
+        });
       },
 
       // Reset functionality
@@ -87,7 +91,7 @@ export const SettingsStateStore = create<SettingsState>()(
             avatar: null,
             devMode: false,
           },
-          userMCPOAuths: [],
+          userMCPOAuths: {},
         });
       },
     }),

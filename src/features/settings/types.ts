@@ -8,9 +8,17 @@ export type UserSettings = {
   devMode: boolean;
 };
 
-export type UserMCPOAuth = {
+export type UserMCPOAuth = Record<
+  string,
+  {
+    resourceName: string;
+    updatedAt: number;
+    token: OAuth2Token;
+  }
+>;
+
+export type UserMCPOAuthPayload = {
   resource: string;
   resourceName: string;
-  updatedAt: number;
   token: OAuth2Token;
 };
