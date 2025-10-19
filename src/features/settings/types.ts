@@ -1,3 +1,4 @@
+import type { OAuth2Token } from '@badgateway/oauth2-client';
 import type { Locale } from '@/shared/locales';
 
 export type UserSettings = {
@@ -5,4 +6,11 @@ export type UserSettings = {
   name: string;
   avatar: string | null;
   devMode: boolean;
+};
+
+export type UserMCPOAuth = {
+  resource: string;
+  resourceName: string;
+  updatedAt: number;
+  token: OAuth2Token;
 };

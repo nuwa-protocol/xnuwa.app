@@ -1,10 +1,56 @@
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Logo } from '@/shared/components/logo';
 import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
+import { MCP_OAUTH_ORIGIN } from '@/shared/config/mcp-oauth';
 
-export default function OAuthCallbackPage() {
+export default function CallbackPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const code = searchParams.get('code');
+  const state = searchParams.get('state');
+
+  const [status, setStatus] = useState<'processing' | 'success' | 'error'>(
+    'processing',
+  );
+  const [message, setMessage] = useState('Processing authorization…');
+
+  const processedRef = useRef(false);
+
+  useEffect(() => {
+    if (processedRef.current) {
+      return;
+    }
+
+    processedRef.current = true;
+
+    const process = async () => {
+      try {
+
+        setStatus('success');
+        setMessage('Authorization successful!');
+
+        if (window.opener) {
+          window.opener.postMessage({ type: 'mcp-oauth', code, state }, MCP_OAUTH_ORIGIN);
+          setTimeout(() => window.close(), 1500);
+        } else {
+          // small delay to let provider autoConnect pick up
+          setTimeout(() => navigate('/'), 500);
+        }
+      } catch (err) {
+        console.error('DID callback error:', err);
+        setStatus('error');
+        setMessage(
+          err instanceof Error
+            ? err.message
+            : 'Failed to process authorization.',
+        );
+        setTimeout(() => navigate('/login'), 2000);
+      }
+    };
+
+    process();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-fuchsia-100 p-4">
@@ -30,7 +76,7 @@ export default function OAuthCallbackPage() {
               {status === 'success' && 'Success'}
               {status === 'error' && 'Error'}
             </h1>
-            <p className="text-sm text-muted-foreground mb-4">{code}</p>
+            <p className="text-sm text-muted-foreground mb-4">{message}</p>
             {status === 'error' && (
               <button
                 type="button"
