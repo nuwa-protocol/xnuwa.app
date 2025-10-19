@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui';
+import { onMcpOAuthEvent } from '@/shared/services/mcp-oauth';
 import {
   closeUnifiedMcpClient,
   createUnifiedMcpClient,
@@ -132,17 +133,19 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       toast.success(`Successfully connected to ${url}`);
       setConnected(true);
     } catch (err) {
+      const error = err as { [key: string]: any } | undefined;
 
-      if ((err as any).code === 'OAUTH_FLOW_INITIATED') {
+      if (error?.code === 'OAUTH_FLOW_INITIATED') {
         pushLog({
           type: 'info',
           message: `MCP Server requires authentication. Please complete the OAuth flow and try again.`,
         });
+        await closeUnifiedMcpClient(url);
         return;
       } else {
         pushLog({
           type: 'error',
-          message: `Connection failed: ${String(err)}`,
+          message: `Connection failed: ${String(error)}`,
         });
       }
       await closeUnifiedMcpClient(url);
@@ -150,6 +153,73 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       setConnecting(false);
     }
   }, [connecting, url, pushLog, mcpType]);
+
+  // handle oauth events
+  useEffect(() => {
+    if (!url) {
+      return;
+    }
+
+    const unsubscribeStart = onMcpOAuthEvent(
+      'mcp-oauth:start',
+      ({ url: eventUrl, resourceName }) => {
+        if (eventUrl !== url) {
+          return;
+        }
+        const name = resourceName || eventUrl;
+        pushLog({
+          type: 'info',
+          message: `Starting OAuth flow for ${name}`,
+        });
+      },
+    );
+
+    const unsubscribeComplete = onMcpOAuthEvent(
+      'mcp-oauth:complete',
+      ({ url: eventUrl, resourceName }) => {
+        if (eventUrl !== url) {
+          return;
+        }
+        const name = resourceName || eventUrl;
+        pushLog({
+          type: 'success',
+          message: `OAuth flow completed for ${name}. Retrying connection...`,
+        });
+
+        if (!connecting) {
+          void handleConnect();
+        }
+      },
+    );
+
+    const unsubscribeError = onMcpOAuthEvent(
+      'mcp-oauth:error',
+      ({ url: eventUrl, resourceName, error }) => {
+        if (eventUrl !== url) {
+          return;
+        }
+
+        const name = resourceName || eventUrl;
+        const message =
+          error instanceof Error
+            ? error.message
+            : typeof error === 'string'
+              ? error
+              : 'Unknown error';
+
+        pushLog({
+          type: 'error',
+          message: `OAuth flow failed for ${name}: ${message}`,
+        });
+      },
+    );
+
+    return () => {
+      unsubscribeStart();
+      unsubscribeComplete();
+      unsubscribeError();
+    };
+  }, [url, pushLog, handleConnect, connecting]);
 
   const handleToolsDiscovery = useCallback(
     async (mcpClient: NuwaMCPClient) => {

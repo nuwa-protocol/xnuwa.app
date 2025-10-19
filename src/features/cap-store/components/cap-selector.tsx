@@ -40,7 +40,7 @@ const LIVE_DEV_BADGE_CLASSES =
   'bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-400/20 dark:text-amber-100 dark:border-amber-300';
 
 export function CapSelector() {
-  const { currentCap, setCurrentCap, isInitialized, isError, errorMessage } =
+  const { currentCap, setCurrentCap, isInitialized, isError, errorMessage, retryCurrentCapInit } =
     CurrentCapStore();
   const { installedCaps } = InstalledCapsStore();
   const { localCaps } = CapStudioStore();
@@ -237,11 +237,27 @@ export function CapSelector() {
                   <AlertCircle className="w-3 h-3 text-destructive" />
                 </span>
               </TooltipTrigger>
-              <TooltipContent className="z-[1000] max-w-48 break-words">
-                <p>
-                  {errorMessage ||
-                    'Cap Initialization Failed, Please Select Again or Check Network Connection'}
+              <TooltipContent className="z-[1000] max-w-sm break-words space-y-2 py-2 px-3 leading-3">
+                <p className="text-sm leading-3">
+                  {'Cap launch Failed, please try again.'}
                 </p>
+                {errorMessage && (
+                  <p className="text-xs text-muted-foreground">
+                    {errorMessage}
+                  </p>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-auto w-full px-2 py-1 text-sm text-destructive"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    retryCurrentCapInit();
+                  }}
+                >
+                  Retry
+                </Button>
               </TooltipContent>
             </Tooltip>
           )}

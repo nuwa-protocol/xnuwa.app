@@ -7,6 +7,7 @@ import { useLiveCapConnections, useRehydration } from '@/shared/hooks';
 import { useAutoLoadingDetection } from '@/shared/hooks/use-auto-loading-detection';
 import { MobileWarning } from '../shared/components/mobile-warning';
 import { ThemeProvider } from '../shared/components/theme-provider';
+import { McpOAuthDialogManager } from '../shared/components/mcp-oauth-dialog';
 import {
   StructuredData,
   generateWebSiteSchema,
@@ -47,6 +48,7 @@ export default function RootLayout() {
       ) : (
         <AuthGuard>
           <Toaster position="top-center" expand={true} richColors />
+          <McpOAuthDialogManager />
           <Outlet />
         </AuthGuard>
       )}

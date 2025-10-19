@@ -1,4 +1,8 @@
-import { generateCodeVerifier, OAuth2Client } from '@badgateway/oauth2-client';
+import {
+  generateCodeVerifier,
+  OAuth2Client,
+  type OAuth2Token,
+} from '@badgateway/oauth2-client';
 import { SettingsStateStore } from '@/features/settings/stores';
 import {
   MCP_OAUTH_CALLBACK_URL,
@@ -15,91 +19,310 @@ interface ResourceMetadata {
   resourceName: string;
 }
 
-export const handleMCPOauth = async (url: string): Promise<void> => {
-  const baseUrl = new URL(url).origin;
+export type McpOAuthEventType =
+  | 'mcp-oauth:start'
+  | 'mcp-oauth:complete'
+  | 'mcp-oauth:error';
 
-  const resourceMetadata = await getResourceMetadata(baseUrl);
-  const authServerMetadata = await getAuthServerMetadata(baseUrl);
-  const { client_id: clientId, client_secret: clientSecret } =
-    await registerClient(authServerMetadata.registration_endpoint);
+export const MCP_OAUTH_POPUP_REQUEST_EVENT = 'mcp-oauth:popup-request';
 
-  const resource = resourceMetadata.resource;
-  if (!resource) {
-    throw new Error('Missing resource identifier in metadata');
-  }
+export interface McpOAuthEventDetail {
+  url: string;
+  resource: string;
+  resourceName: string;
+  token?: OAuth2Token;
+  error?: unknown;
+}
 
-  const resourceName =
-    resourceMetadata.resource_name ?? resourceMetadata.resourceName ?? resource;
+export interface McpOAuthPopupRequestDetail {
+  id: string;
+  url: string;
+  resource: string;
+  resourceName: string;
+  authUrl: string;
+  confirm: (popup: Window | null) => void;
+  reject: (error?: Error) => void;
+}
 
-  const { userMCPOAuths } = SettingsStateStore.getState();
-  const existingOAuth = userMCPOAuths[resource];
+type McpOAuthPopupRequestListener = (
+  detail: McpOAuthPopupRequestDetail,
+) => void;
 
-  if (existingOAuth?.token) {
-    // TODO: return the existing token for the request
-    return;
-  }
+const mcpOAuthEventTarget = new EventTarget();
+const mcpOAuthPopupEventTarget = new EventTarget();
 
-  const client = new OAuth2Client({
-    server: baseUrl,
-    clientId,
-    clientSecret,
-    tokenEndpoint: authServerMetadata.token_endpoint,
-    authorizationEndpoint: authServerMetadata.authorization_endpoint,
-  });
-
-  const codeVerifier = await generateCodeVerifier();
-
-  const state = generateUUID();
-
-  const authUrl = await client.authorizationCode.getAuthorizeUri({
-    redirectUri: MCP_OAUTH_CALLBACK_URL,
-    codeVerifier,
-    state,
-  });
-
-  window.open(authUrl, '_blank');
-  window.addEventListener(
-    'message',
-    handleCallback(resource, resourceName, client, state, codeVerifier),
-  );
+const dispatchMcpOAuthEvent = (
+  type: McpOAuthEventType,
+  detail: McpOAuthEventDetail,
+): void => {
+  mcpOAuthEventTarget.dispatchEvent(new CustomEvent(type, { detail }));
 };
 
-const handleCallback =
-  (
-    resource: string,
-    resourceName: string,
-    client: OAuth2Client,
-    state: string,
-    codeVerifier: string,
-  ) =>
-  async (event: MessageEvent) => {
-    // Check if the message is from the same origin
-    if (event.origin !== MCP_OAUTH_ORIGIN) return;
+export const onMcpOAuthEvent = (
+  type: McpOAuthEventType,
+  listener: (detail: McpOAuthEventDetail) => void,
+): (() => void) => {
+  const handler = (event: Event) =>
+    listener((event as CustomEvent<McpOAuthEventDetail>).detail);
+  mcpOAuthEventTarget.addEventListener(type, handler as EventListener);
+  return () => {
+    mcpOAuthEventTarget.removeEventListener(type, handler as EventListener);
+  };
+};
 
-    // Check if the message is a valid MCP OAuth callback
-    if (event.data.type !== 'mcp-oauth') return;
+export const requestMcpOAuthPopup = ({
+  url,
+  resource,
+  resourceName,
+  authUrl,
+}: {
+  url: string;
+  resource: string;
+  resourceName: string;
+  authUrl: string;
+}): Promise<Window | null> => {
+  return new Promise((resolve, reject) => {
+    let settled = false;
 
-    // Get the token from the message
-    const code = event.data.code;
-    const state = event.data.state;
+    const finalize = (callback: () => void) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      callback();
+    };
 
-    const token = await client.authorizationCode.getToken({
-      code,
-      state,
-      redirectUri: MCP_OAUTH_CALLBACK_URL,
-      codeVerifier,
-    });
-
-    const { upsertUserMCPOAuth } = SettingsStateStore.getState();
-
-    upsertUserMCPOAuth({
+    const detail: McpOAuthPopupRequestDetail = {
+      id: generateUUID(),
+      url,
       resource,
       resourceName,
-      token: token,
+      authUrl,
+      confirm: (popup) => {
+        finalize(() => {
+          resolve(popup ?? null);
+        });
+      },
+      reject: (error) => {
+        finalize(() => {
+          reject(error ?? new Error('MCP OAuth flow cancelled by user'));
+        });
+      },
+    };
+
+    mcpOAuthPopupEventTarget.dispatchEvent(
+      new CustomEvent<McpOAuthPopupRequestDetail>(
+        MCP_OAUTH_POPUP_REQUEST_EVENT,
+        {
+          detail,
+        },
+      ),
+    );
+  });
+};
+
+export const onMcpOAuthPopupRequest = (
+  listener: McpOAuthPopupRequestListener,
+): (() => void) => {
+  const handler = (event: Event) =>
+    listener((event as CustomEvent<McpOAuthPopupRequestDetail>).detail);
+
+  mcpOAuthPopupEventTarget.addEventListener(
+    MCP_OAUTH_POPUP_REQUEST_EVENT,
+    handler as EventListener,
+  );
+
+  return () => {
+    mcpOAuthPopupEventTarget.removeEventListener(
+      MCP_OAUTH_POPUP_REQUEST_EVENT,
+      handler as EventListener,
+    );
+  };
+};
+
+export const handleMCPOauth = async (url: string): Promise<OAuth2Token> => {
+  let resource = '';
+  let resourceName = '';
+  let flowHandled = false;
+
+  try {
+    const baseUrl = new URL(url).origin;
+
+    const resourceMetadata = await getResourceMetadata(baseUrl);
+    const authServerMetadata = await getAuthServerMetadata(baseUrl);
+    const { client_id: clientId, client_secret: clientSecret } =
+      await registerClient(authServerMetadata.registration_endpoint);
+
+    resource = resourceMetadata.resource;
+    if (!resource) {
+      throw new Error('Missing resource identifier in metadata');
+    }
+
+    resourceName =
+      resourceMetadata.resource_name ??
+      resourceMetadata.resourceName ??
+      resource;
+
+    const { userMCPOAuths } = SettingsStateStore.getState();
+    const existingOAuth = userMCPOAuths[resource];
+
+    if (existingOAuth?.token) {
+      // TODO: Handle re-authentication flow
+      // dispatchMcpOAuthEvent('mcp-oauth:complete', {
+      //   url,
+      //   resource,
+      //   resourceName,
+      //   token: existingOAuth.token,
+      // });
+      // return existingOAuth.token;
+    }
+
+    const client = new OAuth2Client({
+      server: baseUrl,
+      clientId,
+      clientSecret,
+      tokenEndpoint: authServerMetadata.token_endpoint,
+      authorizationEndpoint: authServerMetadata.authorization_endpoint,
     });
 
-    console.log('token', token);
-  };
+    const codeVerifier = await generateCodeVerifier();
+    const state = generateUUID();
+
+    dispatchMcpOAuthEvent('mcp-oauth:start', {
+      url,
+      resource,
+      resourceName,
+    });
+
+    const authUrl = await client.authorizationCode.getAuthorizeUri({
+      redirectUri: MCP_OAUTH_CALLBACK_URL,
+      codeVerifier,
+      state,
+    });
+
+    const popup = await requestMcpOAuthPopup({
+      url,
+      resource,
+      resourceName,
+      authUrl,
+    });
+
+    if (!popup) {
+      const error = new Error('Failed to open OAuth window');
+      flowHandled = true;
+      dispatchMcpOAuthEvent('mcp-oauth:error', {
+        url,
+        resource,
+        resourceName,
+        error,
+      });
+      throw error;
+    }
+
+    return await new Promise<OAuth2Token>((resolve, reject) => {
+      let closeWatcher: number | undefined;
+
+      function cleanup(): void {
+        window.removeEventListener('message', handleMessage);
+        if (closeWatcher !== undefined) {
+          window.clearInterval(closeWatcher);
+          closeWatcher = undefined;
+        }
+      }
+
+      async function handleMessage(event: MessageEvent): Promise<void> {
+        if (event.origin !== MCP_OAUTH_ORIGIN) return;
+        if (event.data?.type !== 'mcp-oauth') return;
+
+        const callbackState = event.data.state;
+        const code = event.data.code;
+
+        if (!code) {
+          return;
+        }
+
+        if (callbackState !== state) {
+          cleanup();
+          flowHandled = true;
+          const error = new Error('OAuth state mismatch');
+          dispatchMcpOAuthEvent('mcp-oauth:error', {
+            url,
+            resource,
+            resourceName,
+            error,
+          });
+          reject(error);
+          return;
+        }
+
+        try {
+          const token = await client.authorizationCode.getToken({
+            code,
+            state,
+            redirectUri: MCP_OAUTH_CALLBACK_URL,
+            codeVerifier,
+          });
+
+          SettingsStateStore.getState().upsertUserMCPOAuth({
+            resource,
+            resourceName,
+            token,
+          });
+
+          dispatchMcpOAuthEvent('mcp-oauth:complete', {
+            url,
+            resource,
+            resourceName,
+            token,
+          });
+
+          flowHandled = true;
+          cleanup();
+          resolve(token);
+        } catch (error) {
+          cleanup();
+          flowHandled = true;
+          dispatchMcpOAuthEvent('mcp-oauth:error', {
+            url,
+            resource,
+            resourceName,
+            error,
+          });
+          reject(error);
+        }
+      }
+
+      window.addEventListener('message', handleMessage);
+
+      closeWatcher = window.setInterval(() => {
+        if (popup.closed) {
+          cleanup();
+          if (!flowHandled) {
+            flowHandled = true;
+            const error = new Error('OAuth window closed before completion');
+            dispatchMcpOAuthEvent('mcp-oauth:error', {
+              url,
+              resource,
+              resourceName,
+              error,
+            });
+            reject(error);
+          }
+        }
+      }, 500);
+    });
+  } catch (error) {
+    if (!flowHandled) {
+      dispatchMcpOAuthEvent('mcp-oauth:error', {
+        url,
+        resource,
+        resourceName,
+        error,
+      });
+    }
+    throw error;
+  }
+};
 
 const registerClient = async (registrationEndpoint: string) => {
   const options = {

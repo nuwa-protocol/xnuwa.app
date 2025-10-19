@@ -45,7 +45,7 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
 
       if (result && Array.isArray(result.prompts)) {
         for (const prompt of result.prompts) {
-          if (prompt && prompt.name) {
+          if (prompt?.name) {
             promptsMap[prompt.name] = {
               name: prompt.name,
               description: prompt.description,
@@ -107,7 +107,7 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
       // Add static resources
       if (Array.isArray(resources)) {
         for (const resource of resources) {
-          if (resource && resource.uri) {
+          if (resource?.uri) {
             resourcesMap[resource.uri] = {
               uri: resource.uri,
               name: resource.name,
@@ -120,7 +120,7 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
       // Add resource templates
       if (Array.isArray(templates)) {
         for (const template of templates) {
-          if (template && template.uriTemplate) {
+          if (template?.uriTemplate) {
             resourcesMap[template.uriTemplate] = {
               uriTemplate: template.uriTemplate,
               name: template.name,
@@ -225,10 +225,6 @@ export class UnifiedMcpClientAdapter implements NuwaMCPClient {
   private async handleUnauthorizedError(
     _error: { [key: string]: any } | undefined,
   ): Promise<void> {
-    // TODO: Implement OAuth re-authentication flow for 401 responses.
-    console.log('[MCP Client] handle oauth flow for 401 response', {
-      url: this.mcpUrl,
-    });
     if (!this.mcpUrl) {
       throw new Error('MCP URL is required for OAuth');
     }

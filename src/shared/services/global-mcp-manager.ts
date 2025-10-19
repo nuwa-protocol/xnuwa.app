@@ -32,7 +32,10 @@ class RemoteMCPManager {
     }
 
     // Clean up existing instance if switching caps
-    if (this.currentInstance && this.currentCapId !== cap.id) {
+    if (
+      this.currentInstance &&
+      this.currentCapId !== cap.id
+    ) {
       await this.cleanup();
     }
 
@@ -40,23 +43,25 @@ class RemoteMCPManager {
     const clients = new Map<string, any>();
     const mcpServers = cap.core.mcpServers || {};
 
-    // Initialize all MCP clients using unified client
-    for (const [serverName, server] of Object.entries(mcpServers)) {
-      try {
+    // Track initialization progress; mark instance but keep it uninitialized for now
+    this.currentInstance = {
+      clients,
+      tools: {},
+      initialized: false,
+    };
+    this.currentCapId = cap.id;
+
+    try {
+      // Initialize all MCP clients using unified client
+      for (const [serverName, server] of Object.entries(mcpServers)) {
         // Use unified MCP client which automatically detects server type
         const client = await createUnifiedMcpClient(server);
         clients.set(serverName, client);
-      } catch (error) {
-        throw new Error(
-          `Failed to connect to MCP server ${serverName} at ${server}: ${error}`,
-        );
       }
-    }
 
-    // Get all tools from initialized clients
-    const allTools: Record<string, any> = {};
-    for (const [serverName, client] of clients.entries()) {
-      try {
+      // Get all tools from initialized clients
+      const allTools: Record<string, any> = {};
+      for (const [serverName, client] of clients.entries()) {
         const serverTools = await client.tools();
         for (const [toolName, toolDefinition] of Object.entries(serverTools)) {
           const prefixedToolName = `${serverName}_${toolName}`;
@@ -67,21 +72,40 @@ class RemoteMCPManager {
           });
           allTools[prefixedToolName] = enhancedTool;
         }
-      } catch (error) {
-        throw new Error(
-          `Failed to get tools from MCP server ${serverName}:${error}`,
-        );
       }
+
+      this.currentInstance.tools = allTools;
+      this.currentInstance.initialized = true;
+
+      return allTools;
+    } catch (error) {
+      // Ensure clients opened during this attempt are closed so retries start fresh
+      const closePromises: Promise<void>[] = [];
+      for (const [serverName, client] of clients.entries()) {
+        if (client?.close) {
+          closePromises.push(
+            client
+              .close()
+              .catch((closeError: unknown) => {
+                console.warn(
+                  `Failed to close MCP client ${serverName}:`,
+                  closeError,
+                );
+              })
+              .then(() => undefined),
+          );
+        }
+      }
+      await Promise.allSettled(closePromises);
+
+      // Reset cached instance so future retries reattempt full initialization
+      if (this.currentCapId === cap.id) {
+        this.currentInstance = null;
+        this.currentCapId = null;
+      }
+
+      throw error;
     }
-
-    this.currentInstance = {
-      clients,
-      tools: allTools,
-      initialized: true,
-    };
-    this.currentCapId = cap.id;
-
-    return allTools;
   }
 
   async cleanup(): Promise<void> {
