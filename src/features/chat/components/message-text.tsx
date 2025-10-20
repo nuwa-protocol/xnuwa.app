@@ -22,7 +22,7 @@ import { cn } from '@/shared/utils';
 import { useDeleteMessagesAfterId } from '../hooks';
 import { MessageEditor } from './message-editor';
 
-const MAX_MESSAGE_LENGTH = 150;
+const MAX_MESSAGE_LENGTH = 50;
 
 interface MessageTextProps {
   chatId: string;

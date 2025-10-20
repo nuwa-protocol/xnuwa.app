@@ -2,6 +2,7 @@ import { useChat } from '@ai-sdk/react';
 import { useEffect, useRef } from 'react';
 import { useStickToBottomContext } from 'use-stick-to-bottom';
 import { useChatContext } from '../contexts/chat-context';
+import { useAssistantMinHeight } from '../hooks';
 import {
   Conversation,
   ConversationContent,
@@ -31,18 +32,8 @@ function PureMessages({ isReadonly }: MessagesProps) {
       ),
   );
 
-  // calculate the minimum height of the message
-  const getMessageMinHeight = (shouldPushToTop: boolean) => {
-    if (shouldPushToTop) {
-      const headerHeight = 270;
-      const calculatedMinHeight = Math.max(
-        0,
-        window.innerHeight - headerHeight,
-      );
-      return calculatedMinHeight > 0 ? `${calculatedMinHeight}px` : undefined;
-    }
-    return undefined;
-  };
+  const { lastAssistantId, lastAssistantMinHeight, registerMessageNode } =
+    useAssistantMinHeight({ messages });
 
   // When a user sends a new message, force scroll to bottom immediately
   useEffect(() => {
@@ -76,12 +67,17 @@ function PureMessages({ isReadonly }: MessagesProps) {
           !message.parts?.some((part) => part.type === 'text');
 
         const shouldPushToTop =
-          message.role === 'assistant' && index === messages.length - 1;
-        const minHeight = getMessageMinHeight(shouldPushToTop);
+          message.role === 'assistant' &&
+          index === messages.length - 1 &&
+          message.id === lastAssistantId;
+        const minHeight = shouldPushToTop
+          ? lastAssistantMinHeight
+          : undefined;
 
         return (
           <div
             key={message.id}
+            ref={registerMessageNode(message.id)}
             className={isBeforeLastClearContext ? 'opacity-50' : ''}
           >
             <PreviewMessage
