@@ -1,6 +1,7 @@
 import { useChat } from '@ai-sdk/react';
 import { useEffect, useRef } from 'react';
 import { useStickToBottomContext } from 'use-stick-to-bottom';
+import { ChatErrorCode, resolveChatErrorCode } from '@/shared/utils/handle-error';
 import { useChatContext } from '../contexts/chat-context';
 import { useAssistantMinHeight } from '../hooks';
 import {
@@ -16,7 +17,7 @@ interface MessagesProps {
 
 function PureMessages({ isReadonly }: MessagesProps) {
   const { chat } = useChatContext();
-  const { messages, status, setMessages, regenerate } = useChat({
+  const { messages, status, setMessages, regenerate, error } = useChat({
     chat,
     experimental_throttle: 120,
   });
@@ -51,6 +52,10 @@ function PureMessages({ isReadonly }: MessagesProps) {
     prevLengthRef.current = messages.length;
   }, [messages, scrollToBottom]);
 
+  const resolvedErrorCode = error ? resolveChatErrorCode(error) : undefined;
+  const effectiveError =
+    resolvedErrorCode === ChatErrorCode.IGNORED_ERROR ? undefined : error;
+
   return (
     <ConversationContent>
       {messages.map((message, index) => {
@@ -74,6 +79,16 @@ function PureMessages({ isReadonly }: MessagesProps) {
           ? lastAssistantMinHeight
           : undefined;
 
+        const isErrorMessage =
+          Boolean(effectiveError) &&
+          message.role === 'assistant' &&
+          index === messages.length - 1 &&
+          message.id === lastAssistantId;
+        let messageError: Error | undefined;
+        if (isErrorMessage && effectiveError) {
+          messageError = effectiveError;
+        }
+
         return (
           <div
             key={message.id}
@@ -86,6 +101,7 @@ function PureMessages({ isReadonly }: MessagesProps) {
               message={message}
               isReadonly={isReadonly}
               minHeight={minHeight}
+              error={messageError}
               isStreamingReasoning={isStreamingReasoning}
               isStreaming={isStreaming}
               setMessages={setMessages}
