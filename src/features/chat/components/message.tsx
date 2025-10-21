@@ -2,7 +2,8 @@ import type { UseChatHelpers } from '@ai-sdk/react';
 import { isUIResource, type UIResource } from '@nuwa-ai/ui-kit';
 import type { ToolUIPart, UIMessage } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   isOnResponseDataMarkPart,
   type OnResponseDataMarkPart,
@@ -12,6 +13,7 @@ import { cn } from '@/shared/utils';
 import { Loader } from './loader';
 import { MessageActions } from './message-actions';
 import { MessageCap } from './message-cap';
+import { MessageError } from './message-error';
 import { ClearContextMessage } from './message-clear-context';
 import { MessageImage } from './message-image';
 import { RemoteMCPTool } from './message-mcp-tool';
@@ -56,6 +58,7 @@ const PurePreviewMessage = ({
   message,
   isReadonly,
   minHeight,
+  error,
   isStreamingReasoning,
   isStreaming,
   setMessages,
@@ -64,6 +67,7 @@ const PurePreviewMessage = ({
   chatId: string;
   message: UIMessage;
   isReadonly: boolean;
+  error: Error | undefined;
   minHeight: string | undefined;
   isStreamingReasoning: boolean;
   isStreaming: boolean;
@@ -71,6 +75,15 @@ const PurePreviewMessage = ({
   regenerate: UseChatHelpers<UIMessage>['regenerate'];
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const navigate = useNavigate();
+
+  const handleRetry = useCallback(() => {
+    regenerate();
+  }, [regenerate]);
+
+  const handleOpenWallet = useCallback(() => {
+    navigate('/wallet');
+  }, [navigate]);
 
   const attachmentsFromUserMessage =
     message.role === 'user'
@@ -89,7 +102,7 @@ const PurePreviewMessage = ({
 
   if (isClearContextMessage) return <ClearContextMessage />;
 
-  if (message.parts?.length === 0) return <Loader minHeight={minHeight} />;
+  if (message.parts?.length === 0 && !error) return <Loader minHeight={minHeight} />;
 
   // Find the onResponse data mark part
   const onResponsePart = (() => {
@@ -123,145 +136,163 @@ const PurePreviewMessage = ({
               minHeight: minHeight,
             }}
           >
-            {/* Cap identity header for assistant messages when the onResponse mark is present */}
-            {message.role === 'assistant' && onResponsePart && (
-              <MessageCap part={onResponsePart} />
-            )}
-            {attachmentsFromUserMessage.length > 0 && (
-              <div
-                data-testid={`message-attachments`}
-                className="flex flex-row gap-2 justify-end"
-              >
-                {attachmentsFromUserMessage.map((attachment) => (
-                  <PreviewAttachment
-                    key={attachment.url}
-                    attachment={{
-                      name: attachment.filename ?? 'file',
-                      contentType: attachment.mediaType,
-                      url: attachment.url,
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* render message parts */}
-            {message.parts
-              ?.slice()
-              .sort((a, b) => {
-                if (a.type === 'reasoning' && b.type === 'text') return -1;
-                if (a.type === 'text' && b.type === 'reasoning') return 1;
-                return 0;
-              })
-              ?.map((part, index) => {
-                const { type } = part;
-                const key = `message-${message.id}-part-${index}`;
-
-                if (type === 'reasoning' && part.text?.trim().length > 0) {
-                  return (
-                    <MessageReasoning
-                      key={`reasoning-${message.id}-${index}`}
-                      isStreaming={isStreamingReasoning}
-                      content={part.text}
-                    />
-                  );
+            {error ? (
+              <MessageError
+                error={error}
+                onRetry={
+                  message.role === 'assistant' && !isReadonly
+                    ? handleRetry
+                    : undefined
                 }
-
-                if (type === 'text') {
-                  return (
-                    <MessageText
-                      key={key}
-                      chatId={chatId}
-                      message={message}
-                      part={part}
-                      index={index}
-                      isReadonly={isReadonly}
-                      setMessages={setMessages}
-                      regenerate={regenerate}
-                      onModeChange={setMode}
-                    />
-                  );
+                onOpenWallet={
+                  message.role === 'assistant'
+                    ? handleOpenWallet
+                    : undefined
                 }
-
-                if (typeof type === 'string' && type.startsWith('tool-')) {
-                  const rawToolName = type.slice('tool-'.length);
-                  const formattedToolName = rawToolName
-                    ? rawToolName
-                      .replace(/[-_]/g, ' ')
-                      .replace(/\b\w/g, (char) => char.toUpperCase())
-                    : 'Tool';
-                  const { state } = part as ToolUIPart;
-                  if (state === 'input-streaming') {
-                    return (
-                      <TextShimmer
-                        key={key}
-                        className="text-sm font-medium tracking-wide"
-                      >
-                        {`Running ${formattedToolName}…`}
-                      </TextShimmer>
-                    );
-                  }
-                }
-
-                if (type === 'file' && message.role === 'assistant') {
-                  return (
-                    <MessageImage
-                      key={key}
-                      imageName={part.filename}
-                      base64={part.url}
-                      mediaType={part.mediaType}
-                      alt={part.filename || 'Generated Image'}
-                    />
-                  );
-                }
-
-                if (type === 'dynamic-tool') {
-                  const { toolCallId, state, input, output, toolName } = part;
-
-                  const uiRes = (output as any)?.content?.find((c: any) =>
-                    isUIResource(c as any),
-                  ) as UIResource;
-
-                  if (uiRes)
-                    return (
-                      <MessageMCPUI
-                        key={`mcp-ui-${toolCallId}`}
-                        resource={uiRes}
+              />
+            ) : (
+              <>
+                {/* Cap identity header for assistant messages when the onResponse mark is present */}
+                {message.role === 'assistant' && onResponsePart && (
+                  <MessageCap part={onResponsePart} />
+                )}
+                {attachmentsFromUserMessage.length > 0 && (
+                  <div
+                    data-testid={`message-attachments`}
+                    className="flex flex-row gap-2 justify-end"
+                  >
+                    {attachmentsFromUserMessage.map((attachment) => (
+                      <PreviewAttachment
+                        key={attachment.url}
+                        attachment={{
+                          name: attachment.filename ?? 'file',
+                          contentType: attachment.mediaType,
+                          url: attachment.url,
+                        }}
                       />
-                    );
-
-                  return (
-                    <RemoteMCPTool
-                      key={toolCallId}
-                      input={input}
-                      output={output}
-                      toolCallId={toolCallId}
-                      toolName={toolName}
-                      state={state}
-                    />
-                  );
-                }
-
-                return null;
-              })}
-
-            {(!isReadonly || sources.length > 0) && (
-              <div className="flex items-center gap-3 pt-2">
-                {!isReadonly && (
-                  <MessageActions
-                    key={`action-${message.id}`}
-                    message={message}
-                    isStreaming={isStreaming}
-                  />
+                    ))}
+                  </div>
                 )}
-                {sources.length > 0 && (
-                  <MessageSource
-                    key={`sources-${message.id}`}
-                    sources={sources}
-                    className="ml-auto"
-                  />
+
+                {/* render message parts */}
+                {message.parts
+                  ?.slice()
+                  .sort((a, b) => {
+                    if (a.type === 'reasoning' && b.type === 'text') return -1;
+                    if (a.type === 'text' && b.type === 'reasoning') return 1;
+                    return 0;
+                  })
+                  ?.map((part, index) => {
+                    const { type } = part;
+                    const key = `message-${message.id}-part-${index}`;
+
+                    if (type === 'reasoning' && part.text?.trim().length > 0) {
+                      return (
+                        <MessageReasoning
+                          key={`reasoning-${message.id}-${index}`}
+                          isStreaming={isStreamingReasoning}
+                          content={part.text}
+                        />
+                      );
+                    }
+
+                    if (type === 'text') {
+                      return (
+                        <MessageText
+                          key={key}
+                          chatId={chatId}
+                          message={message}
+                          part={part}
+                          index={index}
+                          isReadonly={isReadonly}
+                          setMessages={setMessages}
+                          regenerate={regenerate}
+                          onModeChange={setMode}
+                        />
+                      );
+                    }
+
+                    if (typeof type === 'string' && type.startsWith('tool-')) {
+                      const rawToolName = type.slice('tool-'.length);
+                      const formattedToolName = rawToolName
+                        ? rawToolName
+                            .replace(/[-_]/g, ' ')
+                            .replace(/\b\w/g, (char) => char.toUpperCase())
+                        : 'Tool';
+                      const { state } = part as ToolUIPart;
+                      if (state === 'input-streaming') {
+                        return (
+                          <TextShimmer
+                            key={key}
+                            className="text-sm font-medium tracking-wide"
+                          >
+                            {`Running ${formattedToolName}…`}
+                          </TextShimmer>
+                        );
+                      }
+                    }
+
+                    if (type === 'file' && message.role === 'assistant') {
+                      return (
+                        <MessageImage
+                          key={key}
+                          imageName={part.filename}
+                          base64={part.url}
+                          mediaType={part.mediaType}
+                          alt={part.filename || 'Generated Image'}
+                        />
+                      );
+                    }
+
+                    if (type === 'dynamic-tool') {
+                      const { toolCallId, state, input, output, toolName } = part;
+
+                      const uiRes = (output as any)?.content?.find((c: any) =>
+                        isUIResource(c as any),
+                      ) as UIResource;
+
+                      if (uiRes)
+                        return (
+                          <MessageMCPUI
+                            key={`mcp-ui-${toolCallId}`}
+                            resource={uiRes}
+                          />
+                        );
+
+                      return (
+                        <RemoteMCPTool
+                          key={toolCallId}
+                          input={input}
+                          output={output}
+                          toolCallId={toolCallId}
+                          toolName={toolName}
+                          state={state}
+                        />
+                      );
+                    }
+
+                    return null;
+                  })}
+
+                {(!isReadonly || sources.length > 0) && (
+                  <div className="flex items-center gap-3 pt-2">
+                    {!isReadonly && (
+                      <MessageActions
+                        key={`action-${message.id}`}
+                        message={message}
+                        isStreaming={isStreaming}
+                      />
+                    )}
+                    {sources.length > 0 && (
+                      <MessageSource
+                        key={`sources-${message.id}`}
+                        sources={sources}
+                        className="ml-auto"
+                      />
+                    )}
+                  </div>
                 )}
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -277,6 +308,7 @@ export const PreviewMessage = memo(
     if (prevProps.chatId !== nextProps.chatId) return false;
     if (prevProps.isReadonly !== nextProps.isReadonly) return false;
     if (prevProps.minHeight !== nextProps.minHeight) return false;
+    if (prevProps.error !== nextProps.error) return false;
     if (prevProps.isStreaming !== nextProps.isStreaming) return false;
     if (prevProps.isStreamingReasoning !== nextProps.isStreamingReasoning)
       return false;

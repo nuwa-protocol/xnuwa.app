@@ -31,16 +31,7 @@ const shouldIgnoreErrorForDeveloper = (errorMessage: string): boolean => {
   );
 };
 
-export const handleError = (error: Error) => {
-  const errorMessage = error.message;
-
-  if (shouldIgnoreErrorForDeveloper(errorMessage)) {
-    return ChatErrorCode.IGNORED_ERROR;
-  }
-
-  console.error(error);
-  Sentry.captureException(error);
-
+const classifyClientErrorCode = (errorMessage: string): ChatErrorCode => {
   if (shouldIgnoreErrorForClient(errorMessage)) {
     return ChatErrorCode.IGNORED_ERROR;
   }
@@ -54,4 +45,27 @@ export const handleError = (error: Error) => {
   }
 
   return ChatErrorCode.UNKNOWN_ERROR;
+};
+
+export const resolveChatErrorCode = (error: Error) => {
+  const errorMessage = error.message;
+
+  if (shouldIgnoreErrorForDeveloper(errorMessage)) {
+    return ChatErrorCode.IGNORED_ERROR;
+  }
+
+  return classifyClientErrorCode(errorMessage);
+};
+
+export const handleError = (error: Error) => {
+  const errorMessage = error.message;
+
+  if (shouldIgnoreErrorForDeveloper(errorMessage)) {
+    return ChatErrorCode.IGNORED_ERROR;
+  }
+
+  console.error(error);
+  Sentry.captureException(error);
+
+  return classifyClientErrorCode(errorMessage);
 };

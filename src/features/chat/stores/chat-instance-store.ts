@@ -14,7 +14,6 @@ interface ChatInstanceStoreState {
     chatId: string,
     initialMessages: UIMessage[],
     callbacks: {
-      onError: (error: Error) => void;
       onFinish: () => void;
       onData: (data: any) => void;
     },
@@ -39,7 +38,6 @@ export const ChatInstanceStore = create<ChatInstanceStoreState>()(
         id: chatId,
         messages: initialMessages,
         transport: new ClientChatTransport(),
-        onError: callbacks.onError,
         onFinish: callbacks.onFinish,
         onData: callbacks.onData,
       });

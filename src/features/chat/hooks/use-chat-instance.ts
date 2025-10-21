@@ -10,7 +10,6 @@ import {
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { Cap } from '@/shared/types';
-import { ChatErrorCode, handleError } from '@/shared/utils/handle-error';
 import { ChatInstanceStore, ChatSessionsStore } from '../stores';
 import { convertToUIMessage } from '../utils';
 import { useUpdateChatTitle } from './use-update-chat-title';
@@ -58,39 +57,6 @@ export function useChatInstance(chatId: string, onStreamStart?: () => void) {
     }
     return null;
   };
-
-  // chat error handler
-  const handleChatError = useCallback(
-    (error: Error) => {
-      const errorCode = handleError(error);
-      switch (errorCode) {
-        case ChatErrorCode.IGNORED_ERROR:
-          return;
-        case ChatErrorCode.INSUFFICIENT_FUNDS:
-          toast.warning('Insufficient funds', {
-            description: 'Please top up your balance to continue',
-            duration: 8000,
-            action: {
-              label: 'Go to Wallet',
-              onClick: () => navigate('/wallet'),
-            },
-          });
-          break;
-        default:
-          toast.error('An error occurred', {
-            description: 'Please check your network connection and try again',
-            action: {
-              label: 'Retry',
-              onClick: () =>
-                console.warn(
-                  'Retry action needs to be handled by the component',
-                ),
-            },
-          });
-      }
-    },
-    [navigate],
-  );
 
   // chat data handler
   const handleOnData = useCallback(
@@ -148,7 +114,6 @@ export function useChatInstance(chatId: string, onStreamStart?: () => void) {
     initialMessages: chatSessions[chatId]
       ? chatSessions[chatId].messages.map(convertToUIMessage)
       : [],
-    onError: handleChatError,
     onFinish: handleOnFinish,
     onData: handleOnData,
   };
@@ -184,7 +149,6 @@ export function useChatInstance(chatId: string, onStreamStart?: () => void) {
 
   // return existing instance or create a new one from the store
   return getInstance(chatId, useChatInitConfig.initialMessages, {
-    onError: useChatInitConfig.onError,
     onFinish: useChatInitConfig.onFinish,
     onData: useChatInitConfig.onData,
   });
