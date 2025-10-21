@@ -1,4 +1,4 @@
-import { handleError } from '@/shared/utils/handl-error';
+import { handleError } from '@/shared/utils/handle-error';
 import { generateTitleFromUserMessage } from '../services';
 import { ChatSessionsStore } from '../stores';
 

@@ -11,7 +11,7 @@ import type { ChildMethods } from '@/shared/hooks/use-iframe-ui-renderer';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 import { generateUUID } from '@/shared/utils';
-import { ChatErrorCode, handleError } from '@/shared/utils/handl-error';
+import { ChatErrorCode, handleError } from '@/shared/utils/handle-error';
 import { CreateAIRequestStream } from '../services/stream-ai';
 
 // Saving status for artifact state persistence

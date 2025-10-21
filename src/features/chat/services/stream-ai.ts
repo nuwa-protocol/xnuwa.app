@@ -13,7 +13,7 @@ import { LLMProvider } from '@/shared/services/llm-providers';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import type { Cap } from '@/shared/types';
 import { generateUUID } from '@/shared/utils';
-import { handleError } from '@/shared/utils/handl-error';
+import { handleError } from '@/shared/utils/handle-error';
 import { ChatSessionsStore } from '../stores';
 
 // Handle AI request, entrance of the AI workflow

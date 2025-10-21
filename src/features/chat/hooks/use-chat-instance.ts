@@ -3,14 +3,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CapStudioStore } from '@/features/cap-studio/stores/cap-studio-stores';
 import type { LocalCap } from '@/features/cap-studio/types';
+import {
+  isOnResponseDataMark,
+  type OnResponseDataMark,
+} from '@/features/chat/types/marks';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { Cap } from '@/shared/types';
-import { ChatErrorCode, handleError } from '@/shared/utils/handl-error';
+import { ChatErrorCode, handleError } from '@/shared/utils/handle-error';
 import { ChatInstanceStore, ChatSessionsStore } from '../stores';
 import { convertToUIMessage } from '../utils';
 import { useUpdateChatTitle } from './use-update-chat-title';
-import { isOnResponseDataMark, type OnResponseDataMark } from '@/features/chat/types/marks';
 
 export function useChatInstance(chatId: string, onStreamStart?: () => void) {
   const navigate = useNavigate();
