@@ -2,6 +2,7 @@ import { ChevronLeft, Github, Globe, Info, Settings, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Markdown } from '@/shared/components/markdown';
 import {
   Button,
   Card,
@@ -100,6 +101,8 @@ export function CapDetails({ capId }: { capId: string }) {
     });
   };
 
+  const introduction = capQueryData.metadata.introduction?.trim();
+
   return (
     <div className="flex flex-col w-full h-full">
       {/* Content */}
@@ -185,9 +188,15 @@ export function CapDetails({ capId }: { capId: string }) {
                       <CardTitle className="text-xl">About This Cap</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground leading-relaxed text-base break-words">
-                        {capQueryData.metadata.introduction}
-                      </p>
+                      {introduction ? (
+                        <Markdown className="">
+                          {introduction}
+                        </Markdown>
+                      ) : (
+                        <p className="text-muted-foreground leading-relaxed text-base">
+                          No overview provided.
+                        </p>
+                      )}
                     </CardContent>
                   </Card>
                 </TabsContent>
