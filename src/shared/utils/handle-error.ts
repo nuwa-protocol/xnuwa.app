@@ -60,6 +60,8 @@ export const resolveChatErrorCode = (error: Error) => {
 export const handleError = (error: Error) => {
   const errorMessage = error.message;
 
+  console.error('[Handle Chat Error]', errorMessage);
+
   if (shouldIgnoreErrorForDeveloper(errorMessage)) {
     return ChatErrorCode.IGNORED_ERROR;
   }

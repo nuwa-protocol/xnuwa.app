@@ -70,7 +70,7 @@
     "@stepperize/react": "^5.1.8",
     "@tailwindcss/typography": "^0.5.16",
     "@web3icons/react": "^4.0.19",
-    "ai": "^5.0.60",
+    "ai": "^5.0.76",
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",

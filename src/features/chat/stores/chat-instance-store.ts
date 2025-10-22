@@ -4,6 +4,7 @@
 import { Chat } from '@ai-sdk/react';
 import type { UIMessage } from 'ai';
 import { create } from 'zustand';
+import { handleError } from '@/shared/utils/handle-error';
 import { ClientChatTransport } from '../services';
 
 interface ChatInstanceStoreState {
@@ -40,6 +41,7 @@ export const ChatInstanceStore = create<ChatInstanceStoreState>()(
         transport: new ClientChatTransport(),
         onFinish: callbacks.onFinish,
         onData: callbacks.onData,
+        onError: handleError,
       });
 
       // Store the new instance using queueMicrotask to avoid setState during render
