@@ -47,10 +47,10 @@ const fetchAndUpdateLiveCap = async (
   if (Array.isArray(data)) {
     throw new Error('Live YAML must describe a single cap object.');
   }
-
+  // TODO: wait for cap kit to upgrade
   const validated = CapSchema.parse({
     ...data,
-    authorDID: localCap.capData.authorDID,
+    authorDID: 'did::unknown',
     id: `${localCap.capData.authorDID}:${data.idName}`,
   });
 
