@@ -1,39 +1,23 @@
+// _worker.js
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
     const url = new URL(request.url);
 
     if (url.pathname.startsWith('/docs')) {
-      // proxy to Mintlify hosted docs
-      const target = new URL(url);
-      target.hostname = 'docs.nuwa.dev';
-      target.protocol = 'https:';
-      target.pathname = url.pathname.replace(/^\/docs/, ''); // remove /docs prefix
+      const path = url.pathname.replace('/docs', '') || '/';
+      const target = `https://docs.nuwa.dev${path}${url.search}`;
 
-      // keep query params
-      target.search = url.search;
-
-      const headers = new Headers(request.headers);
-      headers.delete('host'); // let fetch set host based on the new URL
-
-      const rewrittenPath = url.pathname.replace(/^\/docs/, '') || '/';
-      target.pathname = rewrittenPath.startsWith('/') ? rewrittenPath : `/${rewrittenPath}`;
-
-      const init = {
+      const response = await fetch(target, {
         method: request.method,
-        headers,
-      };
+        headers: request.headers,
+        body: request.method !== 'GET' ? request.body : undefined,
+      });
 
-      if (request.method !== 'GET' && request.method !== 'HEAD') {
-        init.body = request.body;
-      }
-
-      const upstreamResponse = await fetch(target.toString(), init);
-      const response = new Response(upstreamResponse.body, upstreamResponse);
-      response.headers.set('Cache-Control', 'max-age=600');
-      return response;
+      const newResponse = new Response(response.body, response);
+      newResponse.headers.set('Cache-Control', 'public, max-age=600');
+      return newResponse;
     }
 
-    // other paths go to React static assets
     return env.ASSETS.fetch(request);
   },
 };
