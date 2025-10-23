@@ -4,13 +4,12 @@ Allow: /
 # Sitemap location
 Sitemap: https://nuwa.ai/sitemap.xml
 
-# Allow crawling of cap store pages
+# Allow crawling
 Allow: /cap-store
 Allow: /cap-studio
+Allow: /docs/
 
-# Block sensitive areas
-Disallow: /api/
-Disallow: /admin/
+# Block did guarded paths
 Disallow: /settings/
 Disallow: /wallet/
 
