@@ -30,35 +30,69 @@ ${urlEntries}
 </urlset>`;
 }
 
-export function generateBasicSitemap(baseUrl: string): string {
-  const staticUrls: SitemapUrl[] = [
+function buildStaticUrls(baseUrl: string): SitemapUrl[] {
+  const today = new Date().toISOString().split('T')[0];
+
+  return [
     {
       loc: baseUrl,
       changefreq: 'daily',
       priority: 1.0,
-      lastmod: new Date().toISOString().split('T')[0],
+      lastmod: today,
     },
     {
-      loc: `${baseUrl}/cap-store`,
+      loc: `${baseUrl}/explore`,
       changefreq: 'hourly',
       priority: 0.9,
-      lastmod: new Date().toISOString().split('T')[0],
+      lastmod: today,
+    },
+    {
+      loc: `${baseUrl}/explore/caps`,
+      changefreq: 'hourly',
+      priority: 0.85,
+      lastmod: today,
+    },
+    {
+      loc: `${baseUrl}/explore/installed`,
+      changefreq: 'daily',
+      priority: 0.6,
+      lastmod: today,
     },
     {
       loc: `${baseUrl}/cap-studio`,
       changefreq: 'weekly',
       priority: 0.8,
-      lastmod: new Date().toISOString().split('T')[0],
+      lastmod: today,
     },
     {
       loc: `${baseUrl}/chat`,
       changefreq: 'daily',
       priority: 0.8,
-      lastmod: new Date().toISOString().split('T')[0],
+      lastmod: today,
+    },
+    {
+      loc: `${baseUrl}/wallet`,
+      changefreq: 'weekly',
+      priority: 0.5,
+      lastmod: today,
+    },
+    {
+      loc: `${baseUrl}/settings`,
+      changefreq: 'weekly',
+      priority: 0.5,
+      lastmod: today,
+    },
+    {
+      loc: `${baseUrl}/docs`,
+      changefreq: 'daily',
+      priority: 0.6,
+      lastmod: today,
     },
   ];
+}
 
-  return generateSitemap(staticUrls);
+export function generateBasicSitemap(baseUrl: string): string {
+  return generateSitemap(buildStaticUrls(baseUrl));
 }
 
 // Function to generate sitemap with cap pages
@@ -69,42 +103,22 @@ export function generateCapSitemap(
     submittedAt?: number;
   }>,
 ): string {
+  const today = new Date().toISOString().split('T')[0];
+  const staticUrls = buildStaticUrls(baseUrl);
   const capUrls: SitemapUrl[] = caps.map((cap) => ({
-    loc: `${baseUrl}/cap-store/${cap.idName}`,
+    loc: `${baseUrl}/explore/caps/${cap.idName}`,
     changefreq: 'weekly',
     priority: 0.7,
     lastmod: cap.submittedAt
       ? new Date(cap.submittedAt).toISOString().split('T')[0]
-      : new Date().toISOString().split('T')[0],
+      : today,
   }));
 
-  const staticUrls = generateBasicSitemap(baseUrl);
-  const allUrls = [
-    ...JSON.parse(
-      staticUrls.replace(
-        /[\s\S]*<urlset[^>]*>([\s\S]*)<\/urlset>[\s\S]*/,
-        '$1',
-      ),
-    )
-      .split('</url>')
-      .filter((url: string) => url.trim())
-      .map((url: string) => {
-        const loc = url.match(/<loc>(.*?)<\/loc>/)?.[1] || '';
-        const lastmod = url.match(/<lastmod>(.*?)<\/lastmod>/)?.[1];
-        const changefreq = url.match(
-          /<changefreq>(.*?)<\/changefreq>/,
-        )?.[1] as any;
-        const priority = url.match(/<priority>(.*?)<\/priority>/)?.[1];
+  const urlMap = new Map<string, SitemapUrl>();
 
-        return {
-          loc,
-          lastmod,
-          changefreq,
-          priority: priority ? parseFloat(priority) : undefined,
-        };
-      }),
-    ...capUrls,
-  ];
+  [...staticUrls, ...capUrls].forEach((url) => {
+    urlMap.set(url.loc, url);
+  });
 
-  return generateSitemap(allUrls);
+  return generateSitemap(Array.from(urlMap.values()));
 }
