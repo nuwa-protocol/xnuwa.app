@@ -12,10 +12,13 @@ export default {
       // keep query params
       target.search = url.search;
 
+      const headers = new Headers(request.headers);
+      headers.delete('host');
+
       const response = await fetch(target.toString(), {
-        headers: request.headers,
+        headers,
         method: request.method,
-        body: request.body,
+        body: request.method === 'GET' || request.method === 'HEAD' ? undefined : request.body,
       });
       response.headers.set('Cache-Control', 'max-age=600');
       return response;
