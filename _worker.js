@@ -13,13 +13,22 @@ export default {
       target.search = url.search;
 
       const headers = new Headers(request.headers);
-      headers.delete('host');
+      headers.delete('host'); // let fetch set host based on the new URL
 
-      const response = await fetch(target.toString(), {
-        headers,
+      const rewrittenPath = url.pathname.replace(/^\/docs/, '') || '/';
+      target.pathname = rewrittenPath.startsWith('/') ? rewrittenPath : `/${rewrittenPath}`;
+
+      const init = {
         method: request.method,
-        body: request.method === 'GET' || request.method === 'HEAD' ? undefined : request.body,
-      });
+        headers,
+      };
+
+      if (request.method !== 'GET' && request.method !== 'HEAD') {
+        init.body = request.body;
+      }
+
+      const upstreamResponse = await fetch(target.toString(), init);
+      const response = new Response(upstreamResponse.body, upstreamResponse);
       response.headers.set('Cache-Control', 'max-age=600');
       return response;
     }
