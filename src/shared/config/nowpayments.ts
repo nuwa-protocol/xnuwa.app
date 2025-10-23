@@ -3,7 +3,7 @@
  */
 
 export const NOWPAYMENTS_IPN_CALLBACK_URL =
-  'https://nowpayment-service-test.up.railway.app/webhook/nowpayments';
+  'https://test-payment.nuwa.dev/webhook/nowpayments';
 
 interface NowPaymentsConfig {
   appUrl: string;
@@ -16,7 +16,7 @@ export function getNowPaymentsConfig(): NowPaymentsConfig {
   return {
     appUrl:
       import.meta.env.VITE_APP_URL ||
-      'https://nowpayment-service-test.up.railway.app',
+      'https://test-payment.nuwa.dev',
     appName: import.meta.env.VITE_APP_NAME || 'NUWA Client',
     isDevelopment: import.meta.env.MODE === 'development',
   };
