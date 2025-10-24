@@ -13,8 +13,8 @@ import { cn } from '@/shared/utils';
 import { Loader } from './loader';
 import { MessageActions } from './message-actions';
 import { MessageCap } from './message-cap';
-import { MessageError } from './message-error';
 import { ClearContextMessage } from './message-clear-context';
+import { MessageError } from './message-error';
 import { MessageImage } from './message-image';
 import { RemoteMCPTool } from './message-mcp-tool';
 import { MessageMCPUI } from './message-mcp-ui';
@@ -102,7 +102,8 @@ const PurePreviewMessage = ({
 
   if (isClearContextMessage) return <ClearContextMessage />;
 
-  if (message.parts?.length === 0 && !error) return <Loader minHeight={minHeight} />;
+  if (message.parts?.length === 0 && !error)
+    return <Loader minHeight={minHeight} />;
 
   // Find the onResponse data mark part
   const onResponsePart = (() => {
@@ -145,9 +146,7 @@ const PurePreviewMessage = ({
                     : undefined
                 }
                 onOpenWallet={
-                  message.role === 'assistant'
-                    ? handleOpenWallet
-                    : undefined
+                  message.role === 'assistant' ? handleOpenWallet : undefined
                 }
               />
             ) : (
@@ -216,8 +215,8 @@ const PurePreviewMessage = ({
                       const rawToolName = type.slice('tool-'.length);
                       const formattedToolName = rawToolName
                         ? rawToolName
-                            .replace(/[-_]/g, ' ')
-                            .replace(/\b\w/g, (char) => char.toUpperCase())
+                          .replace(/[-_]/g, ' ')
+                          .replace(/\b\w/g, (char) => char.toUpperCase())
                         : 'Tool';
                       const { state } = part as ToolUIPart;
                       if (state === 'input-streaming') {
@@ -245,7 +244,14 @@ const PurePreviewMessage = ({
                     }
 
                     if (type === 'dynamic-tool') {
-                      const { toolCallId, state, input, output, toolName } = part;
+                      const {
+                        toolCallId,
+                        state,
+                        input,
+                        output,
+                        toolName,
+                        errorText,
+                      } = part;
 
                       const uiRes = (output as any)?.content?.find((c: any) =>
                         isUIResource(c as any),
@@ -267,6 +273,7 @@ const PurePreviewMessage = ({
                           toolCallId={toolCallId}
                           toolName={toolName}
                           state={state}
+                          errorText={errorText}
                         />
                       );
                     }
