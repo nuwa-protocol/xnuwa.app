@@ -1,5 +1,5 @@
-import { createUnifiedMcpClient } from '@/shared/services/unified-mcp-client';
 import type { Cap } from '@/shared/types';
+import { createX402MCPClient } from './x402-mcp-client';
 
 interface RemoteMCPInstance {
   clients: Map<string, any>;
@@ -32,10 +32,7 @@ class RemoteMCPManager {
     }
 
     // Clean up existing instance if switching caps
-    if (
-      this.currentInstance &&
-      this.currentCapId !== cap.id
-    ) {
+    if (this.currentInstance && this.currentCapId !== cap.id) {
       await this.cleanup();
     }
 
@@ -55,7 +52,7 @@ class RemoteMCPManager {
       // Initialize all MCP clients using unified client
       for (const [serverName, server] of Object.entries(mcpServers)) {
         // Use unified MCP client which automatically detects server type
-        const client = await createUnifiedMcpClient(server);
+        const client = await createX402MCPClient(server);
         clients.set(serverName, client);
       }
 

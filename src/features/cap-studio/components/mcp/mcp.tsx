@@ -2,6 +2,7 @@
 
 import Form from '@rjsf/shadcn';
 import validator from '@rjsf/validator-ajv8';
+import type { experimental_MCPClient as MCPClient } from 'ai';
 import {
   ArrowLeft,
   BrushCleaning,
@@ -32,11 +33,7 @@ import {
   SelectValue,
 } from '@/shared/components/ui';
 import { onMcpOAuthEvent } from '@/shared/services/mcp-oauth-event';
-import {
-  closeUnifiedMcpClient,
-  createUnifiedMcpClient,
-} from '@/shared/services/unified-mcp-client';
-import type { NuwaMCPClient } from '@/shared/types';
+import { createX402MCPClient } from '@/shared/services/x402-mcp-client';
 
 interface LogEntry {
   id: string;
@@ -62,7 +59,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   const [mcpType, setMcpType] = useState<MCPType>('Remote MCP');
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  const [client, setClient] = useState<NuwaMCPClient | null>(null);
+  const [client, setClient] = useState<MCPClient | null>(null);
   const [tools, setTools] = useState<Record<string, any>>({});
   const [toolParams, setToolParams] = useState<Record<string, any>>({});
   const [toolSearch, setToolSearch] = useState<string>('');
@@ -120,7 +117,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       }
 
       // Use unified MCP client which automatically detects server type
-      const newClient = await createUnifiedMcpClient(url);
+      const newClient = await createX402MCPClient(url);
       setClient(newClient);
 
       pushLog({
@@ -134,21 +131,6 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       setConnected(true);
     } catch (err) {
       const error = err as { [key: string]: any } | undefined;
-
-      if (error?.code === 'OAUTH_FLOW_INITIATED') {
-        pushLog({
-          type: 'info',
-          message: `MCP Server requires authentication. Please complete the OAuth flow and try again.`,
-        });
-        await closeUnifiedMcpClient(url);
-        return;
-      } else {
-        pushLog({
-          type: 'error',
-          message: `Connection failed: ${String(error)}`,
-        });
-      }
-      await closeUnifiedMcpClient(url);
     } finally {
       setConnecting(false);
     }
@@ -222,7 +204,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
   }, [url, pushLog, handleConnect, connecting]);
 
   const handleToolsDiscovery = useCallback(
-    async (mcpClient: NuwaMCPClient) => {
+    async (mcpClient: MCPClient) => {
       // Fetch server capabilities
       const toolsList = await mcpClient.tools();
       setTools(toolsList);
@@ -516,7 +498,9 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
       <div
         className={`flex-1 space-y-6 p-8 ${
           // Make the left pane the only scroll container in Artifact MCP mode
-          mcpType === 'Artifact MCP' ? 'overflow-y-auto min-h-0 pr-2' : 'max-w-4xl mx-auto'
+          mcpType === 'Artifact MCP'
+            ? 'overflow-y-auto min-h-0 pr-2'
+            : 'max-w-4xl mx-auto'
           }`}
       >
         {/* Header */}
