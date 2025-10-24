@@ -56,7 +56,7 @@ const RemoteMCPToolResult = ({
       <ToolInput input={input} />
       <ToolOutput
         output={!errorText ? <ToolResult result={output} /> : undefined}
-        errorText={errorText}
+        errorText={undefined}
       />
     </div>
   );
@@ -81,10 +81,10 @@ export const RemoteMCPTool = ({
     <Tool key={toolCallId} defaultOpen={false}>
       <ToolHeader type={`tool-${toolName}`} state={state} />
       <ToolContent>
-        {state === 'input-available' || state === 'input-streaming' && (
+        {(state === 'input-available' || state === 'input-streaming') && (
           <RemoteMCPToolLoading input={input} toolCallId={toolCallId} />
         )}
-        {state === 'output-available' || state === 'output-error' && (
+        {(state === 'output-available' || state === 'output-error') && (
           <RemoteMCPToolResult
             input={input}
             output={output}
