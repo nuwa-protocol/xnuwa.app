@@ -9,11 +9,11 @@ import { createTogetherAI } from '@ai-sdk/togetherai';
 import { createXai } from '@ai-sdk/xai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
-import { createPaymentFetch } from '@/shared/services/payment-fetch';
 import type { CapModel } from '@/shared/types';
+import { createPaymentFetch } from './x402-payment-fetch';
 
 export const LLMProvider = (model: CapModel) => {
-  const paymentFetch = createPaymentFetch({ extraBody: model.parameters });
+  const paymentFetch = createPaymentFetch();
   const providerSettings = {
     apiKey: 'NOT-USED', // specify a fake api key to avoid SDK errors, the authorization header will be removed before sending to the gateway
     baseURL: model.customGatewayUrl || LLM_GATEWAY_BASE_URL,
