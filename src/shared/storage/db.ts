@@ -28,11 +28,19 @@ export interface InstalledCapRecord {
   updatedAt: number;
 }
 
+export interface AccountRecord {
+  address: string;
+  data: any; // AccountData object
+  isCurrent?: boolean; // 标记是否为当前选中的账户
+  updatedAt: number;
+}
+
 class Database extends Dexie {
   chatSessions!: Table<ChatSessionRecord>;
   capStudio!: Table<CapStudioRecord>;
   artifacts!: Table<ArtifactRecord>;
   installedCaps!: Table<InstalledCapRecord>;
+  accounts!: Table<AccountRecord>;
 
   constructor() {
     if (typeof window === 'undefined') {
@@ -55,6 +63,24 @@ class Database extends Dexie {
       capStudio: '[id+did], id, did, updatedAt',
       artifacts: '[id+did], id, did, updatedAt',
       installedCaps: '[id+did], id, did, updatedAt',
+    });
+
+    // v3: add accounts table
+    this.version(3).stores({
+      chatSessions: '[chatId+did], chatId, did, updatedAt',
+      capStudio: '[id+did], id, did, updatedAt',
+      artifacts: '[id+did], id, did, updatedAt',
+      installedCaps: '[id+did], id, did, updatedAt',
+      accounts: 'address, updatedAt',
+    });
+
+    // v4: add isCurrent field to accounts table
+    this.version(4).stores({
+      chatSessions: '[chatId+did], chatId, did, updatedAt',
+      capStudio: '[id+did], id, did, updatedAt',
+      artifacts: '[id+did], id, did, updatedAt',
+      installedCaps: '[id+did], id, did, updatedAt',
+      accounts: 'address, isCurrent, updatedAt',
     });
   }
 }

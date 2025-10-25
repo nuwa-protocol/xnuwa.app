@@ -25,6 +25,18 @@ class RehydrationTracker {
     return storeNames.every((name) => this.stores[name]);
   }
 
+  isAuthRehydrated(): boolean {
+    const storeNames = Object.keys(this.stores);
+    // 如果没有注册任何store，则认为已经完成rehydration
+    if (storeNames.length === 0) {
+      return true;
+    }
+    return (
+      storeNames.includes('account-store') &&
+      this.stores['account-store'] === true
+    );
+  }
+
   subscribe(callback: () => void) {
     this.listeners.add(callback);
     return () => this.listeners.delete(callback);
@@ -60,4 +72,23 @@ export function useRehydration() {
   }, []);
 
   return isAllRehydrated;
+}
+
+export function useAuthRehydration() {
+  const [isAuthRehydrated, setIsAuthRehydrated] = useState(false);
+
+  useEffect(() => {
+    const checkAuthRehydration = () => {
+      setIsAuthRehydrated(rehydrationTracker.isAuthRehydrated());
+    };
+
+    checkAuthRehydration();
+    const unsubscribe = rehydrationTracker.subscribe(checkAuthRehydration);
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  return isAuthRehydrated;
 }

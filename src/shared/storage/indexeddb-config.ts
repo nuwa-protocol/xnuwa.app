@@ -2,6 +2,7 @@ import { createJSONStorage, type StateStorage } from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { rehydrationTracker } from '../hooks/use-rehydration';
 import {
+  type AccountRecord,
   type ArtifactRecord,
   type CapStudioRecord,
   type ChatSessionRecord,
@@ -329,6 +330,73 @@ export class InstalledCapsStorage implements StateStorage {
   }
 }
 
+export class AccountsStorage implements StateStorage {
+  async getItem(name: string): Promise<string | null> {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      // Get all account records
+      const records = await db.accounts.toArray();
+
+      if (records.length === 0) return null;
+
+      // Convert records back to accounts format
+      const accounts = records.map((record) => record.data);
+
+      // Return in zustand persist format: { state: { accounts: ... }, version: 0 }
+      return JSON.stringify({
+        state: { accounts },
+        version: 0,
+      });
+    } catch (error) {
+      console.error(`Failed to get accounts from IndexedDB:`, error);
+      return null;
+    }
+  }
+
+  async setItem(name: string, value: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const parsedData = JSON.parse(value);
+
+      // Handle zustand persist wrapper format: { state: { accounts: ... }, version: 0 }
+      const accounts = parsedData.state?.accounts || parsedData.accounts;
+
+      if (!accounts || accounts.length === 0) {
+        return;
+      }
+
+      // Clear existing accounts
+      await db.accounts.clear();
+
+      // Save each account as a separate record
+      const records: AccountRecord[] = accounts.map((account: any) => ({
+        address: account.address,
+        data: account,
+        updatedAt: Date.now(),
+      }));
+
+      if (records.length > 0) {
+        await db.accounts.bulkPut(records);
+      }
+    } catch (error) {
+      console.error(`Failed to set accounts in IndexedDB:`, error);
+      throw error;
+    }
+  }
+
+  async removeItem(name: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+
+    try {
+      await db.accounts.clear();
+    } catch (error) {
+      console.error(`Failed to remove accounts from IndexedDB:`, error);
+    }
+  }
+}
+
 /**
  * Persist config generator for ChatSessions
  */
@@ -402,6 +470,120 @@ export function createInstalledCapsPersistConfig<T>(config: PersistConfig<T>) {
   return {
     name: config.name,
     storage: createJSONStorage(() => new InstalledCapsStorage()),
+    partialize: config.partialize,
+    onRehydrateStorage: () => {
+      return (state: T | undefined, error: unknown) => {
+        if (!error && state) {
+          rehydrationTracker.markRehydrated(config.name);
+        }
+      };
+    },
+  };
+}
+
+/**
+ * Storage class for complete account state (accounts + current account)
+ */
+export class AccountStateStorage implements StateStorage {
+  async getItem(name: string): Promise<string | null> {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      // Get all account records
+      const accountRecords = await db.accounts.toArray();
+      const accounts = accountRecords.map((record) => record.data);
+
+      // Find current account (marked with isCurrent: true)
+      const currentAccountRecord = accountRecords.find(
+        (record) => record.isCurrent,
+      );
+      const currentAccount = currentAccountRecord
+        ? currentAccountRecord.data
+        : null;
+
+      // Return in zustand persist format
+      return JSON.stringify({
+        state: {
+          accounts,
+          account: currentAccount, // 使用 account 而不是 currentAccount 以匹配 store 结构
+        },
+        version: 0,
+      });
+    } catch (error) {
+      console.error(`Failed to get account state from IndexedDB:`, error);
+      return null;
+    }
+  }
+
+  async setItem(name: string, value: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const parsedData = JSON.parse(value);
+      const { accounts, account } = parsedData.state;
+
+      // Clear existing accounts
+      await db.accounts.clear();
+
+      if (accounts && accounts.length > 0) {
+        // Save each account as a separate record
+        const records: AccountRecord[] = accounts.map((accountData: any) => ({
+          address: accountData.address,
+          data: accountData,
+          isCurrent: account && account.address === accountData.address, // 标记当前账户
+          updatedAt: Date.now(),
+        }));
+
+        await db.accounts.bulkPut(records);
+      }
+    } catch (error) {
+      console.error(`Failed to set account state in IndexedDB:`, error);
+      throw error;
+    }
+  }
+
+  async removeItem(name: string): Promise<void> {
+    if (typeof window === 'undefined') return;
+
+    try {
+      await db.accounts.clear();
+    } catch (error) {
+      console.error(`Failed to remove account state from IndexedDB:`, error);
+    }
+  }
+}
+
+/**
+ * Persist config generator for Accounts
+ */
+export function createAccountsPersistConfig<T>(config: PersistConfig<T>) {
+  // Register this store with the rehydration tracker
+  rehydrationTracker.registerStore(config.name);
+
+  return {
+    name: config.name,
+    storage: createJSONStorage(() => new AccountsStorage()),
+    partialize: config.partialize,
+    onRehydrateStorage: () => {
+      return (state: T | undefined, error: unknown) => {
+        if (!error && state) {
+          rehydrationTracker.markRehydrated(config.name);
+        }
+      };
+    },
+  };
+}
+
+/**
+ * Persist config generator for complete Account State (accounts + current account)
+ */
+export function createAccountStatePersistConfig<T>(config: PersistConfig<T>) {
+  // Register this store with the rehydration tracker
+  rehydrationTracker.registerStore(config.name);
+
+  return {
+    name: config.name,
+    storage: createJSONStorage(() => new AccountStateStorage()),
     partialize: config.partialize,
     onRehydrateStorage: () => {
       return (state: T | undefined, error: unknown) => {

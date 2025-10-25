@@ -1,22 +1,18 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ConnectButton } from '@/features/auth/components';
+import { CreateAccountButton } from '@/features/auth/components/create-account-button';
+import { AccountStore } from '@/features/auth/store';
 import { Logo } from '@/shared/components/logo';
 import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
-import { useAuth } from '@/shared/hooks';
-import { useLanguage } from '@/shared/hooks/use-language';
 
 export default function LoginPage() {
-  const navigate = useNavigate();
-  const { isConnected } = useAuth();
-  const { t } = useLanguage();
+  const { account } = AccountStore();
 
   // if already logged in, redirect to home
   useEffect(() => {
-    if (isConnected) {
+    if (account !== null) {
       window.location.replace('/');
     }
-  }, [isConnected]);
+  }, [account]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-fuchsia-100 dark:from-gray-900 dark:via-purple-900 dark:to-fuchsia-900 p-4 relative">
@@ -32,7 +28,7 @@ export default function LoginPage() {
           </CardHeader>
 
           <CardContent className="pb-8">
-            <ConnectButton />
+            <CreateAccountButton />
           </CardContent>
         </Card>
       </div>

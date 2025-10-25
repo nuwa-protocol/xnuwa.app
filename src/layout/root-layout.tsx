@@ -1,18 +1,18 @@
-import { Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { AuthGuard } from '@/features/auth/components';
+import { AccountAuthGuard } from '@/features/auth/components/account-auth-guard';
 import { useWalletBalanceManager } from '@/features/wallet/hooks/use-wallet-balance-manager';
 import { useLiveCapConnections } from '@/shared/hooks';
 import { useAutoLoadingDetection } from '@/shared/hooks/use-auto-loading-detection';
-import { MobileWarning } from '../shared/components/mobile-warning';
-import { ThemeProvider } from '../shared/components/theme-provider';
 import { McpOAuthDialogManager } from '../shared/components/mcp-oauth-dialog';
+import { MobileWarning } from '../shared/components/mobile-warning';
 import {
-  StructuredData,
-  generateWebSiteSchema,
   generateOrganizationSchema,
+  generateWebSiteSchema,
+  StructuredData,
 } from '../shared/components/structured-data';
+import { ThemeProvider } from '../shared/components/theme-provider';
 
 export default function RootLayout() {
   // Initialize wallet balance manager
@@ -45,11 +45,11 @@ export default function RootLayout() {
           <StructuredData data={generateOrganizationSchema()} />
         </>
       ) : (
-        <AuthGuard>
+        <AccountAuthGuard>
           <Toaster position="top-center" expand={true} richColors />
           <McpOAuthDialogManager />
           <Outlet />
-        </AuthGuard>
+        </AccountAuthGuard>
       )}
     </ThemeProvider>
   );
