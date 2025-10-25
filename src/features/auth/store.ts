@@ -479,7 +479,11 @@ export const AccountStore = create<AccountStoreState>()(
             privateKey = await get()._authenticateWithPasskey();
           } catch (passkeyError) {
             // Passkey 失败，回退到 PIN 码
-            const { authRequestCallback, _authenticateWithPin } = get();
+            const {
+              authRequestCallback,
+              _authenticateWithPin,
+              _authenticateWithPasskey,
+            } = get();
 
             if (!authRequestCallback) {
               throw new Error('未设置授权回调，无法进行授权');
@@ -494,10 +498,13 @@ export const AccountStore = create<AccountStoreState>()(
               true,
             ); // 传入 fallback 标志
 
-            if (authResult.method !== 'pin' || !authResult.pin) {
+            if (authResult.method === 'passkey') {
+              privateKey = await _authenticateWithPasskey();
+            } else if (authResult.method === 'pin' && authResult.pin) {
+              privateKey = await _authenticateWithPin(authResult.pin);
+            } else {
               throw new Error('PIN 码不能为空');
             }
-            privateKey = await _authenticateWithPin(authResult.pin);
           }
         } else {
           // 没有 passkey，直接使用 PIN 码
