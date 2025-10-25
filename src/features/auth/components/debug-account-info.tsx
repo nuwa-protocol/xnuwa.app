@@ -17,7 +17,7 @@ export function DebugAccountInfo() {
         createAccount,
         deleteAccount,
         renameAccount,
-        switchAccount,
+        setCurrentAccount,
         setSessionDuration,
         getSessionExpiresAt,
         getAccountData,
@@ -198,7 +198,7 @@ export function DebugAccountInfo() {
         const nextAccount = accounts[nextIndex];
 
         try {
-            switchAccount(nextAccount.address);
+            setCurrentAccount(nextAccount.address);
             toast.success(`Switched to ${nextAccount.name}`);
         } catch (error) {
             toast.error(error instanceof Error ? error.message : String(error));
@@ -370,7 +370,7 @@ export function DebugAccountInfo() {
                                 <button
                                     key={acc.address}
                                     type="button"
-                                    onClick={() => switchAccount(acc.address)}
+                                    onClick={() => setCurrentAccount(acc.address)}
                                     className={`text-left w-full text-xs p-1 rounded transition hover:bg-primary/20 ${acc.address === account.address
                                         ? 'bg-primary/10 text-primary'
                                         : 'bg-muted/50'

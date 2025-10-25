@@ -21,7 +21,7 @@ export function AboutSection() {
     setIsLoggingOut(true);
     try {
       await logout();
-      navigate('/login');
+      navigate('/');
       toast.success(
         t('settings.profile.logout.success') || 'Successfully logged out',
       );

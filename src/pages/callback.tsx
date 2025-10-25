@@ -44,7 +44,7 @@ export default function CallbackPage() {
             ? err.message
             : 'Failed to process authorization.',
         );
-        setTimeout(() => navigate('/login'), 2000);
+        setTimeout(() => navigate('/'), 2000);
       }
     };
 

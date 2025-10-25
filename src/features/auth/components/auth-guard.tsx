@@ -1,35 +1,27 @@
-import { createContext, type ReactNode, useEffect } from 'react';
+import { createContext, useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/shared/hooks/use-auth';
+import { useAuthRehydration } from '@/shared/hooks';
+import { AccountStore } from '../store';
 
-type AuthGuardValue = ReturnType<typeof useAuth>;
+type AuthGuardValue = ReturnType<typeof AccountStore>;
 
 const AuthGuardContext = createContext<AuthGuardValue | null>(null);
 
 export function AuthGuard({ children }: { children: ReactNode }) {
-  const { did, isConnecting, isConnected, isError, isInitializing } = useAuth();
-
+  const { account } = AccountStore();
+  const isAuthRehydrated = useAuthRehydration();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Avoid redirect until SDK initialization completes
-    if (isInitializing) {
-      return;
-    }
-
-    if (!isConnecting && !isConnected) {
-      navigate('/login');
-    }
-  }, [isInitializing, isConnecting, isConnected, navigate]);
+    if (!isAuthRehydrated) return;
+    if (account) return;
+    navigate('/', { replace: true });
+  }, [account, isAuthRehydrated, navigate]);
 
   return (
     <AuthGuardContext.Provider
       value={{
-        did,
-        isConnecting,
-        isConnected,
-        isError,
-        isInitializing,
+        account,
       }}
     >
       {children}

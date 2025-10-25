@@ -66,8 +66,8 @@ renameAccount(address: string, newName: string): Promise<void>
 // 获取账户信息
 getAccount(address: string): AccountData | undefined
 
-// 切换账户
-switchAccount(address: string): void
+// 设置当前账户
+setCurrentAccount(address: string): void
 ```
 
 ### 认证管理方法
@@ -119,8 +119,8 @@ const signature = await currentAccount.signMessage({ message: "Hello" });
 // 创建新账户
 const newAccount = await accountStore.createAccount("我的账户", "123456");
 
-// 切换账户
-accountStore.switchAccount("0x...");
+// 切换账户（设置后会自动刷新页面以加载对应数据）
+accountStore.setCurrentAccount("0x...");
 
 // 重命名账户
 await accountStore.renameAccount("0x...", "新名称");

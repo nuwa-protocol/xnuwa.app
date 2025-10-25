@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { AccountLoginDialog } from '@/features/auth/components/account-login-dialog';
+import { AccountStore } from '@/features/auth/store';
 import { CapStoreLoading } from '@/features/cap-store/components/cap-store-loading';
 import { GridPattern } from '@/shared/components/ui/shadcn-io/grid-pattern';
+import { useAuthRehydration } from '@/shared/hooks';
 import { cn } from '@/shared/utils';
 
 // Lazy-load the Cap Store home content to avoid blocking route transition
@@ -12,11 +15,18 @@ const LazyCapStoreHomeContent = lazy(() =>
 );
 
 export function LandingPage() {
+  const account = AccountStore((state) => state.account);
+  const isAuthRehydrated = useAuthRehydration();
   const [squares, setSquares] = useState<Array<[number, number]>>([]);
   const [showHome, setShowHome] = useState(false);
 
   // Generate randomized squares for the grid pattern based on viewport size
   useEffect(() => {
+    if (!account) {
+      setSquares([]);
+      return;
+    }
+
     const CELL_SIZE = 40; // keep in sync with GridPattern props
     const DENSITY = 0.05; // ~5% of cells filled
 
@@ -47,10 +57,15 @@ export function LandingPage() {
     generateSquares();
     window.addEventListener('resize', generateSquares);
     return () => window.removeEventListener('resize', generateSquares);
-  }, []);
+  }, [account]);
 
   // Defer loading of heavy home content until idle for snappier navigation
   useEffect(() => {
+    if (!account) {
+      setShowHome(false);
+      return;
+    }
+
     const schedule = (cb: () => void) => {
       // Prefer requestIdleCallback if available
       if (typeof (window as any).requestIdleCallback === 'function') {
@@ -62,7 +77,26 @@ export function LandingPage() {
     };
     const cancel = schedule(() => setShowHome(true));
     return cancel;
-  }, []);
+  }, [account]);
+
+  if (!isAuthRehydrated) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  if (!account) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-center p-6 relative">
+        <AccountLoginDialog open />
+        <div className="space-y-4">
+          <p className="text-2xl font-semibold">Welcome to Nuwa</p>
+          <p className="text-muted-foreground max-w-md">
+            Placeholder for the future landing experience. Use the wallet dialog to
+            sign in or create an account.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col relative overflow-y-auto hide-scrollbar">

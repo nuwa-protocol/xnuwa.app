@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/react';
 import { sentryConfig } from '../config/sentry';
 import { CurrentCapStore } from '../stores/current-cap-store';
-import { NuwaIdentityKit } from './identity-kit';
 
 export function initSentry() {
   Sentry.init({
@@ -43,28 +42,6 @@ export function initSentry() {
           ...event.contexts,
           cap: currentCap,
         };
-      }
-
-      // Add DID to event
-      try {
-        const did = await NuwaIdentityKit().getDid();
-        const keyIds = await (
-          await NuwaIdentityKit().getKeyManager()
-        ).listKeyIds();
-        if (did && keyIds) {
-          event.user = {
-            ...event.user,
-            id: did,
-            key_ids: keyIds,
-          };
-          event.tags = {
-            ...event.tags,
-            user_did: did,
-          };
-        }
-      } catch (error) {
-        console.error('beforeSend failed:', error);
-        return event;
       }
 
       return event;

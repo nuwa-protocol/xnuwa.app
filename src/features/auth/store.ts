@@ -9,7 +9,7 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/types';
-import type { Hex, SignableMessage, TransactionSerializable } from 'viem';
+import type { Hash, Hex, SignableMessage, TransactionSerializable } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -33,8 +33,9 @@ import {
 } from './utils/crypto';
 
 // 全局常量
-export const IS_PASSKEY_SUPPORTED =
-  window?.PublicKeyCredential && window?.navigator?.credentials;
+export const IS_PASSKEY_SUPPORTED: boolean = !!(
+  window?.PublicKeyCredential && window?.navigator?.credentials
+);
 
 // ==================== 数据库 ====================
 // 现在使用 IndexedDB 通过 persist 中间件自动管理
@@ -60,7 +61,7 @@ export interface AccountStoreState {
   deleteAccount: (address: string) => Promise<void>;
   renameAccount: (address: string, newName: string) => Promise<void>;
   getAccountData: (address: string) => AccountData | undefined;
-  switchAccount: (address: string) => void;
+  setCurrentAccount: (address: string) => void;
 
   // 认证方式管理（只操作当前账户）
   addPasskeyAuth: () => Promise<void>;
@@ -100,6 +101,10 @@ const createManagedAccount = (
     type: 'local',
     source: 'custom',
     publicKey: '0x' as Hex,
+    sign: async ({ hash }: { hash: Hash }) => {
+      const account = await getUnlockedAccount();
+      return account.sign({ hash });
+    },
     isLocked: () => !helpers._isSessionActive(),
     signMessage: async ({ message }: { message: SignableMessage }) => {
       const account = await getUnlockedAccount();
@@ -238,9 +243,9 @@ export const AccountStore = create<AccountStoreState>()(
         return get().accounts.find((a) => a.address === address);
       },
 
-      // ==================== 账户切换 ====================
+      // ==================== 设置当前账户 ====================
 
-      switchAccount: (address) => {
+      setCurrentAccount: (address) => {
         const accountData = get().accounts.find((a) => a.address === address);
         if (!accountData) throw new Error('账户不存在');
 
@@ -253,6 +258,11 @@ export const AccountStore = create<AccountStoreState>()(
         );
 
         set({ account: managedAccount });
+
+        // Reload to ensure all account-scoped data resets cleanly
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
       },
 
       // ==================== 认证方式管理 ====================

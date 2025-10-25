@@ -1,9 +1,12 @@
 import { Outlet } from 'react-router-dom';
 import { DebugAccountInfo } from '@/features/auth/components/debug-account-info';
+import { AccountStore } from '@/features/auth/store';
 import AppSidebar from '@/features/sidebar/components';
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
 
 export default function MainLayout() {
+  const account = AccountStore((state) => state.account);
+
   return (
     <>
       <script
@@ -11,10 +14,16 @@ export default function MainLayout() {
         async
       />
       <TooltipProvider delayDuration={0}>
-        <AppSidebar>
+        {account ? (
+          <>
+            <AppSidebar>
+              <Outlet />
+            </AppSidebar>
+            <DebugAccountInfo />
+          </>
+        ) : (
           <Outlet />
-        </AppSidebar>
-        <DebugAccountInfo />
+        )}
       </TooltipProvider>
     </>
   );

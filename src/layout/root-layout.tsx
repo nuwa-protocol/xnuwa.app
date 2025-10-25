@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { AccountAuthGuard } from '@/features/auth/components/account-auth-guard';
 import { AuthRequestDialog } from '@/features/auth/components/auth-request-dialog';
 import { useWalletBalanceManager } from '@/features/wallet/hooks/use-wallet-balance-manager';
 import { useLiveCapConnections } from '@/shared/hooks';
@@ -46,12 +45,12 @@ export default function RootLayout() {
           <StructuredData data={generateOrganizationSchema()} />
         </>
       ) : (
-        <AccountAuthGuard>
+        <>
           <Toaster position="top-center" expand={true} richColors />
           <McpOAuthDialogManager />
           <AuthRequestDialog />
           <Outlet />
-        </AccountAuthGuard>
+        </>
       )}
     </ThemeProvider>
   );
