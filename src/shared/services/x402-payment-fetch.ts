@@ -4,7 +4,7 @@ import {
   selectPaymentRequirements,
 } from 'x402/client';
 import { PaymentRequirementsSchema, type X402Config } from 'x402/types';
-import { network, walletClient } from './x402-wallet';
+import { getCurrentAccount, network } from './x402-wallet';
 
 /**
  * Enables the payment of APIs using the x402 payment protocol.
@@ -14,11 +14,10 @@ import { network, walletClient } from './x402-wallet';
  * 1. Make the initial request
  * 2. If a 402 response is received, parse the payment requirements
  * 3. Verify the payment amount is within the allowed maximum
- * 4. Create a payment header using the provided wallet client
+ * 4. Create a payment header using the active managed account
  * 5. Retry the request with the payment header
  *
  * @param fetch - The fetch function to wrap (typically globalThis.fetch)
- * @param walletClient - The wallet client used to sign payment messages
  * @param maxValue - The maximum allowed payment amount in base units (defaults to 0.1 USDC)
  * @param paymentRequirementsSelector - A function that selects the payment requirements from the response
  * @param config - Optional configuration for X402 operations (e.g., custom RPC URLs)
@@ -26,15 +25,7 @@ import { network, walletClient } from './x402-wallet';
  *
  * @example
  * ```typescript
- * const wallet = new SignerWallet(...);
- * const fetchWithPay = wrapFetchWithPayment(fetch, wallet);
- *
- * // With custom RPC configuration
- * const fetchWithPay = wrapFetchWithPayment(fetch, wallet, undefined, undefined, {
- *   svmConfig: { rpcUrl: "http://localhost:8899" }
- * });
- *
- * // Make a request that may require payment
+ * const fetchWithPay = createPaymentFetch();
  * const response = await fetchWithPay('https://api.example.com/paid-endpoint');
  * ```
  *
@@ -73,8 +64,9 @@ export function createPaymentFetch(
       throw new Error('Payment amount exceeds maximum allowed');
     }
 
+    const account = getCurrentAccount();
     const paymentHeader = await createPaymentHeader(
-      walletClient.account,
+      account,
       x402Version,
       selectedPaymentRequirements,
       config,

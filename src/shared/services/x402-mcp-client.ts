@@ -7,10 +7,14 @@ import {
   type ToolCallOptions,
   tool,
 } from 'ai';
-import type { Account, Address } from 'viem';
+import type { Account } from 'viem';
 import { createPaymentHeader } from 'x402/client';
 import { type ZodType, z } from 'zod';
-import { account, getWalletBalance, walletClient } from './x402-wallet';
+import {
+  getCurrentAccount,
+  getWalletBalance,
+  network as defaultNetwork,
+} from './x402-wallet';
 
 export const x402Version = 1;
 
@@ -61,7 +65,7 @@ async function callToolWithPayment(
 }
 
 export interface ClientPaymentOptions {
-  account: Account | Address;
+  account: Account;
   maxPaymentValue?: number;
   network: 'base-sepolia' | 'base';
 }
@@ -146,7 +150,7 @@ async function withPayment(
       }
 
       const paymentHeader = await createPaymentHeader(
-        walletClient.account,
+        options.account,
         x402Version,
         input.paymentRequirements,
       );
@@ -224,12 +228,13 @@ async function withPayment(
 }
 
 export const createX402MCPClient = async (url: string) => {
+  const activeAccount = getCurrentAccount();
   return await createMCPClient({
     transport: new StreamableHTTPClientTransport(new URL(url)),
   }).then((client) =>
     withPayment(client, {
-      account: account,
-      network: 'base-sepolia',
+      account: activeAccount,
+      network: defaultNetwork,
     }),
   );
 };
