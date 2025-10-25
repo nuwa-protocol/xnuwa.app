@@ -279,6 +279,10 @@ export const AccountStore = create<AccountStoreState>()(
         // 使用账户地址作为用户标识
         const userIdBytes = new TextEncoder().encode(accountData.address);
 
+        // Build a friendlier label for the passkey record shown in platform UIs
+        const shortAddr = `${accountData.address.slice(0, 6)}...${accountData.address.slice(-4)}`;
+        const passkeyDisplayName = `Nuwa AI Wallet: ${accountData.name} (${shortAddr})`;
+
         const registrationOptions: PublicKeyCredentialCreationOptionsJSON = {
           challenge: bufferToBase64(challenge),
           rp: {
@@ -287,8 +291,10 @@ export const AccountStore = create<AccountStoreState>()(
           },
           user: {
             id: bufferToBase64(userIdBytes),
-            name: accountData.address,
-            displayName: accountData.name,
+            // Keep a stable, unique username for the credential
+            name: passkeyDisplayName,
+            // Display name shown in most passkey pickers / system UIs
+            displayName: passkeyDisplayName,
           },
           pubKeyCredParams: [
             { alg: -7, type: 'public-key' },

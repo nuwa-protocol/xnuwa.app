@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronUp, Clock, Shield, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { AccountStore } from '@/features/auth/store';
+import { AccountStore, IS_PASSKEY_SUPPORTED } from '@/features/auth/store';
 import { Button } from '@/shared/components/ui/button';
 import {
     Card,
@@ -22,6 +22,9 @@ export function DebugAccountInfo() {
         getSessionExpiresAt,
         getAccountData,
         _clearSession,
+        addPasskeyAuth,
+        removePasskeyAuth,
+        _authenticateWithPasskey,
     } = AccountStore();
     const [isExpanded, setIsExpanded] = useState(false);
     const [, forceRefresh] = useState(0);
@@ -63,6 +66,73 @@ export function DebugAccountInfo() {
         try {
             const signature = await account.signMessage({ message });
             toast.success(`Message signed successfully: ${signature}`);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleRegisterPasskey = async () => {
+        try {
+            await addPasskeyAuth();
+            toast.success('Passkey registered for this account');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleRemovePasskey = async () => {
+        if (!window.confirm('Remove passkey authentication from this account?')) {
+            return;
+        }
+        try {
+            await removePasskeyAuth();
+            toast.success('Passkey removed');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleTestPasskeyAuth = async () => {
+        try {
+            const key = await _authenticateWithPasskey();
+            // Only show a short preview of the key to avoid leaking the full value in logs
+            const preview = `${key.slice(0, 6)}...${key.slice(-4)}`;
+            toast.success(`Passkey auth OK. Derived key unlocked (${preview})`);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleSignWithPasskey = async () => {
+        try {
+            // Ensure no active session so auth flow triggers (passkey → PIN fallback)
+            _clearSession();
+            await handleSignMessage();
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleExportPrivateKey = async () => {
+        try {
+            const key = await account.DANGEROUS_exportPrivateKey();
+            const preview = `${key.slice(0, 6)}...${key.slice(-4)}`;
+            toast.success(`Private key unlocked (${preview})`);
+            const shouldCopy = window.confirm(
+                'Copy full private key to clipboard? This is sensitive. Only proceed if you understand the risk.',
+            );
+            if (shouldCopy) {
+                try {
+                    await navigator.clipboard.writeText(key);
+                    toast.success('Private key copied to clipboard');
+                } catch (copyErr) {
+                    toast.error(
+                        copyErr instanceof Error
+                            ? copyErr.message
+                            : String(copyErr),
+                    );
+                }
+            }
         } catch (error) {
             toast.error(error instanceof Error ? error.message : String(error));
         }
@@ -171,6 +241,9 @@ export function DebugAccountInfo() {
         }
     };
 
+    const hasPasskey = Boolean(accountData.authMethods.passkey);
+    const passkeySupported = Boolean(IS_PASSKEY_SUPPORTED);
+
     return (
         <div className="fixed bottom-4 right-4 z-50">
             <Card className="w-80 bg-background/95 backdrop-blur-sm border shadow-lg">
@@ -207,12 +280,23 @@ export function DebugAccountInfo() {
                         {/* 认证方式 */}
                         <div className="flex items-center gap-2 text-xs">
                             <Shield className="h-3 w-3" />
-                            <span>Auth: {account.isLocked() ? 'Locked' : 'Unlocked'}</span>
+                            <span>
+                                Auth: {account.isLocked() ? 'Locked' : 'Unlocked'}
+                                {' · '}Passkey: {hasPasskey ? 'On' : 'Off'}
+                                {' · '}Support: {passkeySupported ? 'Yes' : 'No'}
+                            </span>
                         </div>
 
                         <div className="flex flex-wrap gap-2">
                             <Button size="sm" onClick={handleSignMessage}>
                                 Sign Message
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={handleSignWithPasskey}
+                            >
+                                Sign (Force Auth)
                             </Button>
                             <Button variant="outline" size="sm" onClick={handleCreateTestAccount}>
                                 Create Account
@@ -231,6 +315,39 @@ export function DebugAccountInfo() {
                             </Button>
                             <Button variant="outline" size="sm" onClick={handleClearSession}>
                                 Clear Session
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleExportPrivateKey}
+                                title="Export with forced re-authentication"
+                            >
+                                Export Key (Force Auth)
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleRegisterPasskey}
+                                disabled={!passkeySupported || hasPasskey}
+                                title={passkeySupported ? '' : 'Browser does not support Passkey'}
+                            >
+                                Add Passkey
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleRemovePasskey}
+                                disabled={!hasPasskey}
+                            >
+                                Remove Passkey
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleTestPasskeyAuth}
+                                disabled={!hasPasskey}
+                            >
+                                Test Passkey
                             </Button>
                         </div>
 
