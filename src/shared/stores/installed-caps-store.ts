@@ -90,7 +90,7 @@ export const InstalledCapsStore = create<InstalledCapsState>()(
       onRehydrateStorage: () => {
         return async (_state, _error) => {
           try {
-            await InstalledCapsStore.getState().fetchInstalledCaps();
+            // await InstalledCapsStore.getState().fetchInstalledCaps(); for debug purpose, disable the fetchInstalledCaps
           } catch {
             // swallow errors; UI can retry
           } finally {
