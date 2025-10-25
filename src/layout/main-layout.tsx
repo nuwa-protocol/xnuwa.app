@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import AppSidebar from '@/features/sidebar/components';
+import { DebugAccountInfo } from '@/shared/components/debug-account-info';
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
 
 export default function MainLayout() {
@@ -13,6 +14,7 @@ export default function MainLayout() {
         <AppSidebar>
           <Outlet />
         </AppSidebar>
+        <DebugAccountInfo />
       </TooltipProvider>
     </>
   );

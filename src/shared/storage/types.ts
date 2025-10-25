@@ -4,7 +4,7 @@ export interface StorageConfig {
   stores: Record<string, string>;
 }
 
-export interface PersistConfig<T> {
+export interface PersistConfig<T, PersistedState = Partial<T>> {
   name: string;
-  partialize?: (state: T) => Partial<T>;
+  partialize?: (state: T) => PersistedState;
 }

@@ -1,4 +1,8 @@
-import { createJSONStorage, type StateStorage } from 'zustand/middleware';
+import {
+  createJSONStorage,
+  type PersistOptions,
+  type StateStorage,
+} from 'zustand/middleware';
 import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { rehydrationTracker } from '../hooks/use-rehydration';
 import {
@@ -498,7 +502,7 @@ export class AccountStateStorage implements StateStorage {
         (record) => record.isCurrent,
       );
       const currentAccount = currentAccountRecord
-        ? currentAccountRecord.data
+        ? { address: currentAccountRecord.address }
         : null;
 
       // Return in zustand persist format
@@ -577,7 +581,10 @@ export function createAccountsPersistConfig<T>(config: PersistConfig<T>) {
 /**
  * Persist config generator for complete Account State (accounts + current account)
  */
-export function createAccountStatePersistConfig<T>(config: PersistConfig<T>) {
+export function createAccountStatePersistConfig<
+  T,
+  PersistedState = Partial<T>,
+>(config: PersistConfig<T, PersistedState>): PersistOptions<T, PersistedState> {
   // Register this store with the rehydration tracker
   rehydrationTracker.registerStore(config.name);
 

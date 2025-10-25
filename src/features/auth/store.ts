@@ -58,7 +58,7 @@ export interface AccountStoreState {
   createAccount: (name: string, pin: string) => Promise<ManagedAccount>;
   deleteAccount: (address: string) => Promise<void>;
   renameAccount: (address: string, newName: string) => Promise<void>;
-  getAccount: (address: string) => AccountData | undefined;
+  getAccountData: (address: string) => AccountData | undefined;
   switchAccount: (address: string) => void;
 
   // 认证方式管理（只操作当前账户）
@@ -79,6 +79,44 @@ export interface AccountStoreState {
   _isSessionActive: () => boolean;
   _unlockPrivateKeyWithSessionKey: (sessionKey: string) => Promise<Hex>;
 }
+
+type AccountStorePersistedState = {
+  accounts: AccountData[];
+  account: { address: Hex } | null;
+};
+
+const createManagedAccount = (
+  address: Hex,
+  helpers: Pick<AccountStoreState, '_getPrivateKey' | '_isSessionActive'>,
+): ManagedAccount => {
+  const getUnlockedAccount = async () => {
+    const privateKey = await helpers._getPrivateKey();
+    return privateKeyToAccount(privateKey);
+  };
+
+  return {
+    address,
+    type: 'local',
+    source: 'custom',
+    publicKey: '0x' as Hex,
+    isLocked: () => !helpers._isSessionActive(),
+    signMessage: async ({ message }: { message: SignableMessage }) => {
+      const account = await getUnlockedAccount();
+      return account.signMessage({ message });
+    },
+    signTransaction: async (transaction: TransactionSerializable) => {
+      const account = await getUnlockedAccount();
+      return account.signTransaction(transaction);
+    },
+    signTypedData: async (parameters: any) => {
+      const account = await getUnlockedAccount();
+      return account.signTypedData(parameters);
+    },
+    DANGEROUS_exportPrivateKey: async () => {
+      return await helpers._getPrivateKey(true);
+    },
+  };
+};
 
 export const AccountStore = create<AccountStoreState>()(
   persist(
@@ -145,31 +183,10 @@ export const AccountStore = create<AccountStoreState>()(
         );
 
         // 创建 ManagedAccount
-        const managedAccount: ManagedAccount = {
-          address: tempAccount.address as Hex,
-          type: 'local',
-          source: 'custom',
-          publicKey: '0x' as Hex,
-          isLocked: () => !get()._isSessionActive(),
-          signMessage: async ({ message }: { message: SignableMessage }) => {
-            const privateKey = await get()._getPrivateKey();
-            const account = privateKeyToAccount(privateKey);
-            return account.signMessage({ message });
-          },
-          signTransaction: async (transaction: TransactionSerializable) => {
-            const privateKey = await get()._getPrivateKey();
-            const account = privateKeyToAccount(privateKey);
-            return account.signTransaction(transaction);
-          },
-          signTypedData: async (parameters: any) => {
-            const privateKey = await get()._getPrivateKey();
-            const account = privateKeyToAccount(privateKey);
-            return account.signTypedData(parameters);
-          },
-          DANGEROUS_exportPrivateKey: async () => {
-            return await get()._getPrivateKey(true);
-          },
-        };
+        const managedAccount = createManagedAccount(
+          tempAccount.address as Hex,
+          get(),
+        );
 
         set((state) => ({
           accounts: [...state.accounts, account],
@@ -216,7 +233,7 @@ export const AccountStore = create<AccountStoreState>()(
         }));
       },
 
-      getAccount: (address) => {
+      getAccountData: (address) => {
         return get().accounts.find((a) => a.address === address);
       },
 
@@ -226,34 +243,13 @@ export const AccountStore = create<AccountStoreState>()(
         const accountData = get().accounts.find((a) => a.address === address);
         if (!accountData) throw new Error('账户不存在');
 
-        const { _getPrivateKey } = get();
+        const { _getPrivateKey, _isSessionActive } = get();
 
         // 创建 ManagedAccount
-        const managedAccount: ManagedAccount = {
-          address: accountData.address as Hex,
-          type: 'local',
-          source: 'custom',
-          publicKey: '0x' as Hex,
-          isLocked: () => !get()._isSessionActive(),
-          signMessage: async ({ message }: { message: SignableMessage }) => {
-            const privateKey = await _getPrivateKey();
-            const account = privateKeyToAccount(privateKey);
-            return account.signMessage({ message });
-          },
-          signTransaction: async (transaction: TransactionSerializable) => {
-            const privateKey = await _getPrivateKey();
-            const account = privateKeyToAccount(privateKey);
-            return account.signTransaction(transaction);
-          },
-          signTypedData: async (parameters: any) => {
-            const privateKey = await _getPrivateKey();
-            const account = privateKeyToAccount(privateKey);
-            return account.signTypedData(parameters);
-          },
-          DANGEROUS_exportPrivateKey: async () => {
-            return await _getPrivateKey(true);
-          },
-        };
+        const managedAccount = createManagedAccount(
+          accountData.address as Hex,
+          { _getPrivateKey, _isSessionActive },
+        );
 
         set({ account: managedAccount });
       },
@@ -657,13 +653,43 @@ export const AccountStore = create<AccountStoreState>()(
         }
       },
     }),
-    createAccountStatePersistConfig({
-      name: 'account-store',
-      partialize: (state) => ({
-        accounts: state.accounts,
-        account: state.account, // 现在也持久化当前账户
-        // 不持久化 authRequestCallback 等运行时状态
+    {
+      ...createAccountStatePersistConfig<
+        AccountStoreState,
+        AccountStorePersistedState
+      >({
+        name: 'account-store',
+        partialize: (state) => ({
+          accounts: state.accounts,
+          account: state.account
+            ? { address: state.account.address }
+            : null,
+          // 不持久化 authRequestCallback 等运行时状态
+        }),
       }),
-    }),
+      merge: (persistedState, currentState) => {
+        type PersistedAccountState = Partial<AccountStorePersistedState>;
+
+        const typedState = (persistedState || {}) as PersistedAccountState;
+        const mergedState = {
+          ...currentState,
+          accounts: typedState.accounts ?? currentState.accounts,
+        } as AccountStoreState;
+
+        const persistedAccountAddress = typedState.account?.address;
+        if (persistedAccountAddress) {
+          const accountData = mergedState.accounts.find(
+            (a) => a.address === persistedAccountAddress,
+          );
+          mergedState.account = accountData
+            ? createManagedAccount(accountData.address as Hex, currentState)
+            : null;
+        } else {
+          mergedState.account = null;
+        }
+
+        return mergedState;
+      },
+    },
   ),
 );
