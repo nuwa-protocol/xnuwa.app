@@ -32,9 +32,7 @@ import {
 
 // 全局常量
 export const IS_PASSKEY_SUPPORTED =
-  typeof window !== 'undefined' &&
-  window.PublicKeyCredential &&
-  window.navigator?.credentials;
+  window?.PublicKeyCredential && window?.navigator?.credentials;
 
 // ==================== Dexie 数据库 ====================
 
