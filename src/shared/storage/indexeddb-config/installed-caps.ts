@@ -2,19 +2,19 @@ import { createJSONStorage, type StateStorage } from 'zustand/middleware';
 import { rehydrationTracker } from '../../hooks/use-rehydration';
 import { db, type InstalledCapRecord } from '../db';
 import type { PersistConfig } from '../types';
-import { getCurrentDID } from './utils';
+import { getCurrentAccountAddress } from './utils';
 
 export class InstalledCapsStorage implements StateStorage {
   async getItem(name: string): Promise<string | null> {
     if (typeof window === 'undefined') return null;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return null;
+      const address = await getCurrentAccountAddress();
+      if (!address) return null;
 
       const records = await db.installedCaps
-        .where('did')
-        .equals(did)
+        .where('address')
+        .equals(address)
         .toArray();
       if (records.length === 0) return null;
 
@@ -33,29 +33,38 @@ export class InstalledCapsStorage implements StateStorage {
     if (typeof window === 'undefined') return;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return;
+      if (rehydrationTracker.getStatus()[name] === false) {
+        return;
+      }
+
+      const address = await getCurrentAccountAddress();
+      if (!address) return;
 
       const parsedData = JSON.parse(value);
       const installedCaps =
         parsedData.state?.installedCaps || parsedData.installedCaps;
 
-      if (!installedCaps || installedCaps.length === 0) {
+      const caps = Array.isArray(installedCaps) ? installedCaps : [];
+      const allowedIds = new Set(caps.map((cap: any) => cap.id));
+
+      await db.installedCaps
+        .where('address')
+        .equals(address)
+        .filter((record) => !allowedIds.has(record.id))
+        .delete();
+
+      if (caps.length === 0) {
         return;
       }
 
-      await db.installedCaps.where('did').equals(did).delete();
-
-      const records: InstalledCapRecord[] = installedCaps.map((cap: any) => ({
+      const records: InstalledCapRecord[] = caps.map((cap: any) => ({
         id: cap.id,
-        did,
+        address,
         data: cap,
         updatedAt: Date.now(),
       }));
 
-      if (records.length > 0) {
-        await db.installedCaps.bulkPut(records);
-      }
+      await db.installedCaps.bulkPut(records);
     } catch (error) {
       console.error(`Failed to set installed caps in IndexedDB:`, error);
       throw error;
@@ -66,10 +75,10 @@ export class InstalledCapsStorage implements StateStorage {
     if (typeof window === 'undefined') return;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return;
+      const address = await getCurrentAccountAddress();
+      if (!address) return;
 
-      await db.installedCaps.where('did').equals(did).delete();
+      await db.installedCaps.where('address').equals(address).delete();
     } catch (error) {
       console.error(`Failed to remove installed caps from IndexedDB:`, error);
     }

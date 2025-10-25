@@ -2,17 +2,20 @@ import { createJSONStorage, type StateStorage } from 'zustand/middleware';
 import { rehydrationTracker } from '../../hooks/use-rehydration';
 import { db, type CapStudioRecord } from '../db';
 import type { PersistConfig } from '../types';
-import { getCurrentDID } from './utils';
+import { getCurrentAccountAddress } from './utils';
 
 export class CapStudioStorage implements StateStorage {
   async getItem(name: string): Promise<string | null> {
     if (typeof window === 'undefined') return null;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return null;
+      const address = await getCurrentAccountAddress();
+      if (!address) return null;
 
-      const records = await db.capStudio.where('did').equals(did).toArray();
+      const records = await db.capStudio
+        .where('address')
+        .equals(address)
+        .toArray();
       if (records.length === 0) return null;
 
       const localCaps = records.map((record) => record.data);
@@ -31,28 +34,38 @@ export class CapStudioStorage implements StateStorage {
     if (typeof window === 'undefined') return;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return;
+      if (rehydrationTracker.getStatus()[name] === false) {
+        return;
+      }
+
+      const address = await getCurrentAccountAddress();
+      if (!address) return;
 
       const parsedData = JSON.parse(value);
       const localCaps = parsedData.state?.localCaps || parsedData.localCaps;
 
-      if (!localCaps || localCaps.length === 0) {
+      const caps = Array.isArray(localCaps) ? localCaps : [];
+      const incomingIds = new Set(caps.map((cap: any) => cap.id));
+
+      // Remove stale caps scoped to this account
+      await db.capStudio
+        .where('address')
+        .equals(address)
+        .filter((record) => !incomingIds.has(record.id))
+        .delete();
+
+      if (caps.length === 0) {
         return;
       }
 
-      await db.capStudio.where('did').equals(did).delete();
-
-      const records: CapStudioRecord[] = localCaps.map((cap: any) => ({
+      const records: CapStudioRecord[] = caps.map((cap: any) => ({
         id: cap.id,
-        did,
+        address,
         data: cap,
         updatedAt: Date.now(),
       }));
 
-      if (records.length > 0) {
-        await db.capStudio.bulkPut(records);
-      }
+      await db.capStudio.bulkPut(records);
     } catch (error) {
       console.error(`Failed to set cap studio data in IndexedDB:`, error);
       throw error;
@@ -63,10 +76,10 @@ export class CapStudioStorage implements StateStorage {
     if (typeof window === 'undefined') return;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return;
+      const address = await getCurrentAccountAddress();
+      if (!address) return;
 
-      await db.capStudio.where('did').equals(did).delete();
+      await db.capStudio.where('address').equals(address).delete();
     } catch (error) {
       console.error(`Failed to remove cap studio data from IndexedDB:`, error);
     }

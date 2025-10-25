@@ -2,17 +2,20 @@ import { createJSONStorage, type StateStorage } from 'zustand/middleware';
 import { rehydrationTracker } from '../../hooks/use-rehydration';
 import { db, type ChatSessionRecord } from '../db';
 import type { PersistConfig } from '../types';
-import { getCurrentDID } from './utils';
+import { getCurrentAccountAddress } from './utils';
 
 export class ChatSessionsStorage implements StateStorage {
   async getItem(name: string): Promise<string | null> {
     if (typeof window === 'undefined') return null;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return null;
+      const address = await getCurrentAccountAddress();
+      if (!address) return null;
 
-      const records = await db.chatSessions.where('did').equals(did).toArray();
+      const records = await db.chatSessions
+        .where('address')
+        .equals(address)
+        .toArray();
       if (records.length === 0) return null;
 
       const chatSessions: Record<string, any> = {};
@@ -34,31 +37,39 @@ export class ChatSessionsStorage implements StateStorage {
     if (typeof window === 'undefined') return;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return;
+      if (rehydrationTracker.getStatus()[name] === false) {
+        return;
+      }
+
+      const address = await getCurrentAccountAddress();
+      if (!address) return;
 
       const parsedData = JSON.parse(value);
       const chatSessions =
         parsedData.state?.chatSessions || parsedData.chatSessions;
 
-      if (!chatSessions || Object.keys(chatSessions).length === 0) {
+      const entries = Object.entries(chatSessions || {});
+
+      // Remove stale sessions for this account
+      const nextIds = new Set(entries.map(([chatId]) => chatId));
+      await db.chatSessions
+        .where('address')
+        .equals(address)
+        .filter((record) => !nextIds.has(record.chatId))
+        .delete();
+
+      if (entries.length === 0) {
         return;
       }
 
-      await db.chatSessions.where('did').equals(did).delete();
+      const records: ChatSessionRecord[] = entries.map(([chatId, data]) => ({
+        chatId,
+        address,
+        data,
+        updatedAt: Date.now(),
+      }));
 
-      const records: ChatSessionRecord[] = Object.entries(chatSessions).map(
-        ([chatId, data]) => ({
-          chatId,
-          did,
-          data,
-          updatedAt: Date.now(),
-        }),
-      );
-
-      if (records.length > 0) {
-        await db.chatSessions.bulkPut(records);
-      }
+      await db.chatSessions.bulkPut(records);
     } catch (error) {
       console.error(`Failed to set chat sessions in IndexedDB:`, error);
       throw error;
@@ -69,10 +80,10 @@ export class ChatSessionsStorage implements StateStorage {
     if (typeof window === 'undefined') return;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return;
+      const address = await getCurrentAccountAddress();
+      if (!address) return;
 
-      await db.chatSessions.where('did').equals(did).delete();
+      await db.chatSessions.where('address').equals(address).delete();
     } catch (error) {
       console.error(`Failed to remove chat sessions from IndexedDB:`, error);
     }

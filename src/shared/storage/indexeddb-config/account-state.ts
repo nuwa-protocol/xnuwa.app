@@ -39,20 +39,31 @@ export class AccountStateStorage implements StateStorage {
     if (typeof window === 'undefined') return;
 
     try {
+      if (rehydrationTracker.getStatus()[name] === false) {
+        return;
+      }
+
       const parsedData = JSON.parse(value);
       const { accounts, account } = parsedData.state;
 
-      await db.accounts.clear();
-
-      if (accounts && accounts.length > 0) {
-        const records: AccountRecord[] = accounts.map((accountData: any) => ({
+      const nextAccounts: AccountRecord[] = (accounts || []).map(
+        (accountData: any) => ({
           address: accountData.address,
           data: accountData,
-          isCurrent: account && account.address === accountData.address,
+          isCurrent: Boolean(account && account.address === accountData.address),
           updatedAt: Date.now(),
-        }));
+        }),
+      );
+      const nextAddresses = new Set(
+        nextAccounts.map((record) => record.address),
+      );
 
-        await db.accounts.bulkPut(records);
+      await db.accounts
+        .filter((record) => !nextAddresses.has(record.address))
+        .delete();
+
+      if (nextAccounts.length > 0) {
+        await db.accounts.bulkPut(nextAccounts);
       }
     } catch (error) {
       console.error(`Failed to set account state in IndexedDB:`, error);

@@ -13,6 +13,7 @@ import type { Hex, SignableMessage, TransactionSerializable } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { setAccountAddressResolver } from '@/shared/storage/account-identity';
 import { AUTH_CONFIG } from '../../shared/config/auth';
 import { createAccountStatePersistConfig } from '../../shared/storage/indexeddb-config';
 import { SessionManager } from './service/session';
@@ -674,9 +675,7 @@ export const AccountStore = create<AccountStoreState>()(
         name: 'account-store',
         partialize: (state) => ({
           accounts: state.accounts,
-          account: state.account
-            ? { address: state.account.address }
-            : null,
+          account: state.account ? { address: state.account.address } : null,
           // 不持久化 authRequestCallback 等运行时状态
         }),
       }),
@@ -706,3 +705,10 @@ export const AccountStore = create<AccountStoreState>()(
     },
   ),
 );
+
+setAccountAddressResolver(() => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  return AccountStore.getState().account?.address ?? null;
+});

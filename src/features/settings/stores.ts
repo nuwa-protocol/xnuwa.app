@@ -31,7 +31,8 @@ const persistConfig = createLocalStoragePersistConfig<SettingsState>({
   name: 'settings-storage',
   partialize: (state) => ({
     settings: state.settings,
-    mcpOAuths: state.userMCPOAuths,
+    // Persist under the same key used in state to ensure correct rehydration
+    userMCPOAuths: state.userMCPOAuths,
   }),
 });
 

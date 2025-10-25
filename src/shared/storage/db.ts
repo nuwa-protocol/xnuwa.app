@@ -2,28 +2,28 @@ import Dexie, { type Table } from 'dexie';
 
 export interface ChatSessionRecord {
   chatId: string;
-  did: string;
+  address: string;
   data: any;
   updatedAt: number;
 }
 
 export interface CapStudioRecord {
   id: string;
-  did: string;
+  address: string;
   data: any;
   updatedAt: number;
 }
 
 export interface ArtifactRecord {
   id: string;
-  did: string;
+  address: string;
   data: any;
   updatedAt: number;
 }
 
 export interface InstalledCapRecord {
   id: string;
-  did: string;
+  address: string;
   data: any; // Full Cap object
   updatedAt: number;
 }
@@ -50,36 +50,12 @@ class Database extends Dexie {
 
     super('NuwaClientDB');
 
-    // v1: original schema without installedCaps
+    // v5: switch identity keying from DID to account address
     this.version(1).stores({
-      chatSessions: '[chatId+did], chatId, did, updatedAt',
-      capStudio: '[id+did], id, did, updatedAt',
-      artifacts: '[id+did], id, did, updatedAt',
-    });
-
-    // v2: add installedCaps table
-    this.version(2).stores({
-      chatSessions: '[chatId+did], chatId, did, updatedAt',
-      capStudio: '[id+did], id, did, updatedAt',
-      artifacts: '[id+did], id, did, updatedAt',
-      installedCaps: '[id+did], id, did, updatedAt',
-    });
-
-    // v3: add accounts table
-    this.version(3).stores({
-      chatSessions: '[chatId+did], chatId, did, updatedAt',
-      capStudio: '[id+did], id, did, updatedAt',
-      artifacts: '[id+did], id, did, updatedAt',
-      installedCaps: '[id+did], id, did, updatedAt',
-      accounts: 'address, updatedAt',
-    });
-
-    // v4: add isCurrent field to accounts table
-    this.version(4).stores({
-      chatSessions: '[chatId+did], chatId, did, updatedAt',
-      capStudio: '[id+did], id, did, updatedAt',
-      artifacts: '[id+did], id, did, updatedAt',
-      installedCaps: '[id+did], id, did, updatedAt',
+      chatSessions: '[chatId+address], chatId, address, updatedAt',
+      capStudio: '[id+address], id, address, updatedAt',
+      artifacts: '[id+address], id, address, updatedAt',
+      installedCaps: '[id+address], id, address, updatedAt',
       accounts: 'address, isCurrent, updatedAt',
     });
   }

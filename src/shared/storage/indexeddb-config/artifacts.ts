@@ -2,17 +2,20 @@ import { createJSONStorage, type StateStorage } from 'zustand/middleware';
 import { rehydrationTracker } from '../../hooks/use-rehydration';
 import { db, type ArtifactRecord } from '../db';
 import type { PersistConfig } from '../types';
-import { getCurrentDID } from './utils';
+import { getCurrentAccountAddress } from './utils';
 
 export class ArtifactsStorage implements StateStorage {
   async getItem(name: string): Promise<string | null> {
     if (typeof window === 'undefined') return null;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return null;
+      const address = await getCurrentAccountAddress();
+      if (!address) return null;
 
-      const records = await db.artifacts.where('did').equals(did).toArray();
+      const records = await db.artifacts
+        .where('address')
+        .equals(address)
+        .toArray();
       if (records.length === 0) return null;
 
       const artifactSessions: Record<string, any> = {};
@@ -34,31 +37,38 @@ export class ArtifactsStorage implements StateStorage {
     if (typeof window === 'undefined') return;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return;
+      if (rehydrationTracker.getStatus()[name] === false) {
+        return;
+      }
+
+      const address = await getCurrentAccountAddress();
+      if (!address) return;
 
       const parsedData = JSON.parse(value);
       const artifactSessions =
         parsedData.state?.artifactSessions || parsedData.artifactSessions;
 
-      if (!artifactSessions || Object.keys(artifactSessions).length === 0) {
+      const entries = Object.entries(artifactSessions || {});
+      const incomingIds = new Set(entries.map(([id]) => id));
+
+      await db.artifacts
+        .where('address')
+        .equals(address)
+        .filter((record) => !incomingIds.has(record.id))
+        .delete();
+
+      if (entries.length === 0) {
         return;
       }
 
-      await db.artifacts.where('did').equals(did).delete();
+      const records: ArtifactRecord[] = entries.map(([id, data]) => ({
+        id,
+        address,
+        data,
+        updatedAt: Date.now(),
+      }));
 
-      const records: ArtifactRecord[] = Object.entries(artifactSessions).map(
-        ([id, data]) => ({
-          id,
-          did,
-          data,
-          updatedAt: Date.now(),
-        }),
-      );
-
-      if (records.length > 0) {
-        await db.artifacts.bulkPut(records);
-      }
+      await db.artifacts.bulkPut(records);
     } catch (error) {
       console.error(`Failed to set artifacts in IndexedDB:`, error);
       throw error;
@@ -69,10 +79,10 @@ export class ArtifactsStorage implements StateStorage {
     if (typeof window === 'undefined') return;
 
     try {
-      const did = await getCurrentDID();
-      if (!did) return;
+      const address = await getCurrentAccountAddress();
+      if (!address) return;
 
-      await db.artifacts.where('did').equals(did).delete();
+      await db.artifacts.where('address').equals(address).delete();
     } catch (error) {
       console.error(`Failed to remove artifacts from IndexedDB:`, error);
     }

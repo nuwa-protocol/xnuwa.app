@@ -1,19 +1,16 @@
 import { createJSONStorage } from 'zustand/middleware';
-import { NuwaIdentityKit } from '@/shared/services/identity-kit';
 import { rehydrationTracker } from '../hooks/use-rehydration';
+import { getCurrentAccountAddress } from './account-identity';
 import type { PersistConfig } from './types';
 
-// get current DID
-const getCurrentDID = async () => {
-  const { getDid } = await NuwaIdentityKit();
-  return await getDid();
-};
-
 /**
- * Create storage key with DID
+ * Create storage key scoped by current account address
  */
-export function createStorageKey(baseKey: string, did: string | null): string {
-  return did ? `${baseKey}-${did}` : baseKey;
+export function createStorageKey(
+  baseKey: string,
+  address: string | null,
+): string {
+  return address ? `${baseKey}-${address}` : baseKey;
 }
 
 /**
@@ -27,8 +24,8 @@ export function createLocalStorageHelper<T>(
       if (typeof window === 'undefined') return null;
 
       try {
-        const did = await getCurrentDID();
-        const key = createStorageKey(config.name, did);
+        const address = await getCurrentAccountAddress();
+        const key = createStorageKey(config.name, address);
         return localStorage.getItem(key);
       } catch (error) {
         console.error('Failed to get from localStorage:', error);
@@ -40,8 +37,8 @@ export function createLocalStorageHelper<T>(
       if (typeof window === 'undefined') return;
 
       try {
-        const did = await getCurrentDID();
-        const key = createStorageKey(config.name, did);
+        const address = await getCurrentAccountAddress();
+        const key = createStorageKey(config.name, address);
         localStorage.setItem(key, value);
       } catch (error) {
         console.error('Failed to set to localStorage:', error);
@@ -53,8 +50,8 @@ export function createLocalStorageHelper<T>(
       if (typeof window === 'undefined') return;
 
       try {
-        const did = await getCurrentDID();
-        const key = createStorageKey(config.name, did);
+        const address = await getCurrentAccountAddress();
+        const key = createStorageKey(config.name, address);
         localStorage.removeItem(key);
       } catch (error) {
         console.error('Failed to remove from localStorage:', error);
