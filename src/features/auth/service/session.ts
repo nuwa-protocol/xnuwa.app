@@ -45,11 +45,9 @@ export class SessionManager {
     return this.getSession(address) !== null;
   }
 
-  getSessionRemainingTime(address: string): number {
+  getSessionExpiresAt(address: string): number | null {
     const session = this.getSession(address);
-    if (!session) return 0;
-    const remaining = session.expiresAt - Date.now();
-    return Math.max(0, Math.floor(remaining / 1000));
+    return session ? session.expiresAt : null;
   }
 
   getSessionKey(address: string): string | null {

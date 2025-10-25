@@ -87,8 +87,8 @@ changePinAuth(oldPin: string, newPin: string): Promise<void>
 // 设置会话过期时间
 setSessionDuration(duration: number): void
 
-// 获取会话剩余时间
-getSessionRemainingTime(): number
+// 获取会话过期时间戳（毫秒）
+getSessionExpiresAt(): number | null
 
 // 设置授权回调
 setAuthRequestCallback(callback: AuthRequestCallback | null): void
@@ -146,8 +146,9 @@ await accountStore.removePasskeyAuth();
 // 设置会话过期时间为 2 小时
 accountStore.setSessionDuration(2 * 60 * 60 * 1000);
 
-// 查询剩余时间
-const remainingTime = accountStore.getSessionRemainingTime();
+// 查询会话过期时间并自行计算剩余时间
+const expiresAt = accountStore.getSessionExpiresAt();
+const remainingTime = expiresAt ? expiresAt - Date.now() : 0;
 ```
 
 ### 授权回调设置
@@ -260,7 +261,8 @@ accountStore.setAuthRequestCallback(authCallback);
 ```typescript
 // 定期检查会话状态
 setInterval(() => {
-  const remainingTime = accountStore.getSessionRemainingTime();
+  const expiresAt = accountStore.getSessionExpiresAt();
+  const remainingTime = expiresAt ? expiresAt - Date.now() : 0;
   if (remainingTime < 60000) { // 剩余时间少于1分钟
     showSessionWarning();
   }

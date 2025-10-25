@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronUp, Clock, Shield, User } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { AccountStore } from '@/features/auth/store';
 import { Button } from '@/shared/components/ui/button';
@@ -11,11 +11,33 @@ import {
 } from '@/shared/components/ui/card';
 
 export function DebugAccountInfo() {
-    const { account, accounts, getSessionRemainingTime, getAccountData } =
-        AccountStore();
+    const {
+        account,
+        accounts,
+        createAccount,
+        deleteAccount,
+        renameAccount,
+        switchAccount,
+        setSessionDuration,
+        getSessionExpiresAt,
+        getAccountData,
+        _clearSession,
+    } = AccountStore();
     const [isExpanded, setIsExpanded] = useState(false);
+    const [, forceRefresh] = useState(0);
 
-    const sessionRemainingTime = getSessionRemainingTime();
+    useEffect(() => {
+        const interval = window.setInterval(() => {
+            forceRefresh((tick) => tick + 1);
+        }, 1000);
+
+        return () => window.clearInterval(interval);
+    }, []);
+
+    const sessionExpiresAt = getSessionExpiresAt();
+    const sessionRemainingTime = sessionExpiresAt
+        ? Math.max(0, sessionExpiresAt - Date.now())
+        : 0;
     const sessionMinutes = Math.floor(sessionRemainingTime / 60000);
     const sessionSeconds = Math.floor((sessionRemainingTime % 60000) / 1000);
 
@@ -41,6 +63,109 @@ export function DebugAccountInfo() {
         try {
             const signature = await account.signMessage({ message });
             toast.success(`Message signed successfully: ${signature}`);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleCreateTestAccount = async () => {
+        const defaultName = `Account ${accounts.length + 1}`;
+        const name = window.prompt('New account name', defaultName);
+        if (!name) {
+            return;
+        }
+        const pin = window.prompt('PIN (>= 6 digits)', '123456');
+        if (!pin) {
+            toast.error('PIN is required');
+            return;
+        }
+
+        try {
+            await createAccount(name, pin);
+            toast.success(`Created account ${name}`);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleRenameAccount = async () => {
+        const accountData = getAccountData(account.address);
+        const newName = window.prompt('Rename current account', accountData?.name);
+        if (!newName) {
+            return;
+        }
+
+        try {
+            await renameAccount(account.address, newName);
+            toast.success(`Renamed to ${newName}`);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (!window.confirm('Delete current account?')) {
+            return;
+        }
+
+        try {
+            await deleteAccount(account.address);
+            toast.success('Account deleted');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleCycleAccount = () => {
+        if (!accounts.length) {
+            return;
+        }
+        const currentIndex = accounts.findIndex(
+            (acc) => acc.address === account.address,
+        );
+        const nextIndex =
+            currentIndex === -1 ? 0 : (currentIndex + 1) % accounts.length;
+        const nextAccount = accounts[nextIndex];
+
+        try {
+            switchAccount(nextAccount.address);
+            toast.success(`Switched to ${nextAccount.name}`);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleSetSessionDuration = () => {
+        const accountData = getAccountData(account.address);
+        const currentMinutes = accountData
+            ? Math.round(accountData.sessionDuration / 60000)
+            : 0;
+
+        const minutesInput = window.prompt(
+            'Session duration (minutes)',
+            String(currentMinutes || 5),
+        );
+        if (!minutesInput) {
+            return;
+        }
+        const minutes = Number(minutesInput);
+        if (!Number.isFinite(minutes) || minutes <= 0) {
+            toast.error('Invalid duration');
+            return;
+        }
+
+        try {
+            setSessionDuration(minutes * 60 * 1000);
+            toast.success(`Session set to ${minutes}m`);
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
+
+    const handleClearSession = () => {
+        try {
+            _clearSession();
+            toast.success('Session cleared');
         } catch (error) {
             toast.error(error instanceof Error ? error.message : String(error));
         }
@@ -85,8 +210,28 @@ export function DebugAccountInfo() {
                             <span>Auth: {account.isLocked() ? 'Locked' : 'Unlocked'}</span>
                         </div>
 
-                        <div className="flex items-center justify-between">
-                            <Button onClick={handleSignMessage}>Sign Message</Button>
+                        <div className="flex flex-wrap gap-2">
+                            <Button size="sm" onClick={handleSignMessage}>
+                                Sign Message
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={handleCreateTestAccount}>
+                                Create Account
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={handleRenameAccount}>
+                                Rename
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={handleDeleteAccount}>
+                                Delete
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={handleCycleAccount}>
+                                Cycle Account
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={handleSetSessionDuration}>
+                                Set Session
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={handleClearSession}>
+                                Clear Session
+                            </Button>
                         </div>
 
                         <Button
@@ -105,15 +250,17 @@ export function DebugAccountInfo() {
                         {/* 展开的详细信息 */}
                         {isExpanded &&
                             accounts.map((acc, index) => (
-                                <div
+                                <button
                                     key={acc.address}
-                                    className={`text-xs p-1 rounded ${acc.address === account.address
+                                    type="button"
+                                    onClick={() => switchAccount(acc.address)}
+                                    className={`text-left w-full text-xs p-1 rounded transition hover:bg-primary/20 ${acc.address === account.address
                                         ? 'bg-primary/10 text-primary'
                                         : 'bg-muted/50'
                                         }`}
                                 >
                                     {index + 1}. {acc.name} ({acc.address.slice(0, 6)}...)
-                                </div>
+                                </button>
                             ))}
                     </div>
                 </CardContent>

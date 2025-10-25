@@ -68,7 +68,7 @@ export interface AccountStoreState {
 
   // Session 配置（只操作当前账户）
   setSessionDuration: (duration: number) => void;
-  getSessionRemainingTime: () => number;
+  getSessionExpiresAt: () => number | null;
 
   // 内部方法
   _getPrivateKey: (forceAuth?: boolean) => Promise<Hex>;
@@ -440,10 +440,10 @@ export const AccountStore = create<AccountStoreState>()(
         }));
       },
 
-      getSessionRemainingTime: () => {
+      getSessionExpiresAt: () => {
         const { account } = get();
-        if (!account) return 0;
-        return sessionManager.getSessionRemainingTime(account.address);
+        if (!account) return null;
+        return sessionManager.getSessionExpiresAt(account.address);
       },
 
       // ==================== 内部方法 ====================
