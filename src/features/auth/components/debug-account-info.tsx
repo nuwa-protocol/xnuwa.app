@@ -49,7 +49,7 @@ export function DebugAccountInfo() {
     return (
         <div className="fixed bottom-4 right-4 z-50">
             <Card className="w-80 bg-background/95 backdrop-blur-sm border shadow-lg">
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-2 sr-only">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
                             <User className="h-4 w-4" />
@@ -62,8 +62,7 @@ export function DebugAccountInfo() {
                     <div className="space-y-3">
                         {/* 基本信息 */}
                         <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs">Wallet Name:</span> {accountData.name}
+                            <div className="flex items-center gap-2">{accountData.name}
                             </div>
 
                             <div className="text-xs text-muted-foreground font-mono break-all">

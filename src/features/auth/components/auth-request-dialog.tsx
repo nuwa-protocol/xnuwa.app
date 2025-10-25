@@ -1,12 +1,13 @@
+import { OTPInputContext } from 'input-otp';
 import {
   type FormEvent,
+  useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import type { AuthRequestCallback } from '../types';
-import { AccountStore } from '../store';
 import {
   Button,
   Dialog,
@@ -17,8 +18,10 @@ import {
   DialogTitle,
   InputOTP,
   InputOTPGroup,
-  InputOTPSlot,
 } from '@/shared/components/ui';
+import { cn } from '@/shared/utils';
+import { AccountStore } from '../store';
+import type { AuthRequestCallback } from '../types';
 
 const PIN_LENGTH = 6;
 const PIN_SLOT_KEYS = Array.from(
@@ -37,10 +40,8 @@ type PendingAuthRequest = {
   reject: (reason?: unknown) => void;
 };
 
-const REASON_COPY: Record<
-  AuthReason,
-  { title: string; description: string }
-> = {
+const REASON_COPY: Record<AuthReason, { title: string; description: string }> =
+{
   sign_message: {
     title: 'Message Signature Required',
     description:
@@ -120,17 +121,28 @@ export function AuthRequestDialog() {
   const reasonCopy = request ? REASON_COPY[request.reason] : null;
   const pinComplete = pin.length === PIN_LENGTH;
 
-  const closeAndReset = () => {
+  const closeAndReset = useCallback(() => {
     pendingRef.current = null;
     setRequest(null);
     setPin('');
-  };
+  }, []);
 
   const handleCancel = () => {
     if (!request) return;
     request.reject(new Error('Authorization was cancelled by the user.'));
     closeAndReset();
   };
+
+  const autoSubmitPin = useCallback(() => {
+    if (!request || !pinComplete) return;
+    request.resolve({ method: 'pin', pin });
+    closeAndReset();
+  }, [closeAndReset, pin, pinComplete, request]);
+
+  useEffect(() => {
+    if (!request || !pinComplete) return;
+    autoSubmitPin();
+  }, [autoSubmitPin, pinComplete, request]);
 
   const handlePinChange = (value: string) => {
     const sanitized = value.replace(/\D/g, '').slice(0, PIN_LENGTH);
@@ -139,9 +151,7 @@ export function AuthRequestDialog() {
 
   const handlePinSubmit = (event: FormEvent) => {
     event.preventDefault();
-    if (!request || !pinComplete) return;
-    request.resolve({ method: 'pin', pin });
-    closeAndReset();
+    autoSubmitPin();
   };
 
   const handlePasskey = () => {
@@ -163,10 +173,15 @@ export function AuthRequestDialog() {
         : null;
 
   return (
-    <Dialog open={Boolean(request)} onOpenChange={(open) => !open && handleCancel()}>
+    <Dialog
+      open={Boolean(request)}
+      onOpenChange={(open) => !open && handleCancel()}
+    >
       <DialogContent className="sm:max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>{reasonCopy?.title ?? 'Authorization Required'}</DialogTitle>
+        <DialogHeader className="sr-only">
+          <DialogTitle>
+            {reasonCopy?.title ?? 'Authorization Required'}
+          </DialogTitle>
           <DialogDescription>
             {reasonCopy?.description}
             {fallbackMessage ? (
@@ -178,15 +193,6 @@ export function AuthRequestDialog() {
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="rounded-lg border bg-muted/40 px-3 py-2 text-sm">
-            <div className="font-medium">
-              {accountData?.name ?? 'Wallet'}
-            </div>
-            <div className="text-muted-foreground text-xs">
-              {shortAddress(accountData?.address ?? request?.address)}
-            </div>
-          </div>
-
           {hasPasskey ? (
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground">
@@ -205,7 +211,7 @@ export function AuthRequestDialog() {
 
           <form onSubmit={handlePinSubmit} className="space-y-4">
             <div className="space-y-2 text-center">
-              <p className="text-sm font-medium">Enter your PIN</p>
+              <p className="text-sm font-medium">Authorize with Your PIN</p>
               <InputOTP
                 value={pin}
                 onChange={handlePinChange}
@@ -214,29 +220,48 @@ export function AuthRequestDialog() {
               >
                 <InputOTPGroup>
                   {PIN_SLOT_KEYS.map((slotKey, slotIndex) => (
-                    <InputOTPSlot key={slotKey} index={slotIndex} />
+                    <MaskedPinSlot key={slotKey} index={slotIndex} />
                   ))}
                 </InputOTPGroup>
               </InputOTP>
-              <p className="text-xs text-muted-foreground">
-                PIN must be {PIN_LENGTH} digits.
-              </p>
             </div>
-            <DialogFooter className="sm:justify-between">
+            <DialogFooter className="flex-col w-full">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={handleCancel}
+                className="w-full "
               >
                 Cancel
-              </Button>
-              <Button type="submit" disabled={!pinComplete}>
-                Continue
               </Button>
             </DialogFooter>
           </form>
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function MaskedPinSlot({ index }: { index: number }) {
+  const inputOTPContext = useContext(OTPInputContext);
+  const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {};
+  const isFilled = Boolean(char);
+
+  return (
+    <div
+      data-slot="input-otp-slot"
+      data-active={isActive}
+      data-filled={isFilled}
+      className={cn(
+        'data-[active=true]:border-ring data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[active=true]:aria-invalid:border-destructive dark:bg-input/30 border-input relative flex h-9 w-9 items-center justify-center border-y border-r text-sm shadow-xs transition-all outline-none first:rounded-l-md first:border-l last:rounded-r-md data-[active=true]:z-10 data-[active=true]:ring-[3px]',
+      )}
+    >
+      {isFilled ? '*' : ''}
+      {hasFakeCaret && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="animate-caret-blink bg-foreground h-4 w-px duration-1000" />
+        </div>
+      )}
+    </div>
   );
 }

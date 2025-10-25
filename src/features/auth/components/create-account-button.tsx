@@ -6,7 +6,7 @@ export function CreateAccountButton() {
     const { createAccount } = AccountStore();
 
     const handleConnect = async () => {
-        await createAccount('My Wallet', '123456');
+        await createAccount('Default Wallet Name', '123456');
     };
 
     return (

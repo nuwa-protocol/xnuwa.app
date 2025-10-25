@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from './layout/main-layout';
-import RootLayout from './layout/root-layout';
 import RehydrationGuard from './layout/rehydration-guard';
+import RootLayout from './layout/root-layout';
 import CallbackPage from './pages/callback';
 import CapStudioPage from './pages/cap-studio';
 import ChatPage from './pages/chat';

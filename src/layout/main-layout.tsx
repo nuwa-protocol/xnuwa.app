@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
+import { DebugAccountInfo } from '@/features/auth/components/debug-account-info';
 import AppSidebar from '@/features/sidebar/components';
-import { DebugAccountInfo } from '@/shared/components/debug-account-info';
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
 
 export default function MainLayout() {
