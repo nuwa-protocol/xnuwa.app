@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { parseYaml } from '@/features/cap-studio/utils/yaml';
 import {
   Button,
   Card,
@@ -28,7 +29,6 @@ import { type Cap, CapSchema } from '@/shared/types';
 import { useSubmitCap } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
-import { parseYaml } from '@/features/cap-studio/utils/yaml';
 import { CapCard } from './cap-card';
 
 interface MyCapsProps {
@@ -105,13 +105,13 @@ export function MyCaps({
     const filteredCaps = !searchQuery
       ? localCaps
       : localCaps.filter(
-          (cap) =>
-            cap.capData.metadata.displayName.toLowerCase().includes(query) ||
-            cap.capData.metadata.description.toLowerCase().includes(query) ||
-            cap.capData.metadata.tags.some((tag) =>
-              tag.toLowerCase().includes(query),
-            ),
-        );
+        (cap) =>
+          cap.capData.metadata.displayName.toLowerCase().includes(query) ||
+          cap.capData.metadata.description.toLowerCase().includes(query) ||
+          cap.capData.metadata.tags.some((tag) =>
+            tag.toLowerCase().includes(query),
+          ),
+      );
 
     const liveCaps = filteredCaps.filter((cap) => Boolean(cap.liveSource?.url));
     const otherCaps = filteredCaps.filter((cap) => !cap.liveSource?.url);
@@ -150,10 +150,10 @@ export function MyCaps({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!did) {
-      toast.error('Please sign in to import a cap');
-      return;
-    }
+    // if (!did) {
+    //   toast.error('Please sign in to import a cap');
+    //   return;
+    // }
 
     try {
       const text = await file.text();
@@ -380,7 +380,7 @@ export function MyCaps({
           </CardHeader>
         </Card>
       ) : (
-        <div className='grid grid-cols-1 gap-4 overflow-y-auto max-h-[calc(100vh-250px)] hide-scrollbar'>
+        <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[calc(100vh-250px)] hide-scrollbar">
           {allCaps.map((cap) => (
             <CapCard
               key={cap.id}
