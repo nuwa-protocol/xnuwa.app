@@ -59,5 +59,5 @@ export const UtilityLLMProvider = () => {
     fetch: paymentFetch,
   };
 
-  return createOpenRouter(UtilityProviderSettings).chat('openai/gpt-4o-mini');
+  return createOpenRouter(UtilityProviderSettings)('openai/gpt-4o-mini');
 };

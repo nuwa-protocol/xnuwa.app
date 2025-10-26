@@ -14,7 +14,7 @@ import { getCurrentAccount, network } from './x402-wallet';
  * 1. Make the initial request
  * 2. If a 402 response is received, parse the payment requirements
  * 3. Verify the payment amount is within the allowed maximum
- * 4. Create a payment header using the active managed account
+ * 4. Create a payment header using the provided wallet client
  * 5. Retry the request with the payment header
  *
  * @param fetch - The fetch function to wrap (typically globalThis.fetch)
@@ -25,7 +25,15 @@ import { getCurrentAccount, network } from './x402-wallet';
  *
  * @example
  * ```typescript
- * const fetchWithPay = createPaymentFetch();
+ * const wallet = new SignerWallet(...);
+ * const fetchWithPay = wrapFetchWithPayment(fetch, wallet);
+ *
+ * // With custom RPC configuration
+ * const fetchWithPay = wrapFetchWithPayment(fetch, wallet, undefined, undefined, {
+ *   svmConfig: { rpcUrl: "http://localhost:8899" }
+ * });
+ *
+ * // Make a request that may require payment
  * const response = await fetchWithPay('https://api.example.com/paid-endpoint');
  * ```
  *
