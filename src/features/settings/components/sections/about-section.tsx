@@ -7,8 +7,7 @@ import { useLanguage } from '@/shared/hooks/use-language';
 export function AboutSection() {
   const { t } = useLanguage();
   const version = __APP_VERSION__;
-  const { account } = AccountStore();
-
+  const { account, logout } = AccountStore();
 
   const createGitHubIssueURL = () => {
     const owner = 'nuwa-protocol';
@@ -25,6 +24,10 @@ export function AboutSection() {
     params.append('labels', labels.join(','));
 
     return `${baseURL}?${params.toString()}`;
+  };
+
+  const handleLogout = () => {
+    void logout();
   };
 
   return (
@@ -69,6 +72,19 @@ export function AboutSection() {
                   Submit Feedback
                 </Button>
               </Link>
+            </div>
+          </div>
+          <div className="border-t pt-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <h4 className="text-sm font-medium">Logout</h4>
+                <p className="text-xs text-muted-foreground">
+                  Sign out of your current session.
+                </p>
+              </div>
+              <Button variant="destructive" size="sm" onClick={handleLogout}>
+                Log out
+              </Button>
             </div>
           </div>
         </div>

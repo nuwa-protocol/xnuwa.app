@@ -19,7 +19,7 @@ core:
     mcp-fot: https://x402-ai-starter-lemon.vercel.app/mcp
 metadata:
   displayName: x402 Demo
-  description: This is a demo for testing the x402 based LLM and MCP. Use this smart model to do some basic stuff.
-  introduction: This is a demo for testing the x402 based LLM and MCP. Use this smart model to do some basic stuff.
+  description: This is a demo for testing the x402 based LLM and MCP.
+  introduction: This is a demo for testing the x402 based LLM and MCP.
   tags:
     - Crypto

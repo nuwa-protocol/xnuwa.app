@@ -1,4 +1,4 @@
-import { createContext, useEffect, type ReactNode } from 'react';
+import { createContext, type ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRehydration } from '@/shared/hooks';
 import { AccountStore } from '../store';
@@ -11,6 +11,8 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   const { account } = AccountStore();
   const isAuthRehydrated = useAuthRehydration();
   const navigate = useNavigate();
+
+  console.log('account', account);
 
   useEffect(() => {
     if (!isAuthRehydrated) return;
