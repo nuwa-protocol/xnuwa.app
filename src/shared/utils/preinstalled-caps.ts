@@ -35,8 +35,6 @@ const toCap = (content: string, sourcePath: string): Cap | null => {
           : `${DEFAULT_AUTHOR_DID}:${idName}`,
     });
 
-    console.log('cap', cap);
-
     return cap;
   } catch (error) {
     console.error(`[preinstalled-caps] Failed to parse ${sourcePath}:`, error);
