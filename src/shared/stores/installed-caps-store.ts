@@ -4,6 +4,10 @@ import { rehydrationTracker } from '@/shared/hooks/use-rehydration';
 import { capKitService } from '@/shared/services/capkit-service';
 import { createInstalledCapsPersistConfig } from '@/shared/storage/indexeddb-config';
 import type { Cap } from '@/shared/types';
+import {
+  isPreinstalledCap,
+  mergeWithPreinstalledCaps,
+} from '@/shared/utils/preinstalled-caps';
 
 interface InstalledCapsState {
   installedCaps: Cap[];
@@ -24,7 +28,7 @@ const persistConfig = createInstalledCapsPersistConfig<InstalledCapsState>({
 export const InstalledCapsStore = create<InstalledCapsState>()(
   persist(
     (set, get) => ({
-      installedCaps: [],
+      installedCaps: mergeWithPreinstalledCaps([]),
       isFetchingInstalledCaps: false,
       installedCapsError: null,
 
@@ -35,23 +39,41 @@ export const InstalledCapsStore = create<InstalledCapsState>()(
           throw new Error('Failed to install cap');
         }
         await capKit.favorite(capId, 'add');
-        await set({ installedCaps: [...get().installedCaps, cap] });
+        await set({
+          installedCaps: mergeWithPreinstalledCaps([
+            ...get().installedCaps,
+            cap,
+          ]),
+        });
         return cap;
       },
 
       uninstallCap: async (capId: string) => {
+        if (isPreinstalledCap(capId)) {
+          console.warn(
+            `[installed-caps] Ignoring uninstall for pre-installed cap: ${capId}`,
+          );
+          return;
+        }
+
         const capKit = await capKitService.getCapKit();
         await capKit.favorite(capId, 'remove');
         set({
-          installedCaps: get().installedCaps.filter((c) => c.id !== capId),
+          installedCaps: mergeWithPreinstalledCaps(
+            get().installedCaps.filter((c) => c.id !== capId),
+          ),
         });
       },
 
       fetchInstalledCaps: async () => {
         const capKit = await capKitService.getCapKit();
         if (!capKit) {
-          set({ installedCaps: [], isFetchingInstalledCaps: false });
-          return [];
+          const fallback = mergeWithPreinstalledCaps([]);
+          set({
+            installedCaps: fallback,
+            isFetchingInstalledCaps: false,
+          });
+          return fallback;
         }
 
         set({ isFetchingInstalledCaps: true, installedCapsError: null });
@@ -71,8 +93,9 @@ export const InstalledCapsStore = create<InstalledCapsState>()(
             )
             .map((r) => r.value);
 
-          set({ installedCaps: caps, isFetchingInstalledCaps: false });
-          return caps;
+          const mergedCaps = mergeWithPreinstalledCaps(caps);
+          set({ installedCaps: mergedCaps, isFetchingInstalledCaps: false });
+          return mergedCaps;
         } catch (err) {
           console.error('Error fetching installed caps (favorites):', err);
           set({

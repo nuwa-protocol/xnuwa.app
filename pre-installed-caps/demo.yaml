@@ -3,9 +3,9 @@ core:
   prompt:
     value: ""
     suggestions:
-      - 帮我生成一个1到10之间的随机数
-      - 算一下1加1等于多少
-      - 写一篇关于ai的文章
+      - give me a random number between 1 and 10
+      - what is 1 plus 1?
+      - write an article about ai and crypto
   model:
     providerId: openrouter
     modelId: anthropic/claude-sonnet-4.5

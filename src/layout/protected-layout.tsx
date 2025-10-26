@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AuthRequestDialog } from '@/features/auth/components/auth-request-dialog';
-import { DebugAccountInfo } from '@/features/auth/components/debug-account-info';
 import AppSidebar from '@/features/sidebar/components';
 import { useWalletBalanceManager } from '@/features/wallet/hooks/use-wallet-balance-manager';
 import { McpOAuthDialogManager } from '@/shared/components/mcp-oauth-dialog';
@@ -39,7 +38,7 @@ export default function ProtectedLayout() {
           <AppSidebar>
             <Outlet />
           </AppSidebar>
-          <DebugAccountInfo />
+          {/* <DebugAccountInfo /> */}
         </>
       ) : null}
     </UiProviders>
