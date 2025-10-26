@@ -36,7 +36,7 @@ export const WalletStore = create<WalletState>()((set, get) => ({
     try {
       const balance = await getCurrnetAccountBalance();
       set({
-        usdAmount: formatBigIntWithDecimals(balance, 8, 8),
+        usdAmount: formatBigIntWithDecimals(balance, 6, 3),
         balanceLoading: false,
       });
     } catch (e: any) {

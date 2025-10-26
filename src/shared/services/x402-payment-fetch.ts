@@ -205,29 +205,10 @@ export function createPaymentFetch(
     }
 
     if (ctxId) {
-      const assetDecimals = parseAssetDecimals(
-        selectedPaymentRequirements.extra,
-      );
       await safeRecord(() =>
         recordX402PaymentAttempt({
           ctxId,
-          protocol: 'http',
-          method: requestMethod,
-          urlOrTarget: normalizedUrl,
-          operation,
-          headersSummary,
-          stream: streamHint,
-          assetId: selectedPaymentRequirements.asset,
-          amount: BigInt(selectedPaymentRequirements.maxAmountRequired),
-          assetDecimals,
-          meta: {
-            x402: {
-              resource: selectedPaymentRequirements.resource,
-              network: selectedPaymentRequirements.network,
-              payTo: selectedPaymentRequirements.payTo,
-              description: selectedPaymentRequirements.description,
-            },
-          },
+          requirement: selectedPaymentRequirements,
         }),
       );
     }
@@ -264,33 +245,41 @@ export function createPaymentFetch(
 
     const secondResponse = await fetch(input, newInit);
     if (ctxId) {
-      const paymentResponseHeader =
-        secondResponse.headers.get('X-PAYMENT-RESPONSE');
-      let paymentResponseMeta: { serviceTxRef?: string; metadata?: unknown };
+      // Try to read the payment response header with a robust, case-insensitive lookup.
+      // Note: Browser CORS requires the server to expose this header via
+      // Access-Control-Expose-Headers: X-PAYMENT-RESPONSE on the RESPONSE.
+      // Setting it on the request (as we do) does not make it readable.
+      let paymentResponseHeader = secondResponse.headers.get('X-PAYMENT-RESPONSE');
+      if (!paymentResponseHeader) {
+        try {
+          for (const [name, value] of secondResponse.headers.entries()) {
+            if (name.toLowerCase() === 'x-payment-response') {
+              paymentResponseHeader = value;
+              break;
+            }
+          }
+        } catch {}
+      }
+
+      let decoded: ReturnType<typeof decodeXPaymentResponse> | undefined;
       if (paymentResponseHeader) {
         try {
-          const decoded = decodeXPaymentResponse(paymentResponseHeader);
-          paymentResponseMeta = {
-            serviceTxRef: decoded.transaction,
-            metadata: decoded,
-          };
+          decoded = decodeXPaymentResponse(paymentResponseHeader);
         } catch (error) {
           console.warn(
             '[x402/tx-store] Failed to decode X-PAYMENT-RESPONSE header',
             error,
           );
         }
+      } else {
+        console.warn(
+          '[x402/tx-store] X-PAYMENT-RESPONSE header not accessible. Ensure the server sets Access-Control-Expose-Headers: X-PAYMENT-RESPONSE on the response.',
+        );
       }
       await safeRecord(() =>
         markX402PaymentResult({
           ctxId,
-          status: secondResponse.ok ? 'paid' : 'error',
-          statusCode: secondResponse.status,
-          durationMs: Date.now() - requestStart,
-          errorMessage: secondResponse.ok
-            ? undefined
-            : `HTTP ${secondResponse.status}`,
-          paymentResponse: paymentResponseMeta,
+          response: decoded,
         }),
       );
     }

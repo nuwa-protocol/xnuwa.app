@@ -3,10 +3,11 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { AccountLoginDialog } from '@/features/auth/components/account-login-dialog';
 import { AccountStore } from '@/features/auth/store';
 import { CapStoreLoading } from '@/features/cap-store/components/cap-store-loading';
-import { GridPattern } from '@/shared/components/ui/shadcn-io/grid-pattern';
 import { Button } from '@/shared/components/ui';
+import { GridPattern } from '@/shared/components/ui/shadcn-io/grid-pattern';
 import { useAuthRehydration } from '@/shared/hooks';
 import { cn } from '@/shared/utils';
+
 // App shell is provided by ProtectedLayout; no page-level sidebar wrapping needed
 
 // Lazy-load the Cap Store home content to avoid blocking route transition
@@ -101,7 +102,7 @@ export function LandingPage() {
             </div>
             <div className="flex items-center gap-2">
               <Button size="sm" onClick={() => setLoginOpen(true)}>
-                Sign in
+                Enter App
               </Button>
             </div>
           </div>
@@ -137,7 +138,7 @@ export function LandingPage() {
                   transition={{ delay: 0.18 }}
                   className="text-lg text-muted-foreground max-w-2xl"
                 >
-                  Explore and compose powerful AI capabilities. Create an account to get started.
+                  Explore and compose powerful AI capabilities from here.
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: -6 }}
@@ -146,7 +147,7 @@ export function LandingPage() {
                   className="flex items-center gap-3"
                 >
                   <Button size="lg" onClick={() => setLoginOpen(true)}>
-                    Sign in / Create account
+                    Enter App
                   </Button>
                 </motion.div>
               </div>

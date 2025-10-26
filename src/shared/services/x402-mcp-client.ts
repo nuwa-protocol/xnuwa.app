@@ -8,6 +8,7 @@ import {
 } from 'ai';
 import type { LocalAccount } from 'viem';
 import { createPaymentHeader } from 'x402/client';
+import { decodeXPaymentResponse } from 'x402/shared';
 import { type ZodType, z } from 'zod';
 import {
   markX402PaymentResult,
@@ -236,33 +237,15 @@ async function withPayment(
               resource: requirement.resource,
             });
             const ctxId = extractCtxId(toolOptions, requirement);
-            const attemptStartedAt = Date.now();
-            const amount = BigInt(requirement.maxAmountRequired.toString());
-            const assetDecimals = parseAssetDecimals(requirement.extra);
             if (ctxId) {
               await safeRecord(() =>
                 recordX402PaymentAttempt({
                   ctxId,
-                  protocol: 'mcp',
-                  method: 'tools/call',
-                  urlOrTarget: requirement.resource ?? name,
-                  operation: `tool:${name}`,
-                  stream: false,
-                  assetId: requirement.asset,
-                  amount,
-                  assetDecimals,
-                  meta: {
-                    x402: {
-                      resource: requirement.resource,
-                      network: requirement.network,
-                      payTo: requirement.payTo,
-                      description: requirement.description,
-                    },
-                    tool: name,
-                  },
-                }),
+                  requirement: requirement as any,
+                } as any),
               );
             }
+            const attemptStartedAt = Date.now();
             try {
               const paidResult = await callToolWithPayment(
                 client,
@@ -271,30 +254,60 @@ async function withPayment(
                 paymentAuthorization,
                 toolOptions,
               );
+              console.log('paidResult', paidResult);
               if (ctxId) {
-                const paymentResponseMeta =
-                  extractPaymentResponseMeta(paidResult);
+                // Try to extract the MCP-provided payment response from result._meta
+                let decoded: ReturnType<typeof decodeXPaymentResponse> | undefined;
+                try {
+                  if (
+                    paidResult &&
+                    typeof paidResult === 'object' &&
+                    '_meta' in (paidResult as any)
+                  ) {
+                    const meta = (paidResult as any)._meta;
+                    const pr = meta?.['x402/payment-response'];
+                    if (typeof pr === 'string') {
+                      decoded = decodeXPaymentResponse(pr);
+                    } else if (pr && typeof pr === 'object') {
+                      decoded = pr as ReturnType<typeof decodeXPaymentResponse>;
+                    }
+                  }
+                } catch (e) {
+                  console.warn('[x402/tx-store] Failed to parse MCP payment response', e);
+                }
                 await safeRecord(() =>
                   markX402PaymentResult({
                     ctxId,
-                    status: 'paid',
-                    durationMs: Date.now() - attemptStartedAt,
-                    paymentResponse: paymentResponseMeta,
+                    response: decoded,
                   }),
                 );
               }
               return stripPaymentResponseMetadata(paidResult);
             } catch (retryError) {
               if (ctxId) {
+                // On error, still attempt to capture any payment response metadata
+                let decoded: ReturnType<typeof decodeXPaymentResponse> | undefined;
+                try {
+                  if (
+                    retryError &&
+                    typeof retryError === 'object' &&
+                    '_meta' in (retryError as any)
+                  ) {
+                    const meta = (retryError as any)._meta;
+                    const pr = meta?.['x402/payment-response'];
+                    if (typeof pr === 'string') {
+                      decoded = decodeXPaymentResponse(pr);
+                    } else if (pr && typeof pr === 'object') {
+                      decoded = pr as ReturnType<typeof decodeXPaymentResponse>;
+                    }
+                  }
+                } catch (e) {
+                  console.warn('[x402/tx-store] Failed to parse MCP payment response (error)', e);
+                }
                 await safeRecord(() =>
                   markX402PaymentResult({
                     ctxId,
-                    status: 'error',
-                    durationMs: Date.now() - attemptStartedAt,
-                    errorMessage:
-                      retryError instanceof Error
-                        ? retryError.message
-                        : String(retryError),
+                    response: decoded,
                   }),
                 );
               }
@@ -493,7 +506,7 @@ async function getPaymentAuthorization(
       typeof requirement.extra === 'object' && requirement.extra !== null
         ? (requirement.extra as Record<string, unknown>)
         : undefined,
-  });
+  } as any);
 }
 
 export const createX402MCPClient = async (url: string) => {

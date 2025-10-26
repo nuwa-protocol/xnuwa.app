@@ -1,6 +1,6 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { OTPInputContext } from 'input-otp';
-import { Loader2, Maximize2, Minimize2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { useContext, useEffect, useId, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -40,7 +40,6 @@ export function AccountLoginDialog({ open, onOpenChange }: AccountLoginDialogPro
   const addPasskeyAuth = AccountStore((state) => state.addPasskeyAuth);
 
   const [view, setView] = useState<'list' | 'create'>('list');
-  const [isMinimized, setIsMinimized] = useState(true);
   const [createName, setCreateName] = useState('');
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
@@ -59,17 +58,15 @@ export function AccountLoginDialog({ open, onOpenChange }: AccountLoginDialogPro
   }, [accounts.length]);
 
   useEffect(() => {
+    // Reset internal state when dialog closes
     if (!open) {
-      setIsMinimized(true);
       setCreateError(null);
       setSelectionError(null);
       setPin('');
       setConfirmPin('');
       setEnablePasskey(IS_PASSKEY_SUPPORTED);
       setView(accounts.length === 0 ? 'create' : 'list');
-      return;
     }
-    setIsMinimized(true);
   }, [accounts.length, open]);
 
   const shouldRender = open || isSubmitting;
@@ -314,68 +311,43 @@ export function AccountLoginDialog({ open, onOpenChange }: AccountLoginDialogPro
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal={!isMinimized}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        {!isMinimized ? (
-          <DialogOverlay
-            className={cn('backdrop-blur-sm', 'bg-black/80')}
-          />
-        ) : null}
+        <DialogOverlay className={cn('backdrop-blur-sm', 'bg-black/80')} />
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          onInteractOutside={(event) => event.preventDefault()}
-          onEscapeKeyDown={(event) => event.preventDefault()}
           className={cn(
             'fixed z-50 w-full max-w-2xl rounded-2xl border border-border bg-background/95 p-6 shadow-2xl transition-all',
-            isMinimized
-              ? 'right-4 top-4 left-auto translate-x-0 translate-y-0 max-w-sm'
-              : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
+            'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
           )}
         >
-          {isMinimized ? (
-            <div className="flex items-center justify-between gap-4">
+          <div className="space-y-6">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <DialogTitle className="text-base">
-                  Wallet login required
+                <DialogTitle className="text-2xl font-semibold">
+                  Unlock Nuwa
                 </DialogTitle>
-                <DialogDescription className="mt-1 text-xs">
-                  Select or create an account to continue using Nuwa.
+                <DialogDescription className="mt-2 text-base">
+                  {accounts.length > 0
+                    ? 'Choose an existing account or create a new one to continue.'
+                    : 'Create your first Nuwa account to continue.'}
                 </DialogDescription>
               </div>
-              <Button size="sm" onClick={() => setIsMinimized(false)}>
-                <Maximize2 className="mr-2 h-4 w-4" />
-                Resume
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9"
+                onClick={() => onOpenChange?.(false)}
+                aria-label="Close login dialog"
+              >
+                <X className="h-4 w-4" />
               </Button>
             </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <DialogTitle className="text-2xl font-semibold">
-                    Unlock Nuwa
-                  </DialogTitle>
-                  <DialogDescription className="mt-2 text-base">
-                    {accounts.length > 0
-                      ? 'Choose an existing account or create a new one to continue.'
-                      : 'Create your first Nuwa account to continue.'}
-                  </DialogDescription>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9"
-                  onClick={() => setIsMinimized(true)}
-                  aria-label="Minimize login dialog"
-                >
-                  <Minimize2 className="h-4 w-4" />
-                </Button>
-              </div>
 
-              {view === 'list' && accounts.length > 0
-                ? renderAccounts()
-                : renderCreateForm()}
-            </div>
-          )}
+            {view === 'list' && accounts.length > 0
+              ? renderAccounts()
+              : renderCreateForm()}
+          </div>
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>

@@ -93,10 +93,12 @@ export function createAccountStatePersistConfig<
     storage: createJSONStorage(() => new AccountStateStorage()),
     partialize: config.partialize,
     onRehydrateStorage: () => {
-      return (state: T | undefined, error: unknown) => {
-        if (!error && state) {
-          rehydrationTracker.markRehydrated(config.name);
-        }
+      // Mark rehydration complete regardless of whether there was any
+      // persisted state. On a fresh install (empty IndexedDB), Zustand
+      // passes `undefined` here, which previously left the store marked
+      // as "not rehydrated" and blocked auth-gated UIs from rendering.
+      return (_state: T | undefined, _error: unknown) => {
+        rehydrationTracker.markRehydrated(config.name);
       };
     },
   };

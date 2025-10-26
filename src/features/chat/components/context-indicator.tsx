@@ -64,7 +64,7 @@ export function ContextIndicator() {
 
         const { totalAmount, toolCallAmount } = transactions.reduce(
           (acc, tx) => {
-            const amount = tx.details?.payment?.costUsd || 0n;
+            const amount = toPicoUsd(tx.details);
             return {
               totalAmount: acc.totalAmount + amount,
               toolCallAmount:
@@ -367,4 +367,34 @@ const formatCostDisplay = (amount?: bigint | null) => {
 
   const [dollars, cents] = amountText.split('.');
   return `$${dollars}.${cents.padEnd(2, '0')}`;
+};
+
+// Helpers to support both legacy and new X402 record shapes
+function isLegacy(details: any): details is { payment?: { costUsd?: bigint } } {
+  return !!details && typeof details === 'object' && 'payment' in details;
+}
+
+const pow10 = (exp: number): bigint => {
+  if (exp <= 0) return 1n;
+  return 10n ** BigInt(exp);
+};
+
+const getAssetDecimals = (details: any): number => {
+  const dec = details?.requirement?.extra?.assetDecimals;
+  return Number.isInteger(dec) ? Number(dec) : 6;
+};
+
+const toPicoUsd = (details: any | null | undefined): bigint => {
+  if (!details) return 0n;
+  if (isLegacy(details)) {
+    const v = details.payment?.costUsd;
+    return v === undefined || v === null ? 0n : BigInt(String(v));
+  }
+  const raw = details?.requirement?.maxAmountRequired;
+  if (raw === undefined || raw === null) return 0n;
+  const amount = BigInt(String(raw));
+  const decimals = getAssetDecimals(details);
+  if (decimals === 12) return amount;
+  if (decimals > 12) return amount / pow10(decimals - 12);
+  return amount * pow10(12 - decimals);
 };

@@ -1,9 +1,12 @@
-import type { TransactionRecord } from '@nuwa-ai/payment-kit';
+import type { X402TransactionRecord } from '@/shared/services/x402-transaction-store';
+import type { TransactionRecord as LegacyTransactionRecord } from '@nuwa-ai/payment-kit';
 import type { ChatPayment } from '@/features/chat/types';
+
+export type WalletTransactionDetails = X402TransactionRecord | LegacyTransactionRecord;
 
 export interface PaymentTransaction {
   ctxId: string;
-  details: TransactionRecord | null;
+  details: WalletTransactionDetails | null;
   info: ChatPayment;
 }
 
