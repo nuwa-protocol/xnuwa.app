@@ -1,4 +1,3 @@
-import { createAuthorizedFetch } from '@/shared/services/authorized-fetch';
 import type {
   ModelDetails,
   OpenRouterAPIResponse,
@@ -6,12 +5,11 @@ import type {
 } from '../components/cap-edit/model/model-selector/type';
 
 async function modelFetch(gatewayUrl: string): Promise<OpenRouterAPIResponse> {
-  const authorizedFetch = createAuthorizedFetch();
   // const endpoint = `${gatewayUrl}/models`;
   const endpoint = `https://openrouter.ai/api/v1/models`;
 
   try {
-    const response = await authorizedFetch(endpoint, {
+    const response = await fetch(endpoint, {
       method: 'GET',
     });
     if (!response.ok) {
@@ -29,17 +27,17 @@ async function modelFetch(gatewayUrl: string): Promise<OpenRouterAPIResponse> {
 function detectToolSupport(model: OpenRouterModel): boolean {
   // Check if the model supports function calling based on supported parameters
   const toolSupportParams = [
-    'tools', 
-    'tool_choice', 
-    'function_call', 
+    'tools',
+    'tool_choice',
+    'function_call',
     'functions',
-    'parallel_tool_calls'
+    'parallel_tool_calls',
   ];
-  
-  const hasToolParams = model.supported_parameters.some(param => 
-    toolSupportParams.includes(param.toLowerCase())
-  ); 
-  
+
+  const hasToolParams = model.supported_parameters.some((param) =>
+    toolSupportParams.includes(param.toLowerCase()),
+  );
+
   return hasToolParams;
 }
 
