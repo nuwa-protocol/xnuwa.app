@@ -18,7 +18,7 @@ export function TransactionsCard() {
       <CardHeader>
         <CardTitle>Transactions</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className='max-h-[50vh] overflow-y-auto space-y-2'>
         <AITransactionList />
       </CardContent>
     </Card>
