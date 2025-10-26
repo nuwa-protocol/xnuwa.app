@@ -31,27 +31,15 @@ export const ChatInstanceStore = create<ChatInstanceStoreState>()(
       // Check if instance already exists
       const existingInstance = instances.get(chatId);
       if (existingInstance) {
-        // Sync persisted messages into the existing instance. This handles the
-        // case where the instance was created before the store finished
-        // rehydrating (e.g. page refresh on a chat route) and therefore missed
-        // the historical messages. Once rehydration completes we get called
-        // again with the restored message list and need to push it into the chat
-        // instance so the UI renders them.
-        const persistedMessages = initialMessages || [];
-        if (persistedMessages.length > 0) {
-          const currentMessages = existingInstance.messages || [];
-          const isDifferentLength =
-            currentMessages.length !== persistedMessages.length;
-          const hasDifferentIds =
-            !isDifferentLength &&
-            currentMessages.some(
-              (message, index) =>
-                message.id !== persistedMessages[index]?.id,
-            );
-
-          if (isDifferentLength || hasDifferentIds) {
-            existingInstance.messages = persistedMessages;
-          }
+        // If the instance was created before the chat sessions store rehydrated,
+        // it might still have an empty message list. When we later get called
+        // with the restored message history, hydrate the instance so the UI
+        // shows the persisted conversation after refresh.
+        if (
+          (existingInstance.messages?.length ?? 0) === 0 &&
+          (initialMessages?.length ?? 0) > 0
+        ) {
+          existingInstance.messages = initialMessages;
         }
 
         return existingInstance;

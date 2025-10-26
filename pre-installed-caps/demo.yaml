@@ -16,7 +16,7 @@ core:
       - file
     contextLength: 1000000
   mcpServers:
-    mcp-fot: https://x402-ai-starter-lemon.vercel.app/mcp
+    mcp-fot: https://x402-indol.vercel.app/mcp
 metadata:
   displayName: x402 Demo
   description: This is a demo for testing the x402 based LLM and MCP.
