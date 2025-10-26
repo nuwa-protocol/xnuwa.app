@@ -1,7 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { getPaymentHubClient } from '@/shared/services/payment-clients';
-import { createLocalStoragePersistConfig } from '@/shared/storage';
+import { getCurrnetAccountBalance } from './services/wallet-client';
 
 function formatBigIntWithDecimals(
   value: bigint,
@@ -21,7 +19,6 @@ function formatBigIntWithDecimals(
 
 interface WalletState {
   // Payment hub balance
-  rgasAmount: string;
   usdAmount: string;
   balanceLoading: boolean;
   balanceError: string | null;
@@ -29,40 +26,24 @@ interface WalletState {
   fetchPaymentBalance: (assetId?: string) => Promise<void>;
 }
 
-const persistConfig = createLocalStoragePersistConfig<WalletState>({
-  name: 'wallet-storage',
-  partialize: (state) => ({
-    rgasAmount: state.rgasAmount,
-    usdAmount: state.usdAmount,
-  }),
-});
+export const WalletStore = create<WalletState>()((set, get) => ({
+  usdAmount: '0',
+  balanceLoading: false,
+  balanceError: null,
 
-export const WalletStore = create<WalletState>()(
-  persist(
-    (set, get) => ({
-      rgasAmount: '0',
-      usdAmount: '0',
-      balanceLoading: false,
-      balanceError: null,
-
-      fetchPaymentBalance: async (assetId = '0x3::gas_coin::RGas') => {
-        set({ balanceLoading: true, balanceError: null });
-        try {
-          const hub = await getPaymentHubClient(assetId);
-          const res = await hub.getBalanceWithUsd({ assetId });
-          set({
-            rgasAmount: formatBigIntWithDecimals(res.balance, 8, 8),
-            usdAmount: formatBigIntWithDecimals(res.balancePicoUSD, 12, 2),
-            balanceLoading: false,
-          });
-        } catch (e: any) {
-          set({
-            balanceError: e?.message || String(e),
-            balanceLoading: false,
-          });
-        }
-      },
-    }),
-    persistConfig,
-  ),
-);
+  fetchPaymentBalance: async (assetId = '0x3::gas_coin::RGas') => {
+    set({ balanceLoading: true, balanceError: null });
+    try {
+      const balance = await getCurrnetAccountBalance();
+      set({
+        usdAmount: formatBigIntWithDecimals(balance, 8, 8),
+        balanceLoading: false,
+      });
+    } catch (e: any) {
+      set({
+        balanceError: e?.message || String(e),
+        balanceLoading: false,
+      });
+    }
+  },
+}));
