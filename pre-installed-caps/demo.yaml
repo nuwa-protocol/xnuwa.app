@@ -17,7 +17,7 @@ core:
       - file
     contextLength: 128000
   mcpServers:
-    mcp-fot: https://x402-indol.vercel.app/mcp
+    mcp-fot: https://x402.xnuwa.app/mcp
 metadata:
   displayName: x402 MCP Demo
   description: The Model fee is flat. Waiting for v2's upto schema. 4o-mini is cheap enough but please go easy on it. I have no VC to back me for LLM fee.
