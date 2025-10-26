@@ -1,5 +1,11 @@
 import { Outlet } from 'react-router-dom';
+import { UiProviders } from './ui-providers';
 
 export default function PublicLayout() {
-  return <Outlet />;
+  // Public area renders with UI providers only; no app-level side effects
+  return (
+    <UiProviders>
+      <Outlet />
+    </UiProviders>
+  );
 }

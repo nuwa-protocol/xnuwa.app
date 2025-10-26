@@ -4,6 +4,7 @@ import { rehydrationTracker } from '@/shared/hooks/use-rehydration';
 import { capKitService } from '@/shared/services/capkit-service';
 import { createInstalledCapsPersistConfig } from '@/shared/storage/indexeddb-config';
 import type { Cap } from '@/shared/types';
+import { preinstalledCaps } from '@/shared/utils/preinstalled-caps';
 
 interface InstalledCapsState {
   installedCaps: Cap[];
@@ -24,7 +25,7 @@ const persistConfig = createInstalledCapsPersistConfig<InstalledCapsState>({
 export const InstalledCapsStore = create<InstalledCapsState>()(
   persist(
     (set, get) => ({
-      installedCaps: [],
+      installedCaps: preinstalledCaps,
       isFetchingInstalledCaps: false,
       installedCapsError: null,
 

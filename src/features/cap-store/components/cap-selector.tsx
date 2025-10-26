@@ -320,11 +320,12 @@ export function CapSelector() {
                     Cap Studio
                   </TabsTrigger>
                 )}
+                {/* TODO: store tab */}
                 <TabsTrigger
-                  value="store"
+                  value="store-not-working"
                   className="data-[state=active]:after:bg-primary relative rounded-none py-2 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                 >
-                  Store
+                  Store (Coming Soon)
                 </TabsTrigger>
               </TabsList>
               <CommandList className="max-h-none min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
@@ -401,6 +402,15 @@ export function CapSelector() {
                 </TabsContent>
 
                 {/* Store Tab: not filtered by Command; uses backend search */}
+
+                <TabsContent value="store-not-working">
+                  <CommandGroup>
+                    <div className=" w-full h-full flex items-center justify-center text-center px-2 py-2 text-sm text-muted-foreground">
+                      Store is not available yet. <br /> We are working on it.
+                    </div>
+                  </CommandGroup>
+                </TabsContent>
+
                 <TabsContent value="store">
                   <CommandGroup>
                     {isFetching && (

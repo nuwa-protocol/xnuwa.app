@@ -1,5 +1,7 @@
-import { BanknoteArrowDown, BanknoteArrowUp, HandCoins, WalletIcon } from 'lucide-react';
+import { Copy, WalletIcon } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { AccountStore } from '@/features/auth/store';
 import { Button } from '@/shared/components/ui/button';
 import {
   Card,
@@ -7,12 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/shared/components/ui/tooltip';
+import { TooltipProvider } from '@/shared/components/ui/tooltip';
 import { cn } from '@/shared/utils/cn';
 import { WalletStore } from '../../stores';
 import { TestnetFaucetDialog } from '../testnet-faucet-dialog';
@@ -22,10 +19,9 @@ export function BalanceCard() {
   const { usdAmount, balanceLoading, balanceError } = WalletStore();
   const [showFaucetDialog, setShowFaucetDialog] = useState(false);
   const [showBuyModal, setShowBuyModal] = useState(false);
+  const account = AccountStore((s) => s.account);
 
-  const usdValue = balanceLoading || balanceError
-    ? '-.--'
-    : usdAmount;
+  const usdValue = balanceLoading || balanceError ? '-.--' : usdAmount;
 
   const handleBuy = () => {
     setShowBuyModal(true);
@@ -49,9 +45,26 @@ export function BalanceCard() {
                 <WalletIcon className="w-5 h-5 text-theme-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold">
-                  Credit Balance
-                </CardTitle>
+                <CardTitle className="text-lg font-semibold">Balance</CardTitle>
+                <div className='flex items-center gap-4'>
+                  {account?.address ? (
+                    <div className="text-xs text-muted-foreground font-mono mt-1">
+                      Account:{' '}
+                      {`${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
+                    </div>
+                  ) : null}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      navigator.clipboard.writeText(account?.address || '');
+                      toast.success('Account copied to clipboard');
+                    }}
+                    className='w-2 h-2'
+                  >
+                    <Copy className="w-2 h-2" />
+                  </Button>
+                </div>
               </div>
             </div>
             {/* Balance Display */}
@@ -68,6 +81,19 @@ export function BalanceCard() {
           </div>
           <TooltipProvider delayDuration={0}>
             <div className="flex flex-row items-center gap-4 mt-10">
+              {/* New single button linking to Base faucets docs */}
+              <Button asChild variant="primary" size="sm" className="w-full">
+                <a
+                  href="https://docs.base.org/base-chain/tools/network-faucets"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Get balance from faucet
+                </a>
+              </Button>
+
+              {/* Previous actions commented out per request */}
+              {/**
               <Button
                 variant="primary"
                 size="sm"
@@ -77,6 +103,8 @@ export function BalanceCard() {
                 <BanknoteArrowDown className="w-3.5 h-3.5" />
                 Buy
               </Button>
+              */}
+              {/**
               <Button
                 variant="outline"
                 size="sm"
@@ -86,7 +114,9 @@ export function BalanceCard() {
                 <HandCoins className="w-3.5 h-3.5" />
                 Free Credits
               </Button>
+              */}
               {/* Wrap disabled buttons with tooltip triggers so tooltips still work */}
+              {/**
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
@@ -108,15 +138,13 @@ export function BalanceCard() {
                   Withdraw function will be available soon
                 </TooltipContent>
               </Tooltip>
+              */}
             </div>
           </TooltipProvider>
         </CardContent>
       </Card>
 
-      <BuyCreditsModal
-        open={showBuyModal}
-        onOpenChange={setShowBuyModal}
-      />
+      <BuyCreditsModal open={showBuyModal} onOpenChange={setShowBuyModal} />
 
       <TestnetFaucetDialog
         open={showFaucetDialog}

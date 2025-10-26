@@ -11,6 +11,7 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { setAccountAddressResolver } from '@/shared/storage/account-identity';
+import { db } from '@/shared/storage/db';
 import { AUTH_CONFIG } from '../../shared/config/auth';
 import { createAccountStatePersistConfig } from '../../shared/storage/indexeddb-config';
 import { SessionManager } from './service/session';
@@ -59,6 +60,7 @@ export interface AccountStoreState {
   renameAccount: (address: string, newName: string) => Promise<void>;
   getAccountData: (address: string) => AccountData | undefined;
   setCurrentAccount: (address: string) => void;
+  logout: () => Promise<void>;
 
   // Authentication method management (only operate on current account)
   addPasskeyAuth: () => Promise<void>;
@@ -243,6 +245,7 @@ export const AccountStore = create<AccountStoreState>()(
       // ==================== Set current account ====================
 
       setCurrentAccount: (address) => {
+        console.log('setCurrentAccount', address);
         const accountData = get().accounts.find((a) => a.address === address);
         if (!accountData) throw new Error('Account does not exist');
 
@@ -258,6 +261,62 @@ export const AccountStore = create<AccountStoreState>()(
 
         // Reload to ensure all account-scoped data resets cleanly
         if (typeof window !== 'undefined') {
+          void (async () => {
+            try {
+              await db.accounts.toCollection().modify((record) => {
+                const isCurrent = record.address === address;
+                if (record.isCurrent !== isCurrent) {
+                  record.isCurrent = isCurrent;
+                  record.updatedAt = Date.now();
+                }
+              });
+              const currentRecord = await db.accounts.get(address);
+              if (!currentRecord) {
+                await db.accounts.put({
+                  address,
+                  data: accountData,
+                  isCurrent: true,
+                  updatedAt: Date.now(),
+                });
+              }
+            } catch (error) {
+              console.error(
+                'Failed to update current account flag in IndexedDB:',
+                error,
+              );
+            }
+
+            window.location.reload();
+          })();
+        }
+      },
+
+      logout: async () => {
+        console.log('logout');
+        const currentAccount = get().account;
+
+        if (currentAccount) {
+          sessionManager.clearSession(currentAccount.address);
+          tempEncryptedPrivateKey.delete(currentAccount.address);
+        }
+
+        set({ account: null });
+
+        if (typeof window !== 'undefined') {
+          try {
+            await db.accounts
+              .filter((record) => record.isCurrent === true)
+              .modify((record) => {
+                record.isCurrent = false;
+                record.updatedAt = Date.now();
+              });
+          } catch (error) {
+            console.error(
+              'Failed to clear current account flag in IndexedDB:',
+              error,
+            );
+          }
+
           window.location.reload();
         }
       },

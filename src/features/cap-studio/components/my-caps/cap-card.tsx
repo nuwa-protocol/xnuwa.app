@@ -1,20 +1,8 @@
 import { formatDistanceToNow } from 'date-fns';
-import {
-  Bot,
-  Bug,
-  Check,
-  Clock,
-  Download,
-  Loader2,
-  MoreVertical,
-  PlayCircle,
-  Server,
-  StopCircle,
-  Trash2,
-  Upload,
-} from 'lucide-react';
+import { Bot, Bug, Check, Clock, Download, MoreVertical, Server, Trash2 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { stringifyYaml } from '@/features/cap-studio/utils/yaml';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   AlertDialog,
@@ -34,9 +22,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from '@/shared/components/ui';
 import {
   Dialog,
@@ -50,10 +35,9 @@ import {
   CodeBlock,
   CodeBlockCopyButton,
 } from '@/shared/components/ui/shadcn-io/code-block';
-import { stringifyYaml } from '@/features/cap-studio/utils/yaml';
+import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
-import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { LiveDebugCapDialog } from './live-debug-cap-dialog';
 
 interface CapCardProps {
@@ -167,11 +151,7 @@ export function CapCard({
   const syncCurrentCapLiveSource = (
     nextLiveSource?: LocalCap['liveSource'],
   ) => {
-    if (
-      currentCap &&
-      'capData' in currentCap &&
-      currentCap.id === cap.id
-    ) {
+    if (currentCap && 'capData' in currentCap && currentCap.id === cap.id) {
       setCurrentCap({
         ...currentCap,
         liveSource: nextLiveSource,
@@ -325,6 +305,7 @@ export function CapCard({
                   <Bug className="h-4 w-4 mr-2" />
                   Test Cap
                 </Button>
+                {/* Temporarily disabled: Publish and Live Debugging buttons 
                 {isLiveDebugging ? (
                   <Button
                     onClick={(e) => {
@@ -377,6 +358,7 @@ export function CapCard({
                     Publish
                   </Button>
                 )}
+                */}
               </div>
 
               <DropdownMenu>
@@ -391,6 +373,7 @@ export function CapCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
+                  {/* Temporarily disabled: Start Live Debugging menu 
                   {!isLiveDebugging && (
                     <>
                       <DropdownMenuItem
@@ -406,6 +389,7 @@ export function CapCard({
                     </>
                   )}
 
+*/}
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation();

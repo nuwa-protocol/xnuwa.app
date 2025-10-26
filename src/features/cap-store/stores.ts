@@ -114,7 +114,8 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
   };
 
   // Call initialize immediately when store is created
-  setTimeout(() => initialize(), 0);
+  // TODO: disable initialize
+  // setTimeout(() => initialize(), 0);
 
   return {
     ...initialState,

@@ -1,4 +1,8 @@
 /* Priority loading styles */
+/* Hide the initial loader on pages flagged as public before React mounts */
+html.no-initial-loading #initial-loading {
+  display: none !important;
+}
 #initial-loading {
   position: fixed;
   top: 0;

@@ -64,6 +64,22 @@
       // Add theme class immediately
       document.documentElement.classList.add(theme);
 
+      // Decide if the initial loading screen should be shown for this URL
+      // Only show on protected sections; hide on public pages like '/', '/callback', '/oauth-callback'
+      (function() {
+        try {
+          var path = window.location.pathname || '/';
+          // Mark paths that require auth as protected
+          var isProtected = /^\/(chat|wallet|settings|explore|cap-studio)(\/|$)/.test(path);
+          if (!isProtected) {
+            // Prevent the initial loader from ever showing on public routes
+            document.documentElement.classList.add('no-initial-loading');
+          }
+        } catch (e) {
+          // Fail-safe: do nothing and keep default behavior if something goes wrong
+        }
+      })();
+
       // Progress bar update function
       window.updateLoadingProgress = function(percentage, text = null) {
         const progressFill = document.getElementById('progress-fill');

@@ -38,7 +38,7 @@ export function AITransactionList() {
 
     if (error) return <AITransactionError onRetry={refetch} />;
 
-    if (chatRecords.length === 0) return <AITransactionEmpty onRetry={refetch} />;
+    if (chatRecords.length === 0) return <AITransactionEmpty />;
 
     return (
         <div className="flex flex-col w-full">
@@ -125,32 +125,49 @@ export const getProcessedChatRecords = (
                 if (tx.info?.ctxId?.toLowerCase().includes(q)) return true;
                 if (tx.info?.type?.toLowerCase().includes(q)) return true;
 
-                // Transaction details - check common string fields
+                // Transaction details - support both legacy and new record shapes
                 const d = tx.details as any;
                 if (!d) return false;
 
-                const strFields: Array<unknown> = [
-                    d.clientTxRef,
-                    d.protocol,
-                    d.method,
-                    d.urlOrTarget,
-                    d.operation,
-                    d.status,
-                    d.errorCode,
-                    d.errorMessage,
-                    d.vmIdFragment,
-                    d.channelId,
-                    d.assetId,
-                    d?.payment?.serviceTxRef,
-                ];
-                if (
-                    strFields.some(
-                        (v) => typeof v === 'string' && v.toLowerCase().includes(q),
-                    )
-                )
+                const strFields: Array<unknown> = [];
+                // legacy
+                if ('payment' in d || 'protocol' in d) {
+                    strFields.push(
+                        d.clientTxRef,
+                        d.protocol,
+                        d.method,
+                        d.urlOrTarget,
+                        d.operation,
+                        d.status,
+                        d.errorCode,
+                        d.errorMessage,
+                        d.vmIdFragment,
+                        d.channelId,
+                        d.assetId,
+                        d?.payment?.serviceTxRef,
+                    );
+                }
+                // new
+                if ('requirement' in d) {
+                    strFields.push(
+                        d.requirement?.resource,
+                        d.requirement?.network,
+                        d.requirement?.mimeType,
+                        d.requirement?.asset,
+                        d.requirement?.payTo,
+                        d.requirement?.scheme,
+                        String(d.requirement?.maxAmountRequired ?? ''),
+                    );
+                    // also search in response JSON if present
+                    if (d.response) {
+                        strFields.push(JSON.stringify(d.response));
+                    }
+                }
+                if (strFields.some((v) => typeof v === 'string' && v.toLowerCase().includes(q))) {
                     return true;
+                }
 
-                // headersSummary and meta are objects: scan keys/values
+                // headersSummary and meta (legacy only)
                 const scanObj = (obj: Record<string, unknown> | undefined) => {
                     if (!obj) return false;
                     for (const [k, v] of Object.entries(obj)) {
@@ -195,25 +212,13 @@ export const getProcessedChatRecords = (
                 return mostRecentB - mostRecentA;
             }
             case 'amount-asc': {
-                const totalA = a.transactions.reduce(
-                    (sum, t) => sum + Number(t.details?.payment?.costUsd || 0),
-                    0,
-                );
-                const totalB = b.transactions.reduce(
-                    (sum, t) => sum + Number(t.details?.payment?.costUsd || 0),
-                    0,
-                );
+                const totalA = a.transactions.reduce((sum, t) => sum + Number(toPicoUsd(t.details)), 0);
+                const totalB = b.transactions.reduce((sum, t) => sum + Number(toPicoUsd(t.details)), 0);
                 return totalA - totalB;
             }
             case 'amount-desc': {
-                const totalA = a.transactions.reduce(
-                    (sum, t) => sum + Number(t.details?.payment?.costUsd || 0),
-                    0,
-                );
-                const totalB = b.transactions.reduce(
-                    (sum, t) => sum + Number(t.details?.payment?.costUsd || 0),
-                    0,
-                );
+                const totalA = a.transactions.reduce((sum, t) => sum + Number(toPicoUsd(t.details)), 0);
+                const totalB = b.transactions.reduce((sum, t) => sum + Number(toPicoUsd(t.details)), 0);
                 return totalB - totalA;
             }
             default: {
@@ -225,4 +230,34 @@ export const getProcessedChatRecords = (
             }
         }
     });
+};
+
+// Helpers used above
+function isLegacy(details: any): details is { payment?: { costUsd?: bigint } } {
+    return !!details && typeof details === 'object' && 'payment' in details;
+}
+
+const pow10 = (exp: number): bigint => {
+    if (exp <= 0) return 1n;
+    return 10n ** BigInt(exp);
+};
+
+const getAssetDecimals = (details: any): number => {
+    const dec = details?.requirement?.extra?.assetDecimals;
+    return Number.isInteger(dec) ? Number(dec) : 6;
+};
+
+const toPicoUsd = (details: any | null | undefined): bigint => {
+    if (!details) return 0n;
+    if (isLegacy(details)) {
+        const v = details.payment?.costUsd;
+        return v === undefined || v === null ? 0n : BigInt(String(v));
+    }
+    const raw = details?.requirement?.maxAmountRequired;
+    if (raw === undefined || raw === null) return 0n;
+    const amount = BigInt(String(raw));
+    const decimals = getAssetDecimals(details);
+    if (decimals === 12) return amount;
+    if (decimals > 12) return amount / pow10(decimals - 12);
+    return amount * pow10(12 - decimals);
 };
