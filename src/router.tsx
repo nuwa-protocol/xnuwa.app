@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import AppLayoutSwitch from './layout/app-layout-switch';
+import { AuthGuard } from '@/features/auth/components/auth-guard';
 import CapStudioPage from './pages/cap-studio';
 import ChatPage from './pages/chat';
 import ErrorPage from './pages/error';
@@ -16,11 +17,36 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <LandingPage /> },
-      { path: 'chat', element: <ChatPage /> },
-      { path: 'wallet', element: <WalletPage /> },
-      { path: 'settings', element: <SettingsPage /> },
-      { path: 'explore/*', element: <ExplorePage /> },
-      { path: 'cap-studio/*', element: <CapStudioPage /> },
+      { path: 'chat', element: (
+          <AuthGuard>
+            <ChatPage />
+          </AuthGuard>
+        )
+      },
+      { path: 'wallet', element: (
+          <AuthGuard>
+            <WalletPage />
+          </AuthGuard>
+        )
+      },
+      { path: 'settings', element: (
+          <AuthGuard>
+            <SettingsPage />
+          </AuthGuard>
+        )
+      },
+      { path: 'explore/*', element: (
+          <AuthGuard>
+            <ExplorePage />
+          </AuthGuard>
+        )
+      },
+      { path: 'cap-studio/*', element: (
+          <AuthGuard>
+            <CapStudioPage />
+          </AuthGuard>
+        )
+      },
       { path: 'oauth-callback', element: <OAuthCallbackPage /> },
     ],
   },

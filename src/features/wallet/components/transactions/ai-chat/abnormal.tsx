@@ -45,26 +45,13 @@ export function AITransactionSearchEmpty({
     )
 }
 
-export function AITransactionEmpty({
-    onRetry,
-}: {
-    onRetry: () => void;
-}) {
+export function AITransactionEmpty() {
     return (
         <div className="mx-2 my-4 rounded-xl border bg-muted/30 p-8 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                 <CircleOff className="h-6 w-6 text-muted-foreground" />
             </div>
             <h3 className="text-base font-semibold">No transactions found</h3>
-            <div className="mt-4 flex items-center justify-center gap-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onRetry()}
-                >
-                    Retry
-                </Button>
-            </div>
         </div>
     )
 }

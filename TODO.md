@@ -1,0 +1,7 @@
+- landing page and layout
+- wallet works 
+    - transaction record works
+    - get balance from testnet fix
+- chat works
+  - insufficient balance error 
+  - one single example cap

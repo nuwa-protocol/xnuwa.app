@@ -19,6 +19,11 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     navigate('/', { replace: true });
   }, [account, isAuthRehydrated, navigate]);
 
+  // Avoid rendering protected children while redirecting to prevent runtime errors
+  if (isAuthRehydrated && !account) {
+    return null;
+  }
+
   return (
     <AuthGuardContext.Provider
       value={{

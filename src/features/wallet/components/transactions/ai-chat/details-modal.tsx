@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
+import { Button } from '@/shared/components/ui/button';
 import {
   Table,
   TableBody,
@@ -36,6 +37,23 @@ const formatCost = (details: PaymentTransaction['details']) => {
   const amount = BigInt(String(raw));
   const decimals = getAssetDecimals(details);
   return `$${formatAmount(amount, decimals)}`;
+};
+
+// Build a BaseScan URL when a transaction hash is available
+const getBaseScanUrl = (details: PaymentTransaction['details']): string | null => {
+  if (!details) return null;
+  let tx: string | undefined;
+  let network: string | undefined;
+  if (isLegacy(details)) {
+    tx = details.payment?.serviceTxRef as unknown as string | undefined;
+    network = 'base-sepolia'; // default to sepolia per request
+  } else {
+    tx = (details.response as any)?.transaction as string | undefined;
+    network = (details.requirement as any)?.network as string | undefined;
+  }
+  if (!tx) return null;
+  const host = network === 'base' ? 'basescan.org' : 'sepolia.basescan.org';
+  return `https://${host}/tx/${tx}`;
 };
 
 const formatDate = (timestamp: number) => {
@@ -111,6 +129,7 @@ export function AITransactionDetailsModal({
   if (!transaction) return null;
 
   const details = transaction.details;
+  const txUrl = getBaseScanUrl(details);
 
   return (
     <Dialog open={!!transaction} onOpenChange={onClose}>
@@ -200,12 +219,30 @@ export function AITransactionDetailsModal({
                   <TableRowItem label="Cost (USD)" value={formatCost(details)} isNested />
                   <TableRowItem label="Nonce" value={details.payment?.nonce?.toString() || null} isNested />
                   <TableRowItem label="Service Transaction Reference" value={details.payment?.serviceTxRef || null} isNested />
+                  {txUrl && (
+                    <TableRow>
+                      <TableCell className="pl-8" colSpan={2}>
+                        <Button asChild size="sm" variant="outline">
+                          <a href={txUrl} target="_blank" rel="noopener noreferrer">View on BaseScan</a>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </>
               ) : (
                 <>
                   <TableRowItem label="Amount" value={formatCost(details)} isNested />
                   <TableRowItem label="Asset Decimals" value={String(getAssetDecimals(details))} isNested />
                   <TableRowItem label="Service Transaction Reference" value={(details?.response as any)?.transaction ?? null} isNested />
+                  {txUrl && (
+                    <TableRow>
+                      <TableCell className="pl-8" colSpan={2}>
+                        <Button asChild size="sm" variant="outline">
+                          <a href={txUrl} target="_blank" rel="noopener noreferrer">View on BaseScan</a>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </>
               )}
 

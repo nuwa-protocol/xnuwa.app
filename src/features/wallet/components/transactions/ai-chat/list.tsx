@@ -38,7 +38,7 @@ export function AITransactionList() {
 
     if (error) return <AITransactionError onRetry={refetch} />;
 
-    if (chatRecords.length === 0) return <AITransactionEmpty onRetry={refetch} />;
+    if (chatRecords.length === 0) return <AITransactionEmpty />;
 
     return (
         <div className="flex flex-col w-full">
