@@ -173,7 +173,7 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                   Local-first custody
                 </div>
                 <h1 className="text-4xl font-semibold leading-tight tracking-tight text-balance sm:text-5xl lg:text-6xl">
-                  Your local-first gateway to the x402 AI service network.
+                  Your One-Stop Gateway to the x402 powered AI Capabilities.
                 </h1>
                 <p className="text-lg text-muted-foreground">
                   Launch xNUWA to discover, compose, and run every x402-capable
