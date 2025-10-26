@@ -27,10 +27,13 @@ const PIN_SLOT_KEYS = Array.from(
 );
 
 type AccountLoginDialogProps = {
+  // Controlled open state from parent
   open: boolean;
+  // Optional: allow parent to react to open state changes
+  onOpenChange?: (open: boolean) => void;
 };
 
-export function AccountLoginDialog({ open }: AccountLoginDialogProps) {
+export function AccountLoginDialog({ open, onOpenChange }: AccountLoginDialogProps) {
   const accounts = AccountStore((state) => state.accounts);
   const switchAccount = AccountStore((state) => state.setCurrentAccount);
   const createAccount = AccountStore((state) => state.createAccount);
@@ -311,7 +314,7 @@ export function AccountLoginDialog({ open }: AccountLoginDialogProps) {
   }
 
   return (
-    <Dialog open={open} modal={!isMinimized}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={!isMinimized}>
       <DialogPortal>
         {!isMinimized ? (
           <DialogOverlay

@@ -15,6 +15,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isAuthRehydrated) return;
     if (account) return;
+    // When not authenticated, route to the landing at '/'
     navigate('/', { replace: true });
   }, [account, isAuthRehydrated, navigate]);
 

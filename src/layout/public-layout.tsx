@@ -1,8 +1,11 @@
 import { Outlet } from 'react-router-dom';
-import { useHideInitialLoading } from '@/shared/hooks/use-auto-loading-detection';
+import { UiProviders } from './ui-providers';
 
 export default function PublicLayout() {
-  // Ensure the HTML-level loader is hidden ASAP on public routes (fallback)
-  useHideInitialLoading();
-  return <Outlet />;
+  // Public area renders with UI providers only; no app-level side effects
+  return (
+    <UiProviders>
+      <Outlet />
+    </UiProviders>
+  );
 }

@@ -4,8 +4,10 @@ import { AccountLoginDialog } from '@/features/auth/components/account-login-dia
 import { AccountStore } from '@/features/auth/store';
 import { CapStoreLoading } from '@/features/cap-store/components/cap-store-loading';
 import { GridPattern } from '@/shared/components/ui/shadcn-io/grid-pattern';
+import { Button } from '@/shared/components/ui';
 import { useAuthRehydration } from '@/shared/hooks';
 import { cn } from '@/shared/utils';
+// App shell is provided by ProtectedLayout; no page-level sidebar wrapping needed
 
 // Lazy-load the Cap Store home content to avoid blocking route transition
 const LazyCapStoreHomeContent = lazy(() =>
@@ -19,6 +21,7 @@ export function LandingPage() {
   const isAuthRehydrated = useAuthRehydration();
   const [squares, setSquares] = useState<Array<[number, number]>>([]);
   const [showHome, setShowHome] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   // Generate randomized squares for the grid pattern based on viewport size
   useEffect(() => {
@@ -85,20 +88,76 @@ export function LandingPage() {
 
   if (!account) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-center p-6 relative">
-        <AccountLoginDialog open />
-        <div className="space-y-4">
-          <p className="text-2xl font-semibold">Welcome to Nuwa</p>
-          <p className="text-muted-foreground max-w-md">
-            Placeholder for the future landing experience. Use the wallet dialog to
-            sign in or create an account.
-          </p>
-        </div>
+      <div className="min-h-screen flex flex-col bg-background relative">
+        {/* Login dialog (controlled) */}
+        <AccountLoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
+
+        {/* Header */}
+        <header className="w-full sticky top-0 z-20 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/60">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-6 w-6 rounded bg-primary/90" />
+              <span className="text-sm font-semibold tracking-wide">Nuwa</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button size="sm" onClick={() => setLoginOpen(true)}>
+                Sign in
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        {/* Hero */}
+        <main className="flex-1 relative">
+          <GridPattern
+            width={40}
+            height={40}
+            strokeDasharray={'2 4'}
+            squares={squares}
+            className={cn(
+              'fill-muted/70 dark:fill-muted/20',
+              'absolute inset-0 z-0',
+            )}
+          />
+
+          <div className="relative z-10 px-6">
+            <section className="max-w-6xl mx-auto min-h-[70vh] flex items-center">
+              <div className="w-full grid gap-6">
+                <motion.h1
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-5xl font-bold leading-tight tracking-tight"
+                >
+                  Every AI You Need, In One Place
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.18 }}
+                  className="text-lg text-muted-foreground max-w-2xl"
+                >
+                  Explore and compose powerful AI capabilities. Create an account to get started.
+                </motion.p>
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.26 }}
+                  className="flex items-center gap-3"
+                >
+                  <Button size="lg" onClick={() => setLoginOpen(true)}>
+                    Sign in / Create account
+                  </Button>
+                </motion.div>
+              </div>
+            </section>
+          </div>
+        </main>
       </div>
     );
   }
 
-  return (
+  const authedContent = (
     <div className="flex flex-col relative overflow-y-auto hide-scrollbar">
       {/* Grid Pattern Background */}
       <GridPattern
@@ -158,4 +217,6 @@ export function LandingPage() {
       </div>
     </div>
   );
+
+  return authedContent;
 }
