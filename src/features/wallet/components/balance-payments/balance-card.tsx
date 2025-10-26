@@ -1,4 +1,4 @@
-import { Copy, WalletIcon } from 'lucide-react';
+import { Copy, Globe, WalletIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { AccountStore } from '@/features/auth/store';
@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import { TooltipProvider } from '@/shared/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { cn } from '@/shared/utils/cn';
 import { WalletStore } from '../../stores';
 import { TestnetFaucetDialog } from '../testnet-faucet-dialog';
@@ -53,17 +53,38 @@ export function BalanceCard() {
                       {`${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
                     </div>
                   ) : null}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      navigator.clipboard.writeText(account?.address || '');
-                      toast.success('Account copied to clipboard');
-                    }}
-                    className='w-2 h-2'
-                  >
-                    <Copy className="w-2 h-2" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          navigator.clipboard.writeText(account?.address || '');
+                          toast.success('Account copied to clipboard');
+                        }}
+                        className='w-2 h-2'
+                      >
+                        <Copy className="w-2 h-2" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Copy Address</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          window.open(`https://sepolia.basescan.org/address/${account?.address}`, '_blank');
+                        }}
+                        className='w-2 h-2'
+                      >
+                        <Globe className="w-2 h-2" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>View on BaseScan</TooltipContent>
+                  </Tooltip>
+
                 </div>
               </div>
             </div>
