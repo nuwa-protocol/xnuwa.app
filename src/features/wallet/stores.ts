@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getCurrnetAccountBalance } from './services/wallet-client';
+import { getCurrnetAccountBalance } from './services/balance';
 
 function formatBigIntWithDecimals(
   value: bigint,

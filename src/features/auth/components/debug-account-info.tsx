@@ -103,15 +103,6 @@ export function DebugAccountInfo() {
         }
     };
 
-    const handleSignWithPasskey = async () => {
-        try {
-            // Ensure no active session so auth flow triggers (passkey → PIN fallback)
-            _clearSession();
-            await handleSignMessage();
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : String(error));
-        }
-    };
 
     const handleExportPrivateKey = async () => {
         try {
@@ -181,25 +172,6 @@ export function DebugAccountInfo() {
         try {
             await deleteAccount(account.address);
             toast.success('Account deleted');
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : String(error));
-        }
-    };
-
-    const handleCycleAccount = () => {
-        if (!accounts.length) {
-            return;
-        }
-        const currentIndex = accounts.findIndex(
-            (acc) => acc.address === account.address,
-        );
-        const nextIndex =
-            currentIndex === -1 ? 0 : (currentIndex + 1) % accounts.length;
-        const nextAccount = accounts[nextIndex];
-
-        try {
-            setCurrentAccount(nextAccount.address);
-            toast.success(`Switched to ${nextAccount.name}`);
         } catch (error) {
             toast.error(error instanceof Error ? error.message : String(error));
         }
@@ -291,13 +263,6 @@ export function DebugAccountInfo() {
                             <Button size="sm" onClick={handleSignMessage}>
                                 Sign Message
                             </Button>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={handleSignWithPasskey}
-                            >
-                                Sign (Force Auth)
-                            </Button>
                             <Button variant="outline" size="sm" onClick={handleCreateTestAccount}>
                                 Create Account
                             </Button>
@@ -307,11 +272,8 @@ export function DebugAccountInfo() {
                             <Button variant="outline" size="sm" onClick={handleDeleteAccount}>
                                 Delete
                             </Button>
-                            <Button variant="outline" size="sm" onClick={handleCycleAccount}>
-                                Cycle Account
-                            </Button>
                             <Button variant="outline" size="sm" onClick={handleSetSessionDuration}>
-                                Set Session
+                                Set Session Duration
                             </Button>
                             <Button variant="outline" size="sm" onClick={handleClearSession}>
                                 Clear Session
