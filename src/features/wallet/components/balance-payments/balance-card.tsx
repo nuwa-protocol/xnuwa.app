@@ -109,7 +109,7 @@ export function BalanceCard() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Get balance from faucet
+                  Get Testnet USDC from Base-Sepolia Faucet
                 </a>
               </Button>
 
