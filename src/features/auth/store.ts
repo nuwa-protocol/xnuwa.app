@@ -1,6 +1,3 @@
-// account-store.ts
-// 依赖: viem, @simplewebauthn/browser, zustand, dexie
-
 import {
   startAuthentication,
   startRegistration,
@@ -32,47 +29,47 @@ import {
   encryptWithSessionKey,
 } from './utils/crypto';
 
-// 全局常量
+// global constants
 export const IS_PASSKEY_SUPPORTED: boolean = !!(
   window?.PublicKeyCredential && window?.navigator?.credentials
 );
 
-// ==================== 数据库 ====================
-// 现在使用 IndexedDB 通过 persist 中间件自动管理
+// ==================== Database ====================
+// Now using IndexedDB through persist middleware to manage
 
 const sessionManager = new SessionManager();
 
-// 临时私钥存储（使用 sessionKey 加密）
+// Temporary private key storage (encrypted with sessionKey)
 const tempEncryptedPrivateKey = new Map<string, string>();
 
 // ==================== Zustand Store ====================
 
 export interface AccountStoreState {
-  // 状态
+  // State
   accounts: AccountData[];
-  account: ManagedAccount | null; // 当前账户
+  account: ManagedAccount | null; // Current account
 
-  // 授权回调（由 UI 层设置）
+  // Authorization callback (set by UI layer)
   authRequestCallback: AuthRequestCallback | null;
   setAuthRequestCallback: (callback: AuthRequestCallback | null) => void;
 
-  // 账户管理
+  // Account management
   createAccount: (name: string, pin: string) => Promise<ManagedAccount>;
   deleteAccount: (address: string) => Promise<void>;
   renameAccount: (address: string, newName: string) => Promise<void>;
   getAccountData: (address: string) => AccountData | undefined;
   setCurrentAccount: (address: string) => void;
 
-  // 认证方式管理（只操作当前账户）
+  // Authentication method management (only operate on current account)
   addPasskeyAuth: () => Promise<void>;
   removePasskeyAuth: () => Promise<void>;
   changePinAuth: (oldPin: string, newPin: string) => Promise<void>;
 
-  // Session 配置（只操作当前账户）
+  // Session configuration (only operate on current account)
   setSessionDuration: (duration: number) => void;
   getSessionExpiresAt: () => number | null;
 
-  // 内部方法
+  // Internal methods
   _getPrivateKey: (forceAuth?: boolean) => Promise<Hex>;
   _authenticateWithPin: (pin: string) => Promise<Hex>;
   _authenticateWithPasskey: () => Promise<Hex>;
@@ -127,35 +124,35 @@ const createManagedAccount = (
 export const AccountStore = create<AccountStoreState>()(
   persist(
     (set, get) => ({
-      // 初始状态
+      // Initial state
       accounts: [],
       account: null,
       authRequestCallback: null,
 
-      // ==================== 设置授权回调 ====================
+      // ==================== Set authorization callback ====================
 
       setAuthRequestCallback: (callback) => {
         set({ authRequestCallback: callback });
       },
 
-      // ==================== 账户管理 ====================
+      // ==================== Account management ====================
 
       createAccount: async (name, pin) => {
         if (!pin) {
-          throw new Error('创建账户必须提供 PIN 码');
+          throw new Error('Creating account must provide PIN code');
         }
 
         if (pin.length < 6) {
-          throw new Error('PIN 码至少需要 6 位');
+          throw new Error('PIN code must be at least 6 digits');
         }
 
-        // 生成私钥
+        // Generate private key
         const privateKey = generatePrivateKey();
         const tempAccount = privateKeyToAccount(privateKey);
 
         const authMethods: AuthMethodConfig = {};
 
-        // 添加 PIN 认证（必须）
+        // Add PIN authentication (required)
         authMethods.pin = await encryptPrivateKey(
           privateKey,
           pin,
@@ -163,7 +160,7 @@ export const AccountStore = create<AccountStoreState>()(
         );
 
         const account: AccountData = {
-          address: tempAccount.address, // 使用 address 作为主键
+          address: tempAccount.address, // Use address as primary key
           name,
           authMethods,
           sessionDuration: AUTH_CONFIG.defaultSessionDuration,
@@ -171,9 +168,9 @@ export const AccountStore = create<AccountStoreState>()(
           updatedAt: Date.now(),
         };
 
-        // 数据会通过 persist 中间件自动同步到 IndexedDB
+        // Data will be automatically synchronized to IndexedDB through persist middleware
 
-        // 生成 sessionKey 并创建初始 session（因为用户刚输入过认证信息）
+        // Generate sessionKey and create initial session (because user has just entered authentication information)
         const sessionKey = crypto
           .getRandomValues(new Uint8Array(32))
           .toString();
@@ -188,7 +185,7 @@ export const AccountStore = create<AccountStoreState>()(
           account.sessionDuration,
         );
 
-        // 创建 ManagedAccount
+        // Create ManagedAccount
         const managedAccount = createManagedAccount(
           tempAccount.address as Hex,
           get(),
@@ -222,7 +219,7 @@ export const AccountStore = create<AccountStoreState>()(
 
       renameAccount: async (address, newName) => {
         const account = get().accounts.find((a) => a.address === address);
-        if (!account) throw new Error('账户不存在');
+        if (!account) throw new Error('Account does not exist');
 
         const updatedAccount = {
           ...account,
@@ -230,7 +227,7 @@ export const AccountStore = create<AccountStoreState>()(
           updatedAt: Date.now(),
         };
 
-        // 数据会通过 persist 中间件自动同步到 IndexedDB
+        // Data will be automatically synchronized to IndexedDB through persist middleware
 
         set((state) => ({
           accounts: state.accounts.map((a) =>
@@ -243,15 +240,15 @@ export const AccountStore = create<AccountStoreState>()(
         return get().accounts.find((a) => a.address === address);
       },
 
-      // ==================== 设置当前账户 ====================
+      // ==================== Set current account ====================
 
       setCurrentAccount: (address) => {
         const accountData = get().accounts.find((a) => a.address === address);
-        if (!accountData) throw new Error('账户不存在');
+        if (!accountData) throw new Error('Account does not exist');
 
         const { _getPrivateKey, _isSessionActive } = get();
 
-        // 创建 ManagedAccount
+        // Create ManagedAccount
         const managedAccount = createManagedAccount(
           accountData.address as Hex,
           { _getPrivateKey, _isSessionActive },
@@ -265,29 +262,29 @@ export const AccountStore = create<AccountStoreState>()(
         }
       },
 
-      // ==================== 认证方式管理 ====================
+      // ==================== Authentication Method Management ====================
 
       addPasskeyAuth: async () => {
         const { _getPrivateKey, account } = get();
 
         if (!account) {
-          throw new Error('没有当前账户');
+          throw new Error('No current account');
         }
 
         if (!IS_PASSKEY_SUPPORTED) {
-          throw new Error('当前浏览器不支持 Passkey');
+          throw new Error('Current browser does not support Passkey');
         }
 
         const accountData = get().accounts.find(
           (a) => a.address === account.address,
         );
-        if (!accountData) throw new Error('当前账户不存在');
+        if (!accountData) throw new Error('Current account does not exist');
 
-        // 需要先获取私钥（可能需要授权）
+        // Need to get private key first (may require authorization)
         const privateKey = await _getPrivateKey(true);
 
         const challenge = crypto.getRandomValues(new Uint8Array(32));
-        // 使用账户地址作为用户标识
+        // Use account address as user identifier
         const userIdBytes = new TextEncoder().encode(accountData.address);
 
         // Build a friendlier label for the passkey record shown in platform UIs
@@ -341,7 +338,7 @@ export const AccountStore = create<AccountStoreState>()(
           updatedAt: Date.now(),
         };
 
-        // 数据会通过 persist 中间件自动同步到 IndexedDB
+        // Data will be automatically synchronized to IndexedDB through persist middleware
 
         set((state) => ({
           accounts: state.accounts.map((a) =>
@@ -354,15 +351,17 @@ export const AccountStore = create<AccountStoreState>()(
         const { account } = get();
 
         if (!account) {
-          throw new Error('没有当前账户');
+          throw new Error('No current account');
         }
 
         const accountData = get().accounts.find(
           (a) => a.address === account.address,
         );
-        if (!accountData) throw new Error('当前账户不存在');
+        if (!accountData) throw new Error('Current account does not exist');
         if (!accountData.authMethods.passkey) {
-          throw new Error('此账户未启用 Passkey 认证');
+          throw new Error(
+            'This account has not enabled Passkey authentication',
+          );
         }
 
         const updatedAccount = {
@@ -374,7 +373,7 @@ export const AccountStore = create<AccountStoreState>()(
           updatedAt: Date.now(),
         };
 
-        // 数据会通过 persist 中间件自动同步到 IndexedDB
+        // Data will be automatically synchronized to IndexedDB through persist middleware
 
         set((state) => ({
           accounts: state.accounts.map((a) =>
@@ -387,23 +386,24 @@ export const AccountStore = create<AccountStoreState>()(
         const { account } = get();
 
         if (!account) {
-          throw new Error('没有当前账户');
+          throw new Error('No current account');
         }
 
         const accountData = get().accounts.find(
           (a) => a.address === account.address,
         );
-        if (!accountData) throw new Error('当前账户不存在');
-        if (!accountData.authMethods.pin) throw new Error('未设置 PIN 码认证');
+        if (!accountData) throw new Error('Current account does not exist');
+        if (!accountData.authMethods.pin)
+          throw new Error('PIN authentication not set');
 
-        // 用旧 PIN 解密验证
+        // Decrypt and verify with old PIN
         const privateKey = await decryptPrivateKey(
           accountData.authMethods.pin,
           oldPin,
           AUTH_CONFIG.pbkdf2Iterations,
         );
 
-        // 用新 PIN 重新加密
+        // Re-encrypt with new PIN
         const encrypted = await encryptPrivateKey(
           privateKey,
           newPin,
@@ -419,7 +419,7 @@ export const AccountStore = create<AccountStoreState>()(
           updatedAt: Date.now(),
         };
 
-        // 数据会通过 persist 中间件自动同步到 IndexedDB
+        // Data will be automatically synchronized to IndexedDB through persist middleware
 
         set((state) => ({
           accounts: state.accounts.map((a) =>
@@ -433,13 +433,13 @@ export const AccountStore = create<AccountStoreState>()(
       setSessionDuration: (duration) => {
         const { account } = get();
         if (!account) {
-          throw new Error('没有当前账户');
+          throw new Error('No current account');
         }
 
         const accountData = get().accounts.find(
           (a) => a.address === account.address,
         );
-        if (!accountData) throw new Error('当前账户不存在');
+        if (!accountData) throw new Error('Current account does not exist');
 
         const updatedAccount = {
           ...accountData,
@@ -447,9 +447,9 @@ export const AccountStore = create<AccountStoreState>()(
           updatedAt: Date.now(),
         };
 
-        // 数据会通过 persist 中间件自动同步到 IndexedDB
+        // Data will be automatically synchronized to IndexedDB through persist middleware
 
-        // 更新 store
+        // Update store
         set((state) => ({
           accounts: state.accounts.map((a) =>
             a.address === account.address ? updatedAccount : a,
@@ -463,39 +463,39 @@ export const AccountStore = create<AccountStoreState>()(
         return sessionManager.getSessionExpiresAt(account.address);
       },
 
-      // ==================== 内部方法 ====================
+      // ==================== Internal Methods ====================
 
-      // 核心：获取私钥（自动处理 session 和授权）
+      // Core: Get private key (automatically handle session and authorization)
       _getPrivateKey: async (forceAuth = false) => {
         const { account } = get();
 
         if (!account) {
-          throw new Error('没有当前账户');
+          throw new Error('No current account');
         }
 
-        // 如果不是强制授权，先检查 session
+        // If not forced authorization, check session first
         if (!forceAuth) {
           const sessionKey = sessionManager.getSessionKey(account.address);
           if (sessionKey) {
-            // 使用 sessionKey 解锁私钥
+            // Use sessionKey to unlock private key
             return await get()._unlockPrivateKeyWithSessionKey(sessionKey);
           }
         }
 
-        // 需要授权，优先尝试 passkey，失败时回退到 PIN 码
+        // Authorization required, try passkey first, fallback to PIN on failure
         const accountData = get().accounts.find(
           (a) => a.address === account.address,
         );
-        if (!accountData) throw new Error('当前账户不存在');
+        if (!accountData) throw new Error('Current account does not exist');
 
         let privateKey: Hex;
 
-        // 如果有 passkey 认证，优先尝试
+        // If passkey authentication exists, try it first
         if (accountData.authMethods.passkey) {
           try {
             privateKey = await get()._authenticateWithPasskey();
           } catch (passkeyError) {
-            // Passkey 失败，回退到 PIN 码
+            // Passkey failed, fallback to PIN
             const {
               authRequestCallback,
               _authenticateWithPin,
@@ -503,7 +503,9 @@ export const AccountStore = create<AccountStoreState>()(
             } = get();
 
             if (!authRequestCallback) {
-              throw new Error('未设置授权回调，无法进行授权');
+              throw new Error(
+                'Authorization callback not set, cannot authorize',
+              );
             }
 
             const reason = forceAuth
@@ -513,34 +515,34 @@ export const AccountStore = create<AccountStoreState>()(
               account.address,
               reason,
               true,
-            ); // 传入 fallback 标志
+            ); // Pass fallback flag
 
             if (authResult.method === 'passkey') {
               privateKey = await _authenticateWithPasskey();
             } else if (authResult.method === 'pin' && authResult.pin) {
               privateKey = await _authenticateWithPin(authResult.pin);
             } else {
-              throw new Error('PIN 码不能为空');
+              throw new Error('PIN cannot be empty');
             }
           }
         } else {
-          // 没有 passkey，直接使用 PIN 码
+          // No passkey, use PIN directly
           const { authRequestCallback, _authenticateWithPin } = get();
 
           if (!authRequestCallback) {
-            throw new Error('未设置授权回调，无法进行授权');
+            throw new Error('Authorization callback not set, cannot authorize');
           }
 
           const reason = forceAuth ? 'export_private_key' : 'sign_transaction';
           const authResult = await authRequestCallback(account.address, reason);
 
           if (authResult.method !== 'pin' || !authResult.pin) {
-            throw new Error('PIN 码不能为空');
+            throw new Error('PIN cannot be empty');
           }
           privateKey = await _authenticateWithPin(authResult.pin);
         }
 
-        // 如果不是导出私钥操作，创建 session 并存储加密的私钥
+        // If not exporting private key, create session and store encrypted private key
         if (!forceAuth) {
           const sessionKey = crypto
             .getRandomValues(new Uint8Array(32))
@@ -560,15 +562,15 @@ export const AccountStore = create<AccountStoreState>()(
         const { account } = get();
 
         if (!account) {
-          throw new Error('没有当前账户');
+          throw new Error('No current account');
         }
 
         const accountData = get().accounts.find(
           (a) => a.address === account.address,
         );
-        if (!accountData) throw new Error('当前账户不存在');
+        if (!accountData) throw new Error('Current account does not exist');
         if (!accountData.authMethods.pin)
-          throw new Error('此账户未启用 PIN 码认证');
+          throw new Error('This account has not enabled PIN authentication');
 
         const privateKey = await decryptPrivateKey(
           accountData.authMethods.pin,
@@ -583,15 +585,17 @@ export const AccountStore = create<AccountStoreState>()(
         const { account } = get();
 
         if (!account) {
-          throw new Error('没有当前账户');
+          throw new Error('No current account');
         }
 
         const accountData = get().accounts.find(
           (a) => a.address === account.address,
         );
-        if (!accountData) throw new Error('当前账户不存在');
+        if (!accountData) throw new Error('Current account does not exist');
         if (!accountData.authMethods.passkey)
-          throw new Error('此账户未启用 Passkey 认证');
+          throw new Error(
+            'This account has not enabled Passkey authentication',
+          );
 
         const challenge = crypto.getRandomValues(new Uint8Array(32));
 
@@ -621,7 +625,7 @@ export const AccountStore = create<AccountStoreState>()(
         return privateKey as Hex;
       },
 
-      // ==================== 内部 Session 管理 ====================
+      // ==================== Internal Session Management ====================
 
       _createSession: (sessionKey) => {
         const { account } = get();
@@ -656,14 +660,14 @@ export const AccountStore = create<AccountStoreState>()(
       _unlockPrivateKeyWithSessionKey: async (sessionKey) => {
         const { account } = get();
         if (!account) {
-          throw new Error('没有当前账户');
+          throw new Error('No current account');
         }
 
         const encryptedPrivateKey = tempEncryptedPrivateKey.get(
           account.address,
         );
         if (!encryptedPrivateKey) {
-          throw new Error('Session 已过期，需要重新认证');
+          throw new Error('Session expired, re-authentication required');
         }
 
         try {
@@ -673,7 +677,7 @@ export const AccountStore = create<AccountStoreState>()(
           );
           return privateKey as Hex;
         } catch (error) {
-          throw new Error('Session 已过期，需要重新认证');
+          throw new Error('Session expired, re-authentication required');
         }
       },
     }),
@@ -686,7 +690,7 @@ export const AccountStore = create<AccountStoreState>()(
         partialize: (state) => ({
           accounts: state.accounts,
           account: state.account ? { address: state.account.address } : null,
-          // 不持久化 authRequestCallback 等运行时状态
+          // Do not persist runtime state like authRequestCallback
         }),
       }),
       merge: (persistedState, currentState) => {

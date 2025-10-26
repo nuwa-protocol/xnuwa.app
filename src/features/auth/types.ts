@@ -18,28 +18,28 @@ export interface AuthMethodConfig {
 }
 
 export interface AccountData {
-  address: string; // 以太坊地址（作为唯一标识）
+  address: string; // Ethereum address (as unique identifier)
   name: string;
   authMethods: AuthMethodConfig;
-  sessionDuration: number; // 账户级别的 session 持续时间（毫秒）
+  sessionDuration: number; // Account-level session duration (milliseconds)
   createdAt: number;
   updatedAt: number;
 }
 
 export interface SessionState {
-  address: string; // 使用 address 作为标识
-  sessionKey: string; // 用于解锁账户的会话密钥
+  address: string; // Use address as identifier
+  sessionKey: string; // Session key for unlocking the account
   expiresAt: number;
 }
 
-// 自定义的 Viem Account，签名时会自动处理授权
+// Custom Viem Account, automatically handles authorization when signing
 export interface ManagedAccount extends LocalAccount {
   isLocked: () => boolean;
-  DANGEROUS_exportPrivateKey: () => Promise<Hex>; // 危险操作，强制授权
+  DANGEROUS_exportPrivateKey: () => Promise<Hex>; // Dangerous operation, force authorization
   publicKey: Hex;
 }
 
-// 授权回调类型
+// Authorization callback type
 export type AuthRequestCallback = (
   address: string,
   reason:
@@ -47,5 +47,5 @@ export type AuthRequestCallback = (
     | 'sign_transaction'
     | 'sign_typed_data'
     | 'export_private_key',
-  isFallback?: boolean, // 是否为回退到 PIN 码的情况
+  isFallback?: boolean, // Whether to fall back to PIN code
 ) => Promise<{ method: 'pin' | 'passkey'; pin?: string }>;
