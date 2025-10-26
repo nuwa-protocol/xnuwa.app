@@ -125,69 +125,26 @@ export const getProcessedChatRecords = (
                 if (tx.info?.ctxId?.toLowerCase().includes(q)) return true;
                 if (tx.info?.type?.toLowerCase().includes(q)) return true;
 
-                // Transaction details - support both legacy and new record shapes
-                const d = tx.details as any;
+                const d = tx.details;
                 if (!d) return false;
 
-                const strFields: Array<unknown> = [];
-                // legacy
-                if ('payment' in d || 'protocol' in d) {
-                    strFields.push(
-                        d.clientTxRef,
-                        d.protocol,
-                        d.method,
-                        d.urlOrTarget,
-                        d.operation,
-                        d.status,
-                        d.errorCode,
-                        d.errorMessage,
-                        d.vmIdFragment,
-                        d.channelId,
-                        d.assetId,
-                        d?.payment?.serviceTxRef,
-                    );
+                const strFields: Array<unknown> = [
+                    d.requirement?.resource,
+                    d.requirement?.network,
+                    d.requirement?.mimeType,
+                    d.requirement?.asset,
+                    d.requirement?.payTo,
+                    d.requirement?.scheme,
+                    String(d.requirement?.maxAmountRequired ?? ''),
+                ];
+
+                if (d.response) {
+                    strFields.push(JSON.stringify(d.response));
                 }
-                // new
-                if ('requirement' in d) {
-                    strFields.push(
-                        d.requirement?.resource,
-                        d.requirement?.network,
-                        d.requirement?.mimeType,
-                        d.requirement?.asset,
-                        d.requirement?.payTo,
-                        d.requirement?.scheme,
-                        String(d.requirement?.maxAmountRequired ?? ''),
-                    );
-                    // also search in response JSON if present
-                    if (d.response) {
-                        strFields.push(JSON.stringify(d.response));
-                    }
-                }
+
                 if (strFields.some((v) => typeof v === 'string' && v.toLowerCase().includes(q))) {
                     return true;
                 }
-
-                // headersSummary and meta (legacy only)
-                const scanObj = (obj: Record<string, unknown> | undefined) => {
-                    if (!obj) return false;
-                    for (const [k, v] of Object.entries(obj)) {
-                        const valStr =
-                            typeof v === 'string'
-                                ? v
-                                : typeof v === 'number' || typeof v === 'boolean'
-                                    ? String(v)
-                                    : JSON.stringify(v);
-                        if (
-                            k.toLowerCase().includes(q) ||
-                            valStr.toLowerCase().includes(q)
-                        ) {
-                            return true;
-                        }
-                    }
-                    return false;
-                };
-                if (scanObj(d.headersSummary)) return true;
-                if (scanObj(d.meta)) return true;
 
                 return false;
             });
@@ -232,27 +189,18 @@ export const getProcessedChatRecords = (
     });
 };
 
-// Helpers used above
-function isLegacy(details: any): details is { payment?: { costUsd?: bigint } } {
-    return !!details && typeof details === 'object' && 'payment' in details;
-}
-
 const pow10 = (exp: number): bigint => {
     if (exp <= 0) return 1n;
     return 10n ** BigInt(exp);
 };
 
-const getAssetDecimals = (details: any): number => {
+const getAssetDecimals = (details: PaymentTransaction['details']) => {
     const dec = details?.requirement?.extra?.assetDecimals;
     return Number.isInteger(dec) ? Number(dec) : 6;
 };
 
-const toPicoUsd = (details: any | null | undefined): bigint => {
+const toPicoUsd = (details: PaymentTransaction['details'] | null): bigint => {
     if (!details) return 0n;
-    if (isLegacy(details)) {
-        const v = details.payment?.costUsd;
-        return v === undefined || v === null ? 0n : BigInt(String(v));
-    }
     const raw = details?.requirement?.maxAmountRequired;
     if (raw === undefined || raw === null) return 0n;
     const amount = BigInt(String(raw));
