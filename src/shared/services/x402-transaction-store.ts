@@ -1,8 +1,8 @@
 // Local X402 transaction store that only keeps the official payment requirement
 // and the decoded payment response. We use clientTxRef as the primary key.
 import Dexie, { type Table } from 'dexie';
-import type { PaymentRequirements as X402PaymentRequirement } from 'x402/types';
 import type { decodeXPaymentResponse } from 'x402/shared';
+import type { PaymentRequirements as X402PaymentRequirement } from 'x402/types';
 
 const hasIndexedDB =
   typeof window !== 'undefined' && typeof window.indexedDB !== 'undefined';
@@ -18,10 +18,7 @@ export interface X402TransactionRecord {
 export interface X402TransactionStore {
   create(record: X402TransactionRecord): Promise<void>;
   get(id: string): Promise<X402TransactionRecord | null>;
-  update(
-    id: string,
-    patch: Partial<X402TransactionRecord>,
-  ): Promise<void>;
+  update(id: string, patch: Partial<X402TransactionRecord>): Promise<void>;
 }
 
 // In-memory store with simple pruning (by insertion order)

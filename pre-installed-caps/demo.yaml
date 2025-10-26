@@ -6,20 +6,21 @@ core:
       - give me a random number between 1 and 10
       - what is 1 plus 1?
       - write an article about ai and crypto
+      - hi!
   model:
     providerId: openrouter
-    modelId: anthropic/claude-sonnet-4.5
+    modelId: openai/gpt-4o-mini-2024-07-18
     parameters: {}
     supportedInputs:
       - text
       - image
       - file
-    contextLength: 1000000
+    contextLength: 128000
   mcpServers:
-    mcp-fot: https://x402-ai-starter-lemon.vercel.app/mcp
+    mcp-fot: https://x402-indol.vercel.app/mcp
 metadata:
-  displayName: x402 Demo
-  description: This is a demo for testing the x402 based LLM and MCP.
-  introduction: This is a demo for testing the x402 based LLM and MCP.
+  displayName: x402 MCP Demo
+  description: The Model fee is flat. Waiting for v2's upto schema. 4o-mini is cheap enough but please go easy on it. I have no VC to back me for LLM fee.
+  introduction: This is a demo for testing the x402 MCP. The Model fee is flat. Waiting to update with v2's upto schema. 
   tags:
     - Crypto

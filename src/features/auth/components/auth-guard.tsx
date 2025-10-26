@@ -12,7 +12,6 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   const isAuthRehydrated = useAuthRehydration();
   const navigate = useNavigate();
 
-  console.log('account', account);
 
   useEffect(() => {
     if (!isAuthRehydrated) return;

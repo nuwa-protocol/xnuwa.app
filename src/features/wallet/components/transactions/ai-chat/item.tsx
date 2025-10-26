@@ -16,28 +16,19 @@ const formatDate = (timestamp: number) => {
   return new Date(timestamp).toLocaleString();
 };
 
-// Support both legacy and new record shapes
-function isLegacy(details: any): details is { payment?: { costUsd?: bigint } } {
-  return !!details && typeof details === 'object' && 'payment' in details;
-}
-
 const pow10 = (exp: number): bigint => {
   if (exp <= 0) return 1n;
   return 10n ** BigInt(exp);
 };
 
-const getAssetDecimals = (details: any): number => {
+const getAssetDecimals = (details: PaymentTransaction['details']) => {
   const dec = details?.requirement?.extra?.assetDecimals;
   return Number.isInteger(dec) ? Number(dec) : 6;
 };
 
-const toPicoUsd = (details: any | null | undefined): bigint => {
+const toPicoUsd = (details: PaymentTransaction['details'] | null) => {
   if (!details) return 0n;
-  if (isLegacy(details)) {
-    const v = details.payment?.costUsd;
-    return v === undefined || v === null ? 0n : BigInt(String(v));
-    }
-  const raw = details?.requirement?.maxAmountRequired;
+  const raw = details.requirement?.maxAmountRequired;
   if (raw === undefined || raw === null) return 0n;
   const amount = BigInt(String(raw));
   const decimals = getAssetDecimals(details);
@@ -47,7 +38,10 @@ const toPicoUsd = (details: any | null | undefined): bigint => {
 };
 
 const getTotalCost = (transactions: PaymentTransaction[]) => {
-  const total = transactions.reduce((sum, tx) => sum + toPicoUsd(tx.details), 0n);
+  const total = transactions.reduce<bigint>(
+    (sum, tx) => sum + toPicoUsd(tx.details),
+    0n,
+  );
   return formatUsdCost(total);
 };
 
@@ -68,11 +62,11 @@ export function AITransactionItem({
 
   const chatId = chatRecord.chatId;
   const totalCost = getTotalCost(chatRecord.transactions);
-  // Fall back to chat message timestamp as source of time
   const chatTime =
     chatRecord.transactions.length > 0
       ? Math.max(...chatRecord.transactions.map((tx) => tx.info.timestamp || 0))
       : 0;
+
   return (
     <Collapsible open={isOpen} onOpenChange={() => onToggle(chatId)}>
       <CollapsibleTrigger asChild>

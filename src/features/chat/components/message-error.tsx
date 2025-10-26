@@ -41,6 +41,7 @@ export function MessageError({
   onRetry,
   onOpenWallet,
 }: MessageErrorProps) {
+  const isDevMode = import.meta.env.MODE === 'development';
   const errorCode = useMemo(() => resolveChatErrorCode(error), [error]);
 
   const normalizedCode =
@@ -56,6 +57,7 @@ export function MessageError({
   const cardClasses = isInsufficientFunds
     ? 'relative overflow-hidden rounded-xl border border-amber-300 bg-amber-50 p-5 shadow-sm dark:bg-amber-900/20 dark:border-amber-500/40'
     : 'relative overflow-hidden rounded-xl border border-destructive/40 bg-destructive/10 p-5 shadow-sm dark:bg-destructive/20';
+  const errorDetails = error.stack ?? error.message ?? String(error);
 
   return (
     <div className={cardClasses}>
@@ -134,6 +136,16 @@ export function MessageError({
           </div>
         </div>
       </div>
+      {isDevMode && errorDetails && (
+        <div className="mt-4 rounded-lg border border-border/60 bg-background/80 px-4 py-3">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Error details
+          </p>
+          <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words text-xs font-mono text-muted-foreground">
+            {errorDetails}
+          </pre>
+        </div>
+      )}
     </div>
   );
 }

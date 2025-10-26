@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchTransactionsFromChatSession } from '@/features/wallet/services';
+import type { PaymentTransaction } from '@/features/wallet/types';
 import { formatUsdCost } from '@/features/wallet/utils';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -369,27 +370,18 @@ const formatCostDisplay = (amount?: bigint | null) => {
   return `$${dollars}.${cents.padEnd(2, '0')}`;
 };
 
-// Helpers to support both legacy and new X402 record shapes
-function isLegacy(details: any): details is { payment?: { costUsd?: bigint } } {
-  return !!details && typeof details === 'object' && 'payment' in details;
-}
-
 const pow10 = (exp: number): bigint => {
   if (exp <= 0) return 1n;
   return 10n ** BigInt(exp);
 };
 
-const getAssetDecimals = (details: any): number => {
+const getAssetDecimals = (details: PaymentTransaction['details']) => {
   const dec = details?.requirement?.extra?.assetDecimals;
   return Number.isInteger(dec) ? Number(dec) : 6;
 };
 
-const toPicoUsd = (details: any | null | undefined): bigint => {
+const toPicoUsd = (details: PaymentTransaction['details'] | null): bigint => {
   if (!details) return 0n;
-  if (isLegacy(details)) {
-    const v = details.payment?.costUsd;
-    return v === undefined || v === null ? 0n : BigInt(String(v));
-  }
   const raw = details?.requirement?.maxAmountRequired;
   if (raw === undefined || raw === null) return 0n;
   const amount = BigInt(String(raw));

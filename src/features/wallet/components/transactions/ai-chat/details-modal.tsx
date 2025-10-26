@@ -1,13 +1,13 @@
 import { formatAmount } from '@nuwa-ai/payment-kit';
 import { useState } from 'react';
 import type { PaymentTransaction } from '@/features/wallet/types';
+import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
 import {
   Table,
   TableBody,
@@ -15,24 +15,16 @@ import {
   TableRow,
 } from '@/shared/components/ui/table';
 
-function isLegacy(details: any): details is { payment?: { cost?: bigint; costUsd?: bigint; nonce?: bigint; serviceTxRef?: string } } {
-  return !!details && typeof details === 'object' && 'payment' in details;
-}
-
-const getAssetDecimals = (details: any): number => {
+const getAssetDecimals = (
+  details: PaymentTransaction['details'] | null,
+): number => {
   const dec = details?.requirement?.extra?.assetDecimals;
   return Number.isInteger(dec) ? Number(dec) : 6;
 };
 
-const formatCost = (details: PaymentTransaction['details']) => {
+const formatCost = (details: PaymentTransaction['details'] | null) => {
   if (!details) return null;
-  if (isLegacy(details)) {
-    const cost = details.payment?.costUsd;
-    if (cost === undefined || cost === null) return null;
-    const asBig = typeof cost === 'bigint' ? cost : BigInt(String(cost));
-    return `$${formatAmount(asBig, 12)}`;
-  }
-  const raw = details?.requirement?.maxAmountRequired;
+  const raw = details.requirement?.maxAmountRequired;
   if (raw === undefined || raw === null) return null;
   const amount = BigInt(String(raw));
   const decimals = getAssetDecimals(details);
@@ -40,18 +32,13 @@ const formatCost = (details: PaymentTransaction['details']) => {
 };
 
 // Build a BaseScan URL when a transaction hash is available
-const getBaseScanUrl = (details: PaymentTransaction['details']): string | null => {
+const getBaseScanUrl = (
+  details: PaymentTransaction['details'] | null,
+): string | null => {
   if (!details) return null;
-  let tx: string | undefined;
-  let network: string | undefined;
-  if (isLegacy(details)) {
-    tx = details.payment?.serviceTxRef as unknown as string | undefined;
-    network = 'base-sepolia'; // default to sepolia per request
-  } else {
-    tx = (details.response as any)?.transaction as string | undefined;
-    network = (details.requirement as any)?.network as string | undefined;
-  }
+  const tx = details.response?.transaction as string | undefined;
   if (!tx) return null;
+  const network = details.requirement?.network;
   const host = network === 'base' ? 'basescan.org' : 'sepolia.basescan.org';
   return `https://${host}/tx/${tx}`;
 };
@@ -60,12 +47,6 @@ const formatDate = (timestamp: number) => {
   if (!timestamp) return 'undefined';
   const localString = new Date(timestamp).toLocaleString();
   return `${timestamp} (${localString})`;
-};
-
-const formatDuration = (durationMs: number | undefined) => {
-  if (!durationMs) return null;
-  if (durationMs < 1000) return `${durationMs}ms`;
-  return `${(durationMs / 1000).toFixed(2)}s`;
 };
 
 interface CopyableCellProps {
@@ -144,7 +125,7 @@ export function AITransactionDetailsModal({
               {/* Basic Information */}
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">
-                  Basic Information
+                  Request Information
                 </TableCell>
               </TableRow>
               <TableRowItem
@@ -171,112 +152,91 @@ export function AITransactionDetailsModal({
               {/* Transaction Details */}
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">
-                  Transaction Details
+                  Payment Requirements
                 </TableCell>
               </TableRow>
-              {details && isLegacy(details) ? (
-                <>
-                  <TableRowItem label="Client Transaction Reference" value={details.clientTxRef || null} isNested />
-                  <TableRowItem label="Transaction Timestamp" value={details ? formatDate(details.timestamp) : null} isNested />
-                  <TableRowItem label="Protocol" value={details.protocol || null} isNested />
-                  <TableRowItem label="Method" value={details.method || null} isNested />
-                  <TableRowItem label="URL or Target" value={details.urlOrTarget || null} isNested />
-                  <TableRowItem label="Operation" value={details.operation || null} isNested />
-                  <TableRowItem label="Request Body Hash" value={details.requestBodyHash || null} isNested />
-                  <TableRowItem label="Stream" value={details.stream || null} isNested />
-                  <TableRowItem label="Channel ID" value={details.channelId || null} isNested />
-                  <TableRowItem label="VM ID Fragment" value={details.vmIdFragment || null} isNested />
-                  <TableRowItem label="Asset ID" value={details.assetId || null} isNested />
-                  <TableRowItem label="Status Code" value={details.statusCode || null} isNested />
-                  <TableRowItem label="Duration (ms)" value={formatDuration(details?.durationMs)} isNested />
-                  <TableRowItem label="Status" value={details?.status || null} isNested />
-                  <TableRowItem label="Error Code" value={details?.errorCode || null} isNested />
-                  <TableRowItem label="Error Message" value={details?.errorMessage || null} isNested />
-                </>
-              ) : (
-                <>
-                  <TableRowItem label="Client Transaction Reference" value={transaction.info.ctxId || null} isNested />
-                  <TableRowItem label="Network" value={details?.requirement?.network || null} isNested />
-                  <TableRowItem label="Resource" value={details?.requirement?.resource || null} isNested />
-                  <TableRowItem label="Mime Type" value={details?.requirement?.mimeType || null} isNested />
-                  <TableRowItem label="Asset" value={details?.requirement?.asset || null} isNested />
-                  <TableRowItem label="Pay To" value={details?.requirement?.payTo || null} isNested />
-                  <TableRowItem label="Max Amount Required" value={String(details?.requirement?.maxAmountRequired ?? '') || null} isNested />
-                  <TableRowItem label="Scheme" value={details?.requirement?.scheme || null} isNested />
-                  <TableRowItem label="Description" value={(details?.requirement as any)?.description ?? null} isNested />
-                </>
-              )}
+              <TableRowItem
+                label="Network"
+                value={details?.requirement?.network || null}
+                isNested
+              />
+              <TableRowItem
+                label="Resource"
+                value={details?.requirement?.resource || null}
+                isNested
+              />
+              <TableRowItem
+                label="Mime Type"
+                value={details?.requirement?.mimeType || null}
+                isNested
+              />
+              <TableRowItem
+                label="Asset"
+                value={details?.requirement?.asset || null}
+                isNested
+              />
+              <TableRowItem
+                label="Pay To"
+                value={details?.requirement?.payTo || null}
+                isNested
+              />
+              <TableRowItem
+                label="Max Amount Required"
+                value={
+                  details?.requirement?.maxAmountRequired !== undefined &&
+                    details?.requirement?.maxAmountRequired !== null
+                    ? formatCost(details)
+                    : null
+                }
+                isNested
+              />
+              <TableRowItem
+                label="Scheme"
+                value={details?.requirement?.scheme || null}
+                isNested
+              />
+              <TableRowItem
+                label="Description"
+                value={(details?.requirement as any)?.description ?? null}
+                isNested
+              />
 
               {/* Payment Information */}
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">
-                  Payment Information
+                  Payment Response
                 </TableCell>
               </TableRow>
-              {details && isLegacy(details) ? (
-                <>
-                  <TableRowItem label="Cost (Native Units)" value={details.payment?.cost?.toString() || null} isNested />
-                  <TableRowItem label="Cost (USD)" value={formatCost(details)} isNested />
-                  <TableRowItem label="Nonce" value={details.payment?.nonce?.toString() || null} isNested />
-                  <TableRowItem label="Service Transaction Reference" value={details.payment?.serviceTxRef || null} isNested />
-                  {txUrl && (
-                    <TableRow>
-                      <TableCell className="pl-8" colSpan={2}>
-                        <Button asChild size="sm" variant="outline">
-                          <a href={txUrl} target="_blank" rel="noopener noreferrer">View on BaseScan</a>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </>
-              ) : (
-                <>
-                  <TableRowItem label="Amount" value={formatCost(details)} isNested />
-                  <TableRowItem label="Asset Decimals" value={String(getAssetDecimals(details))} isNested />
-                  <TableRowItem label="Service Transaction Reference" value={(details?.response as any)?.transaction ?? null} isNested />
-                  {txUrl && (
-                    <TableRow>
-                      <TableCell className="pl-8" colSpan={2}>
-                        <Button asChild size="sm" variant="outline">
-                          <a href={txUrl} target="_blank" rel="noopener noreferrer">View on BaseScan</a>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </>
-              )}
-
-              {/* Headers Summary (legacy only) */}
-              {details && isLegacy(details) && details.headersSummary && (
-                <>
-                  <TableRow className="bg-muted/30">
-                    <TableCell colSpan={2} className="font-semibold text-sm">
-                      Headers Summary
-                    </TableCell>
-                  </TableRow>
-                  {Object.entries(details.headersSummary).map(([key, value]) => (
-                    <TableRowItem key={key} label={key} value={value} isNested />
-                  ))}
-                </>
-              )}
-
-              {/* Metadata (legacy only) */}
-              {details && isLegacy(details) && details.meta && (
-                <>
-                  <TableRow className="bg-muted/30">
-                    <TableCell colSpan={2} className="font-semibold text-sm">
-                      Metadata
-                    </TableCell>
-                  </TableRow>
-                  {Object.entries(details.meta).map(([key, value]) => (
-                    <TableRowItem
-                      key={key}
-                      label={key}
-                      value={typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
-                      isNested
-                    />
-                  ))}
-                </>
+              <TableRowItem
+                label="Success"
+                value={details?.response?.success ?? null}
+                isNested
+              />
+              <TableRowItem
+                label="Network"
+                value={details?.response?.network || null}
+                isNested
+              />
+              <TableRowItem
+                label="Payer"
+                value={details?.response?.payer || null}
+                isNested
+              />
+              <TableRowItem
+                label="Transaction Hash"
+                value={details?.response?.transaction ?? null}
+                isNested
+              />
+              {txUrl && (
+                <TableRow>
+                  <TableCell className="pl-8" colSpan={2}>
+                    <Button asChild size="sm" variant="outline">
+                      <a href={txUrl} target="_blank" rel="noopener noreferrer">
+                        View on BaseScan
+                      </a>
+                    </Button>
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>

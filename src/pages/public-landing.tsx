@@ -37,23 +37,23 @@ type ProtocolHighlight = {
 
 const featureHighlights: FeatureHighlight[] = [
   {
-    title: 'Composable Caps',
+    title: 'One x402 entry point',
     description:
-      'Caps package prompts, models, and MCP servers into shareable AI agents. Fork, remix, and publish new capabilities in minutes.',
+      'xNUWA pulls every x402-compatible AI service, MCP server, and Cap into a single local canvas so you can route work without juggling dashboards.',
     icon: Layers,
-    tag: 'Build fast',
+    tag: 'Unified access',
   },
   {
-    title: 'Local-first identity',
+    title: 'Local-first trust boundary',
     description:
-      'Nuwa keeps account state on your machine and lets you decide when anything leaves your device.',
+      'Wallets, sessions, and service preferences live on your machine. You decide when credentials leave the device and which providers can see them.',
     icon: ShieldCheck,
-    tag: 'Stay in control',
+    tag: 'Stay sovereign',
   },
   {
-    title: 'Wallet Native Workspace',
+    title: 'Wallet native settlement',
     description:
-      'We manage an AI-specific session account locally and authorize payments with your PIN or passkey-backed session key.',
+      'Fund once, approve with your PIN or passkey-backed session key, and stream per-call payments across every x402 integration you compose.',
     icon: WalletMinimal,
     tag: 'Session secure',
   },
@@ -69,13 +69,13 @@ const protocolHighlights: ProtocolHighlight[] = [
   {
     title: 'Pay-per-request economics',
     description:
-      'Instead of flat subscriptions, Nuwa streams micro transactions (default 0.1 USDC) precisely when AI or MCP workloads run. You always know the exact spend per call.',
+      'Instead of flat subscriptions, xNUWA streams micro transactions (default 0.1 USDC) across whichever x402 providers you route. You always know the exact spend per call.',
     icon: Bolt,
   },
   {
     title: 'Trustless settlement',
     description:
-      'Facilitators validate transfers and respond with tamper-proof `X-PAYMENT-RESPONSE` receipts, so clients and servers share the same source of truth.',
+      'Facilitators validate transfers and respond with tamper-proof `X-PAYMENT-RESPONSE` receipts, so clients, aggregators, and service operators share the same source of truth.',
     icon: GlobeLock,
   },
 ];
@@ -84,17 +84,17 @@ const workflowSteps = [
   {
     title: 'Discover',
     detail:
-      'Browse curated Caps, import community MCP servers, or bring your own agents into the studio.',
+      'Index the x402 AI ecosystem, sync provider manifests locally, and pin the services your teams rely on.',
   },
   {
     title: 'Compose',
     detail:
-      'Wire prompts, models, and tool calls together visually. Publish privately or to the Cap Store with one click.',
+      'Wire prompts, models, and tool calls into new x402-ready experiences, then share them like native desktop apps.',
   },
   {
     title: 'Monetize',
     detail:
-      'Protect premium workloads with the x402 payment protocol so every inference is compensated instantly.',
+      'Protect premium workloads with the x402 payment protocol so every inference settles instantly, no matter the provider.',
   },
 ];
 
@@ -130,11 +130,29 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
             <div className="hidden items-center gap-2 text-sm text-muted-foreground md:flex">
               <Button variant="ghost" size="sm" asChild>
                 <a
+                  href="https://nuwa.dev"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Home
+                </a>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <a
                   href="https://docs.nuwa.dev"
                   target="_blank"
                   rel="noreferrer"
                 >
                   Docs
+                </a>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <a
+                  href="https://github.com/nuwa-protocol"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  GitHub
                 </a>
               </Button>
               <Button size="sm" onClick={onOpenAuth}>
@@ -150,18 +168,19 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 lg:flex-row lg:items-center">
               <motion.div className="flex-1 space-y-6" {...getFadeIn()}>
                 <div className="inline-flex items-center gap-2 rounded-full border border-theme-primary/40 bg-primary/10 px-4 py-1 text-xs font-semibold tracking-[0.2em] uppercase text-theme-primary">
-                  Local-first AI
+                  x402 AI Hub
                   <span className="inline-flex h-2 w-2 rounded-full bg-theme-primary" />
-                  Powered by x402
+                  Local-first custody
                 </div>
                 <h1 className="text-4xl font-semibold leading-tight tracking-tight text-balance sm:text-5xl lg:text-6xl">
-                  Every AI capability you launch settles payments automatically.
+                  Your local-first gateway to the x402 AI service network.
                 </h1>
                 <p className="text-lg text-muted-foreground">
-                  Nuwa unifies Caps, local-first accounts, and the x402 payment
-                  protocol so teams can design, distribute, and monetize AI in a
-                  single workspace. No subscriptions, no data lock-in—just
-                  on-demand intelligence with verifiable receipts.
+                  Launch xNUWA to discover, compose, and run every x402-capable
+                  AI provider from one place. Keep credentials on-device, stream
+                  per-call payments with verifiable receipts, and offer AI
+                  services that feel like native apps—no extra dashboards, no
+                  data lock-in.
                 </p>
                 <motion.div
                   {...getFadeIn(0.1)}
@@ -175,7 +194,7 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                 </motion.div>
                 <div className="flex flex-wrap gap-4">
                   <Button size="lg" variant="primary" onClick={onOpenAuth}>
-                    Launch xNUWA
+                    Enter xNUWA
                     <ArrowRight className="size-4" />
                   </Button>
                   <Button size="lg" variant="outline" asChild>
@@ -244,13 +263,14 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                   x402 Payment Protocol
                 </div>
                 <h2 className="mt-4 text-3xl font-semibold tracking-tight">
-                  Streaming payments for autonomous AI workloads.
+                  The payment rail behind your x402 AI gateway.
                 </h2>
                 <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                  Nuwa ships with the official x402 client. Every time a
-                  provider responds with HTTP 402, we parse the payment
-                  requirements, create the signed `x402/payment` header, and
-                  retry your request automatically.
+                  xNUWA ships with the official x402 client. When any provider
+                  responds with HTTP 402, we parse the payment requirements,
+                  create the signed `x402/payment` header, and retry your
+                  request automatically—keeping every service in your catalog
+                  payable from the same wallet.
                 </p>
                 <ul className="mt-6 space-y-4 text-sm leading-relaxed text-muted-foreground">
                   <li className="flex items-start gap-3">
@@ -313,9 +333,10 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                     Design → Deploy → Monetize
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                    Everything from Cap creation to payment settlement lives in
-                    one interface. You can experiment privately, share with a
-                    team, or list in the Cap Store when you are ready.
+                    Everything from x402 service discovery to payment
+                    settlement lives in one interface. You can experiment
+                    privately, share with a team, or list in the Cap Store when
+                    you are ready.
                   </p>
                 </div>
                 <Button size="lg" onClick={onOpenAuth}>
@@ -349,23 +370,6 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
         <footer className="border-t border-border/40 bg-background/80">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <p>© {new Date().getFullYear()} Nuwa AI. Built with ❤️.</p>
-            <div className="flex gap-4">
-              <a
-                href="https://docs.nuwa.dev"
-                className="hover:text-foreground"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Docs
-              </a>
-              <button
-                type="button"
-                onClick={onOpenAuth}
-                className="text-theme-primary hover:text-theme-primary/80"
-              >
-                Enter App
-              </button>
-            </div>
           </div>
         </footer>
       </div>
