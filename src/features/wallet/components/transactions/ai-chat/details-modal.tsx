@@ -1,13 +1,13 @@
 import { formatAmount } from '@nuwa-ai/payment-kit';
 import { useState } from 'react';
 import type { PaymentTransaction } from '@/features/wallet/types';
+import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
 import {
   Table,
   TableBody,
@@ -125,7 +125,7 @@ export function AITransactionDetailsModal({
               {/* Basic Information */}
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">
-                  Basic Information
+                  Request Information
                 </TableCell>
               </TableRow>
               <TableRowItem
@@ -152,14 +152,9 @@ export function AITransactionDetailsModal({
               {/* Transaction Details */}
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">
-                  Transaction Details
+                  Payment Requirements
                 </TableCell>
               </TableRow>
-              <TableRowItem
-                label="Client Transaction Reference"
-                value={transaction.info.ctxId || null}
-                isNested
-              />
               <TableRowItem
                 label="Network"
                 value={details?.requirement?.network || null}
@@ -189,8 +184,8 @@ export function AITransactionDetailsModal({
                 label="Max Amount Required"
                 value={
                   details?.requirement?.maxAmountRequired !== undefined &&
-                  details?.requirement?.maxAmountRequired !== null
-                    ? String(details.requirement?.maxAmountRequired)
+                    details?.requirement?.maxAmountRequired !== null
+                    ? formatCost(details)
                     : null
                 }
                 isNested
@@ -209,21 +204,26 @@ export function AITransactionDetailsModal({
               {/* Payment Information */}
               <TableRow className="bg-muted/30">
                 <TableCell colSpan={2} className="font-semibold text-sm">
-                  Payment Information
+                  Payment Response
                 </TableCell>
               </TableRow>
               <TableRowItem
-                label="Amount"
-                value={formatCost(details)}
+                label="Success"
+                value={details?.response?.success ?? null}
                 isNested
               />
               <TableRowItem
-                label="Asset Decimals"
-                value={details ? String(getAssetDecimals(details)) : null}
+                label="Network"
+                value={details?.response?.network || null}
                 isNested
               />
               <TableRowItem
-                label="Service Transaction Reference"
+                label="Payer"
+                value={details?.response?.payer || null}
+                isNested
+              />
+              <TableRowItem
+                label="Transaction Hash"
                 value={details?.response?.transaction ?? null}
                 isNested
               />
@@ -231,11 +231,7 @@ export function AITransactionDetailsModal({
                 <TableRow>
                   <TableCell className="pl-8" colSpan={2}>
                     <Button asChild size="sm" variant="outline">
-                      <a
-                        href={txUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <a href={txUrl} target="_blank" rel="noopener noreferrer">
                         View on BaseScan
                       </a>
                     </Button>
