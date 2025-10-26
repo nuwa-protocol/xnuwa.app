@@ -32,7 +32,9 @@ export function processX402ErrorPayload<TRequirement>(
   };
 
   if (typeof rawPayload.x402Version !== 'number') {
-    throw new Error('x402 error payload is missing a numeric x402Version field');
+    throw new Error(
+      'x402 error payload is missing a numeric x402Version field',
+    );
   }
 
   if (!Array.isArray(rawPayload.accepts) || rawPayload.accepts.length === 0) {
@@ -43,6 +45,9 @@ export function processX402ErrorPayload<TRequirement>(
     parseRequirement as RequirementParserLike<TRequirement>;
 
   const parser: RequirementParser<TRequirement> =
+    typeof maybeParserObject === 'object' &&
+    maybeParserObject !== null &&
+    'parse' in maybeParserObject &&
     typeof maybeParserObject.parse === 'function'
       ? (value: unknown) =>
           maybeParserObject.parse.call(maybeParserObject, value)
