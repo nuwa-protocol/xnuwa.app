@@ -47,6 +47,20 @@ const getTransactionTypeLabel = (transaction: PaymentTransaction) => {
   }
 };
 
+type SettlementStatus = 'settled' | 'pending';
+
+const getSettlementStatus = (
+  details: PaymentTransaction['details'] | null,
+): SettlementStatus => {
+  if (details?.response?.success) return 'settled';
+  return 'pending';
+};
+
+const settlementBadgeStyles: Record<SettlementStatus, string> = {
+  settled: 'text-green-600 border-green-200 bg-green-50',
+  pending: 'text-amber-600 border-amber-200 bg-amber-50',
+};
+
 interface TransactionItemProps {
   transaction: PaymentTransaction;
   onSelect: (transaction: PaymentTransaction) => void;
@@ -61,6 +75,8 @@ export function AITransactionSubItem({
   const costText = transaction.details
     ? formatCost(transaction.details) || '$0.00'
     : null;
+  const settlementStatus = getSettlementStatus(transaction.details);
+  const settlementBadgeClass = settlementBadgeStyles[settlementStatus];
 
   return (
     <Button
@@ -85,7 +101,15 @@ export function AITransactionSubItem({
         {!transaction.details ? (
           <p className="font-medium">No transaction record</p>
         ) : (
-          <p className="font-medium">{costText}</p>
+          <div className="font-medium flex items-center gap-2 justify-end">
+            <span>{costText}</span>
+            <Badge
+              variant="outline"
+              className={`text-[10px] h-5 px-1.5 ${settlementBadgeClass}`}
+            >
+              {settlementStatus === 'settled' ? 'Settled' : 'Pending'}
+            </Badge>
+          </div>
         )}
         <div className="text-xs text-muted-foreground flex items-center gap-2">
           <span>{formatDate(transaction.info.timestamp || 0)}</span>
