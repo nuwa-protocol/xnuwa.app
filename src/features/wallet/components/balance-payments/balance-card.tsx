@@ -23,11 +23,9 @@ export function BalanceCard() {
   const [showFaucetDialog, setShowFaucetDialog] = useState(false);
   const [showBuyModal, setShowBuyModal] = useState(false);
 
-  const usdValue = balanceLoading
-    ? 'loading...'
-    : balanceError
-      ? 'Failed to load balance'
-      : usdAmount;
+  const usdValue = balanceLoading || balanceError
+    ? '-.--'
+    : usdAmount;
 
   const handleBuy = () => {
     setShowBuyModal(true);

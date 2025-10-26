@@ -3,8 +3,115 @@ import {
   type PaymentRequirementsSelector,
   selectPaymentRequirements,
 } from 'x402/client';
+import { decodeXPaymentResponse } from 'x402/shared';
 import { PaymentRequirementsSchema, type X402Config } from 'x402/types';
+import {
+  markX402PaymentResult,
+  recordX402PaymentAttempt,
+} from './x402-transaction-store';
 import { getCurrentAccount, network } from './x402-wallet';
+
+type HeadersLike = HeadersInit | undefined;
+
+const CLIENT_TX_HEADER = 'X-Client-Tx-Ref';
+const STREAMING_HINTS = ['text/event-stream', 'application/x-ndjson'];
+
+const toURLString = (input: RequestInfo | URL): string => {
+  if (typeof input === 'string') return input;
+  if (input instanceof URL) return input.toString();
+  if (input instanceof Request) return input.url;
+  return String(input);
+};
+
+const getHeaderValue = (
+  headers: HeadersLike,
+  key: string,
+): string | undefined => {
+  if (!headers) return undefined;
+  const normalizedKey = key.toLowerCase();
+
+  if (headers instanceof Headers) {
+    const direct = headers.get(key);
+    if (direct) return direct;
+    return headers.get(normalizedKey) ?? undefined;
+  }
+
+  if (Array.isArray(headers)) {
+    const found = headers.find(
+      ([name]) => name.toLowerCase() === normalizedKey,
+    );
+    return found ? found[1] : undefined;
+  }
+
+  for (const [name, value] of Object.entries(headers)) {
+    if (name.toLowerCase() === normalizedKey) {
+      return Array.isArray(value) ? value.join(', ') : value;
+    }
+  }
+  return undefined;
+};
+
+const getCtxIdFromHeaders = (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): string | undefined => {
+  const fromInit = getHeaderValue(init?.headers, CLIENT_TX_HEADER);
+  if (fromInit) return fromInit;
+
+  if (typeof Request !== 'undefined' && input instanceof Request) {
+    return (
+      input.headers.get(CLIENT_TX_HEADER) ??
+      input.headers.get(CLIENT_TX_HEADER.toLowerCase()) ??
+      undefined
+    );
+  }
+
+  return undefined;
+};
+
+const buildHeadersSummary = (
+  inputHeaders: HeadersLike,
+  initHeaders: HeadersLike,
+): Record<string, string> | undefined => {
+  const summary: Record<string, string> = {};
+  for (const key of ['content-type', 'accept', CLIENT_TX_HEADER]) {
+    const value =
+      getHeaderValue(initHeaders, key) ?? getHeaderValue(inputHeaders, key);
+    if (value) {
+      summary[key.toLowerCase()] = value;
+    }
+  }
+  return Object.keys(summary).length > 0 ? summary : undefined;
+};
+
+const isStreamingRequest = (
+  inputHeaders: HeadersLike,
+  initHeaders: HeadersLike,
+): boolean => {
+  const acceptHeader =
+    getHeaderValue(initHeaders, 'accept') ??
+    getHeaderValue(inputHeaders, 'accept');
+  if (!acceptHeader) return false;
+  return STREAMING_HINTS.some((hint) =>
+    acceptHeader.toLowerCase().includes(hint),
+  );
+};
+
+const parseAssetDecimals = (extra: unknown): number | undefined => {
+  if (!extra || typeof extra !== 'object') return undefined;
+  const maybeDecimals = (extra as Record<string, unknown>).assetDecimals;
+  return typeof maybeDecimals === 'number' && Number.isInteger(maybeDecimals)
+    ? maybeDecimals
+    : undefined;
+};
+
+const safeRecord = async (fn: () => Promise<void>) => {
+  try {
+    await fn();
+  } catch (error) {
+    console.warn('[x402/tx-store] Failed to record transaction', error);
+  }
+};
 
 /**
  * Enables the payment of APIs using the x402 payment protocol.
@@ -48,6 +155,7 @@ export function createPaymentFetch(
   config?: X402Config,
 ) {
   return async (input: RequestInfo | URL, init?: RequestInit) => {
+    const requestStart = Date.now();
     const response = await fetch(input, init);
 
     if (response.status !== 402) {
@@ -67,6 +175,62 @@ export function createPaymentFetch(
       network,
       'exact',
     );
+    const ctxId = getCtxIdFromHeaders(input, init);
+    const normalizedUrl = toURLString(input);
+    const headersSummary = buildHeadersSummary(
+      typeof Request !== 'undefined' && input instanceof Request
+        ? input.headers
+        : undefined,
+      init?.headers,
+    );
+    const streamHint = isStreamingRequest(
+      typeof Request !== 'undefined' && input instanceof Request
+        ? input.headers
+        : undefined,
+      init?.headers,
+    );
+    const requestMethod = (
+      (init?.method ??
+        (typeof Request !== 'undefined' && input instanceof Request
+          ? input.method
+          : undefined) ??
+        'GET') as string
+    ).toUpperCase();
+
+    let operation = `${requestMethod}:${normalizedUrl}`;
+    try {
+      operation = `${requestMethod}:${new URL(normalizedUrl).pathname}`;
+    } catch {
+      // Keep fallback when URL parsing fails (e.g. relative URLs)
+    }
+
+    if (ctxId) {
+      const assetDecimals = parseAssetDecimals(
+        selectedPaymentRequirements.extra,
+      );
+      await safeRecord(() =>
+        recordX402PaymentAttempt({
+          ctxId,
+          protocol: 'http',
+          method: requestMethod,
+          urlOrTarget: normalizedUrl,
+          operation,
+          headersSummary,
+          stream: streamHint,
+          assetId: selectedPaymentRequirements.asset,
+          amount: BigInt(selectedPaymentRequirements.maxAmountRequired),
+          assetDecimals,
+          meta: {
+            x402: {
+              resource: selectedPaymentRequirements.resource,
+              network: selectedPaymentRequirements.network,
+              payTo: selectedPaymentRequirements.payTo,
+              description: selectedPaymentRequirements.description,
+            },
+          },
+        }),
+      );
+    }
 
     if (BigInt(selectedPaymentRequirements.maxAmountRequired) > maxValue) {
       throw new Error('Payment amount exceeds maximum allowed');
@@ -99,6 +263,37 @@ export function createPaymentFetch(
     };
 
     const secondResponse = await fetch(input, newInit);
+    if (ctxId) {
+      const paymentResponseHeader =
+        secondResponse.headers.get('X-PAYMENT-RESPONSE');
+      let paymentResponseMeta: { serviceTxRef?: string; metadata?: unknown };
+      if (paymentResponseHeader) {
+        try {
+          const decoded = decodeXPaymentResponse(paymentResponseHeader);
+          paymentResponseMeta = {
+            serviceTxRef: decoded.transaction,
+            metadata: decoded,
+          };
+        } catch (error) {
+          console.warn(
+            '[x402/tx-store] Failed to decode X-PAYMENT-RESPONSE header',
+            error,
+          );
+        }
+      }
+      await safeRecord(() =>
+        markX402PaymentResult({
+          ctxId,
+          status: secondResponse.ok ? 'paid' : 'error',
+          statusCode: secondResponse.status,
+          durationMs: Date.now() - requestStart,
+          errorMessage: secondResponse.ok
+            ? undefined
+            : `HTTP ${secondResponse.status}`,
+          paymentResponse: paymentResponseMeta,
+        }),
+      );
+    }
     return secondResponse;
   };
 }

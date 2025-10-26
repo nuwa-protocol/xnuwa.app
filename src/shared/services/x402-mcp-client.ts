@@ -10,9 +10,10 @@ import type { LocalAccount } from 'viem';
 import { createPaymentHeader } from 'x402/client';
 import { type ZodType, z } from 'zod';
 import {
-  getCurrentAccount,
-  network as defaultNetwork,
-} from './x402-wallet';
+  markX402PaymentResult,
+  recordX402PaymentAttempt,
+} from './x402-transaction-store';
+import { network as defaultNetwork, getCurrentAccount } from './x402-wallet';
 
 export const x402Version = 1;
 
@@ -115,12 +116,81 @@ function logPaymentEvent(
   }
 }
 
+const parseAssetDecimals = (extra: unknown): number | undefined => {
+  if (!extra || typeof extra !== 'object') return undefined;
+  const maybeDecimals = (extra as Record<string, unknown>).assetDecimals;
+  return typeof maybeDecimals === 'number' && Number.isInteger(maybeDecimals)
+    ? maybeDecimals
+    : undefined;
+};
+
+const extractCtxId = (
+  toolOptions: ToolCallOptions | undefined,
+  requirement: PaymentRequirement,
+): string | undefined => {
+  if (toolOptions?.toolCallId) {
+    return toolOptions.toolCallId;
+  }
+  if (requirement.extra && typeof requirement.extra === 'object') {
+    const extra = requirement.extra as Record<string, unknown>;
+    const direct = extra.ctxId ?? extra.clientTxRef;
+    if (typeof direct === 'string') {
+      return direct;
+    }
+  }
+  return undefined;
+};
+
+const safeRecord = async (fn: () => Promise<void>) => {
+  try {
+    await fn();
+  } catch (error) {
+    console.warn('[x402/tx-store] Failed to record MCP transaction', error);
+  }
+};
+
+const extractPaymentResponseMeta = (
+  result: unknown,
+): { serviceTxRef?: string; metadata?: unknown } | undefined => {
+  if (!result || typeof result !== 'object') {
+    return undefined;
+  }
+  const meta = (result as { _meta?: Record<string, unknown> })._meta;
+  if (!meta || typeof meta !== 'object') {
+    return undefined;
+  }
+  const paymentResponse = (meta as Record<string, unknown>)[
+    'x402/payment-response'
+  ];
+  if (!paymentResponse) {
+    return undefined;
+  }
+
+  let serviceTxRef: string | undefined;
+  if (
+    paymentResponse &&
+    typeof paymentResponse === 'object' &&
+    'transaction' in (paymentResponse as Record<string, unknown>)
+  ) {
+    const txValue = (paymentResponse as Record<string, unknown>).transaction;
+    if (typeof txValue === 'string') {
+      serviceTxRef = txValue;
+    }
+  }
+
+  return {
+    serviceTxRef,
+    metadata: paymentResponse,
+  };
+};
+
 async function withPayment(
   mcpClient: MCPClient,
   clientOptions: ClientPaymentOptions,
 ): Promise<MCPClient> {
   const client = mcpClient as MCPClientInternal;
-  const maxPaymentValue = clientOptions.maxPaymentValue ?? DefaultMaxPaymentValue;
+  const maxPaymentValue =
+    clientOptions.maxPaymentValue ?? DefaultMaxPaymentValue;
 
   // Store reference to original tools method before overriding it
   const originalToolsMethod = client.tools.bind(client);
@@ -148,15 +218,12 @@ async function withPayment(
             requirement: PaymentRequirement,
             origin: 'response' | 'error',
           ) => {
-            logPaymentEvent(
-              `Payment required for tool ${name} (${origin})`,
-              {
-                network: requirement.network,
-                resource: requirement.resource,
-                amount: requirement.maxAmountRequired.toString(),
-                payTo: requirement.payTo,
-              },
-            );
+            logPaymentEvent(`Payment required for tool ${name} (${origin})`, {
+              network: requirement.network,
+              resource: requirement.resource,
+              amount: requirement.maxAmountRequired.toString(),
+              payTo: requirement.payTo,
+            });
             const paymentAuthorization = await getPaymentAuthorization(
               requirement,
               {
@@ -168,14 +235,71 @@ async function withPayment(
             logPaymentEvent(`Retrying ${name} with payment`, {
               resource: requirement.resource,
             });
-            const paidResult = await callToolWithPayment(
-              client,
-              name,
-              toolArgs,
-              paymentAuthorization,
-              toolOptions,
-            );
-            return stripPaymentResponseMetadata(paidResult);
+            const ctxId = extractCtxId(toolOptions, requirement);
+            const attemptStartedAt = Date.now();
+            const amount = BigInt(requirement.maxAmountRequired.toString());
+            const assetDecimals = parseAssetDecimals(requirement.extra);
+            if (ctxId) {
+              await safeRecord(() =>
+                recordX402PaymentAttempt({
+                  ctxId,
+                  protocol: 'mcp',
+                  method: 'tools/call',
+                  urlOrTarget: requirement.resource ?? name,
+                  operation: `tool:${name}`,
+                  stream: false,
+                  assetId: requirement.asset,
+                  amount,
+                  assetDecimals,
+                  meta: {
+                    x402: {
+                      resource: requirement.resource,
+                      network: requirement.network,
+                      payTo: requirement.payTo,
+                      description: requirement.description,
+                    },
+                    tool: name,
+                  },
+                }),
+              );
+            }
+            try {
+              const paidResult = await callToolWithPayment(
+                client,
+                name,
+                toolArgs,
+                paymentAuthorization,
+                toolOptions,
+              );
+              if (ctxId) {
+                const paymentResponseMeta =
+                  extractPaymentResponseMeta(paidResult);
+                await safeRecord(() =>
+                  markX402PaymentResult({
+                    ctxId,
+                    status: 'paid',
+                    durationMs: Date.now() - attemptStartedAt,
+                    paymentResponse: paymentResponseMeta,
+                  }),
+                );
+              }
+              return stripPaymentResponseMetadata(paidResult);
+            } catch (retryError) {
+              if (ctxId) {
+                await safeRecord(() =>
+                  markX402PaymentResult({
+                    ctxId,
+                    status: 'error',
+                    durationMs: Date.now() - attemptStartedAt,
+                    errorMessage:
+                      retryError instanceof Error
+                        ? retryError.message
+                        : String(retryError),
+                  }),
+                );
+              }
+              throw retryError;
+            }
           };
 
           try {
@@ -278,7 +402,10 @@ function extractPaymentRequirements(
 
   if (Array.isArray(responseWithContent.content)) {
     for (const contentItem of responseWithContent.content) {
-      if (contentItem?.type === 'text' && typeof contentItem.text === 'string') {
+      if (
+        contentItem?.type === 'text' &&
+        typeof contentItem.text === 'string'
+      ) {
         try {
           candidatePayloads.push(JSON.parse(contentItem.text));
         } catch {
