@@ -105,7 +105,7 @@ export function BalanceCard() {
               {/* New single button linking to Base faucets docs */}
               <Button asChild variant="primary" size="sm" className="w-full">
                 <a
-                  href="https://docs.base.org/base-chain/tools/network-faucets"
+                  href="https://faucet.circle.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
