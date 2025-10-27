@@ -173,7 +173,7 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                   Local-first custody
                 </div>
                 <h1 className="text-4xl font-semibold leading-tight tracking-tight text-balance sm:text-5xl lg:text-6xl">
-                  Your One-Stop Gateway to the x402 powered AI Capabilities.
+                  Your Entrance to <span className="text-theme-700">x402 Protocol AI Ecosystem</span>
                 </h1>
                 <p className="text-lg text-muted-foreground">
                   Launch xNUWA to discover, compose, and run every x402-capable
@@ -192,18 +192,27 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                     validate the protocol.
                   </span>
                 </motion.div>
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap items-center gap-4">
                   <Button size="lg" variant="primary" onClick={onOpenAuth}>
                     Enter xNUWA
                     <ArrowRight className="size-4" />
                   </Button>
-                  <Button size="lg" variant="outline" asChild>
+                  <Button size="sm" variant="outline" asChild>
                     <a
                       href="https://docs.nuwa.dev"
                       target="_blank"
                       rel="noreferrer"
                     >
                       Explore the docs
+                    </a>
+                  </Button>
+                  <Button size="sm" variant="ghost" asChild>
+                    <a
+                      href="https://www.x402.org/"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      What is x402?
                     </a>
                   </Button>
                 </div>
