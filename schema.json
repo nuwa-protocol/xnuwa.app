@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["idName", "core", "metadata"],
+  "properties": {
+    "idName": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_]+:[ ]*[a-zA-Z0-9_]+$"
+    },
+    "core": {
+      "type": "object",
+      "required": ["prompt", "model", "mcpServers"],
+      "properties": {
+        "prompt": {
+          "type": "object",
+          "required": ["value", "suggestions"]
+        },
+        "model": {
+          "type": "object",
+          "required": ["providerId", "modelId"]
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["displayName", "description", "introduction", "tags"],
+      "properties": {
+        "displayName": { "type": "string" },
+        "description": { "type": "string" },
+        "introduction": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

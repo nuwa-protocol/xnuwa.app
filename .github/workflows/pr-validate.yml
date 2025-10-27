@@ -1,0 +1,65 @@
+name: Validate cap-registry YAML Configs
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'cap-registry/**/*.yml'
+      - 'cap-registry/**/*.yaml'
+
+jobs:
+  validate-config:
+    runs-on: ubuntu-latest
+    name: Validate cap-registry Config Files
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          npm install -g yq ajv-cli
+
+      - name: Validate cap-registry YAML files
+        run: |
+          echo "🔍 Searching for YAML files in cap-registry/ ..."
+          files=$(find cap-registry -type f \( -name "*.yaml" -o -name "*.yml" \) || true)
+
+          if [ -z "$files" ]; then
+            echo "✅ No YAML files found in cap-registry/, skipping validation."
+            exit 0
+          fi
+
+          echo "🧩 Found YAML files:"
+          echo "$files"
+          echo ""
+
+          for file in $files; do
+            echo "🔎 Validating $file ..."
+            yq -o=json "$file" | ajv validate -s ./schema.json -d /dev/stdin || {
+              echo "❌ Validation failed for $file"
+              exit 1
+            }
+            echo "✅ $file passed validation."
+            echo ""
+          done
+
+      - name: Comment on PR if validation fails
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: "❌ cap-registry YAML Schema Validation Failed"
+          message: |
+            One or more YAML files in `cap-registry/` failed schema validation.  
+            Please ensure they conform to `schema.json` in the project root.
+
+            You can validate locally using:
+            ```bash
+            npm install -g ajv-cli yq
+            yq -o=json cap-registry/your_file.yaml | ajv validate -s ./schema.json -d /dev/stdin
+            ```
+
