@@ -4,13 +4,10 @@ import { CapSchema } from '@/shared/types';
 
 const DEFAULT_AUTHOR_DID = 'did::preinstalled';
 
-const files = import.meta.glob<string>(
-  '../../../pre-installed-caps/*.{yaml,yml}',
-  {
-    as: 'raw',
-    eager: true,
-  },
-);
+const files = import.meta.glob<string>('../../../cap-registry/*.{yaml,yml}', {
+  as: 'raw',
+  eager: true,
+});
 
 const toCap = (content: string, sourcePath: string): Cap | null => {
   try {
