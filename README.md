@@ -1,32 +1,33 @@
 ![Nuwa AI Readme Background](./src/assets/readme-bg.png)
 
-# Nuwa AI Client
+# xNUWA - Your Entrace to the x402 AI service ecosystem
 
-A local-first AI chat client implemented for [Nuwa AI](https://nuwa.dev/) that enables users to create, share, and interact with Caps. 
+[Check out the app!](https://xnuwa.app)
 
-> **Caps** (i.e. capability) are mini-apps in Nuwa AI, the minimium functional AI unit. Cap is designed to be an abstraction of AI models and agents. Currently it is the composation of Prompt, Model and MCP Servers.
+We are building to offer you the best AI client app for accessing **x402 AI services**, forked from the [original Nuwa Client](https://github.com/nuwa-protocol/nuwa-client). This local-first and user-friendly chat experience lets you create, share, and interact with x402 based AI Cap ecosystem.
+
+> **Caps** (i.e. capability) are mini-apps in Nuwa AI, the minimium functional AI unit. Cap is designed to be an abstraction of AI models and agents. Currently it is the composation of Prompt, Model, MCP Servers and UI. Learn more about Cap on our [official docs](https://docs.nuwa.dev/introduction/core-concepts/capabilities).
 
 ## ✨ Features
 
 ### 🔐 Decentralized Identity & Crypto Payment
-- **Decentralized Identity**: You control your data with DID-based authentication, fully anonymous
+- **Anonymous Identity**: You control your data with your EVM address, fully anonymous
 - **Crypto Payment**: Use cryptos to pay for your day-to-day AI
 - **Data Portability**: Export and migrate your data anywhere
 
 ### 🎨 Modern User Experience
-- **Shadcn UI**: Clean, responsive design with dark/light theme support
+- **Shadcn UI**: Clean, responsive design with dark/light theme and multi-lin support
 - **No MCP Configuration**: MCPs use DID authentication directly, eliminates the need for user to config
 
 
-## 🚀 Beta Release
+## 🚀 Alpha Release
 
-We're excited to announce the **Nuwa Client Beta**! This release includes:
+We're excited to announce the **xNUWA Alpha Release**! This release includes:
 
-- ✅ Core CAP creation and publishing functionality
-- ✅ Web3 wallet integration
-- ✅ Decentralized identity system
-- ✅ MCP server integration
-- ✅ Payment system
+- ✅ x402 Client-Side integration - x402 MCP client follows the [official spec](https://github.com/coinbase/x402/blob/2daa42f6a0e5a36c1bb19677fda2a74a6b466b06/specs/transports/mcp.md?plain=1)
+- ✅ native wallet integration - encrypted, non-exportable privatekey stored in IndexedDB; sign transaction with PIN code or Passkey
+- ✅ A built-in demo for testing MCP
+- ✅ Payment Record Management
 
 
 ## 🛠️ Technology Stack
@@ -35,8 +36,8 @@ We're excited to announce the **Nuwa Client Beta**! This release includes:
 - **Styling**: Tailwind CSS + Shadcn UI
 - **State Management**: Zustand with persistence
 - **Database**: Dexie (IndexedDB) for local storage
-- **Identity**: DID from @nuwa-ai/identity-kit
-- **Payment**: Payment Channel from @nuwa-ai/payment-kit
+- **Identity**: Viem as account manager; Encrypted Zustand store for privatekey management
+- **Payment**: x402 protocol for MCP and LLM fetch
 - **Cap Integration**: Cap integration from @nuwa-ai/cap-kit
 - **Code Quality**: Biome for linting and formatting
 
@@ -50,8 +51,8 @@ We're excited to announce the **Nuwa Client Beta**! This release includes:
 
 ```bash
 # Clone the repository
-git clone https://github.com/nuwa-protocol/nuwa-client.git
-cd nuwa-client
+git clone https://github.com/nuwa-protocol/xnuwa.app.git
+cd xnuwa.app
 
 # Install dependencies
 pnpm install
@@ -61,6 +62,16 @@ pnpm dev
 ```
 
 Visit `http://localhost:5173` to start using Nuwa Client.
+
+## 🧩 Cap Registry
+
+Community-built Caps live in the `cap-registry/` directory. Use this folder to:
+
+- Browse existing community Caps and examples (`cap-registry/`)
+- Follow the Cap Standard defined in the [Nuwa AI docs](https://docs.nuwa.dev/build-caps/quickstart)
+- Github Action is enabled to check the schema of your Cap
+
+We are working on an easier-to-use registry system.
 
 ## 📖 Development
 
@@ -100,19 +111,16 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ## 🆘 Support
 
 - **Documentation**: [docs.nuwa.dev](https://docs.nuwa.dev)
-- **Issues**: [GitHub Issues](https://github.com/nuwa-protocol/nuwa-client/issues)
+- **Issues**: [GitHub Issues](https://github.com/nuwa-protocol/xnuwa.app/issues)
 - **Community**: [Discord](https://discord.gg/nuwaai)
 - **Email**: haichao@nuwa.dev
 
 ## 🎯 Roadmap
 
-- [ ] Cap Inline UI Support 
-- [ ] Cap Artifacts UI Support
-- [ ] Multi-Modal Input Support
+- [ ] Cap Registry 
+- [ ] x402 v2 spec integration
 - [ ] Desktop App with Tauri
 
 ---
 
 **Built with ❤️ by the Nuwa team**
-
-Ready to experience the future of AI chat? [Try Nuwa Client Beta](https://test-app.nuwa.dev) today!
