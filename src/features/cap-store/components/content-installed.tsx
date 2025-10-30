@@ -12,8 +12,8 @@ import {
 import { useLanguage } from '@/shared/hooks';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
-import { CapCard } from './cap-card';
 import { CapActionButton } from './cap-action-button';
+import { CapCard } from './cap-card';
 import { CapStoreLoading } from './cap-store-loading';
 import { CapStoreContentHeader } from './content-header';
 
@@ -94,7 +94,8 @@ export function CapStoreInstalledContent() {
         <Package className="size-12 text-muted-foreground mb-4" />
         <h3 className="text-lg font-medium mb-2">No Installed Caps</h3>
         <p className="text-muted-foreground max-w-md">
-          You haven't installed any caps yet. Browse the store and install caps you like.
+          You haven't installed any caps yet. Browse the store and install caps
+          you like.
         </p>
       </div>
     );

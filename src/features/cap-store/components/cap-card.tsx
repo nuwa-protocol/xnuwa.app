@@ -33,10 +33,12 @@ export function CapCard({ cap, actions }: CapCardProps) {
     ? formatCompactNumber(capStats.favorites)
     : null;
 
+  console.log('cap', cap);
+
   return (
     <Card
       className="group relative flex flex-col gap-2 overflow-hidden p-4 transition-shadow shadow-lg cursor-pointer hover:shadow-md"
-      onClick={() => navigate(`/explore/caps/${cap.id}`)}
+      onClick={() => navigate(`/explore/${(cap as RemoteCap).cid}/${cap.id}`)}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">

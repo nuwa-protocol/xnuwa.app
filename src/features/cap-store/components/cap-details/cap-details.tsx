@@ -33,7 +33,7 @@ export function CapDetails({ capId }: { capId: string }) {
   const [capQueryData, setCapQueryData] = useState<RemoteCap | null>(null);
   const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<boolean>(false);
-  const { downloadCapByIDWithCache } = useCapStore();
+  const { downloadCapByIDWithCache, remoteCaps } = useCapStore();
   const { fetchInstalledCaps } = InstalledCapsStore();
 
   // Fetch full cap data when selectedCap changes
@@ -41,10 +41,13 @@ export function CapDetails({ capId }: { capId: string }) {
     setIsLoading(true);
     setDownloadedCapData(null);
     setCapQueryData(null);
+
     const fetchCap = async () => {
       try {
+
         const downloadedCap = await downloadCapByIDWithCache(capId);
         setDownloadedCapData(downloadedCap);
+
       } catch (error) {
         console.error('Failed to download cap data:', error);
         toast.error('Failed to find the cap.');
@@ -70,11 +73,19 @@ export function CapDetails({ capId }: { capId: string }) {
         const queriedCap = await capKit.queryByID({ id: capId });
         setCapQueryData(mapResultToRemoteCap(queriedCap));
       } catch (error) {
-        console.error('Failed to download cap data:', error);
-        toast.error('Failed to find the cap.');
-        navigate('/explore');
+        // Fallback: derive from current remoteCaps list when backend query fails
+        const localRemote = remoteCaps.find((c) => c.id === capId);
+        if (localRemote) {
+          setCapQueryData(localRemote);
+          return;
+        }
+        console.error('Failed to query cap metadata:', error);
       }
     };
+
+    // Try to prefill from local remote caps for faster paint
+    const localRemote = remoteCaps.find((c) => c.id === capId);
+    if (localRemote) setCapQueryData(localRemote);
 
     Promise.all([fetchCap(), fetchFavoriteStatus(), queryCap()]).finally(() => {
       setIsLoading(false);

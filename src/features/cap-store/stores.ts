@@ -1,7 +1,7 @@
 import type { Cap } from '@nuwa-ai/cap-kit';
 import { create } from 'zustand';
 import { capKitService } from '@/shared/services/capkit-service';
-import { agent8004ToRemoteCap } from './8004-remotecap-adapter';
+import { agent8004ToRemoteCap, agent8004ToCap } from './8004-remotecap-adapter';
 import {
   DEFAULT_IDENTITY_REGISTRY_ADDRESS,
   getAgent8004ByPage,
@@ -9,6 +9,7 @@ import {
   getOwnerAddressesByAgentIds,
 } from './8004-service';
 import type { CapStoreSection, RemoteCap } from './types';
+import type { Agent8004, ErrorAgent8004 } from '@/shared/types/8004-agent';
 
 // Search parameters interface
 export interface UseRemoteCapParams {
@@ -52,6 +53,12 @@ interface CapStoreState {
 
   //downloaded caps management
   downloadedCaps: Record<string, Cap>;
+
+  // 8004 agent JSONs indexed by registry address -> index (1-based within current page)
+  agent8004ByRegistryAndIndex: Record<
+    string,
+    Record<number, Agent8004 | ErrorAgent8004>
+  >;
 
   // UI Actions (from context)
   initialize: () => Promise<void>;
@@ -102,6 +109,8 @@ const initialState = {
 
   //downloaded caps management
   downloadedCaps: {},
+  // Indexed cache for raw 8004 agent JSONs
+  agent8004ByRegistryAndIndex: {},
 };
 
 export const useCapStore = create<CapStoreState>()((set, get) => {
@@ -167,6 +176,8 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
         // 3) Map to RemoteCaps using owner as authorDID and 8004 name as idName
         const newRemoteCaps: RemoteCap[] = agents.map((agent, i) =>
           agent8004ToRemoteCap(agent as any, {
+            id: (i + 1).toString(),
+            cid: registryAddress,
             authorDID:
               owners[i] || '0x0000000000000000000000000000000000000000',
             idName:
@@ -177,6 +188,14 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
         const totalItems = agents.length || 0;
         const { remoteCaps } = get();
 
+        // Build index cache for this registry/page (1-based index within page)
+        const pageIndexMap: Record<number, Agent8004 | ErrorAgent8004> = {};
+        agents.forEach((agent, i) => {
+          pageIndexMap[i + 1] = agent as Agent8004 | ErrorAgent8004;
+        });
+        const prevMap = get().agent8004ByRegistryAndIndex[registryAddress] || {};
+        const mergedIndexMap = append ? { ...prevMap, ...pageIndexMap } : pageIndexMap;
+
         set({
           hasMoreData: totalItems === sizeNum,
           remoteCaps: append
@@ -185,6 +204,10 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
           currentPage: pageNum,
           isFetching: false,
           isLoadingMore: false,
+          agent8004ByRegistryAndIndex: {
+            ...get().agent8004ByRegistryAndIndex,
+            [registryAddress]: mergedIndexMap,
+          },
         });
 
         return newRemoteCaps;
@@ -262,34 +285,44 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
       const remote = get().remoteCaps.find((c) => c.id === id);
       if (!remote) throw new Error('Cap not found in current list');
 
-      // Simple conversion RemoteCap -> Cap
-      const cap: Cap = {
-        id: remote.id,
-        authorDID: remote.authorDID,
-        idName: remote.idName,
-        core: {
-          prompt: { value: '' },
-          model: {
-            providerId: 'openrouter',
-            modelId: 'unknown',
-            supportedInputs: ['text'],
-            contextLength: 4096,
-          },
-          mcpServers: {},
-          artifact: remote.metadata.thumbnail
-            ? { srcUrl: remote.metadata.thumbnail }
-            : undefined,
-        },
-        metadata: {
-          displayName: remote.metadata.displayName,
-          description: remote.metadata.description,
-          introduction: remote.metadata.introduction,
-          tags: remote.metadata.tags,
-          homepage: remote.metadata.homepage,
-          repository: remote.metadata.repository,
-          thumbnail: remote.metadata.thumbnail,
-        },
-      } as Cap;
+      // Prefer mapping from the original 8004 agent JSON if available
+      const registryAddress = remote.cid;
+      const idx = Number.parseInt(id, 10);
+      const agent = get().agent8004ByRegistryAndIndex[registryAddress]?.[idx];
+      const cap: Cap = agent
+        ? agent8004ToCap(agent as Agent8004 | ErrorAgent8004, {
+            authorDID: remote.authorDID,
+            idName: remote.idName,
+            capId: id,
+          })
+        : // Fallback: construct a minimal Cap from the RemoteCap if raw agent not cached
+          ({
+            id: remote.id,
+            authorDID: remote.authorDID,
+            idName: remote.idName,
+            core: {
+              prompt: { value: '' },
+              model: {
+                providerId: 'openrouter',
+                modelId: 'unknown',
+                supportedInputs: ['text'],
+                contextLength: 4096,
+              },
+              mcpServers: {},
+              artifact: remote.metadata.thumbnail
+                ? { srcUrl: remote.metadata.thumbnail }
+                : undefined,
+            },
+            metadata: {
+              displayName: remote.metadata.displayName,
+              description: remote.metadata.description,
+              introduction: remote.metadata.introduction,
+              tags: remote.metadata.tags,
+              homepage: remote.metadata.homepage,
+              repository: remote.metadata.repository,
+              thumbnail: remote.metadata.thumbnail,
+            },
+          } as Cap);
 
       set({ downloadedCaps: { ...get().downloadedCaps, [id]: cap } });
       return cap;
