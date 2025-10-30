@@ -1,8 +1,14 @@
-import type { Cap, Page, Result, ResultCap } from '@nuwa-ai/cap-kit';
+import type { Cap } from '@nuwa-ai/cap-kit';
 import { create } from 'zustand';
 import { capKitService } from '@/shared/services/capkit-service';
+import { agent8004ToRemoteCap } from './8004-remotecap-adapter';
+import {
+  DEFAULT_IDENTITY_REGISTRY_ADDRESS,
+  getAgent8004ByPage,
+  getAgentsByPage,
+  getOwnerAddressesByAgentIds,
+} from './8004-service';
 import type { CapStoreSection, RemoteCap } from './types';
-import { mapResultsToRemoteCaps } from './utils';
 
 // Search parameters interface
 export interface UseRemoteCapParams {
@@ -54,7 +60,7 @@ interface CapStoreState {
   fetchCaps: (
     params?: UseRemoteCapParams,
     append?: boolean,
-  ) => Promise<Result<Page<ResultCap>>>;
+  ) => Promise<RemoteCap[]>;
   refetch: () => void;
   loadMore: () => Promise<any> | undefined;
   goToPage: (newPage: number) => Promise<any>;
@@ -101,16 +107,13 @@ const initialState = {
 export const useCapStore = create<CapStoreState>()((set, get) => {
   // Auto-initialize when store is created
   const initialize = async () => {
-    const { isInitialized, fetchCaps, fetchHome } = get();
+    const { isInitialized, fetchCaps } = get();
     if (isInitialized) return;
 
-    const capKit = await capKitService.getCapKit();
-    if (!capKit) return;
+    // Initial data fetching
+    await Promise.all([fetchCaps()]);
 
     set({ isInitialized: true });
-
-    // Initial data fetching
-    await Promise.all([fetchCaps(), fetchHome()]);
   };
 
   // Call initialize immediately when store is created
@@ -127,7 +130,7 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
     fetchCaps: async (
       params: UseRemoteCapParams = {},
       append = false,
-    ): Promise<Result<Page<ResultCap>>> => {
+    ): Promise<RemoteCap[]> => {
       const capKit = await capKitService.getCapKit();
 
       const {
@@ -147,17 +150,31 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
       set({ error: null, lastSearchParams: params });
 
       try {
-        const response = await capKit.queryByName(queryString, {
-          tags: tagsArray,
-          page: pageNum,
-          size: sizeNum,
-          sortBy: sortByParam,
-          sortOrder: sortOrderParam,
-        });
+        const registryAddress =
+          (tagsArray[0] as `0x${string}`) || DEFAULT_IDENTITY_REGISTRY_ADDRESS;
+        // 1) Compute agent IDs for page
+        const agentIds = await getAgentsByPage(
+          registryAddress,
+          pageNum,
+          sizeNum,
+        );
+        // 2) Batch fetch owners and agent JSONs
+        const [owners, agents] = await Promise.all([
+          getOwnerAddressesByAgentIds(registryAddress, agentIds),
+          getAgent8004ByPage(registryAddress, pageNum, sizeNum),
+        ]);
 
-        const newRemoteCaps: RemoteCap[] = mapResultsToRemoteCaps(response);
+        // 3) Map to RemoteCaps using owner as authorDID and 8004 name as idName
+        const newRemoteCaps: RemoteCap[] = agents.map((agent, i) =>
+          agent8004ToRemoteCap(agent as any, {
+            authorDID:
+              owners[i] || '0x0000000000000000000000000000000000000000',
+            idName:
+              (agent as any)?.name || `agent_${pageNum * sizeNum + i + 1}`,
+          }),
+        );
 
-        const totalItems = response.data?.items?.length || 0;
+        const totalItems = agents.length || 0;
         const { remoteCaps } = get();
 
         set({
@@ -170,7 +187,7 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
           isLoadingMore: false,
         });
 
-        return response;
+        return newRemoteCaps;
       } catch (err) {
         console.error('Error fetching caps:', err);
         set({
@@ -179,6 +196,27 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
           isLoadingMore: false,
         });
         throw err;
+      }
+    },
+
+    // Minimal home fetch (placeholder). You can enhance it to fetch different sorts.
+    fetchHome: async () => {
+      try {
+        set({ isLoadingHome: true, homeError: null });
+        // Reuse fetchCaps to get first page
+        const caps = await get().fetchCaps({ page: 0, size: 12 });
+        const topRated = caps.slice(0, 4);
+        const trending = caps.slice(4, 8);
+        const latest = caps.slice(8, 12);
+        const homeData = { topRated, trending, latest } as HomeData;
+        set({ homeData, isLoadingHome: false });
+        return homeData;
+      } catch (e: any) {
+        set({
+          isLoadingHome: false,
+          homeError: e?.message || 'Failed to load home',
+        });
+        return null;
       }
     },
 
@@ -215,63 +253,44 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
       });
     },
 
-    fetchHome: async (): Promise<HomeData | null> => {
-      const { fetchCaps } = get();
-
-      set({ isLoadingHome: true, homeError: null });
-
-      try {
-        const [topRatedResponse, trendingResponse, latestResponse] =
-          await Promise.all([
-            fetchCaps({
-              searchQuery: '',
-              sortBy: 'average_rating',
-              sortOrder: 'desc',
-              page: 0,
-              size: 6,
-            }) as Promise<Result<Page<ResultCap>>>,
-            fetchCaps({
-              searchQuery: '',
-              sortBy: 'downloads',
-              sortOrder: 'desc',
-              page: 0,
-              size: 6,
-            }) as Promise<Result<Page<ResultCap>>>,
-            fetchCaps({
-              searchQuery: '',
-              sortBy: 'updated_at',
-              sortOrder: 'desc',
-              page: 0,
-              size: 6,
-            }) as Promise<Result<Page<ResultCap>>>,
-          ]).catch((e) => {
-            throw e;
-          });
-        const homeData: HomeData = {
-          topRated: mapResultsToRemoteCaps(topRatedResponse),
-          trending: mapResultsToRemoteCaps(trendingResponse),
-          latest: mapResultsToRemoteCaps(latestResponse),
-        };
-
-        set({ homeData, isLoadingHome: false });
-        return homeData;
-      } catch (err) {
-        console.error('Error fetching home data:', err);
-        set({
-          homeError: 'Failed to load home data. Please try again.',
-          isLoadingHome: false,
-        });
-        throw err;
-      }
-    },
-
     downloadCapByIDWithCache: async (id: string): Promise<Cap> => {
+      // Return from cache if present
       const cachedCap = get().downloadedCaps[id];
-      if (cachedCap) {
-        return cachedCap;
-      }
-      const capKit = await capKitService.getCapKit();
-      const cap = await capKit.downloadByID(id);
+      if (cachedCap) return cachedCap;
+
+      // Find the RemoteCap in current list
+      const remote = get().remoteCaps.find((c) => c.id === id);
+      if (!remote) throw new Error('Cap not found in current list');
+
+      // Simple conversion RemoteCap -> Cap
+      const cap: Cap = {
+        id: remote.id,
+        authorDID: remote.authorDID,
+        idName: remote.idName,
+        core: {
+          prompt: { value: '' },
+          model: {
+            providerId: 'openrouter',
+            modelId: 'unknown',
+            supportedInputs: ['text'],
+            contextLength: 4096,
+          },
+          mcpServers: {},
+          artifact: remote.metadata.thumbnail
+            ? { srcUrl: remote.metadata.thumbnail }
+            : undefined,
+        },
+        metadata: {
+          displayName: remote.metadata.displayName,
+          description: remote.metadata.description,
+          introduction: remote.metadata.introduction,
+          tags: remote.metadata.tags,
+          homepage: remote.metadata.homepage,
+          repository: remote.metadata.repository,
+          thumbnail: remote.metadata.thumbnail,
+        },
+      } as Cap;
+
       set({ downloadedCaps: { ...get().downloadedCaps, [id]: cap } });
       return cap;
     },

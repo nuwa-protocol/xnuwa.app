@@ -1,12 +1,10 @@
-import { Download, Eye } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import { Card } from '@/shared/components/ui';
 import type { Cap } from '@/shared/types';
 import type { RemoteCap } from '../types';
 import { CapActionButton } from './cap-action-button';
-import { StarRating } from './star-rating';
 
 export interface CapCardProps {
   cap: RemoteCap | Cap;
@@ -59,7 +57,7 @@ export function CapCard({ cap, actions }: CapCardProps) {
         ) : null}
       </div>
 
-      {capStats && (
+      {/* {capStats && (
         <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground border-t border-between">
           <span
             className="flex items-center justify-center gap-1 border-r pt-3"
@@ -91,7 +89,7 @@ export function CapCard({ cap, actions }: CapCardProps) {
             />
           </span>
         </div>
-      )}
+      )} */}
     </Card>
   );
 }

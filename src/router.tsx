@@ -4,6 +4,7 @@ import AppLayoutSwitch from './layout/app-layout-switch';
 import CapStudioPage from './pages/cap-studio';
 import ChatPage from './pages/chat';
 import ErrorPage from './pages/error';
+import ExplorePage from './pages/explore';
 import { LandingPage } from './pages/landing';
 import OAuthCallbackPage from './pages/oauth-callback';
 import SettingsPage from './pages/settings';
@@ -40,12 +41,14 @@ const router = createBrowserRouter([
           </AuthGuard>
         ),
       },
-      // { path: 'explore/*', element: (
-      //     <AuthGuard>
-      //       <ExplorePage />
-      //     </AuthGuard>
-      //   )
-      // },
+      {
+        path: 'explore/*',
+        element: (
+          <AuthGuard>
+            <ExplorePage />
+          </AuthGuard>
+        ),
+      },
       {
         path: 'cap-studio/*',
         element: (
