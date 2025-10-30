@@ -288,3 +288,67 @@ export const remoteCapToAgent8004 = (
     supportedTrust: opts.supportedTrust,
   } as Agent8004; // endpoints already validated; optional arrays may be undefined
 };
+
+// Map a Cap object from Cap Studio to a minimal-valid Agent8004 JSON
+// Note: because a Cap does not carry an LLM endpoint URL explicitly, we use
+// `core.model.customGatewayUrl` if provided; otherwise we set a placeholder URL.
+export const capToAgent8004 = (cap: Cap): Agent8004 => {
+  const endpoints: Agent8004Endpoint[] = [];
+
+  // llm (required by 8004) — pull details from cap.core.model
+  const model = cap.core?.model as any;
+  const llmEndpointUrl = model?.customGatewayUrl || 'https://gateway.example.com/llm';
+  const llm: any = {
+    name: 'llm',
+    endpoint: llmEndpointUrl,
+    providerId: model?.providerId,
+    modelId: model?.modelId,
+    contextLength: model?.contextLength,
+    supportedInputs: model?.supportedInputs,
+    parameters: model?.parameters,
+  };
+  const llmParsed = Agent8004EndpointSchema.parse(llm);
+  endpoints.push(llmParsed);
+
+  // metadata endpoint from Cap metadata + prompt suggestions
+  const md: any = {
+    name: 'metadata',
+    displayName: cap.metadata?.displayName,
+    homepage: cap.metadata?.homepage,
+    repository: cap.metadata?.repository,
+    suggestions: cap.core?.prompt?.suggestions,
+  };
+  const mdParsed = Agent8004EndpointSchema.parse(md);
+  endpoints.push(mdParsed);
+
+  // mcp servers -> mcp endpoints
+  const mcpServers = (cap.core?.mcpServers || {}) as Record<string, string>;
+  for (const [serverName, endpoint] of Object.entries(mcpServers)) {
+    const mcpParsed = Agent8004EndpointSchema.parse({
+      name: 'mcp',
+      endpoint,
+      serverName,
+    });
+    endpoints.push(mcpParsed);
+  }
+
+  // artifact
+  const artSrc = cap.core?.artifact?.srcUrl;
+  if (artSrc) {
+    const artParsed = Agent8004EndpointSchema.parse({
+      name: 'artifact',
+      endpoint: artSrc,
+    });
+    endpoints.push(artParsed);
+  }
+
+  return {
+    type: EIP8004_REGISTRATION_V1,
+    // Prefer human-friendly display name
+    name: cap.metadata?.displayName || cap.idName,
+    description: cap.metadata?.description || '',
+    image: cap.metadata?.thumbnail || 'https://example.com/placeholder.png',
+    endpoints,
+    // Optional arrays omitted by default
+  } as Agent8004;
+};

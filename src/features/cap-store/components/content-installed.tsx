@@ -1,14 +1,7 @@
-import { Loader2, MoreVertical, Package, Trash2 } from 'lucide-react';
+import { Package } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  ScrollArea,
-} from '@/shared/components/ui';
+import { ScrollArea } from '@/shared/components/ui';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import { CapActionButton } from './cap-action-button';
@@ -95,46 +88,6 @@ export function CapStoreInstalledContent() {
                       onPointerDown={(event) => event.stopPropagation()}
                     >
                       <CapActionButton cap={cap} />
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 text-muted-foreground hover:text-foreground"
-                            onClick={(event) => event.stopPropagation()}
-                            onPointerDown={(event) => event.stopPropagation()}
-                            aria-label="Cap options"
-                          >
-                            {isUninstalling ? (
-                              <Loader2 className="size-4 animate-spin" />
-                            ) : (
-                              <MoreVertical className="size-4" />
-                            )}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          onCloseAutoFocus={(event) => {
-                            // prevent card focus (which triggers navigation) when menu closes
-                            event.preventDefault();
-                          }}
-                        >
-                          <DropdownMenuItem
-                            disabled={isUninstalling}
-                            onSelect={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              handleUninstallCap(
-                                cap.id,
-                                cap.metadata.displayName,
-                              );
-                            }}
-                          >
-                            <Trash2 className="size-4" />
-                            Uninstall
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
                   }
                 />

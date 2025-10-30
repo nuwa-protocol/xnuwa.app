@@ -176,7 +176,8 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
         // 3) Map to RemoteCaps using owner as authorDID and 8004 name as idName
         const newRemoteCaps: RemoteCap[] = agents.map((agent, i) =>
           agent8004ToRemoteCap(agent as any, {
-            id: (i + 1).toString(),
+            // New ID scheme: `<registryAddress>/<index>` (1-based within current page)
+            id: `${registryAddress}/${i + 1}`,
             cid: registryAddress,
             authorDID:
               owners[i] || '0x0000000000000000000000000000000000000000',
@@ -286,8 +287,9 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
       if (!remote) throw new Error('Cap not found in current list');
 
       // Prefer mapping from the original 8004 agent JSON if available
-      const registryAddress = remote.cid;
-      const idx = Number.parseInt(id, 10);
+      // New ID format: `<registryAddress>/<index>`
+      const [registryAddress, indexStr] = id.split('/');
+      const idx = Number.parseInt(indexStr || '', 10);
       const agent = get().agent8004ByRegistryAndIndex[registryAddress]?.[idx];
       const cap: Cap = agent
         ? agent8004ToCap(agent as Agent8004 | ErrorAgent8004, {

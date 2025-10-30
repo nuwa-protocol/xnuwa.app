@@ -222,11 +222,8 @@ export const getAgent8004ByPage = async (
   page: number,
   pageSize: number,
 ): Promise<Array<Agent8004 | ErrorAgent8004>> => {
-  const uris = await getAgentsTokenURIByPage(
-    registryAddress,
-    page,
-    pageSize,
-  );
+  const uris = await getAgentsTokenURIByPage(registryAddress, page, pageSize);
+  console.log('uris', uris);
   if (!uris.length) return [];
   const results = await Promise.all(
     uris.map((uri) => fetchAgent8004FromTokenURI(uri)),

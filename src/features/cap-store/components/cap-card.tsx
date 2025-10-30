@@ -1,10 +1,9 @@
-import { Loader2, RotateCw } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CapAvatar } from '@/shared/components/cap-avatar';
-import { Button, Card } from '@/shared/components/ui';
+import { Card } from '@/shared/components/ui';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { Cap } from '@/shared/types';
 import { useCapStore } from '../stores';
@@ -64,10 +63,24 @@ export function CapCard({ cap, actions }: CapCardProps) {
     }
   };
 
+  // Resolve registry address for navigation
+  const registryAddress = (cap as RemoteCap).cid || ((): string | undefined => {
+    const idStr = String((cap as any).id || '');
+    const slash = idStr.indexOf('/');
+    if (slash > 0) return idStr.slice(0, slash);
+    return undefined;
+  })();
+
+  const handleNavigate = () => {
+    if (!registryAddress) return; // no-op if we cannot resolve a registry
+    const index = cap.id.split('/')[1];
+    navigate(`/explore/${registryAddress}/${index}`);
+  };
+
   return (
     <Card
       className="group relative flex flex-col gap-2 overflow-hidden p-4 transition-shadow shadow-lg cursor-pointer hover:shadow-md"
-      onClick={() => navigate(`/explore/${(cap as RemoteCap).cid}/${cap.id}`)}
+      onClick={handleNavigate}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
@@ -93,25 +106,6 @@ export function CapCard({ cap, actions }: CapCardProps) {
           <p className="text-sm text-muted-foreground leading-5 line-clamp-3">
             {capData.metadata.description}
           </p>
-        ) : null}
-      </div>
-      <div className="hidden items-end justify-end gap-1 group-hover:flex group-focus-within:flex">
-        {canUpdate ? (
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 px-3"
-            disabled={isUpdating}
-            onClick={handleUpdate}
-            aria-label="Update Cap"
-          >
-            {isUpdating ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <RotateCw className="w-4 h-4 mr-2" />
-            )}
-            Update
-          </Button>
         ) : null}
       </div>
 

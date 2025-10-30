@@ -4,7 +4,6 @@ import {
   Brain,
   Code,
   Coins,
-  Download,
   MoreHorizontal,
   Package,
   PenTool,
@@ -87,12 +86,12 @@ export function CapStoreSidebar() {
   return (
     <div className="w-64 border-r border-border">
       <div className="p-4">
-        <h2 className="text-lg font-semibold mb-4 mx-5">AI Capabilities</h2>
+        {/* <h2 className="text-lg font-semibold mb-4 mx-5">ERC8004 Registries</h2> */}
 
         <ScrollArea className="h-[calc(100vh-200px)]">
           <div className="space-y-1">
             {/* Installed */}
-            <Button
+            {/* <Button
               variant={activeSection.id === 'installed' ? 'secondary' : 'ghost'}
               className="w-full justify-start gap-3 h-10 mb-2"
               onClick={() =>
@@ -105,7 +104,7 @@ export function CapStoreSidebar() {
             >
               <Download className="size-4" />
               <span>Installed Caps</span>
-            </Button>
+            </Button> */}
 
             {/* All Caps */}
             {/* <Button
@@ -124,7 +123,7 @@ export function CapStoreSidebar() {
             </Button> */}
 
             {/* Separator */}
-            <div className="h-px bg-border" />
+            {/* <div className="h-px bg-border" /> */}
 
             {/* Tags */}
             <div className="space-y-1">

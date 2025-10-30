@@ -1,6 +1,14 @@
 import type { Cap } from '@nuwa-ai/cap-kit';
-import { Fingerprint, Share2, Tag, User, RotateCw, Loader2 } from 'lucide-react';
+import {
+  Fingerprint,
+  Loader2,
+  RotateCw,
+  Share2,
+  Tag,
+  User,
+} from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   Badge,
@@ -11,10 +19,9 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
+import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { RemoteCap } from '../../types';
 import { CapActionButton } from '../cap-action-button';
-import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
-import { toast } from 'sonner';
 
 interface CapDetailsHeaderProps {
   capQueryData: RemoteCap;
@@ -37,7 +44,9 @@ export function CapDetailsHeader({
   const { installedCaps, updateCap } = InstalledCapsStore();
   const [isUpdating, setIsUpdating] = useState(false);
   const isInstalled = installedCaps.some((c) => c.id === capQueryData.id);
-  const isPreinstalled = (downloadedCapData?.authorDID || '').startsWith('did::preinstalled');
+  const isPreinstalled = (downloadedCapData?.authorDID || '').startsWith(
+    'did::preinstalled',
+  );
 
   const maxInlineTags = 3;
   const allTags = capQueryData.metadata.tags ?? [];
@@ -95,7 +104,9 @@ export function CapDetailsHeader({
               {/* CID (next line) */}
               <div className="flex items-center gap-2 min-w-0">
                 <Fingerprint className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Identity Registry:</span>
+                <span className="text-xs text-muted-foreground">
+                  Identity Registry:
+                </span>
                 <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -166,6 +177,29 @@ export function CapDetailsHeader({
                   </Tooltip>
                 </TooltipProvider>
               </div>
+            </div>
+            {/* OpenSea、Etherscan按钮区，紧接着模型信息grid下方 */}
+            <div className="flex flex-row justify-start items-center gap-2 mt-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 text-xs rounded-md"
+                onClick={() =>
+                  window.open(`https://opensea.io/item/ethereum/${capQueryData.id}`, '_blank')
+                }
+              >
+                OpenSea
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 text-xs rounded-md"
+                onClick={() =>
+                  window.open(`https://etherscan.io/address/${capQueryData.id.split('/')[0]}`, '_blank')
+                }
+              >
+                Etherscan
+              </Button>
             </div>
           </div>
 
