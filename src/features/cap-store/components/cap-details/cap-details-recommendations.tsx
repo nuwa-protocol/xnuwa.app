@@ -93,7 +93,11 @@ export function CapDetailsRecommendations({
                     key={cap.id}
                     role="button"
                     tabIndex={0}
-                    onClick={() => navigate(`/explore/caps/${cap.id}`)}
+                    onClick={() =>
+                      navigate(
+                        `/explore/${cap.cid}/${encodeURIComponent(cap.id)}`,
+                      )
+                    }
                     className="flex items-center gap-3 rounded-md border px-2 py-2 hover:bg-muted cursor-pointer"
                   >
                     <CapAvatar

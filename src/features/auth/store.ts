@@ -245,7 +245,6 @@ export const AccountStore = create<AccountStoreState>()(
       // ==================== Set current account ====================
 
       setCurrentAccount: (address) => {
-        console.log('setCurrentAccount', address);
         const accountData = get().accounts.find((a) => a.address === address);
         if (!accountData) throw new Error('Account does not exist');
 
@@ -292,7 +291,6 @@ export const AccountStore = create<AccountStoreState>()(
       },
 
       logout: async () => {
-        console.log('logout');
         const currentAccount = get().account;
 
         if (currentAccount) {

@@ -439,7 +439,9 @@ export function CapSelector() {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 setOpen(false);
-                                navigate(`/explore/caps/${cap.id}`);
+                                navigate(
+                                  `/explore/${cap.cid}/${encodeURIComponent(cap.id)}`,
+                                );
                               }}
                             >
                               Details

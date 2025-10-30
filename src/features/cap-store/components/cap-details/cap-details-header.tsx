@@ -1,15 +1,14 @@
 import type { Cap } from '@nuwa-ai/cap-kit';
 import {
-  Download,
-  Eye,
   Fingerprint,
-  GitBranch,
+  Loader2,
+  RotateCw,
   Share2,
-  ShieldCheck,
   Tag,
   User,
 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
   Badge,
@@ -20,9 +19,9 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui';
 import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
+import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { RemoteCap } from '../../types';
 import { CapActionButton } from '../cap-action-button';
-import { StarRating } from '../star-rating';
 
 interface CapDetailsHeaderProps {
   capQueryData: RemoteCap;
@@ -42,6 +41,12 @@ export function CapDetailsHeader({
 
   const [authorCopied, setAuthorCopied] = useState(false);
   const [cidCopied, setCidCopied] = useState(false);
+  const { installedCaps, updateCap } = InstalledCapsStore();
+  const [isUpdating, setIsUpdating] = useState(false);
+  const isInstalled = installedCaps.some((c) => c.id === capQueryData.id);
+  const isPreinstalled = (downloadedCapData?.authorDID || '').startsWith(
+    'did::preinstalled',
+  );
 
   const maxInlineTags = 3;
   const allTags = capQueryData.metadata.tags ?? [];
@@ -89,17 +94,19 @@ export function CapDetailsHeader({
           {/* Structured metadata below title (compact) */}
           <div className="mt-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {/* Version (next line) */}
+              {/* Version (next line)
               <div className="flex items-center gap-2 min-w-0">
                 <GitBranch className="h-4 w-4 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">Version:</span>
                 <Badge variant="secondary">v{capQueryData.version}</Badge>
-              </div>
+              </div> */}
 
               {/* CID (next line) */}
               <div className="flex items-center gap-2 min-w-0">
                 <Fingerprint className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">CID:</span>
+                <span className="text-xs text-muted-foreground">
+                  Identity Registry:
+                </span>
                 <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -128,19 +135,19 @@ export function CapDetailsHeader({
                 </TooltipProvider>
               </div>
 
-              {/* Status */}
+              {/* Status
               <div className="flex items-center gap-2 min-w-0">
                 <ShieldCheck className="h-4 w-4 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
                   Validation:
                 </span>
                 <Badge className="gap-1">Verified</Badge>
-              </div>
+              </div> */}
 
               {/* Author */}
               <div className="flex items-center gap-2 min-w-0">
                 <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Author:</span>
+                <span className="text-xs text-muted-foreground">Owner:</span>
                 <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -171,10 +178,33 @@ export function CapDetailsHeader({
                 </TooltipProvider>
               </div>
             </div>
+            {/* OpenSea、Etherscan按钮区，紧接着模型信息grid下方 */}
+            <div className="flex flex-row justify-start items-center gap-2 mt-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 text-xs rounded-md"
+                onClick={() =>
+                  window.open(`https://opensea.io/item/ethereum/${capQueryData.id}`, '_blank')
+                }
+              >
+                OpenSea
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 text-xs rounded-md"
+                onClick={() =>
+                  window.open(`https://etherscan.io/address/${capQueryData.id.split('/')[0]}`, '_blank')
+                }
+              >
+                Etherscan
+              </Button>
+            </div>
           </div>
 
           {/* Quick Stats */}
-          <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-6 mb-4">
+          {/* <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-6 mb-4">
             <div className="flex items-center gap-2">
               <Eye className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">
@@ -197,7 +227,7 @@ export function CapDetailsHeader({
                 onRate={() => { }}
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Tags moved next to the title */}
         </div>
@@ -205,6 +235,34 @@ export function CapDetailsHeader({
         {/* Right column: vertical actions */}
         <div className="w-full md:w-56 md:ml-auto flex flex-col gap-3">
           <CapActionButton cap={capQueryData} />
+          {isInstalled && !isPreinstalled ? (
+            <Button
+              variant="outline"
+              className="gap-2 w-full"
+              disabled={isUpdating}
+              onClick={async () => {
+                if (isUpdating) return;
+                setIsUpdating(true);
+                try {
+                  const updated = await updateCap(capQueryData.id);
+                  toast.success(`Updated ${updated.metadata.displayName}`);
+                } catch (err) {
+                  console.error('Failed to update cap:', err);
+                  toast.error('Failed to update. Please try again.');
+                } finally {
+                  setIsUpdating(false);
+                }
+              }}
+              aria-label="Update CAP"
+            >
+              {isUpdating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RotateCw className="h-4 w-4" />
+              )}
+              Update
+            </Button>
+          ) : null}
           <ShareDialog
             title="Share this CAP"
             description="Copy the link and share it with others."

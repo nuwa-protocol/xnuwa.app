@@ -98,9 +98,9 @@ export function CapEdit({ id }: { id?: string }) {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="introduction">Introduction</TabsTrigger>
+            {/* <TabsTrigger value="introduction">Introduction</TabsTrigger> */}
             <TabsTrigger value="model">Model</TabsTrigger>
             <TabsTrigger value="prompt">Prompt</TabsTrigger>
             <TabsTrigger value="mcp">MCP</TabsTrigger>

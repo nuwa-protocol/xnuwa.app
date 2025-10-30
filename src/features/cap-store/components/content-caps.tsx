@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observer';
+import { DEFAULT_IDENTITY_REGISTRY_ADDRESS } from '../8004-service';
 import { type UseRemoteCapParams, useCapStore } from '../stores';
 import { CapCard } from './cap-card';
 import { CapStoreLoading } from './cap-store-loading';
@@ -28,6 +29,10 @@ export function CapStoreCapsContent({
     refetch,
     fetchCaps,
   } = useCapStore();
+
+  const registryAddress = tag
+    ? (tag as `0x${string}`)
+    : DEFAULT_IDENTITY_REGISTRY_ADDRESS;
 
   useEffect(() => {
     fetchCaps({
@@ -67,7 +72,7 @@ export function CapStoreCapsContent({
 
   if (isFetching && true) {
     return (
-      <div className='flex flex-col h-full w-full'>
+      <div className="flex flex-col h-full w-full">
         <CapStoreContentHeader showSearchAndSort={true} />
         <CapStoreLoading />
       </div>
@@ -76,10 +81,9 @@ export function CapStoreCapsContent({
 
   if (caps.length === 0) {
     return (
-      <div className='flex flex-col h-full w-full'>
+      <div className="flex flex-col h-full w-full">
         <CapStoreContentHeader showSearchAndSort={true} />
         <div className="w-full flex flex-col items-center justify-center min-h-[700px] text-center">
-
           <Package className="size-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-2 text-muted-foreground">
             No AI Caps Found
@@ -90,7 +94,7 @@ export function CapStoreCapsContent({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full">
       <CapStoreContentHeader showSearchAndSort={true} />
 
       {/* Caps Grid Container with ScrollArea */}
@@ -100,7 +104,9 @@ export function CapStoreCapsContent({
             caps.map((cap) => {
               const id = cap.id;
 
-              return <CapCard key={id} cap={cap} />;
+              return (
+                <CapCard key={id} cap={cap} />
+              );
             })}
         </div>
 

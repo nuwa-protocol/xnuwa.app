@@ -26,6 +26,8 @@ import {
 } from '@/shared/components/ui';
 import { useAuth } from '@/shared/hooks';
 import { type Cap, CapSchema } from '@/shared/types';
+import { Agent8004Schema } from '@/shared/types/8004-agent';
+import { agent8004ToCap } from '@/features/cap-store/8004-remotecap-adapter';
 import { useSubmitCap } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
@@ -51,6 +53,7 @@ export function MyCaps({
   const { localCaps, deleteCap, createCap } = CapStudioStore();
   const { bulkSubmitCaps, bulkProgress } = useSubmitCap();
   const importFileRef = useRef<HTMLInputElement>(null);
+  const importJsonRef = useRef<HTMLInputElement>(null);
 
   // Multi-select state
   const [selectedCapIds, setSelectedCapIds] = useState<Set<string>>(new Set());
@@ -179,6 +182,44 @@ export function MyCaps({
     }
   };
 
+  const handleImportJson = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      // Validate against 8004 Agent schema
+      const agent = Agent8004Schema.parse(data);
+
+      // Normalize author DID (same logic as YAML import)
+      const normalizeAuthorDid = (raw?: string | null): string => {
+        if (!raw) return 'did::unknown';
+        if (raw.startsWith('did::')) return raw;
+        if (raw.startsWith('did:')) return `did::${raw.slice(4)}`;
+        return `did::${raw}`;
+      };
+      const authorDID = normalizeAuthorDid(did);
+
+      // Map to Cap using existing adapter
+      const mappedCap = agent8004ToCap(agent as any, {
+        authorDID,
+      });
+
+      CapSchema.parse(mappedCap);
+      const created = createCap(mappedCap);
+      toast.success(`Imported "${created.capData.metadata.displayName}"`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to import JSON';
+      toast.error(message);
+    } finally {
+      event.target.value = '';
+    }
+  };
+
   if (localCaps.length === 0) {
     return (
       <Card className="border-dashed border-2 border-muted-foreground/25 bg-muted/5">
@@ -198,20 +239,41 @@ export function MyCaps({
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Cap
             </Button>
+            {/**
+             * Temporarily disable YAML import in Cap Studio
+             * <Button
+             *   onClick={() => importFileRef.current?.click()}
+             *   variant="outline"
+             *   size="lg"
+             * >
+             *   <Upload className="h-4 w-4 mr-2" />
+             *   Import YAML
+             * </Button>
+             */}
             <Button
-              onClick={() => importFileRef.current?.click()}
+              onClick={() => importJsonRef.current?.click()}
               variant="outline"
               size="lg"
             >
               <Upload className="h-4 w-4 mr-2" />
-              Import YAML
+              Import 8004 JSON
             </Button>
-            {/* Hidden input for importing a single cap YAML */}
+            {/**
+             * Hidden input for YAML import disabled
+             * <input
+             *   ref={importFileRef}
+             *   type="file"
+             *   accept=".yaml,.yml"
+             *   onChange={handleImportYaml}
+             *   className="hidden"
+             * />
+             */}
+            {/* Hidden input for importing a single 8004 JSON */}
             <input
-              ref={importFileRef}
+              ref={importJsonRef}
               type="file"
-              accept=".yaml,.yml"
-              onChange={handleImportYaml}
+              accept=".json"
+              onChange={handleImportJson}
               className="hidden"
             />
           </div>
@@ -294,22 +356,41 @@ export function MyCaps({
                     <Upload className="h-4 w-4 mr-2" />
                     Batch Create
                   </DropdownMenuItem> */}
+                  {/**
+                   * Temporarily disable YAML import
+                   * <DropdownMenuItem
+                   *   onClick={() => importFileRef.current?.click()}
+                   * >
+                   *   <FileUp className="h-4 w-4 mr-2" />
+                   *   Import from YAML
+                   * </DropdownMenuItem>
+                   */}
                   <DropdownMenuItem
-                    onClick={() => importFileRef.current?.click()}
+                    onClick={() => importJsonRef.current?.click()}
                   >
                     <FileUp className="h-4 w-4 mr-2" />
-                    Import from YAML
+                    Import from 8004 JSON
                   </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {/* Hidden input for importing a single cap YAML */}
-              <input
-                ref={importFileRef}
-                type="file"
-                accept=".yaml,.yml"
-                onChange={handleImportYaml}
-                className="hidden"
-              />
+              </DropdownMenuContent>
+            </DropdownMenu>
+              {/**
+               * Hidden input for YAML import disabled
+               * <input
+               *   ref={importFileRef}
+               *   type="file"
+               *   accept=".yaml,.yml"
+               *   onChange={handleImportYaml}
+               *   className="hidden"
+               * />
+               */}
+            {/* Hidden input for importing a single 8004 JSON */}
+            <input
+              ref={importJsonRef}
+              type="file"
+              accept=".json"
+              onChange={handleImportJson}
+              className="hidden"
+            />
             </>
           ) : (
             <div className="flex gap-2">

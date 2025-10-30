@@ -13,9 +13,9 @@ const ExplorePageContent = () => {
   const sortBy = searchParams.get('sortBy');
   const search = searchParams.get('search');
 
-  if (path === 'caps') {
+  if (typeof path === 'string' && path.startsWith('0x')) {
     if (capId) {
-      return <CapDetails capId={capId} />;
+      return <CapDetails capId={`${path}/${capId}`} />;
     } else {
       return <CapStoreCapsContent tag={tag} sortBy={sortBy} search={search} />;
     }

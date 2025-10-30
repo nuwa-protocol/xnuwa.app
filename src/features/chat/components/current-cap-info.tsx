@@ -60,23 +60,50 @@ export function CurrentCapInfo() {
       role="region"
       aria-label="Capability information"
     >
-      <div className="flex flex-col items-center text-center py-6">
-        <CapAvatar cap={currentCap} size="4xl" className="rounded-xl mb-2" />
+      <div className="flex flex-col items-center text-center py-4">
+        {/* 头像和标题 */}
+        <button
+          type="button"
+          onClick={() => {
+            navigate(`/explore/${currentCap?.id}`);
+          }}
+          className="flex flex-col items-center"
+        >
+          <CapAvatar cap={currentCap} size="5xl" className="rounded-xl mb-2 mx-auto" />
+          <div className="mb-2 text-xl md:text-2xl font-semibold tracking-tight text-foreground">
+            {currentCap?.metadata.displayName || ''}
+          </div>
+        </button>
+        <div className="flex flex-row justify-center items-center gap-2 mb-1 mt-0 w-full">
+          <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-xs text-muted-foreground flex-grow">
+            <div>{currentCap?.core.model.modelId || ''}</div>
+            <div>{`• ${formatContextLength(currentCap?.core.model.contextLength)} Context`}</div>
+            {currentCap?.core.artifact && ' • Artifact'}
+            {Object.keys(currentCap?.core.mcpServers || {}).length > 0 &&
+              ` • ${Object.keys(currentCap?.core.mcpServers || {}).length} MCP`}
+            <div className="flex flex-row gap-2 flex-shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 text-xs rounded-md"
+                onClick={() => window.open(`https://opensea.io/item/ethereum/${currentCap?.id}`, '_blank')}
+              >
+                OpenSea
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 text-xs rounded-md"
+                onClick={() => window.open(`https://etherscan.io/address/${currentCap?.id.split('/')[0]}`, '_blank')}
+              >
+                Etherscan
+              </Button>
+            </div>
+          </div>
 
-        <div className="mb-2 text-xl md:text-2xl font-semibold tracking-tight text-foreground">
-          {currentCap?.metadata.displayName || ''}
         </div>
-
-        <div className="mb-4 flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-          <div>{currentCap?.core.model.modelId || ''}</div>
-          <div>{`• ${formatContextLength(currentCap?.core.model.contextLength)} Context`}</div>
-          {currentCap?.core.artifact && ' • Artifact'}
-          {Object.keys(currentCap?.core.mcpServers || {}).length > 0 &&
-            ` • ${Object.keys(currentCap?.core.mcpServers || {}).length} MCP`}
-        </div>
-
         {currentCap?.metadata.description && (
-          <div className="mt-1 text-sm md:text-[15px] leading-6 text-muted-foreground/90">
+          <div className="mt-0.5 text-sm md:text-[15px] leading-6 text-muted-foreground/90">
             {currentCap?.metadata.description}
           </div>
         )}

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Loader2, Plus, Settings, Wallet, Wrench } from 'lucide-react';
+import { Compass, Loader2, Plus, Settings, Wallet, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WalletStore } from '@/features/wallet/stores';
 import { useDevMode } from '@/shared/hooks';
@@ -53,12 +53,12 @@ export function AppSidebarContent() {
               </motion.span>
             }
           />
-          {/* <SecondarySidebarButton
+          <SecondarySidebarButton
             icon={<Compass className="size-5 shrink-0" />}
             label="Explore"
             targetPath="/explore"
             onClick={() => navigate('/explore')}
-          /> */}
+          />
           {isDevMode && (
             <SecondarySidebarButton
               icon={<Wrench className="size-5 shrink-0" />}

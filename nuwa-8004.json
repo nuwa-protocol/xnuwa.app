@@ -1,0 +1,65 @@
+{
+    "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+    "name": "nuwa-agent",
+    "description": "Nuwa Agent",
+    "image": "https://pbs.twimg.com/profile_images/1982791363012759552/OoW6Tuhv_400x400.jpg",
+    "endpoints": [
+        {
+            "name": "prompt",
+            "endpoint": "https://x402.xnuwa.app/mcp",
+            "version": "v0.1.0"
+        },
+        {
+            "name": "x402-LLM",
+            "endpoint": "https://x402.xnuwa.app/mcp",
+            "gateway": "",
+            "modelId": "",
+            "providerId": "",
+            "contextLength": 128000,
+            "supportedInputs": [
+                "text",
+                "image",
+                "file",
+                "audio"
+            ],
+            "parameters": {
+                "temperature": 0.5,
+                "max_tokens": 1000,
+                "top_p": 1,
+                "frequency_penalty": 0,
+                "presence_penalty": 0
+            }
+        },
+        {
+            "name": "x402-MCP",
+            "endpoint": "https://x402.xnuwa.app/mcp",
+            "serverName": ""
+        },
+        {
+            "name": "Artifact",
+            "endpoint": "https://x402.xnuwa.app/mcp"
+        },
+        {
+            "name": "metadata",
+            "displayName": "",
+            "homepage": "",
+            "repository": "",
+            "suggestions": [
+                "suggestion1",
+                "suggestion2",
+                "suggestion3"
+            ]
+        }
+    ],
+    "registrations": [
+        {
+            "agentId": "*",
+            "agentRegistry": "eip155:1:{IDENTITY_REGISTRY_ADDRESS}"
+        }
+    ],
+    "supportedTrust": [
+        "reputation",
+        "crypto-economic",
+        "tee-attestation"
+    ]
+}

@@ -39,6 +39,7 @@ import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
 import { LiveDebugCapDialog } from './live-debug-cap-dialog';
+import { capToAgent8004 } from '@/features/cap-store/8004-remotecap-adapter';
 
 interface CapCardProps {
   cap: LocalCap;
@@ -65,6 +66,7 @@ export function CapCard({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'yaml' | 'json'>('yaml');
   const suppressCardClickUntilRef = useRef<number>(0); // suppress accidental card click after dialog closes
   const [isStoppingLiveDebug, setIsStoppingLiveDebug] = useState(false);
   const [isLiveDebugDialogOpen, setIsLiveDebugDialogOpen] = useState(false);
@@ -80,6 +82,16 @@ export function CapCard({
         ...exportCap
       } = (cap.capData as any) || {};
       return stringifyYaml(exportCap);
+    } catch {
+      return '{}';
+    }
+  }, [cap.capData]);
+
+  // Build the exportable 8004 agent JSON from Cap
+  const exportJson = useMemo(() => {
+    try {
+      const agent = capToAgent8004(cap.capData as any);
+      return JSON.stringify(agent, null, 2);
     } catch {
       return '{}';
     }
@@ -116,27 +128,32 @@ export function CapCard({
     addSuffix: true,
   });
 
-  // Trigger the dialog that previews export YAML
-  const handleOpenExportDialog = () => {
+  // Trigger the dialog that previews export (YAML or 8004 JSON)
+  const handleOpenExportDialog = (format: 'yaml' | 'json' = 'yaml') => {
+    setExportFormat(format);
     setExportDialogOpen(true);
   };
 
-  // Save the YAML to file (used by dialog "Save YAML")
-  const handleDownloadYaml = () => {
+  // Save the current export content to file
+  const handleDownloadExport = () => {
     try {
-      const blob = new Blob([exportYaml], { type: 'text/yaml' });
+      const isYaml = exportFormat === 'yaml';
+      const content = isYaml ? exportYaml : exportJson;
+      const mime = isYaml ? 'text/yaml' : 'application/json';
+      const ext = isYaml ? 'yaml' : 'json';
+      const blob = new Blob([content], { type: mime });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${cap.capData.idName}.yaml`;
+      a.download = `${cap.capData.idName}.${ext}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      toast.success('Exported cap YAML');
+      toast.success(`Exported cap ${exportFormat.toUpperCase()}`);
     } catch (err) {
       console.error(err);
-      toast.error('Failed to export cap YAML');
+      toast.error('Failed to export');
     }
   };
 
@@ -390,14 +407,26 @@ export function CapCard({
                   )}
 
 */}
+                  {/**
+                   * Temporarily disable YAML export in Cap Studio
+                   * <DropdownMenuItem
+                   *   onClick={(e) => {
+                   *     e.stopPropagation();
+                   *     handleOpenExportDialog('yaml');
+                   *   }}
+                   * >
+                   *   <Download className="h-4 w-4 mr-2" />
+                   *   Export YAML
+                   * </DropdownMenuItem>
+                   */}
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleOpenExportDialog();
+                      handleOpenExportDialog('json');
                     }}
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    Export YAML
+                    Export 8004 JSON
                   </DropdownMenuItem>
 
                   <DropdownMenuSeparator />
@@ -439,7 +468,7 @@ export function CapCard({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* Export YAML preview dialog with copy/save actions */}
+      {/* Export preview dialog (YAML or 8004 JSON) with copy/save actions */}
       <Dialog
         open={exportDialogOpen}
         onOpenChange={handleExportDialogOpenChange}
@@ -449,21 +478,30 @@ export function CapCard({
           onClick={(e) => e.stopPropagation()}
         >
           <DialogHeader>
-            <DialogTitle>Export YAML</DialogTitle>
+            <DialogTitle>
+              Export {exportFormat === 'yaml' ? 'YAML' : '8004 JSON'}
+            </DialogTitle>
             <DialogDescription>
-              Preview and copy or save the YAML for @{cap.capData.idName}
+              Preview and copy or save the {exportFormat.toUpperCase()} for @
+              {cap.capData.idName}
             </DialogDescription>
           </DialogHeader>
 
           <CodeBlock
-            code={exportYaml}
-            language="yaml"
+            code={exportFormat === 'yaml' ? exportYaml : exportJson}
+            language={exportFormat === 'yaml' ? 'yaml' : 'json'}
             className="max-h-[60vh] overflow-auto"
           >
             <CodeBlockCopyButton
-              onCopy={() => toast.success('YAML copied to clipboard')}
-              onError={() => toast.error('Failed to copy YAML')}
-              title="Copy YAML"
+              onCopy={() =>
+                toast.success(
+                  `${exportFormat.toUpperCase()} copied to clipboard`,
+                )
+              }
+              onError={() => toast.error('Failed to copy')}
+              title={
+                exportFormat === 'yaml' ? 'Copy YAML' : 'Copy 8004 JSON'
+              }
             />
           </CodeBlock>
 
@@ -474,9 +512,9 @@ export function CapCard({
             >
               Close
             </Button>
-            <Button onClick={handleDownloadYaml}>
+            <Button onClick={handleDownloadExport}>
               <Download className="h-4 w-4 mr-2" />
-              Save YAML
+              {exportFormat === 'yaml' ? 'Save YAML' : 'Save JSON'}
             </Button>
           </DialogFooter>
         </DialogContent>

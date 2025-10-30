@@ -14,16 +14,12 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui';
-import { capKitService } from '@/shared/services/capkit-service';
-import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { Cap } from '@/shared/types';
 import { useCapStore } from '../../stores';
 import type { RemoteCap } from '../../types';
-import { mapResultToRemoteCap } from '../../utils';
 import { CapDetailsConfiguration } from './cap-details-configuration';
 import { CapDetailsHeader } from './cap-details-header';
 import { CapDetailsLoadingSkeleton } from './cap-details-loading-skeleton';
-import { CapDetailsRating } from './cap-details-rating';
 import { CapDetailsRecommendations } from './cap-details-recommendations';
 
 export function CapDetails({ capId }: { capId: string }) {
@@ -33,18 +29,20 @@ export function CapDetails({ capId }: { capId: string }) {
   const [capQueryData, setCapQueryData] = useState<RemoteCap | null>(null);
   const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<boolean>(false);
-  const { downloadCapByIDWithCache } = useCapStore();
-  const { fetchInstalledCaps } = InstalledCapsStore();
+  const { downloadCapByIDWithCache, remoteCaps } = useCapStore();
 
   // Fetch full cap data when selectedCap changes
   useEffect(() => {
     setIsLoading(true);
     setDownloadedCapData(null);
     setCapQueryData(null);
+
     const fetchCap = async () => {
       try {
+
         const downloadedCap = await downloadCapByIDWithCache(capId);
         setDownloadedCapData(downloadedCap);
+
       } catch (error) {
         console.error('Failed to download cap data:', error);
         toast.error('Failed to find the cap.');
@@ -52,31 +50,11 @@ export function CapDetails({ capId }: { capId: string }) {
       }
     };
 
-    const fetchFavoriteStatus = async () => {
-      const capKit = await capKitService.getCapKit();
+    // Try to prefill from local remote caps for faster paint
+    const localRemote = remoteCaps.find((c) => c.id === capId);
+    if (localRemote) setCapQueryData(localRemote);
 
-      try {
-        const favoriteStatus = await capKit.favorite(capId, 'isFavorite');
-        setIsCapFavorite(favoriteStatus.data ?? false);
-      } catch (error) {
-        console.error('Failed to fetch installed status:', error);
-      }
-    };
-
-    const queryCap = async () => {
-      const capKit = await capKitService.getCapKit();
-
-      try {
-        const queriedCap = await capKit.queryByID({ id: capId });
-        setCapQueryData(mapResultToRemoteCap(queriedCap));
-      } catch (error) {
-        console.error('Failed to download cap data:', error);
-        toast.error('Failed to find the cap.');
-        navigate('/explore');
-      }
-    };
-
-    Promise.all([fetchCap(), fetchFavoriteStatus(), queryCap()]).finally(() => {
+    Promise.all([fetchCap()]).finally(() => {
       setIsLoading(false);
     });
   }, [capId]);
@@ -85,21 +63,21 @@ export function CapDetails({ capId }: { capId: string }) {
     return <CapDetailsLoadingSkeleton />;
   }
 
-  const handleRateCap = async (rating: number) => {
-    const capKit = await capKitService.getCapKit();
+  // const handleRateCap = async (rating: number) => {
+  //   const capKit = await capKitService.getCapKit();
 
-    toast.promise(capKit.rateCap(capId, rating), {
-      loading: 'Submitting your rating...',
-      success: async (data) => {
-        const queriedCap = await capKit.queryByID({ id: capId });
-        setCapQueryData(mapResultToRemoteCap(queriedCap));
-        return `You rated ${capQueryData.metadata.displayName} ${rating} stars!`;
-      },
-      error: () => {
-        return 'Failed to submit your rating. Please try again.';
-      },
-    });
-  };
+  //   toast.promise(capKit.rateCap(capId, rating), {
+  //     loading: 'Submitting your rating...',
+  //     success: async (data) => {
+  //       const queriedCap = await capKit.queryByID({ id: capId });
+  //       setCapQueryData(mapResultToRemoteCap(queriedCap));
+  //       return `You rated ${capQueryData.metadata.displayName} ${rating} stars!`;
+  //     },
+  //     error: () => {
+  //       return 'Failed to submit your rating. Please try again.';
+  //     },
+  //   });
+  // };
 
   const introduction = capQueryData.metadata.introduction?.trim();
 
@@ -199,13 +177,6 @@ export function CapDetails({ capId }: { capId: string }) {
                       )}
                     </CardContent>
                   </Card>
-                </TabsContent>
-
-                <TabsContent value="ratings" className="mt-0">
-                  <CapDetailsRating
-                    capQueryData={capQueryData}
-                    onRate={handleRateCap}
-                  />
                 </TabsContent>
 
                 <TabsContent value="configuration" className="mt-0">
