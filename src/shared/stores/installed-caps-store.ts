@@ -1,20 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { rehydrationTracker } from '@/shared/hooks/use-rehydration';
-import { capKitService } from '@/shared/services/capkit-service';
 import { createInstalledCapsPersistConfig } from '@/shared/storage/indexeddb-config';
 import type { Cap } from '@/shared/types';
 import { preinstalledCaps } from '@/shared/utils/preinstalled-caps';
+import { useCapStore } from '@/features/cap-store/stores';
 
 interface InstalledCapsState {
   installedCaps: Cap[];
-  isFetchingInstalledCaps: boolean;
-  installedCapsError: string | null;
 
+  // Local-only management of installed caps
   installCap: (capId: string) => Promise<Cap>;
   uninstallCap: (capId: string) => Promise<void>;
-
-  fetchInstalledCaps: () => Promise<Cap[]>;
+  updateCap: (capId: string) => Promise<Cap>;
 }
 
 const persistConfig = createInstalledCapsPersistConfig<InstalledCapsState>({
@@ -26,77 +24,55 @@ export const InstalledCapsStore = create<InstalledCapsState>()(
   persist(
     (set, get) => ({
       installedCaps: preinstalledCaps,
-      isFetchingInstalledCaps: false,
-      installedCapsError: null,
-
+      // Install a cap using the same local mapping approach as cap-store/stores.ts
+      // No network or CapKit usage: we derive a Cap from the current store cache
       installCap: async (capId: string) => {
-        const capKit = await capKitService.getCapKit();
-        const cap = await capKit.downloadByID(capId);
-        if (!cap) {
-          throw new Error('Failed to install cap');
-        }
-        await capKit.favorite(capId, 'add');
-        await set({ installedCaps: [...get().installedCaps, cap] });
+        // Build Cap from local cache (remote list and/or raw agent JSON)
+        const cap = await useCapStore
+          .getState()
+          .downloadCapByIDWithCache(capId);
+        // Prevent duplicates
+        const exists = get().installedCaps.some((c) => c.id === cap.id);
+        if (!exists) set({ installedCaps: [...get().installedCaps, cap] });
         return cap;
       },
 
       uninstallCap: async (capId: string) => {
-        const capKit = await capKitService.getCapKit();
-        await capKit.favorite(capId, 'remove');
         set({
           installedCaps: get().installedCaps.filter((c) => c.id !== capId),
         });
       },
 
-      fetchInstalledCaps: async () => {
-        const capKit = await capKitService.getCapKit();
-        if (!capKit) {
-          set({ installedCaps: [], isFetchingInstalledCaps: false });
-          return [];
+      // Force refresh an installed cap from local sources (bypasses the download cache)
+      updateCap: async (capId: string) => {
+        // Drop from downloaded cache to rebuild from the latest mapped agent/remote data
+        const capStoreState = useCapStore.getState();
+        const currentDownloaded = capStoreState.downloadedCaps || {};
+        if (capId in currentDownloaded) {
+          const next = { ...currentDownloaded };
+          delete (next as any)[capId];
+          useCapStore.setState({ downloadedCaps: next });
         }
 
-        set({ isFetchingInstalledCaps: true, installedCapsError: null });
-        try {
-          // Backend API still uses the "favorite" concept
-          const response = await capKit.queryMyFavorite();
-          const items = response.data?.items || [];
-          const ids = items.map((item) => item.id).filter(Boolean);
+        const cap = await useCapStore
+          .getState()
+          .downloadCapByIDWithCache(capId);
 
-          // Download full Cap objects in parallel; tolerate partial failures
-          const results = await Promise.allSettled(
-            ids.map((id: string) => capKit.downloadByID(id)),
-          );
-          const caps: Cap[] = results
-            .filter(
-              (r): r is PromiseFulfilledResult<Cap> => r.status === 'fulfilled',
-            )
-            .map((r) => r.value);
+        set({
+          installedCaps: get().installedCaps.map((c) =>
+            c.id === capId ? cap : c,
+          ),
+        });
 
-          set({ installedCaps: caps, isFetchingInstalledCaps: false });
-          return caps;
-        } catch (err) {
-          console.error('Error fetching installed caps (favorites):', err);
-          set({
-            installedCapsError:
-              'Failed to fetch installed caps. Please try again.',
-            isFetchingInstalledCaps: false,
-          });
-          throw err;
-        }
+        return cap;
       },
     }),
     {
       ...persistConfig,
-      // On rehydrate, refresh from server instead of relying on main.tsx
+      // On rehydrate, we only mark as rehydrated; installed caps are managed locally
       onRehydrateStorage: () => {
         return async (_state, _error) => {
-          try {
-            // await InstalledCapsStore.getState().fetchInstalledCaps(); for debug purpose, disable the fetchInstalledCaps
-          } catch {
-            // swallow errors; UI can retry
-          } finally {
-            rehydrationTracker.markRehydrated('installed-caps-storage');
-          }
+          rehydrationTracker.markRehydrated('installed-caps-storage');
         };
       },
     },

@@ -254,10 +254,11 @@ async function withPayment(
                 paymentAuthorization,
                 toolOptions,
               );
-              console.log('paidResult', paidResult);
               if (ctxId) {
                 // Try to extract the MCP-provided payment response from result._meta
-                let decoded: ReturnType<typeof decodeXPaymentResponse> | undefined;
+                let decoded:
+                  | ReturnType<typeof decodeXPaymentResponse>
+                  | undefined;
                 try {
                   if (
                     paidResult &&
@@ -273,7 +274,10 @@ async function withPayment(
                     }
                   }
                 } catch (e) {
-                  console.warn('[x402/tx-store] Failed to parse MCP payment response', e);
+                  console.warn(
+                    '[x402/tx-store] Failed to parse MCP payment response',
+                    e,
+                  );
                 }
                 await safeRecord(() =>
                   markX402PaymentResult({
@@ -286,7 +290,9 @@ async function withPayment(
             } catch (retryError) {
               if (ctxId) {
                 // On error, still attempt to capture any payment response metadata
-                let decoded: ReturnType<typeof decodeXPaymentResponse> | undefined;
+                let decoded:
+                  | ReturnType<typeof decodeXPaymentResponse>
+                  | undefined;
                 try {
                   if (
                     retryError &&
@@ -302,7 +308,10 @@ async function withPayment(
                     }
                   }
                 } catch (e) {
-                  console.warn('[x402/tx-store] Failed to parse MCP payment response (error)', e);
+                  console.warn(
+                    '[x402/tx-store] Failed to parse MCP payment response (error)',
+                    e,
+                  );
                 }
                 await safeRecord(() =>
                   markX402PaymentResult({

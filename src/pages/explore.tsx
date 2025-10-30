@@ -13,8 +13,6 @@ const ExplorePageContent = () => {
   const sortBy = searchParams.get('sortBy');
   const search = searchParams.get('search');
 
-  console.log('index', capId);
-
   if (typeof path === 'string' && path.startsWith('0x')) {
     if (capId) {
       return <CapDetails capId={capId} />;

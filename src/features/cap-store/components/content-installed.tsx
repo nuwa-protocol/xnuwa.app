@@ -9,22 +9,16 @@ import {
   DropdownMenuTrigger,
   ScrollArea,
 } from '@/shared/components/ui';
-import { useLanguage } from '@/shared/hooks';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import { CapActionButton } from './cap-action-button';
 import { CapCard } from './cap-card';
-import { CapStoreLoading } from './cap-store-loading';
 import { CapStoreContentHeader } from './content-header';
 
 // Installed caps list (previously Favorites)
 export function CapStoreInstalledContent() {
-  const { t } = useLanguage();
   const {
     installedCaps,
-    installedCapsError,
-    isFetchingInstalledCaps,
-    fetchInstalledCaps,
     uninstallCap,
   } = InstalledCapsStore();
   const { currentCap, setCurrentCap } = CurrentCapStore();
@@ -66,27 +60,6 @@ export function CapStoreInstalledContent() {
 
   // Backend API still uses the "favorite" concept; UI calls them "Installed Caps".
   const caps = installedCaps;
-
-  if (installedCapsError) {
-    return (
-      <div className="flex flex-col items-center justify-center w-full min-h-[700px] text-center">
-        <Package className="size-12 text-red-500 mb-4" />
-        <h3 className="text-lg font-medium mb-2 text-red-600">
-          {t('capStore.status.error')}
-        </h3>
-        <p className="text-muted-foreground max-w-md mb-4">
-          {t('capStore.status.errorDesc')}
-        </p>
-        <Button variant="outline" onClick={fetchInstalledCaps}>
-          {t('capStore.status.tryAgain')}
-        </Button>
-      </div>
-    );
-  }
-
-  if (isFetchingInstalledCaps) {
-    return <CapStoreLoading />;
-  }
 
   if (caps.length === 0) {
     return (
