@@ -11,9 +11,15 @@ import {
 } from 'lucide-react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/components/ui/dropdown-menu';
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { useLanguage } from '@/shared/hooks';
-import { REGISTRIES } from '../8004-registries';
+import { REGISTRIES } from '../../../erc8004/8004-registries';
 import type { CapStoreSection } from '../types';
 
 export function CapStoreSidebar() {
@@ -135,15 +141,66 @@ export function CapStoreSidebar() {
                 const isSelected = activeSection.id === section.id;
 
                 return (
-                  <Button
-                    key={section.id}
-                    variant={isSelected ? 'secondary' : 'ghost'}
-                    className="w-full justify-start gap-3 h-10"
-                    onClick={() => handleActiveSectionChange(section)}
-                  >
-                    <IconComponent className="size-4" />
-                    <span>{section.label}</span>
-                  </Button>
+                  <div key={section.id} className="relative group">
+                    {/* Main registry button */}
+                    <Button
+                      variant={isSelected ? 'secondary' : 'ghost'}
+                      className="w-full justify-start gap-3 h-10 pr-8"
+                      onClick={() => handleActiveSectionChange(section)}
+                    >
+                      <IconComponent className="size-4" />
+                      <span>{section.label}</span>
+                    </Button>
+
+                    {/* Hover menu icon with dropdown */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          // Prevent navigating when clicking the menu icon
+                          onClick={(e) => e.stopPropagation()}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          className="
+                            absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-sm z-10
+                            text-muted-foreground/60 hover:text-foreground hover:bg-accent
+                            opacity-0 group-hover:opacity-100 transition-opacity
+                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                          "
+                          aria-label="Open menu"
+                        >
+                          <MoreHorizontal className="size-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Open the registry contract on OpenSea (contract assets page)
+                            window.open(
+                              `https://opensea.io/assets/ethereum/${section.id}`,
+                              '_blank',
+                            );
+                          }}
+                        >
+                          see on opensea
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Open the registry contract address on Etherscan
+                            window.open(
+                              `https://etherscan.io/address/${section.id}`,
+                              '_blank',
+                            );
+                          }}
+                        >
+                          see on etherscan
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 );
               })}
             </div>

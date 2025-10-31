@@ -1,5 +1,5 @@
 import type { ChatPayment } from '@/features/chat/types';
-import type { X402TransactionRecord } from '@/shared/services/x402-transaction-store';
+import type { X402TransactionRecord } from '@/x402/x402-transaction-store';
 
 export type WalletTransactionDetails = X402TransactionRecord;
 

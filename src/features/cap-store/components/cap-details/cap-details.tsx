@@ -1,4 +1,4 @@
-import { ChevronLeft, Github, Globe, Info, Settings, Star } from 'lucide-react';
+import { ChevronLeft, Github, Globe, Info, Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -115,13 +115,13 @@ export function CapDetails({ capId }: { capId: string }) {
                 <Info className="w-4 h-4 mr-2" />
                 Overview
               </TabsTrigger>
-              <TabsTrigger
+              {/* <TabsTrigger
                 value="ratings"
                 className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary"
               >
                 <Star className="w-4 h-4 mr-2" />
                 Ratings
-              </TabsTrigger>
+              </TabsTrigger> */}
               <TabsTrigger
                 value="configuration"
                 className="rounded-none bg-background h-full data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary"
@@ -163,7 +163,7 @@ export function CapDetails({ capId }: { capId: string }) {
                 <TabsContent value="overview" className="mt-0">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-xl">About This Cap</CardTitle>
+                      <CardTitle className="text-xl">About This Agent</CardTitle>
                     </CardHeader>
                     <CardContent>
                       {introduction ? (

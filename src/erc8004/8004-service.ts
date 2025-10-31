@@ -21,10 +21,18 @@ export const DEFAULT_IDENTITY_REGISTRY_ADDRESS: `0x${string}` =
 // Use the contract ABI from the local JSON file
 const registryABI = identityRegistry.abi as Abi;
 
+// Use a public RPC; allow override via env for stability in production
+const rpcUrl = (import.meta as any)?.env?.VITE_MAINNET_RPC_URL as
+  | string
+  | undefined;
 const client = createPublicClient({
   chain: registryNetwork,
-  transport: http(),
+  transport: rpcUrl ? http(rpcUrl) : http(),
 });
+
+// Simple in-memory cache for totalAgents to avoid repeating the on-chain call
+const TOTAL_AGENTS_TTL_MS = 3 * 60 * 1000; // 3 minutes
+const totalAgentsCache = new Map<string, { value: number; ts: number }>();
 
 export const getAgentTokenURI = async (
   registryAddress: `0x${string}`,
@@ -42,12 +50,22 @@ export const getAgentTokenURI = async (
 export const getTotalAgents = async (
   registryAddress: `0x${string}`,
 ): Promise<bigint> => {
-  const totalAgents = await client.readContract({
+  const cached = totalAgentsCache.get(registryAddress);
+  const now = Date.now();
+  if (cached && now - cached.ts < TOTAL_AGENTS_TTL_MS) {
+    return BigInt(cached.value);
+  }
+  const totalAgents = (await client.readContract({
     address: registryAddress,
     abi: registryABI,
     functionName: 'totalAgents',
+  })) as bigint;
+  // Cache numeric version to avoid BigInt serialization issues
+  totalAgentsCache.set(registryAddress, {
+    value: Number(totalAgents),
+    ts: now,
   });
-  return totalAgents as bigint;
+  return totalAgents;
 };
 
 // Compute the list of agent IDs for a given page and size (0-based page indexing)
@@ -194,8 +212,8 @@ export const fetchAgent8004FromTokenURI = async (
   try {
     const res = await fetch(tokenUri, {
       headers: { Accept: 'application/json' },
-      // No-cache to always reflect latest metadata; adjust if needed
-      cache: 'no-store',
+      // Allow the browser to cache these JSONs to reduce variability between loads
+      cache: 'default',
     });
     if (!res.ok) {
       return {
@@ -217,16 +235,49 @@ export const fetchAgent8004FromTokenURI = async (
 };
 
 // Convenience: for a page, fetch tokenURIs, then resolve JSONs to Agent8004 or ErrorAgent8004
+// Utility: map with concurrency limit, preserving order
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  mapper: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (true) {
+      const current = nextIndex;
+      if (current >= items.length) return;
+      nextIndex++;
+      try {
+        results[current] = await mapper(items[current], current);
+      } catch (e) {
+        // Bubble up errors as undefined-like entries; the caller can handle failures
+        // @ts-expect-error
+        results[current] = undefined;
+      }
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, () =>
+    worker(),
+  );
+  await Promise.all(workers);
+  return results;
+}
+
 export const getAgent8004ByPage = async (
   registryAddress: `0x${string}`,
   page: number,
   pageSize: number,
 ): Promise<Array<Agent8004 | ErrorAgent8004>> => {
   const uris = await getAgentsTokenURIByPage(registryAddress, page, pageSize);
-  console.log('uris', uris);
   if (!uris.length) return [];
-  const results = await Promise.all(
-    uris.map((uri) => fetchAgent8004FromTokenURI(uri)),
+  // Limit concurrent fetches to reduce variability from remote gateways
+  const results = await mapWithConcurrency(
+    uris,
+    12,
+    (uri) => fetchAgent8004FromTokenURI(uri),
   );
   return results;
 };

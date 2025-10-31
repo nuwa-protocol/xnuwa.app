@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observer';
-import { DEFAULT_IDENTITY_REGISTRY_ADDRESS } from '../8004-service';
+import { DEFAULT_IDENTITY_REGISTRY_ADDRESS } from '../../../erc8004/8004-service';
 import { type UseRemoteCapParams, useCapStore } from '../stores';
 import { CapCard } from './cap-card';
 import { CapStoreLoading } from './cap-store-loading';

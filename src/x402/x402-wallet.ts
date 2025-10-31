@@ -1,5 +1,3 @@
-import { AccountStore } from '@/features/auth/store';
-import type { ManagedAccount } from '@/features/auth/types';
 import {
   type Address,
   createPublicClient,
@@ -8,6 +6,8 @@ import {
   parseAbi,
 } from 'viem';
 import { base, baseSepolia } from 'viem/chains';
+import { AccountStore } from '@/features/auth/store';
+import type { ManagedAccount } from '@/features/auth/types';
 
 export const network = 'base-sepolia' as const;
 

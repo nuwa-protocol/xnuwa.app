@@ -1,4 +1,4 @@
-import type { CapStoreSection } from './types';
+import type { CapStoreSection } from '../features/cap-store/types';
 export const REGISTRIES: CapStoreSection[] = [
   {
     id: '0x4f4B183eAE80D62B880458E4A812F896CFb2d4d6',

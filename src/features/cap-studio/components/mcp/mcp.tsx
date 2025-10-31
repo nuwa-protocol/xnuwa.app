@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from '@/shared/components/ui';
 import { onMcpOAuthEvent } from '@/shared/services/mcp-oauth-event';
-import { createX402MCPClient } from '@/shared/services/x402-mcp-client';
+import { createX402MCPClient } from '@/x402/x402-mcp-client';
 
 interface LogEntry {
   id: string;

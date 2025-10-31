@@ -10,7 +10,7 @@ import { createXai } from '@ai-sdk/xai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { LLM_GATEWAY_BASE_URL } from '@/shared/config/llm-gateway';
 import type { CapModel } from '@/shared/types';
-import { createPaymentFetch } from './x402-payment-fetch';
+import { createPaymentFetch } from '../../x402/x402-payment-fetch';
 
 export const LLMProvider = (model: CapModel) => {
   const paymentFetch = createPaymentFetch();

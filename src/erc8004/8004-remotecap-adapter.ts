@@ -6,7 +6,7 @@ import {
   EIP8004_REGISTRATION_V1,
   type ErrorAgent8004,
 } from '@/shared/types/8004-agent';
-import type { RemoteCap } from './types';
+import type { RemoteCap } from '../features/cap-store/types';
 
 // Simple slugifier for idName (lowercase, [a-z0-9_], min length 6)
 const toIdName = (name: string | undefined): string => {
@@ -297,7 +297,8 @@ export const capToAgent8004 = (cap: Cap): Agent8004 => {
 
   // llm (required by 8004) — pull details from cap.core.model
   const model = cap.core?.model as any;
-  const llmEndpointUrl = model?.customGatewayUrl || 'https://gateway.example.com/llm';
+  const llmEndpointUrl =
+    model?.customGatewayUrl || 'https://gateway.example.com/llm';
   const llm: any = {
     name: 'llm',
     endpoint: llmEndpointUrl,

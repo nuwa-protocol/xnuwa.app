@@ -39,14 +39,14 @@ export function CurrentCapInfo() {
         <div className="flex flex-col items-center text-center py-8">
           <Package className="size-12 text-muted-foreground mb-3" />
           <div className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
-            Install Your First Cap
+            Install Your First AI Agent
           </div>
           <div className="mt-2 text-sm md:text-[15px] leading-6 text-muted-foreground/90">
-            Nuwa AI requires AI Capabilities to work. Please install a Cap to get started.
+            Nuwa AI requires installing AI Agents to work. Please install an AI Agent to get started.
           </div>
           <div className="mt-4">
             <Button variant="default" onClick={() => navigate('/explore')}>
-              <Sparkles className="w-4 h-4 mr-2" /> Explore Caps
+              <Sparkles className="w-4 h-4 mr-2" /> Explore Agents
             </Button>
           </div>
         </div>

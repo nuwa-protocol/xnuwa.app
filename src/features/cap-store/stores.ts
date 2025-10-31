@@ -1,15 +1,18 @@
 import type { Cap } from '@nuwa-ai/cap-kit';
 import { create } from 'zustand';
 import { capKitService } from '@/shared/services/capkit-service';
-import { agent8004ToRemoteCap, agent8004ToCap } from './8004-remotecap-adapter';
+import type { Agent8004, ErrorAgent8004 } from '@/shared/types/8004-agent';
+import {
+  agent8004ToCap,
+  agent8004ToRemoteCap,
+} from '../../erc8004/8004-remotecap-adapter';
 import {
   DEFAULT_IDENTITY_REGISTRY_ADDRESS,
   getAgent8004ByPage,
   getAgentsByPage,
   getOwnerAddressesByAgentIds,
-} from './8004-service';
+} from '../../erc8004/8004-service';
 import type { CapStoreSection, RemoteCap } from './types';
-import type { Agent8004, ErrorAgent8004 } from '@/shared/types/8004-agent';
 
 // Search parameters interface
 export interface UseRemoteCapParams {
@@ -151,6 +154,11 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
         sortOrder: sortOrderParam = 'desc',
       } = params;
 
+      // Avoid duplicate non-append fetches (e.g., StrictMode double effects)
+      if (get().isFetching && !append) {
+        return get().remoteCaps;
+      }
+
       if (append) {
         set({ isLoadingMore: true });
       } else {
@@ -194,8 +202,11 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
         agents.forEach((agent, i) => {
           pageIndexMap[i + 1] = agent as Agent8004 | ErrorAgent8004;
         });
-        const prevMap = get().agent8004ByRegistryAndIndex[registryAddress] || {};
-        const mergedIndexMap = append ? { ...prevMap, ...pageIndexMap } : pageIndexMap;
+        const prevMap =
+          get().agent8004ByRegistryAndIndex[registryAddress] || {};
+        const mergedIndexMap = append
+          ? { ...prevMap, ...pageIndexMap }
+          : pageIndexMap;
 
         set({
           hasMoreData: totalItems === sizeNum,

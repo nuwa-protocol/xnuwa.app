@@ -10,9 +10,9 @@ import {
   DialogOverlay,
   DialogPortal,
   DialogTitle,
+  Input,
   InputOTP,
   InputOTPGroup,
-  Input,
   Label,
   Switch,
 } from '@/shared/components/ui';
@@ -33,7 +33,10 @@ type AccountLoginDialogProps = {
   onOpenChange?: (open: boolean) => void;
 };
 
-export function AccountLoginDialog({ open, onOpenChange }: AccountLoginDialogProps) {
+export function AccountLoginDialog({
+  open,
+  onOpenChange,
+}: AccountLoginDialogProps) {
   const accounts = AccountStore((state) => state.accounts);
   const switchAccount = AccountStore((state) => state.setCurrentAccount);
   const createAccount = AccountStore((state) => state.createAccount);
@@ -106,7 +109,9 @@ export function AccountLoginDialog({ open, onOpenChange }: AccountLoginDialogPro
 
     try {
       const finalName =
-        createName.trim().length > 0 ? createName.trim() : DEFAULT_ACCOUNT_PLACEHOLDER;
+        createName.trim().length > 0
+          ? createName.trim()
+          : DEFAULT_ACCOUNT_PLACEHOLDER;
 
       await createAccount(finalName, pin);
 
@@ -169,11 +174,7 @@ export function AccountLoginDialog({ open, onOpenChange }: AccountLoginDialogPro
 
       <div className="flex items-center justify-between rounded-lg border border-dashed px-4 py-2 text-sm text-muted-foreground">
         <span>Need another wallet?</span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setView('create')}
-        >
+        <Button variant="ghost" size="sm" onClick={() => setView('create')}>
           Create new
         </Button>
       </div>
@@ -209,10 +210,9 @@ export function AccountLoginDialog({ open, onOpenChange }: AccountLoginDialogPro
             setPin(numericValue);
             setCreateError(null);
           }}
-          containerClassName="flex flex-wrap gap-2"
           aria-invalid={pin.length > 0 && pin.length !== PIN_LENGTH}
         >
-          <InputOTPGroup className="flex flex-wrap gap-2">
+          <InputOTPGroup>
             {PIN_SLOT_KEYS.map((slotKey, slotIndex) => (
               <MaskedPinSlot key={slotKey} index={slotIndex} />
             ))}
@@ -236,19 +236,16 @@ export function AccountLoginDialog({ open, onOpenChange }: AccountLoginDialogPro
             setConfirmPin(numericValue);
             setCreateError(null);
           }}
-          containerClassName="flex flex-wrap gap-2"
           aria-invalid={confirmPin.length > 0 && pin !== confirmPin}
         >
-          <InputOTPGroup className="flex flex-wrap gap-2">
+          <InputOTPGroup>
             {PIN_SLOT_KEYS.map((slotKey, slotIndex) => (
               <MaskedPinSlot key={`${slotKey}-confirm`} index={slotIndex} />
             ))}
           </InputOTPGroup>
         </InputOTP>
         {confirmPin.length > 0 && pin !== confirmPin ? (
-          <p className="text-xs text-destructive">
-            PIN codes do not match.
-          </p>
+          <p className="text-xs text-destructive">PIN codes do not match.</p>
         ) : (
           <p className="text-xs text-muted-foreground">
             Re-enter the same PIN to confirm.
@@ -365,7 +362,7 @@ function MaskedPinSlot({ index }: { index: number }) {
       data-active={isActive}
       data-filled={isFilled}
       className={cn(
-        'border-input bg-muted/70 text-base font-medium data-[active=true]:bg-background data-[active=true]:border-ring data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[active=true]:aria-invalid:border-destructive dark:bg-input/40 relative flex h-11 w-11 items-center justify-center border-y border-r shadow-xs transition-all outline-none first:rounded-l-md first:border-l last:rounded-r-md data-[active=true]:z-10 data-[active=true]:ring-[3px]',
+        'border-input bg-card text-base font-medium data-[active=true]:bg-background data-[active=true]:border-ring data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[active=true]:aria-invalid:border-destructive relative flex h-11 w-11 items-center justify-center border-y border-r shadow-xs transition-all outline-none first:rounded-l-md first:border-l last:rounded-r-md data-[active=true]:z-10 data-[active=true]:ring-[3px]',
       )}
     >
       {isFilled ? '*' : ''}

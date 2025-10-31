@@ -66,7 +66,7 @@ export function CapDetailsRecommendations({
     <Card className="border-none shadow-none p-0 gap-4">
       <CardHeader className="pb-0 mb-0 px-0">
         <CardTitle className="flex items-center gap-2 pt-2 pb-0 mb-0">
-          More Similar Caps
+          More Similar Agents
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
