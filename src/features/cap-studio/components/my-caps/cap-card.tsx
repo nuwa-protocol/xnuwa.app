@@ -1,7 +1,17 @@
 import { formatDistanceToNow } from 'date-fns';
-import { Bot, Bug, Check, Clock, Download, MoreVertical, Server, Trash2 } from 'lucide-react';
+import {
+  Bot,
+  Bug,
+  Check,
+  Clock,
+  Download,
+  MoreVertical,
+  Server,
+  Trash2,
+} from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { capToAgent8004 } from '@/erc8004/8004-remotecap-adapter';
 import { stringifyYaml } from '@/features/cap-studio/utils/yaml';
 import { CapAvatar } from '@/shared/components/cap-avatar';
 import {
@@ -39,7 +49,6 @@ import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
 import { LiveDebugCapDialog } from './live-debug-cap-dialog';
-import { capToAgent8004 } from '@/features/cap-store/8004-remotecap-adapter';
 
 interface CapCardProps {
   cap: LocalCap;
@@ -499,9 +508,7 @@ export function CapCard({
                 )
               }
               onError={() => toast.error('Failed to copy')}
-              title={
-                exportFormat === 'yaml' ? 'Copy YAML' : 'Copy 8004 JSON'
-              }
+              title={exportFormat === 'yaml' ? 'Copy YAML' : 'Copy 8004 JSON'}
             />
           </CodeBlock>
 

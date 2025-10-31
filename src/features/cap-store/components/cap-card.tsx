@@ -26,7 +26,7 @@ const formatCompactNumber = (value: number) =>
 export function CapCard({ cap, actions }: CapCardProps) {
   const navigate = useNavigate();
   const { installedCaps, updateCap } = InstalledCapsStore();
-  const { remoteCaps } = useCapStore();
+  const { remoteCaps, agent8004ByRegistryAndIndex } = useCapStore();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const capData = ('capData' in cap ? cap.capData : cap) as Cap;
@@ -71,10 +71,18 @@ export function CapCard({ cap, actions }: CapCardProps) {
     return undefined;
   })();
 
+  const indexStr = cap.id.split('/')[1];
+  const idx = Number.parseInt(indexStr || '', 10);
+
+  const agentRaw =
+    registryAddress && idx
+      ? agent8004ByRegistryAndIndex[registryAddress]?.[idx]
+      : undefined;
+  const isInvalid8004 = !!(agentRaw as any)?.error;
+
   const handleNavigate = () => {
     if (!registryAddress) return; // no-op if we cannot resolve a registry
-    const index = cap.id.split('/')[1];
-    navigate(`/explore/${registryAddress}/${index}`);
+    navigate(`/explore/${registryAddress}/${indexStr}`);
   };
 
   return (
@@ -85,8 +93,13 @@ export function CapCard({ cap, actions }: CapCardProps) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <CapAvatar cap={cap} size="3xl" className="rounded-md" />
-          <h3 className="text-xl font-semibold leading-tight text-foreground line-clamp-2">
-            {capData.metadata.displayName}
+          <h3 className="text-xl font-semibold leading-tight text-foreground line-clamp-2 flex items-center gap-2">
+            <span className="truncate">{capData.metadata.displayName}</span>
+            {isInvalid8004 && (
+              <span className="text-[11px] font-medium px-1.5 py-0.5 rounded border border-red-200 bg-red-50 text-red-600 uppercase tracking-wide">
+                Invalid 8004
+              </span>
+            )}
           </h3>
         </div>
         <div className="hidden items-center gap-1 group-hover:flex group-focus-within:flex">
@@ -96,7 +109,7 @@ export function CapCard({ cap, actions }: CapCardProps) {
               onClick={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
             >
-              <CapActionButton cap={cap} />
+              <CapActionButton cap={cap} disabled={isInvalid8004} />
             </div>
           )}
         </div>

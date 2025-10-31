@@ -1,5 +1,5 @@
 import type { ChatSession } from '@/features/chat/types';
-import { getX402TransactionStore } from '@/shared/services/x402-transaction-store';
+import { getX402TransactionStore } from '@/x402/x402-transaction-store';
 import type { PaymentTransaction } from '../types';
 
 export const fetchTransactionsFromChatSession = async (

@@ -3,7 +3,12 @@ import { useEffect } from 'react';
 import { Button, ScrollArea } from '@/shared/components/ui';
 import { useLanguage } from '@/shared/hooks';
 import { useIntersectionObserver } from '@/shared/hooks/use-intersection-observer';
-import { DEFAULT_IDENTITY_REGISTRY_ADDRESS } from '../8004-service';
+import { DEFAULT_IDENTITY_REGISTRY_ADDRESS } from '../../../erc8004/8004-service';
+import {
+  DEFAULT_REGISTRY,
+  buildExplorerAddressUrlFromRegistry,
+  getRegistryByAddress,
+} from '../../../erc8004/8004-registries';
 import { type UseRemoteCapParams, useCapStore } from '../stores';
 import { CapCard } from './cap-card';
 import { CapStoreLoading } from './cap-store-loading';
@@ -33,6 +38,10 @@ export function CapStoreCapsContent({
   const registryAddress = tag
     ? (tag as `0x${string}`)
     : DEFAULT_IDENTITY_REGISTRY_ADDRESS;
+  const registry = getRegistryByAddress(registryAddress) || DEFAULT_REGISTRY;
+  const explorerUrl = registry
+    ? buildExplorerAddressUrlFromRegistry(registry, registryAddress)
+    : `https://etherscan.io/address/${registryAddress}`;
 
   useEffect(() => {
     fetchCaps({
@@ -55,17 +64,31 @@ export function CapStoreCapsContent({
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[700px] text-center">
-        <Package className="size-12 text-red-500 mb-4" />
-        <h3 className="text-lg font-medium mb-2 text-red-600">
-          {t('capStore.status.error')}
-        </h3>
-        <p className="text-muted-foreground max-w-md mb-4">
-          {t('capStore.status.errorDesc')}
-        </p>
-        <Button variant="outline" onClick={refetch}>
-          {t('capStore.status.tryAgain')}
-        </Button>
+      <div className="flex flex-col h-full w-full">
+        <CapStoreContentHeader showSearchAndSort={true} />
+        <div className="w-full flex flex-col items-center justify-center min-h-[700px] text-center">
+          <Package className="size-12 text-red-500 mb-4" />
+          <h3 className="text-lg font-medium mb-2 text-red-600">
+            {t('capStore.status.error')}
+          </h3>
+          <p className="text-muted-foreground max-w-md mb-4">
+            {t('capStore.status.errorDesc')}
+          </p>
+          <p className="text-xs text-muted-foreground max-w-md mb-6">
+            This registry may be broken or empty (no agents yet). Please verify the
+            contract address on the explorer and try again later.
+          </p>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={refetch}>
+              {t('capStore.status.tryAgain')}
+            </Button>
+            <Button variant="secondary" asChild>
+              <a href={explorerUrl} target="_blank" rel="noreferrer">
+                View Registry on Explorer
+              </a>
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -74,7 +97,7 @@ export function CapStoreCapsContent({
     return (
       <div className="flex flex-col h-full w-full">
         <CapStoreContentHeader showSearchAndSort={true} />
-        <CapStoreLoading />
+        <CapStoreLoading registryAddress={registryAddress} />
       </div>
     );
   }

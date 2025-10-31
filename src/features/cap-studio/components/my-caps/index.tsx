@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { agent8004ToCap } from '@/erc8004/8004-remotecap-adapter';
 import { parseYaml } from '@/features/cap-studio/utils/yaml';
 import {
   Button,
@@ -27,7 +28,6 @@ import {
 import { useAuth } from '@/shared/hooks';
 import { type Cap, CapSchema } from '@/shared/types';
 import { Agent8004Schema } from '@/shared/types/8004-agent';
-import { agent8004ToCap } from '@/features/cap-store/8004-remotecap-adapter';
 import { useSubmitCap } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
@@ -371,8 +371,8 @@ export function MyCaps({
                     <FileUp className="h-4 w-4 mr-2" />
                     Import from 8004 JSON
                   </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
               {/**
                * Hidden input for YAML import disabled
                * <input
@@ -383,14 +383,14 @@ export function MyCaps({
                *   className="hidden"
                * />
                */}
-            {/* Hidden input for importing a single 8004 JSON */}
-            <input
-              ref={importJsonRef}
-              type="file"
-              accept=".json"
-              onChange={handleImportJson}
-              className="hidden"
-            />
+              {/* Hidden input for importing a single 8004 JSON */}
+              <input
+                ref={importJsonRef}
+                type="file"
+                accept=".json"
+                onChange={handleImportJson}
+                className="hidden"
+              />
             </>
           ) : (
             <div className="flex gap-2">

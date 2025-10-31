@@ -22,15 +22,18 @@ import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { RemoteCap } from '../../types';
 import { CapActionButton } from '../cap-action-button';
+import { getRegistryByAddress } from '@/erc8004/8004-registries';
 
 interface CapDetailsHeaderProps {
   capQueryData: RemoteCap;
   downloadedCapData: Cap;
+  isInvalid8004?: boolean;
 }
 
 export function CapDetailsHeader({
   capQueryData,
   downloadedCapData,
+  isInvalid8004 = false,
 }: CapDetailsHeaderProps) {
   const truncate = (value: string, head = 10, tail = 10) => {
     if (!value) return '';
@@ -180,26 +183,50 @@ export function CapDetailsHeader({
             </div>
             {/* OpenSea、Etherscan按钮区，紧接着模型信息grid下方 */}
             <div className="flex flex-row justify-start items-center gap-2 mt-1">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 px-3 text-xs rounded-md"
-                onClick={() =>
-                  window.open(`https://opensea.io/item/ethereum/${capQueryData.id}`, '_blank')
-                }
-              >
-                OpenSea
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 px-3 text-xs rounded-md"
-                onClick={() =>
-                  window.open(`https://etherscan.io/address/${capQueryData.id.split('/')[0]}`, '_blank')
-                }
-              >
-                Etherscan
-              </Button>
+              {(() => {
+                const [addr, tokenId] = (capQueryData.id || '').split('/');
+                const reg = addr ? getRegistryByAddress(addr) : undefined;
+                const chainId = reg?.chainId;
+                // Prefer Rarible on Sepolia testnet for token pages; otherwise default to OpenSea on mainnet
+                const url = (() => {
+                  if (addr && tokenId) {
+                    if (chainId === 11155111) {
+                      return `https://testnet.rarible.com/token/${addr}:${tokenId}`;
+                    }
+                    // Default: OpenSea mainnet (ethereum)
+                    return `https://opensea.io/assets/ethereum/${addr}/${tokenId}`;
+                  }
+                  return undefined;
+                })();
+                return url ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs rounded-md"
+                    onClick={() => window.open(url, '_blank')}
+                  >
+                    {chainId === 11155111 ? 'Rarible' : 'OpenSea'}
+                  </Button>
+                ) : null;
+              })()}
+              {(() => {
+                const addr = (capQueryData.id || '').split('/')[0];
+                if (!addr) return null;
+                // Fallback to mainnet explorer when chain unknown
+                const reg = getRegistryByAddress(addr);
+                const etherscanBase = reg?.explorerBase || 'https://etherscan.io';
+                const explorerUrl = `${etherscanBase.replace(/\/$/, '')}/address/${addr}`;
+                return (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs rounded-md"
+                    onClick={() => window.open(explorerUrl, '_blank')}
+                  >
+                    Explorer
+                  </Button>
+                );
+              })()}
             </div>
           </div>
 
@@ -234,12 +261,12 @@ export function CapDetailsHeader({
 
         {/* Right column: vertical actions */}
         <div className="w-full md:w-56 md:ml-auto flex flex-col gap-3">
-          <CapActionButton cap={capQueryData} />
+          <CapActionButton cap={capQueryData} disabled={isInvalid8004} />
           {isInstalled && !isPreinstalled ? (
             <Button
               variant="outline"
               className="gap-2 w-full"
-              disabled={isUpdating}
+              disabled={isUpdating || isInvalid8004}
               onClick={async () => {
                 if (isUpdating) return;
                 setIsUpdating(true);

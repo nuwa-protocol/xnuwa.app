@@ -35,8 +35,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
     
-    <!-- Priority loading Loading styles -->
+    <!-- Priority loading styles -->
     <link rel="stylesheet" href="/src/assets/initial-loading.css">
+    <!-- Inline critical rule so we can disable the loader even if the external CSS hasn't loaded yet -->
+    <style>
+      /* Ensure we can force-hide the initial loader for public routes like '/' */
+      html.no-initial-loading #initial-loading { display: none !important; }
+    </style>
     
     <!-- Hide scrollbars -->
     <style>
@@ -65,7 +70,7 @@
       document.documentElement.classList.add(theme);
 
       // Decide if the initial loading screen should be shown for this URL
-      // Only show on protected sections; hide on public pages like '/', '/callback', '/oauth-callback'
+      // Only show on protected sections; always hide on public pages
       (function() {
         try {
           var path = window.location.pathname || '/';
@@ -73,6 +78,11 @@
           var isProtected = /^\/(chat|wallet|settings|explore|cap-studio)(\/|$)/.test(path);
           if (!isProtected) {
             // Prevent the initial loader from ever showing on public routes
+            document.documentElement.classList.add('no-initial-loading');
+          }
+          // Additional hardening: explicitly force-hide for exactly the root path.
+          // This guarantees the home page never shows the blocking loader overlay on first visit.
+          if (path === '/') {
             document.documentElement.classList.add('no-initial-loading');
           }
         } catch (e) {

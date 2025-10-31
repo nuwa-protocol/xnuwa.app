@@ -9,7 +9,13 @@ import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { Cap } from '@/shared/types';
 import type { RemoteCap } from '../types';
 
-export const CapActionButton = ({ cap }: { cap: Cap | RemoteCap }) => {
+export const CapActionButton = ({
+    cap,
+    disabled = false,
+}: {
+    cap: Cap | RemoteCap;
+    disabled?: boolean;
+}) => {
     const navigate = useNavigate();
     const { installedCaps, installCap } = InstalledCapsStore();
     const { setCurrentCap } = CurrentCapStore();
@@ -42,15 +48,21 @@ export const CapActionButton = ({ cap }: { cap: Cap | RemoteCap }) => {
         navigate(`/chat`);
     };
 
+    const isDisabled = disabled || isInstalling;
+
     return (
         <Button
             onClick={isInstalled ? handleUseCap : handleInstallCap}
             variant="primary"
             size="sm"
             className="shrink-0 gap-2 h-9 min-w-[110px] px-3 text-sm"
-            disabled={isInstalling}
+            disabled={isDisabled}
         >
-            <ButtonContent isInstalled={isInstalled} isInstalling={isInstalling} />
+            <ButtonContent
+                isInstalled={isInstalled}
+                isInstalling={isInstalling}
+                disabled={disabled}
+            />
         </Button>
     );
 };
@@ -58,10 +70,20 @@ export const CapActionButton = ({ cap }: { cap: Cap | RemoteCap }) => {
 const ButtonContent = ({
     isInstalled,
     isInstalling,
+    disabled,
 }: {
     isInstalled: boolean;
     isInstalling: boolean;
+    disabled?: boolean;
 }) => {
+    if (disabled) {
+        return (
+            <>
+                <PackagePlus className="w-4 h-4 text-white opacity-60" />
+                Invalid
+            </>
+        );
+    }
     if (isInstalled) {
         return (
             <>

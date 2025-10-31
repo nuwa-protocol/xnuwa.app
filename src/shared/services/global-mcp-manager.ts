@@ -1,5 +1,5 @@
 import type { Cap } from '@/shared/types';
-import { createX402MCPClient } from './x402-mcp-client';
+import { createX402MCPClient } from '../../x402/x402-mcp-client';
 
 interface RemoteMCPInstance {
   clients: Map<string, any>;
