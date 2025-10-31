@@ -26,11 +26,13 @@ import { CapActionButton } from '../cap-action-button';
 interface CapDetailsHeaderProps {
   capQueryData: RemoteCap;
   downloadedCapData: Cap;
+  isInvalid8004?: boolean;
 }
 
 export function CapDetailsHeader({
   capQueryData,
   downloadedCapData,
+  isInvalid8004 = false,
 }: CapDetailsHeaderProps) {
   const truncate = (value: string, head = 10, tail = 10) => {
     if (!value) return '';
@@ -234,12 +236,12 @@ export function CapDetailsHeader({
 
         {/* Right column: vertical actions */}
         <div className="w-full md:w-56 md:ml-auto flex flex-col gap-3">
-          <CapActionButton cap={capQueryData} />
+          <CapActionButton cap={capQueryData} disabled={isInvalid8004} />
           {isInstalled && !isPreinstalled ? (
             <Button
               variant="outline"
               className="gap-2 w-full"
-              disabled={isUpdating}
+              disabled={isUpdating || isInvalid8004}
               onClick={async () => {
                 if (isUpdating) return;
                 setIsUpdating(true);

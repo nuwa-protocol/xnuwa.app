@@ -13,6 +13,9 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  Alert,
+  AlertDescription,
+  AlertTitle,
 } from '@/shared/components/ui';
 import type { Cap } from '@/shared/types';
 import { useCapStore } from '../../stores';
@@ -29,7 +32,8 @@ export function CapDetails({ capId }: { capId: string }) {
   const [capQueryData, setCapQueryData] = useState<RemoteCap | null>(null);
   const [isCapFavorite, setIsCapFavorite] = useState<boolean>(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<boolean>(false);
-  const { downloadCapByIDWithCache, remoteCaps } = useCapStore();
+  const { downloadCapByIDWithCache, remoteCaps, agent8004ByRegistryAndIndex } =
+    useCapStore();
 
   // Fetch full cap data when selectedCap changes
   useEffect(() => {
@@ -81,6 +85,13 @@ export function CapDetails({ capId }: { capId: string }) {
 
   const introduction = capQueryData.metadata.introduction?.trim();
 
+  // Determine invalid 8004 flag by looking up the raw agent JSON cached for the registry/index
+  const [registryAddress, indexStr] = capId.split('/');
+  const idx = Number.parseInt(indexStr || '', 10);
+  const agent = agent8004ByRegistryAndIndex[registryAddress]?.[idx];
+  const isInvalid8004 = !!(agent as any)?.error;
+  const invalidReason = (agent as any)?.error as string | undefined;
+
   return (
     <div className="flex flex-col w-full h-full">
       {/* Content */}
@@ -102,7 +113,23 @@ export function CapDetails({ capId }: { capId: string }) {
           <CapDetailsHeader
             capQueryData={capQueryData}
             downloadedCapData={downloadedCapData}
+            isInvalid8004={isInvalid8004}
           />
+
+          {isInvalid8004 && (
+            <Alert variant="destructive">
+              <AlertTitle>Invalid ERC‑8004 Agent</AlertTitle>
+              <AlertDescription>
+                This agent does not conform to the ERC‑8004 schema and cannot be installed or used.
+                {invalidReason ? (
+                  <>
+                    <br />
+                    <span className="font-medium">Reason:</span> {invalidReason}
+                  </>
+                ) : null}
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Tabs + Content/Grid */}
           <Tabs defaultValue="overview" className="w-full">
