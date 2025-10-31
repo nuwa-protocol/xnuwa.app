@@ -11,24 +11,44 @@ import {
   type ErrorAgent8004,
   SupportedTrustSchema,
 } from '@/shared/types/8004-agent';
+import {
+  DEFAULT_REGISTRY,
+  getRegistryByAddress,
+  type IdentityRegistry,
+} from './8004-registries';
 import identityRegistry from './identity-registry-abi.json';
 
-const registryNetwork = mainnet;
-// Default Identity Registry address; callers can override via function params
+// Default Identity Registry address; select from configured registries
 export const DEFAULT_IDENTITY_REGISTRY_ADDRESS: `0x${string}` =
-  '0x4f4B183eAE80D62B880458E4A812F896CFb2d4d6';
+  (DEFAULT_REGISTRY?.id as `0x${string}`) ||
+  ('0x4f4B183eAE80D62B880458E4A812F896CFb2d4d6' as const);
 
 // Use the contract ABI from the local JSON file
 const registryABI = identityRegistry.abi as Abi;
 
-// Use a public RPC; allow override via env for stability in production
-const rpcUrl = (import.meta as any)?.env?.VITE_MAINNET_RPC_URL as
-  | string
-  | undefined;
-const client = createPublicClient({
-  chain: registryNetwork,
-  transport: rpcUrl ? http(rpcUrl) : http(),
-});
+// Build a viem client for a given registry address using configured chain/RPC.
+// Cache clients by `chainId|rpcUrl` to avoid redundant instances.
+const clientCache = new Map<string, ReturnType<typeof createPublicClient>>();
+const getClientForRegistry = (registryAddress: `0x${string}`) => {
+  const registry: IdentityRegistry | undefined =
+    getRegistryByAddress(registryAddress);
+  const chain = registry?.chain || mainnet;
+  // Use per-registry RPC, or fall back to chain default or env if provided
+  const envUrl = (import.meta as any)?.env?.VITE_MAINNET_RPC_URL as
+    | string
+    | undefined;
+  const rpcUrl = registry?.rpcUrl || envUrl;
+  const key = `${chain.id}|${rpcUrl || 'default'}`;
+  let client = clientCache.get(key);
+  if (!client) {
+    client = createPublicClient({
+      chain,
+      transport: rpcUrl ? http(rpcUrl) : http(),
+    });
+    clientCache.set(key, client);
+  }
+  return client;
+};
 
 // Simple in-memory cache for totalAgents to avoid repeating the on-chain call
 const TOTAL_AGENTS_TTL_MS = 3 * 60 * 1000; // 3 minutes
@@ -38,6 +58,7 @@ export const getAgentTokenURI = async (
   registryAddress: `0x${string}`,
   agentId: string,
 ): Promise<string> => {
+  const client = getClientForRegistry(registryAddress);
   const agentTokenURI = await client.readContract({
     address: registryAddress,
     abi: registryABI,
@@ -55,6 +76,7 @@ export const getTotalAgents = async (
   if (cached && now - cached.ts < TOTAL_AGENTS_TTL_MS) {
     return BigInt(cached.value);
   }
+  const client = getClientForRegistry(registryAddress);
   const totalAgents = (await client.readContract({
     address: registryAddress,
     abi: registryABI,
@@ -105,6 +127,7 @@ export const getAgentsTokenURIByPage = async (
   }));
 
   // Use multicall to batch tokenURI reads; allowFailure=true so one bad item does not fail all
+  const client = getClientForRegistry(registryAddress);
   const results = await client.multicall({ contracts, allowFailure: true });
 
   // Extract successful tokenURIs in order
@@ -117,6 +140,7 @@ export const getOwnerAddressByAgentId = async (
   registryAddress: `0x${string}`,
   agentId: string,
 ): Promise<string> => {
+  const client = getClientForRegistry(registryAddress);
   const ownerAddress = await client.readContract({
     address: registryAddress,
     abi: registryABI,
@@ -138,6 +162,7 @@ export const getOwnerAddressesByAgentIds = async (
     functionName: 'ownerOf' as const,
     args: [BigInt(id)],
   }));
+  const client = getClientForRegistry(registryAddress);
   const results = await client.multicall({ contracts, allowFailure: true });
   return results
     .map((r) => (r.status === 'success' ? (r.result as string) : undefined))
@@ -274,10 +299,8 @@ export const getAgent8004ByPage = async (
   const uris = await getAgentsTokenURIByPage(registryAddress, page, pageSize);
   if (!uris.length) return [];
   // Limit concurrent fetches to reduce variability from remote gateways
-  const results = await mapWithConcurrency(
-    uris,
-    12,
-    (uri) => fetchAgent8004FromTokenURI(uri),
+  const results = await mapWithConcurrency(uris, 12, (uri) =>
+    fetchAgent8004FromTokenURI(uri),
   );
   return results;
 };
