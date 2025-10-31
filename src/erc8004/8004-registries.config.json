@@ -17,8 +17,8 @@
     "rpcUrl": "https://ethereum-sepolia-rpc.publicnode.com",
     "explorerBase": "https://sepolia.etherscan.io",
     "marketplace": {
-      "label": "OpenSea",
-      "urlTemplate": "https://testnets.opensea.io/assets/sepolia/{address}"
+      "label": "Rarible",
+      "urlTemplate": "https://testnet.rarible.com/token/{registryAddress}:{tokenId}"
     }
   }
 ]

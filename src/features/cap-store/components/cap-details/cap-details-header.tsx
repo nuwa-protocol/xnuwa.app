@@ -22,6 +22,7 @@ import { ShareDialog } from '@/shared/components/ui/shadcn-io/share-dialog';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import type { RemoteCap } from '../../types';
 import { CapActionButton } from '../cap-action-button';
+import { getRegistryByAddress } from '@/erc8004/8004-registries';
 
 interface CapDetailsHeaderProps {
   capQueryData: RemoteCap;
@@ -182,26 +183,50 @@ export function CapDetailsHeader({
             </div>
             {/* OpenSea、Etherscan按钮区，紧接着模型信息grid下方 */}
             <div className="flex flex-row justify-start items-center gap-2 mt-1">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 px-3 text-xs rounded-md"
-                onClick={() =>
-                  window.open(`https://opensea.io/item/ethereum/${capQueryData.id}`, '_blank')
-                }
-              >
-                OpenSea
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 px-3 text-xs rounded-md"
-                onClick={() =>
-                  window.open(`https://etherscan.io/address/${capQueryData.id.split('/')[0]}`, '_blank')
-                }
-              >
-                Etherscan
-              </Button>
+              {(() => {
+                const [addr, tokenId] = (capQueryData.id || '').split('/');
+                const reg = addr ? getRegistryByAddress(addr) : undefined;
+                const chainId = reg?.chainId;
+                // Prefer Rarible on Sepolia testnet for token pages; otherwise default to OpenSea on mainnet
+                const url = (() => {
+                  if (addr && tokenId) {
+                    if (chainId === 11155111) {
+                      return `https://testnet.rarible.com/token/${addr}:${tokenId}`;
+                    }
+                    // Default: OpenSea mainnet (ethereum)
+                    return `https://opensea.io/assets/ethereum/${addr}/${tokenId}`;
+                  }
+                  return undefined;
+                })();
+                return url ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs rounded-md"
+                    onClick={() => window.open(url, '_blank')}
+                  >
+                    {chainId === 11155111 ? 'Rarible' : 'OpenSea'}
+                  </Button>
+                ) : null;
+              })()}
+              {(() => {
+                const addr = (capQueryData.id || '').split('/')[0];
+                if (!addr) return null;
+                // Fallback to mainnet explorer when chain unknown
+                const reg = getRegistryByAddress(addr);
+                const etherscanBase = reg?.explorerBase || 'https://etherscan.io';
+                const explorerUrl = `${etherscanBase.replace(/\/$/, '')}/address/${addr}`;
+                return (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs rounded-md"
+                    onClick={() => window.open(explorerUrl, '_blank')}
+                  >
+                    Explorer
+                  </Button>
+                );
+              })()}
             </div>
           </div>
 

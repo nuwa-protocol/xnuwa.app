@@ -182,10 +182,11 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
         ]);
 
         // 3) Map to RemoteCaps using owner as authorDID and 8004 name as idName
+        // Use the real on-chain agentId (tokenId) rather than the page index.
         const newRemoteCaps: RemoteCap[] = agents.map((agent, i) =>
           agent8004ToRemoteCap(agent as any, {
-            // New ID scheme: `<registryAddress>/<index>` (1-based within current page)
-            id: `${registryAddress}/${i + 1}`,
+            // ID scheme: `<registryAddress>/<agentId>` where agentId is the ERC-721 tokenId
+            id: `${registryAddress}/${agentIds[i]}`,
             cid: registryAddress,
             authorDID:
               owners[i] || '0x0000000000000000000000000000000000000000',
@@ -197,10 +198,11 @@ export const useCapStore = create<CapStoreState>()((set, get) => {
         const totalItems = agents.length || 0;
         const { remoteCaps } = get();
 
-        // Build index cache for this registry/page (1-based index within page)
+        // Build index cache for this registry/page keyed by the real agentId (tokenId)
         const pageIndexMap: Record<number, Agent8004 | ErrorAgent8004> = {};
         agents.forEach((agent, i) => {
-          pageIndexMap[i + 1] = agent as Agent8004 | ErrorAgent8004;
+          const agentId = agentIds[i];
+          pageIndexMap[agentId] = agent as Agent8004 | ErrorAgent8004;
         });
         const prevMap =
           get().agent8004ByRegistryAndIndex[registryAddress] || {};

@@ -6,6 +6,7 @@ import { Button } from '@/shared/components/ui/button';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
 import { InstalledCapsStore } from '@/shared/stores/installed-caps-store';
 import { SuggestedActions } from './suggested-actions';
+import { getRegistryByAddress } from '@/erc8004/8004-registries';
 
 // Format large token counts into a compact string like "128k" or "2m".
 // We don't need exact precision here; whole-number rounding is fine.
@@ -82,14 +83,31 @@ export function CurrentCapInfo() {
             {Object.keys(currentCap?.core.mcpServers || {}).length > 0 &&
               ` • ${Object.keys(currentCap?.core.mcpServers || {}).length} MCP`}
             <div className="flex flex-row gap-2 flex-shrink-0">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 px-3 text-xs rounded-md"
-                onClick={() => window.open(`https://opensea.io/item/ethereum/${currentCap?.id}`, '_blank')}
-              >
-                OpenSea
-              </Button>
+              {(() => {
+                const id = currentCap?.id || '';
+                const [addr, tokenId] = id.split('/');
+                const reg = addr ? getRegistryByAddress(addr) : undefined;
+                const chainId = reg?.chainId;
+                const url = (() => {
+                  if (addr && tokenId) {
+                    if (chainId === 11155111) {
+                      return `https://testnet.rarible.com/token/${addr}:${tokenId}`;
+                    }
+                    return `https://opensea.io/assets/ethereum/${addr}/${tokenId}`;
+                  }
+                  return undefined;
+                })();
+                return url ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs rounded-md"
+                    onClick={() => window.open(url, '_blank')}
+                  >
+                    {chainId === 11155111 ? 'Rarible' : 'OpenSea'}
+                  </Button>
+                ) : null;
+              })()}
               <Button
                 variant="outline"
                 size="sm"
