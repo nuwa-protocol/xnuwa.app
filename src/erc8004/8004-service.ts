@@ -33,11 +33,8 @@ const getClientForRegistry = (registryAddress: `0x${string}`) => {
   const registry: IdentityRegistry | undefined =
     getRegistryByAddress(registryAddress);
   const chain = registry?.chain || mainnet;
-  // Use per-registry RPC, or fall back to chain default or env if provided
-  const envUrl = (import.meta as any)?.env?.VITE_MAINNET_RPC_URL as
-    | string
-    | undefined;
-  const rpcUrl = registry?.rpcUrl || envUrl;
+  // Use per-registry RPC, or fall back to chain default when omitted
+  const rpcUrl = registry?.rpcUrl;
   const key = `${chain.id}|${rpcUrl || 'default'}`;
   let client = clientCache.get(key);
   if (!client) {

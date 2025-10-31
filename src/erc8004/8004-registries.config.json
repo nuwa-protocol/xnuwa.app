@@ -1,0 +1,24 @@
+[
+  {
+    "id": "0x4f4B183eAE80D62B880458E4A812F896CFb2d4d6",
+    "label": "Nuwa Agents",
+    "chainId": 1,
+    "rpcUrl": "https://ethereum.publicnode.com",
+    "explorerBase": "https://etherscan.io",
+    "marketplace": {
+      "label": "OpenSea",
+      "urlTemplate": "https://opensea.io/assets/ethereum/{address}"
+    }
+  },
+  {
+    "id": "0x7a44Ec131315572594dcD6C4f3AE99aCd9b3a315",
+    "label": "Nuwa Agents (Sepolia)",
+    "chainId": 11155111,
+    "rpcUrl": "https://ethereum-sepolia-rpc.publicnode.com",
+    "explorerBase": "https://sepolia.etherscan.io",
+    "marketplace": {
+      "label": "OpenSea",
+      "urlTemplate": "https://testnets.opensea.io/assets/sepolia/{address}"
+    }
+  }
+]

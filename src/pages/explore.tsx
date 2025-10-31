@@ -13,16 +13,23 @@ const ExplorePageContent = () => {
   const sortBy = searchParams.get('sortBy');
   const search = searchParams.get('search');
 
-  if (typeof path === 'string' && path.startsWith('0x')) {
+  const pathIsRegistry = typeof path === 'string' && path.startsWith('0x');
+  const effectiveTag = pathIsRegistry ? path : tag;
+
+  if (pathIsRegistry) {
     if (capId) {
       return <CapDetails capId={`${path}/${capId}`} />;
     } else {
-      return <CapStoreCapsContent tag={tag} sortBy={sortBy} search={search} />;
+      return (
+        <CapStoreCapsContent tag={effectiveTag} sortBy={sortBy} search={search} />
+      );
     }
   } else if (path === 'installed') {
     return <CapStoreInstalledContent />;
   } else {
-    return <CapStoreCapsContent tag={tag} sortBy={sortBy} search={search} />;
+    return (
+      <CapStoreCapsContent tag={effectiveTag} sortBy={sortBy} search={search} />
+    );
   }
 };
 

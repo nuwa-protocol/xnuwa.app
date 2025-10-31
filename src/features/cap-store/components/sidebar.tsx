@@ -9,6 +9,7 @@ import {
   PenTool,
   Wrench,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -19,7 +20,13 @@ import {
 } from '@/shared/components/ui/dropdown-menu';
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { useLanguage } from '@/shared/hooks';
-import { REGISTRIES } from '../../../erc8004/8004-registries';
+import {
+  buildExplorerAddressUrlFromRegistry,
+  getMarketplaceLinkFromRegistry,
+  type IdentityRegistry,
+  REGISTRIES,
+} from '../../../erc8004/8004-registries';
+import { getAgent8004ByPage } from '../../../erc8004/8004-service';
 import type { CapStoreSection } from '../types';
 
 export function CapStoreSidebar() {
@@ -28,7 +35,45 @@ export function CapStoreSidebar() {
   const [searchParams] = useSearchParams();
   const { pathname } = useLocation();
 
-  const tagSections: CapStoreSection[] = REGISTRIES;
+  // Include chain/network data from registries.
+  const tagSections: IdentityRegistry[] = REGISTRIES;
+
+  // Cache icons locally (address -> image URL or null if none found)
+  const [icons, setIcons] = useState<Record<string, string | null>>({});
+
+  useEffect(() => {
+    let mounted = true;
+    const addrs = tagSections
+      .map((s) => s.id as `0x${string}`)
+      .filter((a) => icons[a] === undefined);
+    if (!addrs.length) return;
+
+    const fetchIcons = async () => {
+      for (const address of addrs) {
+        let url: string | null = null;
+        try {
+          // Try first N agents and pick the first with a valid image
+          const agents = await getAgent8004ByPage(address, 0, 8);
+          for (const agent of agents) {
+            const img = (agent as any)?.image;
+            if (typeof img === 'string' && /^https?:\/\//.test(img)) {
+              url = img;
+              break;
+            }
+          }
+        } catch {
+          // ignore errors; url stays null
+        }
+        if (!mounted) return;
+        setIcons((prev) => ({ ...prev, [address]: url }));
+      }
+    };
+    fetchIcons();
+    return () => {
+      mounted = false;
+    };
+    // serialize ids as dependency to re-run when registries change
+  }, [JSON.stringify(tagSections.map((s) => s.id).sort())]);
 
   const getActiveSection = (): CapStoreSection => {
     const pathSegments = pathname.split('/');
@@ -38,7 +83,13 @@ export function CapStoreSidebar() {
       return { id: 'installed', label: 'Installed Caps', type: 'section' };
     }
 
-    return tagSections.find((section) => section.id === path) || { id: 'all', label: 'All Caps', type: 'section' };
+    return (
+      tagSections.find((section) => section.id === path) || {
+        id: 'all',
+        label: 'All Caps',
+        type: 'section',
+      }
+    );
   };
 
   const getSectionIcon = (sectionId: string, type: string) => {
@@ -139,6 +190,14 @@ export function CapStoreSidebar() {
               {tagSections.map((section) => {
                 const IconComponent = getSectionIcon(section.id, section.type);
                 const isSelected = activeSection.id === section.id;
+                const explorerUrl = buildExplorerAddressUrlFromRegistry(
+                  section,
+                  section.id,
+                );
+                const marketplace = getMarketplaceLinkFromRegistry(
+                  section,
+                  section.id,
+                );
 
                 return (
                   <div key={section.id} className="relative group">
@@ -148,7 +207,15 @@ export function CapStoreSidebar() {
                       className="w-full justify-start gap-3 h-10 pr-8"
                       onClick={() => handleActiveSectionChange(section)}
                     >
-                      <IconComponent className="size-4" />
+                      {icons[section.id] ? (
+                        <img
+                          alt="registry icon"
+                          src={icons[section.id] as string}
+                          className="size-4 rounded-sm object-cover"
+                        />
+                      ) : (
+                        <IconComponent className="size-4" />
+                      )}
                       <span>{section.label}</span>
                     </Button>
 
@@ -172,31 +239,25 @@ export function CapStoreSidebar() {
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
+                        {marketplace ? (
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(marketplace.url, '_blank');
+                            }}
+                          >
+                            {`see on ${marketplace.label.toLowerCase()}`}
+                          </DropdownMenuItem>
+                        ) : null}
                         <DropdownMenuItem
                           className="cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
-                            // Open the registry contract on OpenSea (contract assets page)
-                            window.open(
-                              `https://opensea.io/assets/ethereum/${section.id}`,
-                              '_blank',
-                            );
+                            window.open(explorerUrl, '_blank');
                           }}
                         >
-                          see on opensea
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Open the registry contract address on Etherscan
-                            window.open(
-                              `https://etherscan.io/address/${section.id}`,
-                              '_blank',
-                            );
-                          }}
-                        >
-                          see on etherscan
+                          see on explorer
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
