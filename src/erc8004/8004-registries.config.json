@@ -1,7 +1,7 @@
 [
   {
     "id": "0x4f4B183eAE80D62B880458E4A812F896CFb2d4d6",
-    "label": "Nuwa Agents",
+    "label": "Nuwa (Mainnet Ethereum)",
     "chainId": 1,
     "rpcUrl": "https://ethereum.publicnode.com",
     "explorerBase": "https://etherscan.io",
@@ -12,7 +12,7 @@
   },
   {
     "id": "0x7a44Ec131315572594dcD6C4f3AE99aCd9b3a315",
-    "label": "Nuwa Agents (Sepolia)",
+    "label": "Nuwa  (Sepolia)",
     "chainId": 11155111,
     "rpcUrl": "https://ethereum-sepolia-rpc.publicnode.com",
     "explorerBase": "https://sepolia.etherscan.io",
@@ -20,5 +20,12 @@
       "label": "Rarible",
       "urlTemplate": "https://testnet.rarible.com/token/{registryAddress}:{tokenId}"
     }
+  },
+  {
+    "id": "0xD2003a5EBC1D5d73bbA056a67d165D1eaE9616fE",
+    "label": "Nuwa  (X Layer Testnet)",
+    "chainId": 1952,
+    "rpcUrl": "https://xlayertestrpc.okx.com/terigon",
+    "explorerBase": "https://www.oklink.com/zh-hant/x-layer-testnet"
   }
 ]
