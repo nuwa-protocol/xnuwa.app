@@ -72,6 +72,7 @@
     "@simplewebauthn/types": "^12.0.0",
     "@stepperize/react": "^5.1.8",
     "@tailwindcss/typography": "^0.5.16",
+    "@vercel/analytics": "^1.5.0",
     "@web3icons/react": "^4.0.19",
     "ai": "^5.0.76",
     "class-variance-authority": "^0.7.1",
