@@ -36,7 +36,7 @@ export const useDepositOrder = () => {
         price_amount: amount,
         price_currency: 'USD',
         order_id: `order_${userDid}_${amount}_${Date.now()}`,
-        order_description: `$${amount} USD of Nuwa AI credits`,
+        order_description: `$${amount} USD of xNUWA credits`,
         pay_currency: currency.code.toLowerCase(),
         payer_did: userDid,
       };

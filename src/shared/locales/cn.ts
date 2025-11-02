@@ -4,7 +4,7 @@ export const cn: typeof en = {
     title: 'DID 登录',
     description: '请输入您的 DID 以访问聊天',
   },
-  logo: 'Nuwa AI',
+  logo: 'xNUWA',
   home: {
     loading: '加载中...',
   },

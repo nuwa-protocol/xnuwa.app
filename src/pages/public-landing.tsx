@@ -54,7 +54,7 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
               </Button>
               <Button variant="ghost" size="sm" asChild>
                 <a
-                  href="https://docs.nuwa.dev"
+                  href="https://docs.nuwa.dev/xnuwa/"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -110,7 +110,7 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                   </Button>
                   <Button size="sm" variant="ghost" asChild>
                     <a
-                      href="https://docs.nuwa.dev"
+                      href="https://docs.nuwa.dev/xnuwa/"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -126,9 +126,9 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                 {...getFadeIn(0.15)}
               >
                 {resolvedTheme === 'dark' ? (
-                  <img src={nuwaAtAGlanceDark} alt="Nuwa at a glance" />
+                  <img src={nuwaAtAGlanceDark} alt="xNUWA at a glance" />
                 ) : (
-                  <img src={nuwaAtAGlance} alt="Nuwa at a glance" />
+                  <img src={nuwaAtAGlance} alt="xNUWA at a glance" />
                 )}
               </motion.div>
             </div>
@@ -139,7 +139,7 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
 
         <footer className="border-t border-border/40 bg-background/80">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <p>© {new Date().getFullYear()} Nuwa AI. Built with ❤️.</p>
+            <p>© {new Date().getFullYear()} xNUWA. Built with ❤️.</p>
           </div>
         </footer>
       </div>

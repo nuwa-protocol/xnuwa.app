@@ -66,7 +66,7 @@ export function generateSoftwareApplicationSchema(cap: {
       ? metadata.thumbnail.url
       : metadata.thumbnail?.type === 'file'
         ? metadata.thumbnail.file
-        : '/src/assets/og-image.png';
+        : '/og/xnuwa-og.png';
 
   return {
     '@context': 'https://schema.org',
@@ -76,10 +76,10 @@ export function generateSoftwareApplicationSchema(cap: {
     applicationCategory: 'AI Tools',
     operatingSystem: 'Web',
     url: `${window.location.origin}/cap-store/${capData.idName}`,
-    image: thumbnailUrl || '/src/assets/og-image.png',
+    image: thumbnailUrl || '/og/xnuwa-og.png',
     publisher: {
       '@type': 'Organization',
-      name: 'Nuwa AI',
+      name: 'xNUWA',
       url: window.location.origin,
     },
     downloadUrl: `${window.location.origin}/cap-store/${capData.idName}`,
@@ -124,12 +124,12 @@ export function generateWebSiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Nuwa AI',
-    description: 'Use All AIs with Crypto',
+    name: 'xNUWA',
+    description: 'Your One-Stop Shop for AI Agents On-Chain',
     url: window.location.origin,
     publisher: {
       '@type': 'Organization',
-      name: 'Nuwa AI',
+      name: 'xNUWA',
       url: window.location.origin,
     },
     potentialAction: {
@@ -147,8 +147,8 @@ export function generateOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Nuwa AI',
-    description: 'Use All AIs with Crypto',
+    name: 'xNUWA',
+    description: 'Your One-Stop Shop for AI Agents On-Chain',
     url: window.location.origin,
     logo: {
       '@type': 'ImageObject',

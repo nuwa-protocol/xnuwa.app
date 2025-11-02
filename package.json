@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "NODE_OPTIONS='--max-old-space-size=8192' tsc -b && NODE_OPTIONS='--max-old-space-size=8192' vite build",
+    "og:generate": "tsx scripts/generate-og.tsx",
     "preview": "vite preview",
     "lint": "biome lint src/",
     "lint:fix": "biome lint --apply src/",
