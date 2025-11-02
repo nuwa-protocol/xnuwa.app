@@ -20,7 +20,7 @@ import { cn } from '@/shared/utils';
 import { AccountStore, IS_PASSKEY_SUPPORTED } from '../store';
 
 const PIN_LENGTH = 6;
-const DEFAULT_ACCOUNT_PLACEHOLDER = 'Nuwa Account';
+const DEFAULT_ACCOUNT_PLACEHOLDER = 'xNUWA Account';
 const PIN_SLOT_KEYS = Array.from(
   { length: PIN_LENGTH },
   (_, index) => `pin-slot-${index}`,
@@ -141,7 +141,7 @@ export function AccountLoginDialog({
     <div className="space-y-6">
       <div className="space-y-1.5">
         <p className="text-sm font-medium text-muted-foreground">
-          Choose an account to continue.
+          Select an existing account or set up a new one.
         </p>
       </div>
 
@@ -173,7 +173,7 @@ export function AccountLoginDialog({
       ) : null}
 
       <div className="flex items-center justify-between rounded-lg border border-dashed px-4 py-2 text-sm text-muted-foreground">
-        <span>Need another wallet?</span>
+        <span>Need another account?</span>
         <Button variant="ghost" size="sm" onClick={() => setView('create')}>
           Create new
         </Button>
@@ -204,6 +204,7 @@ export function AccountLoginDialog({
           maxLength={PIN_LENGTH}
           inputMode="numeric"
           autoComplete="one-time-code"
+          containerClassName="w-full justify-center"
           value={pin}
           onChange={(value) => {
             const numericValue = value.replace(/\D/g, '').slice(0, PIN_LENGTH);
@@ -219,7 +220,7 @@ export function AccountLoginDialog({
           </InputOTPGroup>
         </InputOTP>
         <p className="text-xs text-muted-foreground">
-          Enter a {PIN_LENGTH}-digit PIN. Keep this safe to unlock your wallet.
+          Enter a {PIN_LENGTH}-digit PIN. Keep this safe — you will use it to secure and sign in to your account.
         </p>
       </div>
 
@@ -230,6 +231,7 @@ export function AccountLoginDialog({
           maxLength={PIN_LENGTH}
           inputMode="numeric"
           autoComplete="one-time-code"
+          containerClassName="w-full justify-center"
           value={confirmPin}
           onChange={(value) => {
             const numericValue = value.replace(/\D/g, '').slice(0, PIN_LENGTH);
@@ -258,7 +260,7 @@ export function AccountLoginDialog({
           <p className="text-sm font-medium">Enable passkey</p>
           <p className="text-xs text-muted-foreground">
             {IS_PASSKEY_SUPPORTED
-              ? 'Use Face ID, Touch ID, or biometrics for quick unlock.'
+              ? 'Use Face ID, Touch ID, or biometrics for quick sign-in.'
               : 'Passkey is not supported in this browser.'}
           </p>
         </div>
@@ -273,8 +275,8 @@ export function AccountLoginDialog({
         <p className="text-sm text-destructive">{createError}</p>
       ) : null}
 
-      <div className="flex items-center justify-end gap-2">
-        {accounts.length > 0 ? (
+      {accounts.length > 0 ? (
+        <div className="flex items-center justify-end gap-2">
           <Button
             type="button"
             variant="ghost"
@@ -283,9 +285,26 @@ export function AccountLoginDialog({
           >
             Back
           </Button>
-        ) : null}
+          <Button
+            type="submit"
+            disabled={
+              isSubmitting || pin.length !== PIN_LENGTH || pin !== confirmPin
+            }
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating…
+              </>
+            ) : (
+              'Create account'
+            )}
+          </Button>
+        </div>
+      ) : (
         <Button
           type="submit"
+          className="w-full"
           disabled={
             isSubmitting || pin.length !== PIN_LENGTH || pin !== confirmPin
           }
@@ -299,13 +318,15 @@ export function AccountLoginDialog({
             'Create account'
           )}
         </Button>
-      </div>
+      )}
     </form>
   );
 
   if (!shouldRender) {
     return null;
   }
+
+  const isSetupOnly = accounts.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -314,7 +335,10 @@ export function AccountLoginDialog({
         <DialogPrimitive.Content
           aria-describedby={undefined}
           className={cn(
-            'fixed z-50 w-full max-w-2xl rounded-2xl border border-border bg-background/95 p-6 shadow-2xl transition-all',
+            // Keep setup view narrower than the list view but a bit wider than before,
+            // ensuring the 6 PIN slots stay on one row while giving content some room.
+            isSetupOnly ? 'max-w-sm' : 'max-w-2xl',
+            'fixed z-50 w-full rounded-2xl border border-border bg-background/95 p-6 shadow-2xl transition-all',
             'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
           )}
         >
@@ -322,12 +346,14 @@ export function AccountLoginDialog({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <DialogTitle className="text-2xl font-semibold">
-                  Unlock Nuwa
+                  {accounts.length > 0
+                    ? 'Choose or Set Up Account'
+                    : 'Set Up Your xNUWA Account'}
                 </DialogTitle>
                 <DialogDescription className="mt-2 text-base">
                   {accounts.length > 0
-                    ? 'Choose an existing account or create a new one to continue.'
-                    : 'Create your first Nuwa account to continue.'}
+                    ? 'Select an existing account, or create a new local account secured by a PIN.'
+                    : 'Create a local account secured by a PIN. You can also enable a passkey for fast sign-in.'}
                 </DialogDescription>
               </div>
               <Button

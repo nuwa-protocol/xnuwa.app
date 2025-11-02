@@ -3,7 +3,7 @@ export const en = {
     title: 'DID Sign In',
     description: 'Enter your DID to access the chat',
   },
-  logo: 'Nuwa AI',
+  logo: 'xNUWA',
   home: {
     loading: 'Loading...',
   },

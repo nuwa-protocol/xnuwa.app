@@ -43,7 +43,7 @@ export function CurrentCapInfo() {
             Install Your First AI Agent
           </div>
           <div className="mt-2 text-sm md:text-[15px] leading-6 text-muted-foreground/90">
-            Nuwa AI requires installing AI Agents to work. Please install an AI Agent to get started.
+            xNUWA requires installing AI Agents to work. Please install an AI Agent to get started.
           </div>
           <div className="mt-4">
             <Button variant="default" onClick={() => navigate('/explore')}>

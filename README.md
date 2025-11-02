@@ -61,7 +61,7 @@ pnpm install
 pnpm dev
 ```
 
-Visit `http://localhost:5173` to start using Nuwa Client.
+Visit `http://localhost:5173` to start using xNUWA.
 
 ## 🧩 Cap Registry
 
@@ -110,7 +110,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## 🆘 Support
 
-- **Documentation**: [docs.nuwa.dev](https://docs.nuwa.dev)
+- **Documentation**: [docs.nuwa.dev/xnuwa](https://docs.nuwa.dev/xnuwa/)
 - **Issues**: [GitHub Issues](https://github.com/nuwa-protocol/xnuwa.app/issues)
 - **Community**: [Discord](https://discord.gg/nuwaai)
 - **Email**: haichao@nuwa.dev

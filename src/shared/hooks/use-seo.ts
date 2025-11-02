@@ -15,11 +15,12 @@ export interface SEOData {
 }
 
 const DEFAULT_SEO: SEOData = {
-  title: 'Nuwa AI - Use All AIs with Crypto',
-  description: 'Nuwa AI - Use All AIs with Crypto',
-  image: '/src/assets/og-image.png',
+  title: 'xNUWA - Your One-Stop Shop for AI Agents On-Chain',
+  description: 'xNUWA - Your One-Stop Shop for AI Agents On-Chain',
+  image: '/og/xnuwa-og.png',
   type: 'website',
-  keywords: ['nuwa', 'ai', 'crypto', 'application'],
+  // Brand the default keyword set around xNUWA and on-chain AI agents
+  keywords: ['xnuwa', 'ai agents', 'on-chain', 'crypto', 'application'],
 };
 
 export function useSEO(seoData: Partial<SEOData> = {}) {
@@ -134,7 +135,7 @@ export function generateCapSEO(cap: {
   const { capData, stats } = cap;
   const { metadata } = capData;
 
-  const title = `${metadata.displayName} - AI Cap | Nuwa AI`;
+  const title = `${metadata.displayName} - AI Cap | xNUWA - Your One-Stop Shop for AI Agents On-Chain`;
   const description = `${metadata.description} - Download: ${stats?.downloads || 0}, Rating: ${stats?.averageRating || 0}/5 (${stats?.ratingCount || 0} reviews)`;
 
   // Extract thumbnail URL from the thumbnail object
@@ -143,16 +144,16 @@ export function generateCapSEO(cap: {
       ? metadata.thumbnail.url
       : metadata.thumbnail?.type === 'file'
         ? metadata.thumbnail.file
-        : '/src/assets/og-image.png';
+        : '/og/xnuwa-og.png';
 
   return {
     title,
     description,
-    keywords: ['nuwa ai', 'ai cap', 'crypto ai', ...metadata.tags],
-    image: thumbnailUrl || '/src/assets/og-image.png',
+    keywords: ['xnuwa', 'ai cap', 'ai agents', 'on-chain', 'crypto ai', ...metadata.tags],
+    image: thumbnailUrl || '/og/xnuwa-og.png',
     url: `${window.location.origin}/cap-store/${capData.idName}`,
     type: 'product',
-    author: 'Nuwa AI',
+    author: 'xNUWA Team',
     publishedTime: metadata.submittedAt
       ? new Date(metadata.submittedAt).toISOString()
       : undefined,
