@@ -46,7 +46,7 @@ export function ThumbnailUpload({
           Thumbnail
         </CardTitle>
         <CardDescription className="text-slate-600 dark:text-slate-400">
-          Enter an image URL to set your Cap thumbnail
+          Enter an image URL to set your Agent thumbnail
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

@@ -45,7 +45,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : 'Failed to submit cap. Please try again.';
+          : 'Failed to submit agent. Please try again.';
       toast.error(errorMessage);
 
       navigate('/cap-studio');

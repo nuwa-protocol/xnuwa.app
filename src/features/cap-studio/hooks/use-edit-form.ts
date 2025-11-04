@@ -132,7 +132,7 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
         handleCreateCap(data);
       }
     } catch (error) {
-      toast.error('Failed to save cap. Please try again.');
+      toast.error('Failed to save agent. Please try again.');
     } finally {
       setIsSaving(false);
     }

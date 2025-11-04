@@ -30,19 +30,19 @@ export const useSubmitCap = () => {
     async (capData: Cap): Promise<CapSubmitResponse> => {
       try {
         const capKit = await capKitService.getCapKit();
-        // Register the capability using CapKit
+        // Register the agent using CapKit
         const cid = await capKit.registerCap(capData);
 
         return {
           success: true,
           capId: cid,
-          message: `Capability "@${capData.idName}" registered successfully with CID: ${cid}`,
+          message: `Agent "@${capData.idName}" registered successfully with CID: ${cid}`,
         };
       } catch (error) {
         const errorMessage =
           error instanceof Error
             ? error.message
-            : 'Failed to submit capability';
+            : 'Failed to submit agent';
         return {
           success: false,
           message: errorMessage,
@@ -76,7 +76,7 @@ export const useSubmitCap = () => {
         }));
 
         try {
-          // Register the capability using CapKit
+          // Register the agent using CapKit
           await capKit.registerCap(cap.capData);
           setBulkProgress((prev) => ({
             ...prev,
@@ -86,7 +86,7 @@ export const useSubmitCap = () => {
           const errorMessage =
             error instanceof Error
               ? error.message
-              : 'Failed to submit capability';
+              : 'Failed to submit agent';
           errors.push({ capName: displayName, error: errorMessage });
           setBulkProgress((prev) => ({
             ...prev,

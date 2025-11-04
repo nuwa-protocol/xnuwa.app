@@ -24,7 +24,7 @@ export const getErrorMessage = (
 // Helper function to convert field paths to user-friendly names
 export const getFieldDisplayName = (path: string): string => {
   const fieldMap: Record<string, string> = {
-    idName: 'Cap Name',
+    idName: 'Agent Name',
     'metadata.displayName': 'Display Name',
     'metadata.description': 'Description',
     'metadata.tags': 'Tags',

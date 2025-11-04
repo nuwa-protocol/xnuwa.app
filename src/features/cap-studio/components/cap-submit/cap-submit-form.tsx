@@ -146,7 +146,7 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
           <CardHeader>
             <CardTitle className="text-base">Introduction</CardTitle>
             <CardDescription>
-              Details and usage of your cap (Markdown)
+              Details and usage of your agent (Markdown)
             </CardDescription>
           </CardHeader>
           <CardContent>
