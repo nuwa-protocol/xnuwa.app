@@ -29,7 +29,7 @@ export function GeneralTab({ form }: GeneralTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Basic Information</CardTitle>
-          <CardDescription>Essential details about your cap</CardDescription>
+          <CardDescription>Essential details about your agent</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <FormField
@@ -39,10 +39,10 @@ export function GeneralTab({ form }: GeneralTabProps) {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Unique identifier for your cap.
+                  Unique identifier for your agent.
                 </p>
                 <FormControl>
-                  <Input placeholder="my_awesome_cap" {...field} />
+                  <Input placeholder="my_awesome_agent" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -56,10 +56,10 @@ export function GeneralTab({ form }: GeneralTabProps) {
               <FormItem>
                 <FormLabel>Display Name</FormLabel>
                 <p className="text-sm text-muted-foreground mb-2">
-                  The display name of your Cap.
+                  The display name of your Agent.
                 </p>
                 <FormControl>
-                  <Input placeholder="My Awesome Cap" {...field} />
+                  <Input placeholder="My Awesome Agent" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -74,14 +74,14 @@ export function GeneralTab({ form }: GeneralTabProps) {
                 <FormLabel>Description</FormLabel>
                 <div className='flex flex-row items-center justify-between'>
                   <p className="text-sm text-muted-foreground mb-2">
-                    A short description of your cap.
+                    A short description of your agent.
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {field.value?.length || 0} / 150
                   </p>
                 </div>
                 <FormControl>
-                  <Input placeholder="An awesome cap that lets you don anything" {...field} />
+                  <Input placeholder="An awesome agent that helps users do anything" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -95,7 +95,7 @@ export function GeneralTab({ form }: GeneralTabProps) {
               <FormItem>
                 <FormLabel>Tags</FormLabel>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Select one or more tags that describe your cap.
+                  Select one or more tags that describe your agent.
                 </p>
                 <FormControl>
                   <CapTags
@@ -126,7 +126,7 @@ export function GeneralTab({ form }: GeneralTabProps) {
                   />
                 </FormControl>
                 <FormDescription>
-                  Link to your cap's homepage or documentation
+                  Link to your agent's homepage or documentation
                 </FormDescription>
                 <FormMessage />
               </FormItem>

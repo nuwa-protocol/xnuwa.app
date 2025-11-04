@@ -12,7 +12,7 @@ export function AboutSection() {
   const createGitHubIssueURL = () => {
     const owner = 'nuwa-protocol';
     const repo = 'nuwa';
-    const title = '[xNUWA Feedback] PLEASE ENTER TITLE HERE';
+    const title = '[x402AI Feedback] PLEASE ENTER TITLE HERE';
     const body = `## Info\n- My DID: ${account?.address}\n- Client Version: ${version}\n\n## Description\n PLEASE DESCRIBE THE ISSUE HERE...`;
     const labels = ['uncategorized'];
 
@@ -36,7 +36,7 @@ export function AboutSection() {
       <div className="rounded-lg border p-6">
         <div className="space-y-4">
           <div className="space-y-0.5">
-            <h3 className="text-base font-medium">xNUWA v{version}</h3>
+            <h3 className="text-base font-medium">x402AI v{version}</h3>
             <div className="pt-2">
               <Button
                 variant="link"

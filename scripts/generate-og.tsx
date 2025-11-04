@@ -1,6 +1,6 @@
 /*
   Generates a shareable OG image using a React component via Satori + Resvg.
-  Output: public/og/xnuwa-og.png (1200x630)
+  Output: public/og/x402ai-og.png (1200x630)
 
   Run: pnpm og:generate
 */
@@ -69,7 +69,7 @@ async function main() {
               letterSpacing: -0.5,
             }}
           >
-            xNUWA
+            x402AI
           </div>
           <div
             style={{
@@ -105,7 +105,7 @@ async function main() {
         >
           Alpha Test · ERC-8004 Registry · x402 Payments
         </div>
-        <div style={{ fontSize: 20, color: '#94a3b8' }}>xnuwa.app</div>
+        <div style={{ fontSize: 20, color: '#94a3b8' }}>x402ai.app</div>
       </div>
     </div>
   );
@@ -128,7 +128,7 @@ async function main() {
 
   const outDir = path.resolve('public/og');
   fs.mkdirSync(outDir, { recursive: true });
-  const outFile = path.join(outDir, 'xnuwa-og.png');
+  const outFile = path.join(outDir, 'x402ai-og.png');
   fs.writeFileSync(outFile, pngData);
   console.log(`OG image generated: ${path.relative(process.cwd(), outFile)}`);
 }
@@ -137,4 +137,3 @@ main().catch((err) => {
   console.error('Failed to generate OG image:', err);
   process.exit(1);
 });
-

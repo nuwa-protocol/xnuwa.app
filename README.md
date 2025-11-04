@@ -1,8 +1,8 @@
 ![Nuwa AI Readme Background](./src/assets/readme-bg.png)
 
-# xNUWA - Your Entrace to the x402 AI service ecosystem
+# x402AI - Your Entrace to the x402 AI service ecosystem
 
-[Check out the app!](https://xnuwa.app)
+[Check out the app!](https://x402ai.app)
 
 We are building to offer you the best AI client app for accessing **x402 AI services**, forked from the [original Nuwa Client](https://github.com/nuwa-protocol/nuwa-client). This local-first and user-friendly chat experience lets you create, share, and interact with x402 based AI Cap ecosystem.
 
@@ -22,7 +22,7 @@ We are building to offer you the best AI client app for accessing **x402 AI serv
 
 ## 🚀 Alpha Release
 
-We're excited to announce the **xNUWA Alpha Release**! This release includes:
+We're excited to announce the **x402AI Alpha Release**! This release includes:
 
 - ✅ x402 Client-Side integration - x402 MCP client follows the [official spec](https://github.com/coinbase/x402/blob/2daa42f6a0e5a36c1bb19677fda2a74a6b466b06/specs/transports/mcp.md?plain=1)
 - ✅ native wallet integration - encrypted, non-exportable privatekey stored in IndexedDB; sign transaction with PIN code or Passkey
@@ -61,7 +61,7 @@ pnpm install
 pnpm dev
 ```
 
-Visit `http://localhost:5173` to start using xNUWA.
+Visit `http://localhost:5173` to start using x402AI.
 
 ## 🧩 Cap Registry
 

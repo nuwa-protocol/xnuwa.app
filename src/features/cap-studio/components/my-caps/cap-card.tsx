@@ -159,7 +159,7 @@ export function CapCard({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      toast.success(`Exported cap ${exportFormat.toUpperCase()}`);
+      toast.success(`Exported agent ${exportFormat.toUpperCase()}`);
     } catch (err) {
       console.error(err);
       toast.error('Failed to export');
@@ -329,7 +329,7 @@ export function CapCard({
                   className="w-full"
                 >
                   <Bug className="h-4 w-4 mr-2" />
-                  Test Cap
+                  Test Agent
                 </Button>
                 {/* Temporarily disabled: Publish and Live Debugging buttons 
                 {isLiveDebugging ? (
@@ -367,7 +367,7 @@ export function CapCard({
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-64">
-                      Publishing again will update this cap.
+                      Publishing again will update this agent.
                     </TooltipContent>
                   </Tooltip>
                 ) : (
@@ -448,7 +448,7 @@ export function CapCard({
                     className="text-destructive"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Cap
+                    Delete Agent
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -460,7 +460,7 @@ export function CapCard({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Cap</AlertDialogTitle>
+            <AlertDialogTitle>Delete Agent</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete @{cap.capData.idName}? This action
               cannot be undone.

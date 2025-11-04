@@ -228,16 +228,16 @@ export function MyCaps({
             <Plus className="h-6 w-6 text-muted-foreground" />
           </div>
           <CardTitle className="text-xl text-muted-foreground">
-            No Caps Yet
+            No Agents Yet
           </CardTitle>
           <CardDescription className="text-base max-w-md mx-auto">
-            You haven't created any caps yet. Start building your first
-            capability to get started with cap development.
+            You haven't created any agents yet. Start building your first
+            agent to get started with agent development.
           </CardDescription>
           <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
             <Button onClick={onCreateNew} size="lg">
               <Plus className="h-4 w-4 mr-2" />
-              Create Your First Cap
+              Create Your First Agent
             </Button>
             {/**
              * Temporarily disable YAML import in Cap Studio
@@ -291,7 +291,7 @@ export function MyCaps({
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-sm text-blue-800 dark:text-blue-200">
-                  Publishing Caps ({bulkProgress.completed}/{bulkProgress.total}
+                  Publishing Agents ({bulkProgress.completed}/{bulkProgress.total}
                   )
                 </CardTitle>
                 {bulkProgress.currentCap && (
@@ -337,7 +337,7 @@ export function MyCaps({
             <>
               <Button onClick={onCreateNew} className="rounded-r-none w-32">
                 <Plus className="h-4 w-4 mr-2" />
-                New Cap
+                New Agent
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger
@@ -438,7 +438,7 @@ export function MyCaps({
         <div className="relative flex-1 max-w-64">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search caps..."
+            placeholder="Search agents..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -451,12 +451,12 @@ export function MyCaps({
         <Card className="border-dashed">
           <CardHeader className="text-center py-8">
             <CardTitle className="text-muted-foreground">
-              {searchQuery ? 'No matching caps found' : 'No caps yet'}
+              {searchQuery ? 'No matching agents found' : 'No agents yet'}
             </CardTitle>
             <CardDescription>
               {searchQuery
                 ? 'Try adjusting your search criteria'
-                : 'Create your first cap to get started'}
+                : 'Create your first agent to get started'}
             </CardDescription>
           </CardHeader>
         </Card>

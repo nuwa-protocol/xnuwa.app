@@ -54,10 +54,12 @@ export function CapEdit({ id }: { id?: string }) {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-semibold">
-              {editingCap ? 'Edit Cap' : 'Create New Cap'}
+              {editingCap ? 'Edit Agent' : 'Create New Agent'}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {editingCap ? 'Update your Cap' : 'Build a new Cap from scratch'}
+              {editingCap
+                ? 'Update your Agent'
+                : 'Build a new Agent from scratch'}
             </p>
           </div>
 
@@ -86,7 +88,7 @@ export function CapEdit({ id }: { id?: string }) {
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  {editingCap ? 'Update Cap' : 'Create Cap'}
+                  {editingCap ? 'Update Agent' : 'Create Agent'}
                 </>
               )}
             </Button>
@@ -211,7 +213,7 @@ export function CapEdit({ id }: { id?: string }) {
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  {editingCap ? 'Update Cap' : 'Create Cap'}
+                  {editingCap ? 'Update Agent' : 'Create Agent'}
                 </>
               )}
             </Button>

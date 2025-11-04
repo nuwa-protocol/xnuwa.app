@@ -20,7 +20,7 @@ import { cn } from '@/shared/utils';
 import { AccountStore, IS_PASSKEY_SUPPORTED } from '../store';
 
 const PIN_LENGTH = 6;
-const DEFAULT_ACCOUNT_PLACEHOLDER = 'xNUWA Account';
+const DEFAULT_ACCOUNT_PLACEHOLDER = 'x402AI Account';
 const PIN_SLOT_KEYS = Array.from(
   { length: PIN_LENGTH },
   (_, index) => `pin-slot-${index}`,
@@ -348,7 +348,7 @@ export function AccountLoginDialog({
                 <DialogTitle className="text-2xl font-semibold">
                   {accounts.length > 0
                     ? 'Choose or Set Up Account'
-                    : 'Set Up Your xNUWA Account'}
+                    : 'Set Up Your x402AI Account'}
                 </DialogTitle>
                 <DialogDescription className="mt-2 text-base">
                   {accounts.length > 0

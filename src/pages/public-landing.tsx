@@ -45,7 +45,7 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
             <div className="hidden items-center gap-2 text-sm text-muted-foreground md:flex">
               <Button variant="ghost" size="sm" asChild>
                 <a
-                  href="https://nuwa.dev"
+                  href="https://x402ai.app"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -88,10 +88,12 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                   ERC-8004 Agent Registry
                 </div>
                 <h1 className="text-4xl font-semibold leading-tight tracking-tight text-balance sm:text-5xl lg:text-6xl">
-                  Your One-Stop Shop for AI Agents On-Chain
+                  Your One-Stop Show for AI Agents on X Layer
                 </h1>
                 <p className="text-lg text-muted-foreground">
-                  xNUWA lets you interact with AI agents registered on-chain via the ERC8004 protocol and pay seamlessly using the x402 payment protocol.
+                  x402AI lets you interact with AI agents registered on-chain via the ERC8004 protocol and pay seamlessly using the x402 payment protocol. Built on
+                  {' '}<a className="underline underline-offset-2" href="https://www.okx.com/xlayer" target="_blank" rel="noreferrer">X Layer</a>{' '}and leveraging the{' '}
+                  <a className="underline underline-offset-2" href="https://x402x.dev/" target="_blank" rel="noreferrer">x402x project</a>.
                 </p>
                 <motion.div
                   {...getFadeIn(0.1)}
@@ -105,7 +107,7 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                 </motion.div>
                 <div className="flex flex-wrap items-center gap-4">
                   <Button size="lg" variant="primary" onClick={onOpenAuth}>
-                    Enter xNUWA
+                    Enter x402AI
                     <ArrowRight className="size-4" />
                   </Button>
                   <Button size="sm" variant="ghost" asChild>
@@ -126,9 +128,9 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
                 {...getFadeIn(0.15)}
               >
                 {resolvedTheme === 'dark' ? (
-                  <img src={nuwaAtAGlanceDark} alt="xNUWA at a glance" />
+                  <img src={nuwaAtAGlanceDark} alt="x402AI at a glance" />
                 ) : (
-                  <img src={nuwaAtAGlance} alt="xNUWA at a glance" />
+                  <img src={nuwaAtAGlance} alt="x402AI at a glance" />
                 )}
               </motion.div>
             </div>
@@ -139,7 +141,18 @@ export function PublicLanding({ onOpenAuth }: PublicLandingProps) {
 
         <footer className="border-t border-border/40 bg-background/80">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <p>© {new Date().getFullYear()} xNUWA. Built with ❤️.</p>
+            <p>
+              © {new Date().getFullYear()} x402AI. A project from{' '}
+              <a
+                href="https://x.com/NuwaDev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-foreground"
+              >
+                Nuwa AI
+              </a>
+              . Built with ❤️.
+            </p>
           </div>
         </footer>
       </div>

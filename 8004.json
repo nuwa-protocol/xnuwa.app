@@ -29,7 +29,7 @@
         },
         {
             "name": "mcp",
-            "endpoint": "https://x402.xnuwa.app/mcp",
+            "endpoint": "https://x402.x402ai.app/mcp",
             "serverName": "mcp-fot"
         }
     ]

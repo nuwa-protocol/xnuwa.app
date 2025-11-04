@@ -25,7 +25,7 @@ export function PromptTab({ form }: PromptTabProps) {
           <div>
             <CardTitle className="text-base">Prompt Configuration</CardTitle>
             <CardDescription>
-              This prompt will guide the AI model's behavior when using your cap
+              This prompt will guide the AI model's behavior when using your agent
             </CardDescription>
           </div>
         </div>

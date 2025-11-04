@@ -19,7 +19,7 @@ export const SidebarLogo = () => {
     >
       <img
         src={logoAppBrand}
-        alt="xNUWA"
+        alt="x402AI"
         className="h-8 w-9 shrink-0 translate-y-0 -translate-x-0.5"
       />
       {open && (
@@ -30,7 +30,7 @@ export const SidebarLogo = () => {
         >
           <img
             src={resolvedTheme === 'dark' ? logoTextsDark : logoTexts}
-            alt="xNUWA"
+            alt="x402AI"
             className="h-4 shrink-0"
           />
         </motion.span>

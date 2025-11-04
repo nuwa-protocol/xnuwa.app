@@ -144,7 +144,7 @@ export function useAutoLoadingDetection() {
       return;
     }
 
-    updateLoadingProgress(12, 'Initializing xNUWA...');
+    updateLoadingProgress(12, 'Initializing x402AI...');
 
     const cleanupFns: Array<() => void> = [];
     let hasAppContent = false;
@@ -343,7 +343,7 @@ export function useAutoLoadingDetection() {
 
     registerTimeout(() => {
       if (!isLoadingComplete) {
-        finalizeLoading('xNUWA is ready');
+        finalizeLoading('x402AI is ready');
       }
     }, 7000);
 
