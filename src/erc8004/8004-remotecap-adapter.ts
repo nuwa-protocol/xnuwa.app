@@ -1,11 +1,11 @@
-import type { Cap, CapStats } from '@/shared/types';
 import {
   type Agent8004,
   type Agent8004Endpoint,
   Agent8004EndpointSchema,
   EIP8004_REGISTRATION_V1,
   type ErrorAgent8004,
-} from '@/shared/types/8004-agent';
+} from '@/erc8004/8004-agent';
+import type { Cap, CapStats } from '@/shared/types';
 import type { RemoteCap } from '../features/cap-store/types';
 
 // Simple slugifier for idName (lowercase, [a-z0-9_], min length 6)
@@ -118,6 +118,12 @@ export const agent8004ToCap = (
   opts: AgentToCapOptions,
 ): Cap => {
   const md = pickMetadataEndpoint(agent);
+  // Prefer prompt endpoint's value for Cap prompt
+  const promptEp = Array.isArray(agent.endpoints)
+    ? ((agent.endpoints as any[]).find((e) => e?.name === 'prompt') as
+        | Extract<Agent8004Endpoint, { name: 'prompt' }>
+        | undefined)
+    : undefined;
 
   const authorDID = opts.authorDID;
   const idName = opts.idName || toIdName(agent.name);
@@ -171,7 +177,7 @@ export const agent8004ToCap = (
     idName,
     core: {
       prompt: {
-        value: '',
+        value: typeof (promptEp as any)?.value === 'string' ? (promptEp as any).value : '',
         suggestions: md?.suggestions,
       },
       model: {
@@ -212,6 +218,8 @@ export type RemoteCapToAgentOptions = {
   // Additional optional endpoints
   mcpServers?: Record<string, string>; // name -> URL
   artifactUrl?: string;
+  // Optional prompt content (if available when converting from a RemoteCap)
+  promptValue?: string;
   // Optional trust and registrations
   supportedTrust?: string[];
   registrations?: Array<{ agentId: string; agentRegistry: string }>;
@@ -243,6 +251,15 @@ export const remoteCapToAgent8004 = (
   if (opts.parameters) llm.parameters = opts.parameters;
   const llmParsed = Agent8004EndpointSchema.parse(llm);
   endpoints.push(llmParsed);
+
+  // prompt (optional when provided)
+  if (opts.promptValue && typeof opts.promptValue === 'string') {
+    const promptParsed = Agent8004EndpointSchema.parse({
+      name: 'prompt',
+      value: opts.promptValue,
+    } as any);
+    endpoints.push(promptParsed);
+  }
 
   // metadata endpoint from RemoteCap metadata
   const metadataEndpoint: any = {
@@ -310,6 +327,16 @@ export const capToAgent8004 = (cap: Cap): Agent8004 => {
   };
   const llmParsed = Agent8004EndpointSchema.parse(llm);
   endpoints.push(llmParsed);
+
+  // prompt endpoint — carry the actual prompt value for round-trip fidelity
+  const promptValue = cap.core?.prompt?.value;
+  if (typeof promptValue === 'string' && promptValue.length > 0) {
+    const promptEp = Agent8004EndpointSchema.parse({
+      name: 'prompt',
+      value: promptValue,
+    } as any);
+    endpoints.push(promptEp);
+  }
 
   // metadata endpoint from Cap metadata + prompt suggestions
   const md: any = {

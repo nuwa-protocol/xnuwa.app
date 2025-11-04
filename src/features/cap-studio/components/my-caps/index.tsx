@@ -1,15 +1,4 @@
-import {
-  CheckSquare,
-  ChevronDown,
-  FileUp,
-  Plus,
-  Search,
-  Send,
-  Trash2,
-  Upload,
-} from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
-import { toast } from 'sonner';
+import { Agent8004Schema } from '@/erc8004/8004-agent';
 import { agent8004ToCap } from '@/erc8004/8004-remotecap-adapter';
 import { parseYaml } from '@/features/cap-studio/utils/yaml';
 import {
@@ -27,7 +16,18 @@ import {
 } from '@/shared/components/ui';
 import { useAuth } from '@/shared/hooks';
 import { type Cap, CapSchema } from '@/shared/types';
-import { Agent8004Schema } from '@/shared/types/8004-agent';
+import {
+  CheckSquare,
+  ChevronDown,
+  FileUp,
+  Plus,
+  Search,
+  Send,
+  Trash2,
+  Upload,
+} from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { useSubmitCap } from '../../hooks';
 import { CapStudioStore } from '../../stores';
 import type { LocalCap } from '../../types';
@@ -231,8 +231,8 @@ export function MyCaps({
             No Agents Yet
           </CardTitle>
           <CardDescription className="text-base max-w-md mx-auto">
-            You haven't created any agents yet. Start building your first
-            agent to get started with agent development.
+            You haven't created any agents yet. Start building your first agent
+            to get started with agent development.
           </CardDescription>
           <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
             <Button onClick={onCreateNew} size="lg">
@@ -291,8 +291,8 @@ export function MyCaps({
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-sm text-blue-800 dark:text-blue-200">
-                  Publishing Agents ({bulkProgress.completed}/{bulkProgress.total}
-                  )
+                  Publishing Agents ({bulkProgress.completed}/
+                  {bulkProgress.total})
                 </CardTitle>
                 {bulkProgress.currentCap && (
                   <CardDescription className="text-xs text-blue-600 dark:text-blue-300">

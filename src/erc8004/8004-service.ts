@@ -1,5 +1,3 @@
-import { type Abi, createPublicClient, http } from 'viem';
-import { mainnet } from 'viem/chains';
 import {
   type Agent8004,
   type Agent8004Endpoint,
@@ -10,7 +8,9 @@ import {
   EIP8004_REGISTRATION_V1,
   type ErrorAgent8004,
   SupportedTrustSchema,
-} from '@/shared/types/8004-agent';
+} from '@/erc8004/8004-agent';
+import { type Abi, createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 import {
   DEFAULT_REGISTRY,
   getRegistryByAddress,

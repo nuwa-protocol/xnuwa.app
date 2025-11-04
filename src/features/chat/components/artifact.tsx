@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import type { LocalCap } from '@/features/cap-studio/types';
 import { IframeUIRenderer } from '@/shared/components/iframe-ui-renderer';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import type { Cap, CapArtifact } from '@/shared/types';
+import type { Cap, Artifact as CapArtifact } from '@/shared/types';
 import { useChatContext } from '../contexts/chat-context';
 import { useArtifact } from '../hooks/use-artifact';
 import { ArtifactSaveBadge } from './artifact-save-badge';

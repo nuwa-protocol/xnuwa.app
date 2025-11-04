@@ -2,7 +2,7 @@ import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components';
 import { Input, Label } from '@/shared/components/ui';
-import type { CapArtifact } from '@/shared/types';
+import type { Artifact as CapArtifact } from '@/shared/types';
 import { validateURL } from '@/shared/utils/validate-url';
 
 interface ArtifactEditorProps {
