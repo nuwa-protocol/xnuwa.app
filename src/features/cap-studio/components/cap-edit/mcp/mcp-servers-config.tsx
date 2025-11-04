@@ -147,7 +147,7 @@ export function McpServersConfig({
           <div>
             <CardTitle className="text-base">Remote MCP</CardTitle>
             <CardDescription>
-              Set up Remote MCP servers to provide tools for your Cap.
+              Set up Remote MCP servers to provide tools for your agent.
             </CardDescription>
           </div>
           <Button

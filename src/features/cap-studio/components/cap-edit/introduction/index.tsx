@@ -30,9 +30,9 @@ export function IntroductionTab({ form }: IntroductionTabProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Cap Introduction</CardTitle>
+        <CardTitle className="text-base">Agent Introduction</CardTitle>
         <CardDescription>
-          Tell us everything about your cap. Markdown is supported.
+          Tell us everything about your agent. Markdown is supported.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -57,7 +57,7 @@ export function IntroductionTab({ form }: IntroductionTabProps) {
                   </div>
                   <TabsContent value="write" className="mt-3">
                     <Textarea
-                      placeholder="Describe what your cap does, usage instructions, examples, limits, and credits. Use Markdown for formatting."
+                      placeholder="Describe what your agent does, usage instructions, examples, limits, and credits. Use Markdown for formatting."
                       className="min-h-[320px]"
                       value={field.value ?? ''}
                       onChange={(e) => field.onChange(e.target.value)}

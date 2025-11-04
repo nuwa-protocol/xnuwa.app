@@ -93,7 +93,7 @@ export function GatewayConfiguration({
       <CardHeader>
         <CardTitle className="text-base">Gateway Configuration</CardTitle>
         <CardDescription>
-          Choose your LLM gateway for this cap. You can provide your own
+          Choose your LLM gateway for this agent. You can provide your own
           custom LLM gateway URL.
         </CardDescription>
       </CardHeader>

@@ -25,10 +25,10 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
       <div className="max-w-4xl h-full mx-auto m-6 flex flex-col gap-6 ">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold">Submit Cap to Store</h3>
+            <h3 className="text-lg font-semibold">Submit Agent to Store</h3>
             <p className="text-sm text-muted-foreground">
               Review and confirm the information before publishing @
-              {cap.capData.idName} to the Nuwa Cap Store
+              {cap.capData.idName} to the Nuwa Agent Store
             </p>
           </div>
 
@@ -37,11 +37,11 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
           </Button>
         </div>
 
-        {/* Cap Information - Read Only */}
+        {/* Agent Information - Read Only */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Cap Information</CardTitle>
-            <CardDescription>Basic information about your cap</CardDescription>
+            <CardTitle className="text-base">Agent Information</CardTitle>
+            <CardDescription>Basic information about your agent</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -160,12 +160,13 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
           </CardContent>
         </Card>
 
-        {/* Remote MCP - Read Only, mirrors edit card scopes */}
+        {/* Remote MCP - Read Only, mirrors edit card scopes */
+        }
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Remote MCP</CardTitle>
             <CardDescription>
-              Set up Remote MCP servers to provide tools for your Cap.
+              Set up Remote MCP servers to provide tools for your agent.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -198,7 +199,7 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
           <CardHeader>
             <CardTitle className="text-base">Artifact</CardTitle>
             <CardDescription>
-              This artifact provides interactive UI for your cap
+              This artifact provides interactive UI for your agent
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -224,14 +225,14 @@ export function CapSubmitForm({ cap }: CapSubmitFormProps) {
           </CardContent>
         </Card>
 
-        {/* Author Information & Thumbnail merged into Cap Information above */}
+        {/* Author Information & Thumbnail merged into Agent Information above */}
 
         {/* Submit */}
         <Card className="border-none shadow-none">
           <CardContent>
             <div className="flex items-center justify-between pt-6">
               <div className="text-sm text-muted-foreground">
-                Ready to publish your cap to the store
+                Ready to publish your agent to the store
               </div>
 
               <div className="flex items-center space-x-2">

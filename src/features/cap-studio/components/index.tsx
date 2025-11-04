@@ -35,8 +35,8 @@ export function CapStudio() {
   return (
     <DashboardLayout>
       <DashboardHeader
-        title="Cap Studio"
-        description="Create, test, and publish powerful AI capabilities with integrated MCP tools"
+        title="Agent Studio"
+        description="Create, test, and publish powerful AI agents with integrated MCP tools"
         actions={
           <Button onClick={handleGoToMcp} variant="outline" size="sm">
             <Bug className="mr-1" /> MCP Debug Tool

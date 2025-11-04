@@ -4,10 +4,10 @@ import { CapEdit } from '@/features/cap-studio/components/cap-edit';
 import { Submit } from '@/features/cap-studio/components/cap-submit';
 import { MCPDebug } from '@/features/cap-studio/components/mcp';
 
-// Single entry page for all Cap Studio routes. We pick which
+// Single entry page for all Agent Studio routes. We pick which
 // sub-component to render based on the URL pathname so the router
 // can point every cap-studio path to this file.
-export default function CapStudioPage() {
+export default function AgentStudioPage() {
   const { pathname } = useLocation();
 
   // Normalize path for checks (remove trailing slash if any)

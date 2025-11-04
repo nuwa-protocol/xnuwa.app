@@ -34,7 +34,7 @@ export function ModelConfiguration({
             <CardTitle className="text-base">Model Configuration</CardTitle>
             <CardDescription>
               {gatewayType === 'nuwa'
-                ? 'Choose the AI model for your cap'
+                ? 'Choose the AI model for your agent'
                 : 'Manually configure your model settings'}
             </CardDescription>
           </div>

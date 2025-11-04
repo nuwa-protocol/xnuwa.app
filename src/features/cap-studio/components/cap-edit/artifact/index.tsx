@@ -25,7 +25,7 @@ export function ArtifactTab({ form }: ArtifactTabProps) {
           <div>
             <CardTitle className="text-base">Artifact Configuration</CardTitle>
             <CardDescription>
-              This artifact provides interactive UI for your cap
+              This artifact provides interactive UI for your agent
             </CardDescription>
           </div>
         </div>

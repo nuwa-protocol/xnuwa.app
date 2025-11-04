@@ -9,7 +9,7 @@ export function Submit({ id }: { id: string }) {
   if (!cap) {
     return (
       <div className="text-center w-full h-full py-12">
-        <p className="text-muted-foreground">Cap not found</p>
+        <p className="text-muted-foreground">Agent not found</p>
       </div>
     );
   }
