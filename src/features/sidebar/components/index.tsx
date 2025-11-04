@@ -62,9 +62,9 @@ export function AppSidebarContent() {
           {isDevMode && (
             <SecondarySidebarButton
               icon={<Wrench className="size-5 shrink-0" />}
-              label="Cap Studio"
-              targetPath="/cap-studio"
-              onClick={() => navigate('/cap-studio')}
+              label="Agent Studio"
+              targetPath="/agent-studio"
+              onClick={() => navigate('/agent-studio')}
             />
           )}
         </div>

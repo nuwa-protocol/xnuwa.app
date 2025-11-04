@@ -514,7 +514,7 @@ export function Mcp({ mcpServerUrl, mcpUIUrl }: McpProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/cap-studio')}
+            onClick={() => navigate('/agent-studio')}
             className="flex items-center space-x-2"
           >
             <ArrowLeft className="h-4 w-4" />

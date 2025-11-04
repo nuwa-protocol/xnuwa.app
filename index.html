@@ -75,7 +75,7 @@
         try {
           var path = window.location.pathname || '/';
           // Mark paths that require auth as protected
-          var isProtected = /^\/(chat|wallet|settings|explore|cap-studio)(\/|$)/.test(path);
+          var isProtected = /^\/(chat|wallet|settings|explore|agent-studio)(\/|$)/.test(path);
           if (!isProtected) {
             // Prevent the initial loader from ever showing on public routes
             document.documentElement.classList.add('no-initial-loading');

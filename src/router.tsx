@@ -50,7 +50,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'cap-studio/*',
+        path: 'agent-studio/*',
         element: (
           <AuthGuard>
             <CapStudioPage />

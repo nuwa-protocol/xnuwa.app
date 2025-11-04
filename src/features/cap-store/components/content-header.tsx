@@ -1,31 +1,18 @@
-import {
-  Calendar,
-  ChevronDown,
-  CloudDownload,
-  Heart,
-  Search,
-  Star,
-  UserRoundPen,
-  X,
-} from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Input } from '@/shared/components/ui';
 import { Button } from '@/shared/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu';
 import { useDebounceValue, useLanguage } from '@/shared/hooks';
 
 interface ContentHeaderProps {
   showSearchAndSort: boolean;
+  explorerUrl?: string; // optional explorer link for current registry
 }
 
 export function CapStoreContentHeader({
   showSearchAndSort,
+  explorerUrl,
 }: ContentHeaderProps) {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,17 +22,6 @@ export function CapStoreContentHeader({
     urlSearchValue,
     500,
   );
-
-  const sortBy = searchParams.get('sortBy') || 'downloads';
-  const sortOrder = searchParams.get('sortOrder') || 'desc';
-
-  const sortOptions = [
-    { value: 'downloads' as const, label: 'Downloads', icon: CloudDownload },
-    { value: 'updated_at' as const, label: 'Updated Time', icon: Calendar },
-    { value: 'average_rating' as const, label: 'Rating', icon: Heart },
-    { value: 'favorites' as const, label: 'Favorites', icon: Star },
-    { value: 'rating_count' as const, label: 'Reviews', icon: UserRoundPen },
-  ];
 
   // Sync debounced search value with URL
   useEffect(() => {
@@ -119,54 +95,16 @@ export function CapStoreContentHeader({
             )}
           </div>
 
-          {/* Sort Dropdown */}
-          <div className="flex items-center">
-            <span className="text-sm text-muted-foreground">Sort By:</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-10 px-4 text-sm items-center justify-center font-medium gap-2"
-                >
-                  {(() => {
-                    const option = sortOptions.find(
-                      (opt) => opt.value === sortBy,
-                    );
-                    return (
-                      <>
-                        <span>{option?.label || 'Sort'}</span>
-                        <ChevronDown className="size-4" />
-                      </>
-                    );
-                  })()}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {sortOptions.map((option) => {
-                  const IconComponent = option.icon;
-                  return (
-                    <DropdownMenuItem
-                      key={`${option.value}-desc`}
-                      onClick={() => {
-                        const newParams = new URLSearchParams(searchParams);
-                        newParams.set('sortBy', option.value);
-                        newParams.set('sortOrder', 'desc');
-                        setSearchParams(newParams);
-                      }}
-                      className={`
-                      flex items-center gap-2 cursor-pointer
-                      ${sortBy === option.value && sortOrder === 'desc' ? 'bg-accent text-accent-foreground' : ''}
-                    `}
-                    >
-                      <IconComponent className="size-4" />
-                      <span className="text-sm">{option.label}</span>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          {/* Explorer Link */}
+          {explorerUrl && (
+            <div className="flex items-center">
+              <Button variant="secondary" asChild size="sm" className="h-10">
+                <a href={explorerUrl} target="_blank" rel="noreferrer">
+                  View Registry on Explorer
+                </a>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

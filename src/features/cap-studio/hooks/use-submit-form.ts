@@ -16,7 +16,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
   const { submitCap } = useSubmitCap();
 
   const handleCancel = () => {
-    navigate('/cap-studio');
+    navigate('/agent-studio');
   };
 
   const handleSubmit = async () => {
@@ -40,7 +40,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
 
       toast.success(result.message);
 
-      navigate('/cap-studio');
+      navigate('/agent-studio');
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -48,7 +48,7 @@ export const useSubmitForm = ({ cap }: UseSubmitFormProps) => {
           : 'Failed to submit agent. Please try again.';
       toast.error(errorMessage);
 
-      navigate('/cap-studio');
+      navigate('/agent-studio');
     } finally {
       setIsSubmitting(false);
     }

@@ -97,7 +97,7 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
 
     toast.success(`${data.metadata.displayName} has been updated successfully`);
 
-    navigate('/cap-studio');
+    navigate('/agent-studio');
   };
 
   const handleCreateCap = async (data: CapFormData) => {
@@ -110,7 +110,7 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
 
     toast.success(`${data.metadata.displayName} has been created successfully`);
 
-    navigate('/cap-studio');
+    navigate('/agent-studio');
   };
 
   const handleFormSave = async (data: CapFormData) => {
@@ -139,7 +139,7 @@ export const useEditForm = ({ editingCap }: UseEditFormProps) => {
   };
 
   const handleFormCancel = () => {
-    navigate('/cap-studio');
+    navigate('/agent-studio');
   };
 
   return {
