@@ -346,7 +346,7 @@ export const AccountStore = create<AccountStoreState>()(
 
         // Build a friendlier label for the passkey record shown in platform UIs
         const shortAddr = `${accountData.address.slice(0, 6)}...${accountData.address.slice(-4)}`;
-        const passkeyDisplayName = `xNUWA Wallet: ${accountData.name} (${shortAddr})`;
+        const passkeyDisplayName = `x402AI Wallet: ${accountData.name} (${shortAddr})`;
 
         const registrationOptions: PublicKeyCredentialCreationOptionsJSON = {
           challenge: bufferToBase64(challenge),

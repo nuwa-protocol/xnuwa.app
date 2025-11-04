@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://xnuwa.app/sitemap.xml
+Sitemap: https://x402ai.app/sitemap.xml
 
 # Allow crawling
 Allow: /cap-store

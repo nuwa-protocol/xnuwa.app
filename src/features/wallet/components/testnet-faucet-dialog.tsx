@@ -37,7 +37,7 @@ export function TestnetFaucetDialog({
             Need more testnet balance?
           </DialogDescription>
           <DialogTitle className=" text-lg font-medium text-primary">
-            Join xNUWA Discord to get free testnet balance
+            Join x402AI Discord to get free testnet balance
           </DialogTitle>
         </DialogHeader>
 

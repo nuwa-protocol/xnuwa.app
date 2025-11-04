@@ -15,12 +15,12 @@ export interface SEOData {
 }
 
 const DEFAULT_SEO: SEOData = {
-  title: 'xNUWA - Your One-Stop Shop for AI Agents On-Chain',
-  description: 'xNUWA - Your One-Stop Shop for AI Agents On-Chain',
-  image: '/og/xnuwa-og.png',
+  title: 'x402AI - Your One-Stop Shop for AI Agents On-Chain',
+  description: 'x402AI - Your One-Stop Shop for AI Agents On-Chain',
+  image: '/og/x402ai-og.png',
   type: 'website',
-  // Brand the default keyword set around xNUWA and on-chain AI agents
-  keywords: ['xnuwa', 'ai agents', 'on-chain', 'crypto', 'application'],
+  // Brand the default keyword set around x402AI and on-chain AI agents
+  keywords: ['x402AI', 'ai agents', 'on-chain', 'crypto', 'application'],
 };
 
 export function useSEO(seoData: Partial<SEOData> = {}) {
@@ -135,7 +135,7 @@ export function generateCapSEO(cap: {
   const { capData, stats } = cap;
   const { metadata } = capData;
 
-  const title = `${metadata.displayName} - AI Cap | xNUWA - Your One-Stop Shop for AI Agents On-Chain`;
+  const title = `${metadata.displayName} - AI Cap | x402AI - Your One-Stop Shop for AI Agents On-Chain`;
   const description = `${metadata.description} - Download: ${stats?.downloads || 0}, Rating: ${stats?.averageRating || 0}/5 (${stats?.ratingCount || 0} reviews)`;
 
   // Extract thumbnail URL from the thumbnail object
@@ -144,16 +144,16 @@ export function generateCapSEO(cap: {
       ? metadata.thumbnail.url
       : metadata.thumbnail?.type === 'file'
         ? metadata.thumbnail.file
-        : '/og/xnuwa-og.png';
+        : '/og/x402ai-og.png';
 
   return {
     title,
     description,
-    keywords: ['xnuwa', 'ai cap', 'ai agents', 'on-chain', 'crypto ai', ...metadata.tags],
-    image: thumbnailUrl || '/og/xnuwa-og.png',
+    keywords: ['x402AI', 'ai cap', 'ai agents', 'on-chain', 'crypto ai', ...metadata.tags],
+    image: thumbnailUrl || '/og/x402ai-og.png',
     url: `${window.location.origin}/cap-store/${capData.idName}`,
     type: 'product',
-    author: 'xNUWA Team',
+    author: 'x402AI Team',
     publishedTime: metadata.submittedAt
       ? new Date(metadata.submittedAt).toISOString()
       : undefined,

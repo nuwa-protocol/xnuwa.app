@@ -6,12 +6,12 @@
     "endpoints": [
         {
             "name": "prompt",
-            "endpoint": "https://x402.xnuwa.app/mcp",
+            "endpoint": "https://x402.x402ai.app/mcp",
             "version": "v0.1.0"
         },
         {
             "name": "x402-LLM",
-            "endpoint": "https://x402.xnuwa.app/mcp",
+            "endpoint": "https://x402.x402ai.app/mcp",
             "gateway": "",
             "modelId": "",
             "providerId": "",
@@ -32,12 +32,12 @@
         },
         {
             "name": "x402-MCP",
-            "endpoint": "https://x402.xnuwa.app/mcp",
+            "endpoint": "https://x402.x402ai.app/mcp",
             "serverName": ""
         },
         {
             "name": "Artifact",
-            "endpoint": "https://x402.xnuwa.app/mcp"
+            "endpoint": "https://x402.x402ai.app/mcp"
         },
         {
             "name": "metadata",

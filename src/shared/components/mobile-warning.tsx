@@ -15,7 +15,7 @@ export function MobileWarning() {
         desktop or laptop computer.
       </p>
       <Button asChild variant="primary" className="mt-6">
-        <a href="https://xnuwa.app">Go to xNUWA Home</a>
+        <a href="https://x402ai.app">Go to x402AI Home</a>
       </Button>
     </div>
   );

@@ -66,7 +66,7 @@ export function generateSoftwareApplicationSchema(cap: {
       ? metadata.thumbnail.url
       : metadata.thumbnail?.type === 'file'
         ? metadata.thumbnail.file
-        : '/og/xnuwa-og.png';
+        : '/og/x402ai-og.png';
 
   return {
     '@context': 'https://schema.org',
@@ -76,10 +76,10 @@ export function generateSoftwareApplicationSchema(cap: {
     applicationCategory: 'AI Tools',
     operatingSystem: 'Web',
     url: `${window.location.origin}/cap-store/${capData.idName}`,
-    image: thumbnailUrl || '/og/xnuwa-og.png',
+    image: thumbnailUrl || '/og/x402ai-og.png',
     publisher: {
       '@type': 'Organization',
-      name: 'xNUWA',
+      name: 'x402AI',
       url: window.location.origin,
     },
     downloadUrl: `${window.location.origin}/cap-store/${capData.idName}`,
@@ -124,12 +124,12 @@ export function generateWebSiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'xNUWA',
+    name: 'x402AI',
     description: 'Your One-Stop Shop for AI Agents On-Chain',
     url: window.location.origin,
     publisher: {
       '@type': 'Organization',
-      name: 'xNUWA',
+      name: 'x402AI',
       url: window.location.origin,
     },
     potentialAction: {
@@ -147,7 +147,7 @@ export function generateOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'xNUWA',
+    name: 'x402AI',
     description: 'Your One-Stop Shop for AI Agents On-Chain',
     url: window.location.origin,
     logo: {
