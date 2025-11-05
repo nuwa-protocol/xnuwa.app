@@ -112,7 +112,7 @@ export function BalanceCard() {
               {/* New single button linking to Base faucets docs */}
               <Button asChild variant="primary" size="sm" className="w-full">
                 <a
-                  href="https://faucet.circle.com/"
+                  href="https://faucet.nuwa.dev/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
