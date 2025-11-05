@@ -1,7 +1,7 @@
+import type { Agent8004, ErrorAgent8004 } from '@/erc8004/8004-agent';
+import { capKitService } from '@/shared/services/capkit-service';
 import type { Cap } from '@nuwa-ai/cap-kit';
 import { create } from 'zustand';
-import { capKitService } from '@/shared/services/capkit-service';
-import type { Agent8004, ErrorAgent8004 } from '@/shared/types/8004-agent';
 import {
   agent8004ToCap,
   agent8004ToRemoteCap,

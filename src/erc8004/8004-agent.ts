@@ -17,16 +17,16 @@ export const SupportedTrustSchema = z.enum([
 ]);
 
 // Endpoint: prompt
+// Prompt endpoint now carries the actual prompt value instead of a URL.
+// This allows round-tripping prompt content between Cap <-> 8004 Agent.
 export const PromptEndpointSchema = z.object({
   name: z.literal('prompt'),
-  endpoint: z.string().url(),
-  version: z.string(),
+  value: z.string(),
 });
 
 // Endpoint: x402-LLM
 export const X402LlmEndpointSchema = z.object({
   name: z.literal('llm'),
-  endpoint: z.string().url(),
   gateway: z.string().optional(),
   modelId: z.string().optional(),
   providerId: z.string().optional(),

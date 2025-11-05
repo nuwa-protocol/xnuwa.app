@@ -109,7 +109,7 @@ function PureMultimodalInput({ className }: { className?: string }) {
       cap?.core?.mcpServers && Object.keys(cap.core.mcpServers).length > 0;
 
     if (hasMCPServers && !isInitialized) {
-      toast.warning('Cap MCP is initializing, please try again later');
+      toast.warning('Agent MCP is initializing, please try again later');
       return;
     }
 

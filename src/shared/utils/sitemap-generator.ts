@@ -59,7 +59,7 @@ function buildStaticUrls(baseUrl: string): SitemapUrl[] {
       lastmod: today,
     },
     {
-      loc: `${baseUrl}/cap-studio`,
+      loc: `${baseUrl}/agent-studio`,
       changefreq: 'weekly',
       priority: 0.8,
       lastmod: today,

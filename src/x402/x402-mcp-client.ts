@@ -14,7 +14,11 @@ import {
   markX402PaymentResult,
   recordX402PaymentAttempt,
 } from './x402-transaction-store';
-import { network as defaultNetwork, getCurrentAccount } from './x402-wallet';
+import {
+  network as defaultNetwork,
+  getCurrentAccount,
+  type SupportedNetwork,
+} from './x402-wallet';
 
 export const x402Version = 1;
 
@@ -67,7 +71,7 @@ async function callToolWithPayment(
 export interface ClientPaymentOptions {
   account: LocalAccount;
   maxPaymentValue?: bigint;
-  network: 'base-sepolia' | 'base';
+  network: SupportedNetwork;
 }
 
 const EvmAddressRegex = /^0x[0-9a-fA-F]{40}$/;
@@ -85,7 +89,7 @@ const MaxTimeoutSchema = z
 
 const PaymentRequirementSchema = z.object({
   scheme: z.literal('exact'),
-  network: z.enum(['base-sepolia', 'base']),
+  network: z.enum(['x-layer-testnet', 'x-layer']),
   maxAmountRequired: z.union([z.string(), z.number()]),
   resource: z.string(),
   description: z.string().optional(),

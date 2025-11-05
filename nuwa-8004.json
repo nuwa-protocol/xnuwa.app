@@ -6,13 +6,11 @@
     "endpoints": [
         {
             "name": "prompt",
-            "endpoint": "https://x402.x402ai.app/mcp",
-            "version": "v0.1.0"
+            "value": "You are Nuwa Agent. Be helpful, concise, and safe."
         },
         {
-            "name": "x402-LLM",
-            "endpoint": "https://x402.x402ai.app/mcp",
-            "gateway": "",
+            "name": "llm",
+            "gateway": "https://x402.x402ai.app/gateway",
             "modelId": "",
             "providerId": "",
             "contextLength": 128000,
@@ -31,12 +29,12 @@
             }
         },
         {
-            "name": "x402-MCP",
+            "name": "mcp",
             "endpoint": "https://x402.x402ai.app/mcp",
             "serverName": ""
         },
         {
-            "name": "Artifact",
+            "name": "artifact",
             "endpoint": "https://x402.x402ai.app/mcp"
         },
         {

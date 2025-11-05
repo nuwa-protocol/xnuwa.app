@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import type { ModelDetails } from '@/features/cap-studio/components/cap-edit/model/model-selector/type';
 import type { CapFormData } from '@/features/cap-studio/hooks/use-edit-form';
-import { GatewayConfiguration } from './gateway-configuration';
+// import { GatewayConfiguration } from './gateway-configuration';
 import { ModelConfiguration } from './model-configuration';
 
 interface ModelTabProps {
@@ -77,6 +77,7 @@ export function ModelTab({ form }: ModelTabProps) {
 
   return (
     <div className="space-y-6">
+      {/*
       <GatewayConfiguration
         form={form}
         onGatewayConfirmed={setIsGatewayConfirmed}
@@ -84,6 +85,7 @@ export function ModelTab({ form }: ModelTabProps) {
         gatewayType={gatewayType}
         isGatewayConfirmed={isGatewayConfirmed}
       />
+      */}
       <ModelConfiguration
         form={form}
         isGatewayConfirmed={isGatewayConfirmed}

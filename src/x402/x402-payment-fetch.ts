@@ -6,20 +6,19 @@ import {
 import { decodeXPaymentResponse } from 'x402/shared';
 import { PaymentRequirementsSchema, type X402Config } from 'x402/types';
 import {
-  markX402PaymentResult,
-  recordX402PaymentAttempt,
-} from './x402-transaction-store';
-import {
   parseX402ErrorOrThrow,
   processX402ErrorPayload,
   validateX402Error,
 } from './x402-error-utils';
+import {
+  markX402PaymentResult,
+  recordX402PaymentAttempt,
+} from './x402-transaction-store';
 import { getCurrentAccount, network } from './x402-wallet';
 
 type HeadersLike = HeadersInit | undefined;
 
 const CLIENT_TX_HEADER = 'X-Client-Tx-Ref';
-const STREAMING_HINTS = ['text/event-stream', 'application/x-ndjson'];
 
 const toURLString = (input: RequestInfo | URL): string => {
   if (typeof input === 'string') return input;
@@ -74,42 +73,6 @@ const getCtxIdFromHeaders = (
   return undefined;
 };
 
-const buildHeadersSummary = (
-  inputHeaders: HeadersLike,
-  initHeaders: HeadersLike,
-): Record<string, string> | undefined => {
-  const summary: Record<string, string> = {};
-  for (const key of ['content-type', 'accept', CLIENT_TX_HEADER]) {
-    const value =
-      getHeaderValue(initHeaders, key) ?? getHeaderValue(inputHeaders, key);
-    if (value) {
-      summary[key.toLowerCase()] = value;
-    }
-  }
-  return Object.keys(summary).length > 0 ? summary : undefined;
-};
-
-const isStreamingRequest = (
-  inputHeaders: HeadersLike,
-  initHeaders: HeadersLike,
-): boolean => {
-  const acceptHeader =
-    getHeaderValue(initHeaders, 'accept') ??
-    getHeaderValue(inputHeaders, 'accept');
-  if (!acceptHeader) return false;
-  return STREAMING_HINTS.some((hint) =>
-    acceptHeader.toLowerCase().includes(hint),
-  );
-};
-
-const parseAssetDecimals = (extra: unknown): number | undefined => {
-  if (!extra || typeof extra !== 'object') return undefined;
-  const maybeDecimals = (extra as Record<string, unknown>).assetDecimals;
-  return typeof maybeDecimals === 'number' && Number.isInteger(maybeDecimals)
-    ? maybeDecimals
-    : undefined;
-};
-
 const safeRecord = async (fn: () => Promise<void>) => {
   try {
     await fn();
@@ -160,7 +123,6 @@ export function createPaymentFetch(
   config?: X402Config,
 ) {
   return async (input: RequestInfo | URL, init?: RequestInit) => {
-    const requestStart = Date.now();
     const response = await fetch(input, init);
 
     if (response.status !== 402) {
@@ -186,26 +148,16 @@ export function createPaymentFetch(
 
     const parsedPaymentRequirements = processed.requirements;
 
+    // Cast `network` to satisfy current x402 type union until the lib is upgraded to include X Layer networks.
+    // Runtime behavior is unaffected; selectPaymentRequirements treats network as a string.
     const selectedPaymentRequirements = paymentRequirementsSelector(
       parsedPaymentRequirements,
-      network,
+      network as unknown as Parameters<PaymentRequirementsSelector>[1],
       'exact',
     );
 
     const ctxId = getCtxIdFromHeaders(input, init);
     const normalizedUrl = toURLString(input);
-    const headersSummary = buildHeadersSummary(
-      typeof Request !== 'undefined' && input instanceof Request
-        ? input.headers
-        : undefined,
-      init?.headers,
-    );
-    const streamHint = isStreamingRequest(
-      typeof Request !== 'undefined' && input instanceof Request
-        ? input.headers
-        : undefined,
-      init?.headers,
-    );
     const requestMethod = (
       (init?.method ??
         (typeof Request !== 'undefined' && input instanceof Request

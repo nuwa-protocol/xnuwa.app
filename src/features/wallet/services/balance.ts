@@ -1,19 +1,12 @@
-import { type Address, createPublicClient, http, parseAbi } from 'viem';
-import { base, baseSepolia } from 'viem/chains';
+import { type Address, parseAbi } from 'viem';
 import { AccountStore } from '@/features/auth/store';
 import type { ManagedAccount } from '@/features/auth/types';
-
-const network = 'base-sepolia' as const;
-
-const networkToChain = {
-  'base-sepolia': baseSepolia,
-  base: base,
-} as const;
-
-const networkToUsdcAddress = {
-  'base-sepolia': '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
-  base: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-} as const;
+import {
+  network,
+  networkToUsdcAddress,
+  publicClients,
+  type SupportedNetwork,
+} from '@/x402/x402-wallet';
 
 const getActiveAccount = (): ManagedAccount => {
   const account = AccountStore.getState().account;
@@ -27,13 +20,9 @@ const getActiveAccount = (): ManagedAccount => {
 
 const getWalletBalance = async (
   address: Address,
-  network: 'base-sepolia' | 'base',
+  network: SupportedNetwork,
 ) => {
-  const publicClient = createPublicClient({
-    chain: networkToChain['base-sepolia'],
-    transport: http(),
-  });
-  const result = await publicClient.readContract({
+  const result = await publicClients[network].readContract({
     address: networkToUsdcAddress[network],
     abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
     functionName: 'balanceOf',

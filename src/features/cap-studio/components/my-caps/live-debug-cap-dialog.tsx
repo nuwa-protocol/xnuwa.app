@@ -52,7 +52,7 @@ export function LiveDebugCapDialog({
       const response = await fetch(trimmedUrl);
       if (!response.ok) {
         throw new Error(
-          `Failed to fetch cap YAML from the provided URL (status ${response.status}).`,
+          `Failed to fetch agent YAML from the provided URL (status ${response.status}).`,
         );
       }
 
@@ -67,13 +67,13 @@ export function LiveDebugCapDialog({
         typeof fetchedIdName !== 'string' ||
         fetchedIdName.trim().length === 0
       ) {
-        toast.error('The fetched cap YAML is missing an idName field.');
+        toast.error('The fetched agent YAML is missing an idName field.');
         return;
       }
 
       if (fetchedIdName !== expectedIdName) {
         toast.error(
-          `The fetched cap idName "${fetchedIdName}" does not match the selected cap "@${expectedIdName}".`,
+          `The fetched agent idName "${fetchedIdName}" does not match the selected agent "@${expectedIdName}".`,
         );
         return;
       }
@@ -83,7 +83,7 @@ export function LiveDebugCapDialog({
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to validate the cap YAML from the provided URL.';
+          : 'Failed to validate the agent YAML from the provided URL.';
       toast.error(
         'Failed to start live debugging. Please check the URL and try again.',
       );
@@ -98,14 +98,14 @@ export function LiveDebugCapDialog({
         <DialogHeader>
           <DialogTitle>Start Live Debugging</DialogTitle>
           <DialogDescription>
-            Start live debugging for a Cap from a local Cap YAML file. Enter the
-            served URL to auto-refresh the cap while you edit the YAML file.
+            Start live debugging for an Agent from a local Agent YAML file. Enter the
+            served URL to auto-refresh the agent while you edit the YAML file.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <Label htmlFor={liveYamlInputId}>Cap YAML URL</Label>
+            <Label htmlFor={liveYamlInputId}>Agent YAML URL</Label>
             <Input
               id={liveYamlInputId}
               placeholder="http://localhost:8080/"

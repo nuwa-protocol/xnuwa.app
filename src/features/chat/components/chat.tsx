@@ -9,7 +9,7 @@ import {
   ResizablePanelGroup,
 } from '@/shared/components/ui/resizable';
 import { CurrentCapStore } from '@/shared/stores/current-cap-store';
-import type { Cap, CapArtifact } from '@/shared/types';
+import type { Cap, Artifact as CapArtifact } from '@/shared/types';
 import { useChatContext } from '../contexts/chat-context';
 import { Artifacts } from './artifacts';
 import { ChatContent } from './chat-content';

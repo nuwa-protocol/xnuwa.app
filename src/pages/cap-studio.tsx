@@ -16,13 +16,13 @@ export default function AgentStudioPage() {
       ? pathname.slice(0, -1)
       : pathname;
 
-  if (path === '/cap-studio') return <CapStudio />;
-  if (path.startsWith('/cap-studio/create')) return <CapEdit />;
-  if (path.startsWith('/cap-studio/edit/'))
+  if (path === '/agent-studio') return <CapStudio />;
+  if (path.startsWith('/agent-studio/create')) return <CapEdit />;
+  if (path.startsWith('/agent-studio/edit/'))
     return <CapEdit id={path.split('/').pop() || ''} />;
-  if (path.startsWith('/cap-studio/submit/'))
+  if (path.startsWith('/agent-studio/submit/'))
     return <Submit id={path.split('/').pop() || ''} />;
-  if (path.startsWith('/cap-studio/mcp')) return <MCPDebug />;
+  if (path.startsWith('/agent-studio/mcp')) return <MCPDebug />;
 
   // Fallback to main studio for unknown subpaths
   return <CapStudio />;

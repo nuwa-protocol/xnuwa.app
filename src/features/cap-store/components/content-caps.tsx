@@ -65,7 +65,7 @@ export function CapStoreCapsContent({
   if (error) {
     return (
       <div className="flex flex-col h-full w-full">
-        <CapStoreContentHeader showSearchAndSort={true} />
+        <CapStoreContentHeader showSearchAndSort={true} explorerUrl={explorerUrl} />
         <div className="w-full flex flex-col items-center justify-center min-h-[700px] text-center">
           <Package className="size-12 text-red-500 mb-4" />
           <h3 className="text-lg font-medium mb-2 text-red-600">
@@ -96,7 +96,7 @@ export function CapStoreCapsContent({
   if (isFetching && true) {
     return (
       <div className="flex flex-col h-full w-full">
-        <CapStoreContentHeader showSearchAndSort={true} />
+        <CapStoreContentHeader showSearchAndSort={true} explorerUrl={explorerUrl} />
         <CapStoreLoading registryAddress={registryAddress} />
       </div>
     );
@@ -105,7 +105,7 @@ export function CapStoreCapsContent({
   if (caps.length === 0) {
     return (
       <div className="flex flex-col h-full w-full">
-        <CapStoreContentHeader showSearchAndSort={true} />
+        <CapStoreContentHeader showSearchAndSort={true} explorerUrl={explorerUrl} />
         <div className="w-full flex flex-col items-center justify-center min-h-[700px] text-center">
           <Package className="size-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-2 text-muted-foreground">
@@ -118,7 +118,7 @@ export function CapStoreCapsContent({
 
   return (
     <div className="flex flex-col h-full w-full">
-      <CapStoreContentHeader showSearchAndSort={true} />
+      <CapStoreContentHeader showSearchAndSort={true} explorerUrl={explorerUrl} />
 
       {/* Caps Grid Container with ScrollArea */}
       <ScrollArea className="flex-1">
