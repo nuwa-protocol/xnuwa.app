@@ -14,7 +14,7 @@ import type { ChatPayment, ChatSelection, ChatSession } from '../types';
 export const createInitialChatSession = (chatId: string): ChatSession => {
   const { currentCap } = CurrentCapStore.getState();
   if (!currentCap) {
-    throw new Error('No current cap found');
+    throw new Error('No current agent found');
   }
   return {
     id: chatId,
