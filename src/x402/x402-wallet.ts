@@ -27,6 +27,44 @@ export const networkToUsdcAddress = {
   'x-layer': '0x0000000000000000000000000000000000000000',
 } as const;
 
+// Blockchain explorer configuration
+export const networkToExplorerBase = {
+  'x-layer-testnet': 'https://www.oklink.com/x-layer-testnet',
+  'x-layer': 'https://www.oklink.com/x-layer',
+} as const;
+
+/**
+ * Get transaction URL on blockchain explorer
+ * @param txHash Transaction hash
+ * @param network Network name (defaults to current network)
+ * @returns Transaction URL or null if txHash is invalid
+ */
+export const getTransactionUrl = (
+  txHash: string | undefined | null,
+  networkParam?: SupportedNetwork,
+): string | null => {
+  if (!txHash) return null;
+  const targetNetwork = networkParam ?? network;
+  const base = networkToExplorerBase[targetNetwork];
+  return `${base}/tx/${txHash}`;
+};
+
+/**
+ * Get address URL on blockchain explorer
+ * @param address Wallet address
+ * @param network Network name (defaults to current network)
+ * @returns Address URL or null if address is invalid
+ */
+export const getAddressUrl = (
+  address: Address | string | undefined | null,
+  networkParam?: SupportedNetwork,
+): string | null => {
+  if (!address) return null;
+  const targetNetwork = networkParam ?? network;
+  const base = networkToExplorerBase[targetNetwork];
+  return `${base}/address/${address}`;
+};
+
 export const publicClients = {
   'x-layer-testnet': createPublicClient({
     chain: networkToChain['x-layer-testnet'],

@@ -27,7 +27,6 @@ export const PromptEndpointSchema = z.object({
 // Endpoint: x402-LLM
 export const X402LlmEndpointSchema = z.object({
   name: z.literal('llm'),
-  endpoint: z.string().url(),
   gateway: z.string().optional(),
   modelId: z.string().optional(),
   providerId: z.string().optional(),

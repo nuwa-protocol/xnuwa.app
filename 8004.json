@@ -6,7 +6,7 @@
     "endpoints": [
         {
             "name": "llm",
-            "endpoint": "https://gateway.example.com/llm",
+            "gateway": "https://gateway.example.com/llm",
             "modelId": "openai/gpt-4o-mini-2024-07-18",
             "providerId": "openrouter",
             "contextLength": 128000,

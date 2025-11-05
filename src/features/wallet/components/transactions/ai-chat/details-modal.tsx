@@ -1,5 +1,3 @@
-import { formatAmount } from '@nuwa-ai/payment-kit';
-import { useState } from 'react';
 import type { PaymentTransaction } from '@/features/wallet/types';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -14,6 +12,9 @@ import {
   TableCell,
   TableRow,
 } from '@/shared/components/ui/table';
+import { getTransactionUrl } from '@/x402/x402-wallet';
+import { formatAmount } from '@nuwa-ai/payment-kit';
+import { useState } from 'react';
 
 const getAssetDecimals = (
   details: PaymentTransaction['details'] | null,
@@ -31,16 +32,18 @@ const formatCost = (details: PaymentTransaction['details'] | null) => {
   return `$${formatAmount(amount, decimals)}`;
 };
 
-// Build a BaseScan URL when a transaction hash is available
+// Get transaction explorer URL from details
 const getBaseScanUrl = (
   details: PaymentTransaction['details'] | null,
 ): string | null => {
   if (!details) return null;
   const tx = details.response?.transaction as string | undefined;
   if (!tx) return null;
-  const network = details.requirement?.network;
-  const host = network === 'base' ? 'basescan.org' : 'sepolia.basescan.org';
-  return `https://${host}/tx/${tx}`;
+  const networkParam = details.requirement?.network as
+    | 'x-layer-testnet'
+    | 'x-layer'
+    | undefined;
+  return getTransactionUrl(tx, networkParam);
 };
 
 const formatDate = (timestamp: number) => {
@@ -232,7 +235,7 @@ export function AITransactionDetailsModal({
                   <TableCell className="pl-8" colSpan={2}>
                     <Button asChild size="sm" variant="outline">
                       <a href={txUrl} target="_blank" rel="noopener noreferrer">
-                        View on BaseScan
+                        View on OKLINK
                       </a>
                     </Button>
                   </TableCell>

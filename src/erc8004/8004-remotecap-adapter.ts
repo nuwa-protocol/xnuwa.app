@@ -2,6 +2,7 @@ import {
   type Agent8004,
   type Agent8004Endpoint,
   Agent8004EndpointSchema,
+  Agent8004Schema,
   EIP8004_REGISTRATION_V1,
   type ErrorAgent8004,
 } from '@/erc8004/8004-agent';
@@ -206,12 +207,11 @@ export const agent8004ToCap = (
 };
 
 export type RemoteCapToAgentOptions = {
-  // Minimal requirement for Agent8004: must include at least one x402-LLM endpoint
-  llmEndpointUrl: string; // e.g. https://gateway.example.com/llm
-  // Optional details for the LLM endpoint
+  // Minimal requirement for Agent8004: must include at least one x402-LLM endpoint (added below)
+  // Details for the LLM endpoint
+  gateway: string; // e.g. https://gateway.example.com/llm
   modelId?: string;
   providerId?: string;
-  gateway?: string;
   contextLength?: number;
   supportedInputs?: Array<'text' | 'image' | 'file' | 'audio'>;
   parameters?: Record<string, any>;
@@ -239,9 +239,8 @@ export const remoteCapToAgent8004 = (
   // llm (required)
   const llm: any = {
     name: 'llm',
-    endpoint: opts.llmEndpointUrl,
   };
-  if (opts.gateway) llm.gateway = opts.gateway;
+  llm.gateway = opts.gateway;
   if (opts.modelId) llm.modelId = opts.modelId;
   if (opts.providerId) llm.providerId = opts.providerId;
   if (typeof opts.contextLength === 'number')
@@ -295,36 +294,41 @@ export const remoteCapToAgent8004 = (
     endpoints.push(artParsed);
   }
 
-  return {
+  const agent = Agent8004Schema.parse({
     type: EIP8004_REGISTRATION_V1,
     name: opts.name || remote.idName,
     description: opts.description || remote.metadata.description,
-    image: opts.imageUrl || remote.metadata.thumbnail || '',
+    image:
+      opts.imageUrl ||
+      remote.metadata.thumbnail ||
+      'https://example.com/placeholder.png',
     endpoints,
     registrations: opts.registrations,
     supportedTrust: opts.supportedTrust,
-  } as Agent8004; // endpoints already validated; optional arrays may be undefined
+  });
+
+  return agent;
 };
 
 // Map a Cap object from Cap Studio to a minimal-valid Agent8004 JSON
-// Note: because a Cap does not carry an LLM endpoint URL explicitly, we use
+// Note: because a Cap does not carry an LLM gateway URL explicitly, we use
 // `core.model.customGatewayUrl` if provided; otherwise we set a placeholder URL.
 export const capToAgent8004 = (cap: Cap): Agent8004 => {
   const endpoints: Agent8004Endpoint[] = [];
 
   // llm (required by 8004) — pull details from cap.core.model
   const model = cap.core?.model as any;
-  const llmEndpointUrl =
+  const llmGatewayUrl =
     model?.customGatewayUrl || 'https://gateway.example.com/llm';
   const llm: any = {
     name: 'llm',
-    endpoint: llmEndpointUrl,
     providerId: model?.providerId,
     modelId: model?.modelId,
     contextLength: model?.contextLength,
     supportedInputs: model?.supportedInputs,
     parameters: model?.parameters,
   };
+  if (llmGatewayUrl) llm.gateway = llmGatewayUrl;
   const llmParsed = Agent8004EndpointSchema.parse(llm);
   endpoints.push(llmParsed);
 
@@ -370,7 +374,7 @@ export const capToAgent8004 = (cap: Cap): Agent8004 => {
     endpoints.push(artParsed);
   }
 
-  return {
+  const agent = Agent8004Schema.parse({
     type: EIP8004_REGISTRATION_V1,
     // Prefer human-friendly display name
     name: cap.metadata?.displayName || cap.idName,
@@ -378,5 +382,7 @@ export const capToAgent8004 = (cap: Cap): Agent8004 => {
     image: cap.metadata?.thumbnail || 'https://example.com/placeholder.png',
     endpoints,
     // Optional arrays omitted by default
-  } as Agent8004;
+  });
+
+  return agent;
 };

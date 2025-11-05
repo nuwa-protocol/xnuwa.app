@@ -10,8 +10,7 @@
         },
         {
             "name": "llm",
-            "endpoint": "https://x402.x402ai.app/mcp",
-            "gateway": "",
+            "gateway": "https://x402.x402ai.app/gateway",
             "modelId": "",
             "providerId": "",
             "contextLength": 128000,
