@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!assets|og|robots\\.txt).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
