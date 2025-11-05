@@ -5,7 +5,7 @@ export function Wallet() {
   return (
     <div className="container mx-auto max-w-2xl p-6 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Wallet (Base-Sepolia Testnet)</h1>
+        <h1 className="text-3xl font-bold">Wallet (X Layer Testnet)</h1>
         <p className="text-muted-foreground">
           Check your balance and transaction history
         </p>

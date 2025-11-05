@@ -1,6 +1,3 @@
-import { Copy, Globe, WalletIcon } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
 import { AccountStore } from '@/features/auth/store';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -9,8 +6,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip';
 import { cn } from '@/shared/utils/cn';
+import { Copy, Globe, WalletIcon } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { WalletStore } from '../../stores';
 import { TestnetFaucetDialog } from '../testnet-faucet-dialog';
 import { BuyCreditsModal } from './deposit';
@@ -46,7 +51,7 @@ export function BalanceCard() {
               </div>
               <div>
                 <CardTitle className="text-lg font-semibold">Balance</CardTitle>
-                <div className='flex items-center gap-4'>
+                <div className="flex items-center gap-4">
                   {account?.address ? (
                     <div className="text-xs text-muted-foreground font-mono mt-1">
                       Account:{' '}
@@ -62,7 +67,7 @@ export function BalanceCard() {
                           navigator.clipboard.writeText(account?.address || '');
                           toast.success('Account copied to clipboard');
                         }}
-                        className='w-2 h-2'
+                        className="w-2 h-2"
                       >
                         <Copy className="w-2 h-2" />
                       </Button>
@@ -75,16 +80,18 @@ export function BalanceCard() {
                         variant="ghost"
                         size="icon"
                         onClick={() => {
-                          window.open(`https://sepolia.basescan.org/address/${account?.address}`, '_blank');
+                          window.open(
+                            `https://www.oklink.com/zh-hant/x-layer-testnet/address/${account?.address}`,
+                            '_blank',
+                          );
                         }}
-                        className='w-2 h-2'
+                        className="w-2 h-2"
                       >
                         <Globe className="w-2 h-2" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>View on BaseScan</TooltipContent>
+                    <TooltipContent>View on OKLink</TooltipContent>
                   </Tooltip>
-
                 </div>
               </div>
             </div>
@@ -109,7 +116,7 @@ export function BalanceCard() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Get Testnet USDC from Base-Sepolia Faucet
+                  Get Testnet USDC from X Layer Testnet Faucet
                 </a>
               </Button>
 

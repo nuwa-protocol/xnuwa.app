@@ -5,29 +5,35 @@ import {
   http,
   parseAbi,
 } from 'viem';
-import { base, baseSepolia } from 'viem/chains';
+import { xLayer, xLayerTestnet } from 'viem/chains';
+// Switch from Base/Base-Sepolia to X Layer/X Layer Testnet
 import { AccountStore } from '@/features/auth/store';
 import type { ManagedAccount } from '@/features/auth/types';
 
-export const network = 'base-sepolia' as const;
-
-const networkToChain = {
-  'base-sepolia': baseSepolia,
-  base: base,
+export const networkToChain = {
+  'x-layer-testnet': xLayerTestnet,
+  'x-layer': xLayer,
 } as const;
 
-const networkToUsdcAddress = {
-  'base-sepolia': '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
-  base: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+export type SupportedNetwork = keyof typeof networkToChain;
+
+// Default to X Layer Testnet by default during migration
+export const network: SupportedNetwork = 'x-layer-testnet';
+
+// TODO: Confirm USDC (6 decimals) contract addresses on X Layer mainnet & testnet.
+// Using placeholders to keep types intact; update before enabling balance calls in production.
+export const networkToUsdcAddress = {
+  'x-layer-testnet': '0xcb8bf24c6ce16ad21d707c9505421a17f2bec79d',
+  'x-layer': '0x0000000000000000000000000000000000000000',
 } as const;
 
-const publicClients = {
-  'base-sepolia': createPublicClient({
-    chain: networkToChain['base-sepolia'],
+export const publicClients = {
+  'x-layer-testnet': createPublicClient({
+    chain: networkToChain['x-layer-testnet'],
     transport: http(),
   }),
-  base: createPublicClient({
-    chain: networkToChain.base,
+  'x-layer': createPublicClient({
+    chain: networkToChain['x-layer'],
     transport: http(),
   }),
 } as const;
@@ -55,7 +61,7 @@ export const getWalletClient = () =>
 
 export const getWalletBalance = async (
   address: Address,
-  network: 'base-sepolia' | 'base',
+  network: SupportedNetwork,
 ) => {
   const result = await publicClients[network].readContract({
     address: networkToUsdcAddress[network],
